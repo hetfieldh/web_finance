@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Usuário{% endblock %}
+{% block page_title %}Adicionar Novo Usuário{% endblock %}
+
+{% block content %}
+<h2>Adicionar Novo Usuário</h2>
+<form method="POST" action="{{ url_for('usuario.adicionar_usuario') }}">
+    <div class="mb-3">
+        <label for="nome" class="form-label">Nome:</label>
+        <input type="text" class="form-control" id="nome" name="nome" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">E-mail:</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="mb-3">
+        <label for="login" class="form-label">Login:</label>
+        <input type="text" class="form-control" id="login" name="login" required>
+    </div>
+    <div class="mb-3">
+        <label for="senha" class="form-label">Senha:</label>
+        <input type="password" class="form-control" id="senha" name="senha" required>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin">
+        <label class="form-check-label" for="is_admin">É Administrador?</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Salvar Usuário</button>
+    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
