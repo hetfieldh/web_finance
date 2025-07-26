@@ -45,3 +45,5 @@ Dockerfile*.tmp
 .dockerignore
 .docker/
 docker-compose*.yml
+
+add_adm.py

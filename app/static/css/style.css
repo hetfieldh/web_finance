@@ -1,4 +1,4 @@
-/* Estilos básicos para a sidebar */
+/* Ajustes da Sidebar */
 #wrapper {
     overflow-x: hidden;
 }
@@ -6,19 +6,17 @@
 #sidebar-wrapper {
     min-height: 100vh;
     margin-left: -15rem;
-    -webkit-transition: margin .25s ease-out;
-    -moz-transition: margin .25s ease-out;
-    -o-transition: margin .25s ease-out;
     transition: margin .25s ease-out;
+    width: 14rem; 
 }
 
 #sidebar-wrapper .sidebar-heading {
+    font-size: 1.25rem; 
     padding: 0.875rem 1.25rem;
-    font-size: 1.2rem;
 }
 
 #sidebar-wrapper .list-group {
-    width: 15rem;
+    width: 100%;
 }
 
 #page-content-wrapper {
@@ -29,6 +27,7 @@
     margin-left: 0;
 }
 
+/* Media query para telas maiores */
 @media (min-width: 768px) {
     #sidebar-wrapper {
         margin-left: 0;
@@ -40,7 +39,7 @@
     }
 
     #wrapper.toggled #sidebar-wrapper {
-        margin-left: -15rem;
+        margin-left: -14rem; 
     }
 }
 
@@ -59,4 +58,106 @@ body.login-body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     background-color: #ffffff;
+}
+
+/* Estilos para botões de ação nas tabelas */
+.table-actions .btn {
+    min-width: 90px; 
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-actions .btn i {
+    margin-right: 4px; 
+}
+
+.table-actions form {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+/* --- Ajustes de Tamanho de Fonte --- */
+
+/* Base: Fonte geral do documento */
+body {
+    font-size: 0.9rem; 
+    line-height: 1.5;
+}
+
+/* Cabeçalhos */
+h1, .h1 { font-size: 2.2rem; }
+h2, .h2 { font-size: 1.8rem; }
+h3, .h3 { font-size: 1.5rem; }
+h4, .h4 { font-size: 1.3rem; }
+h5, .h5 { font-size: 1.1rem; }
+h6, .h6 { font-size: 0.95rem; }
+
+/* Tabelas */
+.table {
+    font-size: 0.85rem;
+}
+
+/* Campos de Formulário */
+.form-control,
+.form-select,
+.form-check-label {
+    font-size: 0.9rem; 
+}
+
+/* Textos de Ajuda */
+.form-text {
+    font-size: 0.75rem;
+}
+
+/* Mensagens Flash */
+.alert {
+    font-size: 0.85rem;
+}
+
+/* Título de Cards */
+.card-header h5 {
+    font-size: 1.05rem;
+}
+
+/* Links de navegação */
+.list-group-item,
+.navbar-nav .nav-link {
+    font-size: 0.95rem;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.7rem;
+    padding: 0.25em 0.5em;
+}
+
+/* --- Ajustes de Dimensões da Tabela --- */
+.table-responsive {
+    max-width: 1280px; 
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+}
+
+/* Ajustes para telas menores (responsividade) */
+@media (max-width: 767.98px) {
+    h1, .h1 { font-size: 1.8rem; }
+    h2, .h2 { font-size: 1.5rem; }
+    h3, .h3 { font-size: 1.3rem; }
+    h4, .h4 { font-size: 1.1rem; }
+    .table {
+        font-size: 0.8rem;
+    }
+    .table-actions .btn {
+        min-width: auto;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+    .table-responsive {
+        max-width: 100%;
+        padding: 0;
+    }
 }

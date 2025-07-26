@@ -1,36 +1,97 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Editar Usuário{% endblock %}
 {% block page_title %}Editar Usuário{% endblock %}
 
 {% block content %}
-<h2>Editar Usuário</h2>
-<form method="POST" action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
-    <div class="mb-3">
-        <label for="nome" class="form-label">Nome:</label>
-        <input type="text" class="form-control" id="nome" name="nome" value="{{ usuario.nome }}" required>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-3">
+                        {{ form.nome.label(class="form-label") }}
+                        {{ form.nome(class="form-control") }}
+                        {% if form.nome.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nome.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.sobrenome.label(class="form-label") }}
+                        {{ form.sobrenome(class="form-control") }}
+                        {% if form.sobrenome.errors %}
+                            <div class="text-danger">
+                                {% for error in form.sobrenome.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.login.label(class="form-label") }}
+                        {{ form.login(class="form-control") }}
+                        {% if form.login.errors %}
+                            <div class="text-danger">
+                                {% for error in form.login.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.senha.label(class="form-label") }}
+                        {{ form.senha(class="form-control", placeholder="Deixe em branco para manter a senha atual") }}
+                        <small class="form-text text-muted">Mínimo 8 caracteres, com pelo menos uma letra maiúscula e um caractere especial.</small>
+                        {% if form.senha.errors %}
+                            <div class="text-danger">
+                                {% for error in form.senha.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.confirmar_senha.label(class="form-label") }}
+                        {{ form.confirmar_senha(class="form-control", placeholder="Repita a nova senha") }}
+                        {% if form.confirmar_senha.errors %}
+                            <div class="text-danger">
+                                {% for error in form.confirmar_senha.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_active(class="form-check-input") }}
+                        {{ form.is_active.label(class="form-check-label") }}
+                        {% if form.is_active.errors %}
+                            <div class="text-danger">
+                                {% for error in form.is_active.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_admin(class="form-check-input") }}
+                        {{ form.is_admin.label(class="form-check-label") }}
+                        {% if form.is_admin.errors %}
+                            <div class="text-danger">
+                                {% for error in form.is_admin.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="email" class="form-label">E-mail:</label>
-        <input type="email" class="form-control" id="email" name="email" value="{{ usuario.email }}" required>
-    </div>
-    <div class="mb-3">
-        <label for="login" class="form-label">Login:</label>
-        <input type="text" class="form-control" id="login" name="login" value="{{ usuario.login }}" required>
-    </div>
-    <div class="mb-3">
-        <label for="senha" class="form-label">Nova Senha (opcional):</label>
-        <input type="password" class="form-control" id="senha" name="senha" placeholder="Deixe em branco para manter a senha atual">
-    </div>
-    <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if usuario.is_active %}checked{% endif %}>
-        <label class="form-check-label" for="is_active">Ativo?</label>
-    </div>
-    <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" {% if usuario.is_admin %}checked{% endif %}>
-        <label class="form-check-label" for="is_admin">É Administrador?</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Atualizar Usuário</button>
-    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 {% endblock %}

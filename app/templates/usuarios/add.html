@@ -1,32 +1,88 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Adicionar Usuário{% endblock %}
 {% block page_title %}Adicionar Novo Usuário{% endblock %}
 
 {% block content %}
-<h2>Adicionar Novo Usuário</h2>
-<form method="POST" action="{{ url_for('usuario.adicionar_usuario') }}">
-    <div class="mb-3">
-        <label for="nome" class="form-label">Nome:</label>
-        <input type="text" class="form-control" id="nome" name="nome" required>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Formulário de Cadastro de Usuário</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('usuario.adicionar_usuario') }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-3">
+                        {{ form.nome.label(class="form-label") }}
+                        {{ form.nome(class="form-control") }}
+                        {% if form.nome.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nome.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.sobrenome.label(class="form-label") }}
+                        {{ form.sobrenome(class="form-control") }}
+                        {% if form.sobrenome.errors %}
+                            <div class="text-danger">
+                                {% for error in form.sobrenome.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.login.label(class="form-label") }}
+                        {{ form.login(class="form-control") }}
+                        {% if form.login.errors %}
+                            <div class="text-danger">
+                                {% for error in form.login.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.senha.label(class="form-label") }}
+                        {{ form.senha(class="form-control") }}
+                        <small class="form-text text-muted">Mínimo 8 caracteres, com pelo menos uma letra maiúscula e um caractere especial.</small>
+                        {% if form.senha.errors %}
+                            <div class="text-danger">
+                                {% for error in form.senha.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.confirmar_senha.label(class="form-label") }}
+                        {{ form.confirmar_senha(class="form-control") }}
+                        {% if form.confirmar_senha.errors %}
+                            <div class="text-danger">
+                                {% for error in form.confirmar_senha.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_admin(class="form-check-input") }}
+                        {{ form.is_admin.label(class="form-check-label") }}
+                        {% if form.is_admin.errors %}
+                            <div class="text-danger">
+                                {% for error in form.is_admin.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {{ form.submit(class="btn btn-success") }}
+                    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="email" class="form-label">E-mail:</label>
-        <input type="email" class="form-control" id="email" name="email" required>
-    </div>
-    <div class="mb-3">
-        <label for="login" class="form-label">Login:</label>
-        <input type="text" class="form-control" id="login" name="login" required>
-    </div>
-    <div class="mb-3">
-        <label for="senha" class="form-label">Senha:</label>
-        <input type="password" class="form-control" id="senha" name="senha" required>
-    </div>
-    <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin">
-        <label class="form-check-label" for="is_admin">É Administrador?</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Salvar Usuário</button>
-    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 {% endblock %}

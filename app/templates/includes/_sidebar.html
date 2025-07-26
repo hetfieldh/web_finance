@@ -1,5 +1,7 @@
 <div class="bg-light border-right" id="sidebar-wrapper">
-    <div class="sidebar-heading">Web Finance </div>
+    <div class="sidebar-heading text-center py-4">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Web Finance" class="img-fluid" style="max-width: 120px; height: auto;"> {# Adiciona o logotipo #}
+    </div>
     <div class="list-group list-group-flush">
         <a href="{{ url_for('main.dashboard') }}" class="list-group-item list-group-item-action bg-light">Dashboard</a>
         <a href="{{ url_for('usuario.listar_usuarios') }}" class="list-group-item list-group-item-action bg-light">Usuários</a>
