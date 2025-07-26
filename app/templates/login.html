@@ -9,7 +9,10 @@
 </head>
 <body class="login-body">
     <div class="login-container">
-        <h2 class="text-center mb-4">Login - Web Finance</h2>
+        <div class="d-flex justify-content-center align-items-center mb-4">
+            <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="Logo WebFin" class="logo-login me-2">
+            <h2 class="mb-0">Web Finance</h2>
+        </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

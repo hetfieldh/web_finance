@@ -89,8 +89,8 @@ class CadastroUsuarioForm(FlaskForm):
             EqualTo("senha", message="A senha e a confirmação de senha não coincidem."),
         ],
     )
-    is_admin = BooleanField("É Administrador")
-    submit = SubmitField("Adicionar Usuário")
+    is_admin = BooleanField("Administrador")
+    submit = SubmitField("Adicionar")
 
     def validate_email(self, email):
         usuario = Usuario.query.filter_by(email=email.data).first()
@@ -167,8 +167,8 @@ class EditarUsuarioForm(FlaskForm):
         ],
     )
     is_active = BooleanField("Ativo?")
-    is_admin = BooleanField("É Administrador")
-    submit = SubmitField("Atualizar Usuário")
+    is_admin = BooleanField("Administrador")
+    submit = SubmitField("Atualizar")
 
     def __init__(self, original_email, original_login, *args, **kwargs):
         super().__init__(*args, **kwargs)

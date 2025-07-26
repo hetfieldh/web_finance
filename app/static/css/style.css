@@ -1,58 +1,73 @@
-/* Ajustes da Sidebar */
+/* --- Ajustes da Sidebar --- */
+
+/* Wrapper principal: evita rolagem horizontal */
 #wrapper {
     overflow-x: hidden;
 }
 
+/* Sidebar lateral oculta inicialmente */
 #sidebar-wrapper {
-    min-height: 100vh;
-    margin-left: -15rem;
-    transition: margin .25s ease-out;
-    width: 14rem; 
+    min-height: 100vh;           /* Altura total da viewport */
+    margin-left: -15rem;         /* Esconde a sidebar à esquerda */
+    transition: margin .25s ease-out; /* Transição suave de margem */
+    width: 14rem;                /* Largura da sidebar */
 }
 
+/* Cabeçalho da sidebar */
 #sidebar-wrapper .sidebar-heading {
-    font-size: 1.25rem; 
+    font-size: 1.25rem;
     padding: 0.875rem 1.25rem;
 }
 
+/* Lista de itens na sidebar ocupa 100% da largura */
 #sidebar-wrapper .list-group {
     width: 100%;
 }
 
+/* Área principal do conteúdo da página */
 #page-content-wrapper {
     min-width: 100vw;
 }
 
+/* Quando wrapper possui "toggled", mostra a sidebar */
 #wrapper.toggled #sidebar-wrapper {
     margin-left: 0;
 }
 
-/* Media query para telas maiores */
+/* --- Media Query para telas maiores (≥ 768px) --- */
 @media (min-width: 768px) {
+    /* Sidebar visível por padrão */
     #sidebar-wrapper {
         margin-left: 0;
     }
 
+    /* Ajusta o conteúdo para preencher a largura */
     #page-content-wrapper {
         min-width: 0;
         width: 100%;
     }
 
+    /* Quando toggled, oculta a sidebar */
     #wrapper.toggled #sidebar-wrapper {
-        margin-left: -14rem; 
+        margin-left: -14rem;
     }
 }
 
-/* Estilos para a página de login */
+/* --- Estilos para a página de login --- */
+
+/* Corpo com conteúdo centralizado vertical e horizontalmente */
 body.login-body {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f8f9fa;
+    background-color: #323232;
 }
+
+/* Container do formulário de login */
 .login-container {
     max-width: 400px;
+    min-width: 300px;
     padding: 20px;
     border: 1px solid #dee2e6;
     border-radius: 8px;
@@ -60,20 +75,27 @@ body.login-body {
     background-color: #ffffff;
 }
 
-/* Estilos para botões de ação nas tabelas */
+/* Logotipo na página de login */
+.logo-login {
+    max-height: 50px;
+    width: auto;
+}
+
+/* --- Estilos para botões de ação nas tabelas --- */
+
+/* Botões de ação dentro das tabelas */
 .table-actions .btn {
-    min-width: 90px; 
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
+    min-width: 0.6px;
+    height: 20px;
+    font-size: 0.7rem;
+    padding: 0.01rem 0.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    margin-right: 0px;
 }
 
-.table-actions .btn i {
-    margin-right: 4px; 
-}
-
+/* Formulários dentro das ações da tabela */
 .table-actions form {
     display: inline-block;
     margin-bottom: 0;
@@ -81,13 +103,13 @@ body.login-body {
 
 /* --- Ajustes de Tamanho de Fonte --- */
 
-/* Base: Fonte geral do documento */
+/* Fonte base do corpo */
 body {
-    font-size: 0.9rem; 
+    font-size: 0.9rem;
     line-height: 1.5;
 }
 
-/* Cabeçalhos */
+/* Tamanhos dos cabeçalhos */
 h1, .h1 { font-size: 2.2rem; }
 h2, .h2 { font-size: 1.8rem; }
 h3, .h3 { font-size: 1.5rem; }
@@ -95,67 +117,108 @@ h4, .h4 { font-size: 1.3rem; }
 h5, .h5 { font-size: 1.1rem; }
 h6, .h6 { font-size: 0.95rem; }
 
-/* Tabelas */
+/* Fonte para tabelas */
 .table {
-    font-size: 0.85rem;
-}
-
-/* Campos de Formulário */
-.form-control,
-.form-select,
-.form-check-label {
-    font-size: 0.9rem; 
-}
-
-/* Textos de Ajuda */
-.form-text {
     font-size: 0.75rem;
 }
 
-/* Mensagens Flash */
+/* Altura e espaçamento interno das células da tabela */
+.table td,
+.table th {
+    padding: 0.1rem 0.2rem;
+    height: 20px;
+    vertical-align: middle;
+}
+
+/* Fontes para campos de formulário */
+.form-control,
+.form-select {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    height: calc(1.5em + 0.5rem + 2px);
+}
+
+.form-check-label {
+    font-size: 0.85rem;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    margin-bottom: -0.2rem; /* AJUSTADO: Margem negativa para aproximar mais */
+    padding-bottom: 0; /* Garante que não há padding extra */
+    line-height: 1; /* Reduz a altura da linha para o rótulo */
+}
+
+/* Texto auxiliar em formulários */
+.form-text {
+    font-size: 0.7rem;
+}
+
+/* Fontes para mensagens flash */
 .alert {
     font-size: 0.85rem;
 }
 
-/* Título de Cards */
+/* Título nos cabeçalhos dos cards */
 .card-header h5 {
     font-size: 1.05rem;
 }
 
-/* Links de navegação */
+/* Links em listas de navegação e navbar */
 .list-group-item,
 .navbar-nav .nav-link {
     font-size: 0.95rem;
 }
 
-/* Badges */
+/* Estilo para badges */
 .badge {
     font-size: 0.7rem;
     padding: 0.25em 0.5em;
 }
 
 /* --- Ajustes de Dimensões da Tabela --- */
+
+/* Container responsivo para tabelas */
 .table-responsive {
-    max-width: 1280px; 
+    max-width: 1280px;
     margin-left: auto;
     margin-right: auto;
     padding: 0 15px;
 }
 
-/* Ajustes para telas menores (responsividade) */
+/* Botão genérico "Adicionar" */
+.btn-add {
+    font-size: 0.9rem !important;
+    padding: 0.2rem 1rem !important;
+}
+
+/* Espaço entre ícone e texto no botão "Adicionar" */
+.btn-add i {
+    margin-right: 1px;
+}
+
+
+/* --- Responsividade para telas menores (≤ 767.98px) --- */
 @media (max-width: 767.98px) {
+    /* Redução dos tamanhos dos cabeçalhos */
     h1, .h1 { font-size: 1.8rem; }
     h2, .h2 { font-size: 1.5rem; }
     h3, .h3 { font-size: 1.3rem; }
     h4, .h4 { font-size: 1.1rem; }
+
+    /* Fonte maior para tabelas em telas pequenas */
     .table {
         font-size: 0.8rem;
     }
+
+    /* Botões de ação menores em telas pequenas */
     .table-actions .btn {
         min-width: auto;
         font-size: 0.7rem;
         padding: 0.2rem 0.4rem;
     }
+
+    /* Remove padding e ajusta largura máxima da tabela responsiva */
     .table-responsive {
         max-width: 100%;
         padding: 0;
