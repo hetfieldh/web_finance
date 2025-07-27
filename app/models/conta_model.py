@@ -6,8 +6,10 @@ from sqlalchemy import Enum, UniqueConstraint, Numeric
 
 
 class Conta(db.Model):
+    # Define o nome da tabela no banco de dados
     __tablename__ = "conta"
 
+    # Definição das colunas da tabela
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     nome_banco = db.Column(db.String(100), nullable=False)
@@ -28,14 +30,17 @@ class Conta(db.Model):
     )
 
     saldo_inicial = db.Column(Numeric(12, 2), nullable=False)
+    saldo_atual = db.Column(Numeric(12, 2), nullable=False)
     limite = db.Column(Numeric(12, 2), nullable=True)
     ativa = db.Column(db.Boolean, nullable=False, default=True)
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
+    # Relacionamento com o modelo Usuario
     usuario = db.relationship("Usuario", backref=db.backref("contas", lazy=True))
 
+    # Define um índice único composto
     __table_args__ = (
         UniqueConstraint(
             "usuario_id",

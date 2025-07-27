@@ -92,7 +92,7 @@ class CadastroContaForm(FlaskForm):
         default=0.00,
     )
     ativa = BooleanField("Conta Ativa", default=True)
-    submit = SubmitField("Adicionar")
+    submit = SubmitField("Adicionar Conta")
 
     def validate(self, extra_validators=None):
         initial_validation = super().validate(extra_validators)
@@ -192,7 +192,7 @@ class EditarContaForm(FlaskForm):
         places=2,
     )
     ativa = BooleanField("Conta Ativa")
-    submit = SubmitField("Atualizar")
+    submit = SubmitField("Atualizar Conta")
 
     def __init__(
         self,

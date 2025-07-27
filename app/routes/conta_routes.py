@@ -14,12 +14,12 @@ import functools
 from app import db
 from app.models.conta_model import Conta
 from app.forms.conta_forms import CadastroContaForm, EditarContaForm
+from sqlalchemy.exc import IntegrityError
+from decimal import Decimal
 
-# Cria um Blueprint para as rotas de contas bancárias
 conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
 
 
-# Rota para listar todas as contas do usuário logado
 @conta_bp.route("/")
 @login_required
 def listar_contas():
@@ -27,7 +27,6 @@ def listar_contas():
     return render_template("contas/list.html", contas=contas)
 
 
-# Rota para adicionar uma nova conta bancária
 @conta_bp.route("/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_conta():
@@ -55,11 +54,8 @@ def adicionar_conta():
                 "Você já possui uma conta com este banco, agência, número e tipo.",
                 "danger",
             )
-            return render_template(
-                "contas/add.html", form=form
-            )  # Renderiza o formulário novamente com a mensagem
+            return render_template("contas/add.html", form=form)
 
-        # Cria uma nova instância de Conta
         nova_conta = Conta(
             usuario_id=current_user.id,
             nome_banco=nome_banco,
@@ -67,6 +63,7 @@ def adicionar_conta():
             conta=conta_num,
             tipo=tipo,
             saldo_inicial=saldo_inicial,
+            saldo_atual=saldo_inicial,
             limite=limite,
             ativa=ativa,
         )
@@ -81,7 +78,6 @@ def adicionar_conta():
     return render_template("contas/add.html", form=form)
 
 
-# Rota para editar uma conta bancária existente
 @conta_bp.route("/editar/<int:id>", methods=["GET", "POST"])
 @login_required
 def editar_conta(id):
@@ -95,6 +91,25 @@ def editar_conta(id):
     )
 
     if form.validate_on_submit():
+        if not form.ativa.data and Decimal(str(conta.saldo_atual)) != Decimal("0.00"):
+            flash(
+                "Não é possível inativar a conta. O saldo atual deve ser zero para inativação.",
+                "danger",
+            )
+            form.nome_banco.data = conta.nome_banco
+            form.agencia.data = conta.agencia
+            form.conta.data = conta.conta
+            form.tipo.data = conta.tipo
+            form.saldo_inicial.data = conta.saldo_inicial
+            form.limite.data = conta.limite
+            form.ativa.data = conta.ativa
+            return render_template("contas/edit.html", form=form, conta=conta)
+
+        conta.nome_banco = form.nome_banco.data.strip().upper()
+        conta.agencia = form.agencia.data.strip()
+        conta.conta = form.conta.data.strip()
+        conta.saldo_inicial = form.saldo_inicial.data
+
         conta.tipo = conta.tipo
 
         conta.limite = form.limite.data
@@ -119,11 +134,24 @@ def editar_conta(id):
     return render_template("contas/edit.html", form=form, conta=conta)
 
 
-# Rota para excluir uma conta bancária
 @conta_bp.route("/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_conta(id):
     conta = Conta.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
+
+    # Antes de excluir, verificar se há movimentações associadas
+    # CORRIGIDO: Usando len() para verificar o tamanho da coleção
+    if len(conta.movimentos) > 0:
+        flash(
+            "Não é possível excluir a conta. Existem movimentações associadas a ela.",
+            "danger",
+        )
+        return redirect(url_for("conta.listar_contas"))
+
+    # Se a conta não tiver saldo zero, não permitir exclusão
+    if Decimal(str(conta.saldo_atual)) != Decimal("0.00"):
+        flash("Não é possível excluir a conta. O saldo atual deve ser zero.", "danger")
+        return redirect(url_for("conta.listar_contas"))
 
     db.session.delete(conta)
     db.session.commit()

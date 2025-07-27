@@ -9,14 +9,14 @@
 <div class="row">
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
-            <div class="card-header bg-black text-white">
+            <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Formulário de Registro de Movimentação</h5>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('conta_movimento.adicionar_movimentacao') }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1"> 
+                    <div class="mb-1">
                         {{ form.conta_id.label(class="form-label") }}
                         {{ form.conta_id(class="form-select") }}
                         {% if form.conta_id.errors %}
@@ -61,7 +61,30 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3"> 
+                    
+                    {# NOVO: Checkbox de Transferência inter contas #}
+                    <div class="mb-1 form-check">
+                        {{ form.is_transferencia(class="form-check-input") }}
+                        {{ form.is_transferencia.label(class="form-check-label") }}
+                        {% if form.is_transferencia.errors %}
+                            <div class="text-danger">
+                                {% for error in form.is_transferencia.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# NOVO: Campo de Conta de Destino (visibilidade controlada por JS) #}
+                    <div class="mb-1" id="conta_destino_field" style="display: none;"> {# Inicialmente oculto #}
+                        {{ form.conta_destino_id.label(class="form-label") }}
+                        {{ form.conta_destino_id(class="form-select") }}
+                        {% if form.conta_destino_id.errors %}
+                            <div class="text-danger">
+                                {% for error in form.conta_destino_id.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3"> {# Espaçamento final antes dos botões #}
                     </div>
                     {{ form.submit(class="btn btn-success btn-add") }}
                     <a href="{{ url_for('conta_movimento.listar_movimentacoes') }}" class="btn btn-secondary btn-add">Cancelar</a>
@@ -70,4 +93,30 @@
         </div>
     </div>
 </div>
+
+{# Script para controlar a visibilidade do campo conta_destino_id #}
+{% endblock %} {# FECHA O BLOCO CONTENT AQUI #}
+
+{% block scripts %} {# ABRE O BLOCO SCRIPTS AQUI #}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const isTransferenciaCheckbox = document.getElementById('is_transferencia');
+        const contaDestinoField = document.getElementById('conta_destino_field');
+
+        function toggleContaDestinoField() {
+            if (isTransferenciaCheckbox.checked) {
+                contaDestinoField.style.display = 'block';
+            } else {
+                contaDestinoField.style.display = 'none';
+            }
+        }
+
+        // Adiciona listener para o checkbox
+        if (isTransferenciaCheckbox) {
+            isTransferenciaCheckbox.addEventListener('change', toggleContaDestinoField);
+            // Chama a função uma vez ao carregar a página para definir o estado inicial
+            toggleContaDestinoField();
+        }
+    });
+</script>
 {% endblock %}

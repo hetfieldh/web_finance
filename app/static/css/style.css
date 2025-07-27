@@ -146,7 +146,7 @@ h6, .h6 { font-size: 0.95rem; }
 
 /* Texto auxiliar em formulários */
 .form-text {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 /* Fontes para mensagens flash */
@@ -182,12 +182,29 @@ h6, .h6 { font-size: 0.95rem; }
 
 /* Remover borda inferior dos itens de submenu */
 .collapse.list-group-flush .list-group-item {
-    border-bottom: none !important;
+    border-bottom: none !important; /* Adicionado !important para forçar a remoção da borda */
 }
 
 /* Estilo para ícones dentro de submenus */
 .collapse.list-group-flush .list-group-item i {
-    color: #007515 !important;
+    color: #007bff !important; /* Adicionado !important para forçar a cor do ícone */
+}
+
+/* NOVO: Estilos para o destaque do Saldo Final no extrato */
+.saldo-positivo-box {
+    background-color: #d4edda; /* Cor de fundo verde sutil (similar ao bg-success-subtle) */
+    border: 1px solid #28a745; /* Borda verde */
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+}
+
+.saldo-negativo-box {
+    background-color: #f8d7da; /* Cor de fundo vermelha sutil (similar ao bg-danger-subtle) */
+    border: 1px solid #dc3545; /* Borda vermelha */
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
 }
 
 

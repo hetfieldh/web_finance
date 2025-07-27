@@ -12,6 +12,7 @@ from flask import (
 from flask_login import login_required, current_user
 from app import db
 from app.models.conta_transacao_model import ContaTransacao
+from app.models.conta_movimento_model import ContaMovimento
 from app.forms.conta_transacao_forms import (
     CadastroContaTransacaoForm,
     EditarContaTransacaoForm,
@@ -95,6 +96,13 @@ def excluir_tipo_transacao(id):
     tipo_transacao = ContaTransacao.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
+
+    if len(tipo_transacao.movimentos) > 0:
+        flash(
+            "Não é possível excluir este tipo de transação. Existem movimentações associadas a ele.",
+            "danger",
+        )
+        return redirect(url_for("conta_transacao.listar_tipos_transacao"))
 
     db.session.delete(tipo_transacao)
     db.session.commit()

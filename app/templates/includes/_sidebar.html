@@ -33,9 +33,20 @@
         </a>
         <div class="collapse list-group-flush" id="submenuMovimentacoes">
             <a href="{{ url_for('conta_movimento.listar_movimentacoes') }}" class="list-group-item list-group-item-action bg-light ps-4">
-                <i class="fas fa-file-invoice-dollar me-2"></i>Bancárias
+                <i class="fas fa-file-invoice-dollar me-2"></i>Lançamentos
             </a>
         </div>
+
+        <!-- Menu "Extratos" com submenus -->
+        <a href="#submenuExtratos" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">
+            <i class="fas fa-file-alt me-2"></i>Extratos
+        </a>
+        <div class="collapse list-group-flush" id="submenuExtratos">
+            <a href="{{ url_for('extrato.extrato_bancario') }}" class="list-group-item list-group-item-action bg-light ps-4">
+                <i class="fas fa-university me-2"></i>Bancário
+            </a>
+        </div>
+        <!-- FIM do menu "Extratos" -->
 
         <!-- Links gerais de navegação -->
         <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-light text-danger">
