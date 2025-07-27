@@ -16,8 +16,8 @@ login_manager = LoginManager()
 
 
 def create_app():
-    # Importa a classe Config AQUI DENTRO, para garantir a ordem de carregamento
-    from config import Config  # MOVIDO PARA AQUI
+    # Importa a classe Config
+    from config import Config
 
     # Cria a instância da aplicação Flask
     app = Flask(__name__)
@@ -35,6 +35,7 @@ def create_app():
 
     # Importa o modelo de usuário para que o Flask-Login e Alembic o detectem
     from app.models.usuario_model import Usuario
+    from app.models.conta_model import Conta
 
     # Função user_loader para o Flask-Login carregar usuários da sessão
     @login_manager.user_loader
@@ -45,10 +46,12 @@ def create_app():
     from app.routes.usuario_routes import usuario_bp
     from app.routes.auth_routes import auth_bp
     from app.routes.main_routes import main_bp
+    from app.routes.conta_routes import conta_bp
 
     app.register_blueprint(usuario_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(conta_bp)
 
     # Rota raiz que redireciona para o dashboard
     @app.route("/")
@@ -114,4 +117,3 @@ def create_app():
         return render_template("500.html"), 500
 
     return app
-    

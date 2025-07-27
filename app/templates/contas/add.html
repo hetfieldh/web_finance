@@ -1,0 +1,91 @@
+<!--- app/templates/contas/add.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Adicionar Conta Bancária{% endblock %}
+{% block page_title %}Adicionar Nova Conta Bancária{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Formulário de Cadastro de Conta Bancária</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('conta.adicionar_conta') }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-1">
+                        {{ form.nome_banco.label(class="form-label") }}
+                        {{ form.nome_banco(class="form-control") }}
+                        {% if form.nome_banco.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nome_banco.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
+                        {{ form.agencia.label(class="form-label") }}
+                        {{ form.agencia(class="form-control") }}
+                        {% if form.agencia.errors %}
+                            <div class="text-danger">
+                                {% for error in form.agencia.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
+                        {{ form.conta.label(class="form-label") }}
+                        {{ form.conta(class="form-control") }}
+                        {% if form.conta.errors %}
+                            <div class="text-danger">
+                                {% for error in form.conta.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
+                        {{ form.tipo.label(class="form-label") }}
+                        {{ form.tipo(class="form-select") }}
+                        {% if form.tipo.errors %}
+                            <div class="text-danger">
+                                {% for error in form.tipo.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
+                        {{ form.saldo_inicial.label(class="form-label") }}
+                        {{ form.saldo_inicial(class="form-control", type="number", step="0.01") }}
+                        {% if form.saldo_inicial.errors %}
+                            <div class="text-danger">
+                                {% for error in form.saldo_inicial.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
+                        {{ form.limite.label(class="form-label") }}
+                        {{ form.limite(class="form-control", type="number", step="0.01", placeholder="Opcional") }}
+                        {% if form.limite.errors %}
+                            <div class="text-danger">
+                                {% for error in form.limite.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1 form-check">
+                        {{ form.ativa(class="form-check-input") }}
+                        {{ form.ativa.label(class="form-check-label") }}
+                        {% if form.ativa.errors %}
+                            <div class="text-danger">
+                                {% for error in form.ativa.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                    </div>
+                    {{ form.submit(class="btn btn-success btn-add") }}
+                    <a href="{{ url_for('conta.listar_contas') }}" class="btn btn-secondary btn-add">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -48,8 +48,8 @@ class CadastroUsuarioForm(FlaskForm):
             DataRequired("O campo nome é obrigatório."),
             Length(min=3, max=50, message="O nome deve ter entre 3 e 50 caracteres."),
             Regexp(
-                r"^[a-zA-ZÀ-ÿ\s'\-]+$",
-                message="O nome contém caracteres inválidos. Use apenas letras, espaços, hífens ou apóstrofos.",
+                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",  # Não permite múltiplos espaços
+                message="O nome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
     )
@@ -62,8 +62,8 @@ class CadastroUsuarioForm(FlaskForm):
                 min=3, max=50, message="O sobrenome deve ter entre 3 e 50 caracteres."
             ),
             Regexp(
-                r"^[a-zA-ZÀ-ÿ\s'\-]+$",
-                message="O sobrenome contém caracteres inválidos. Use apenas letras, espaços, hífens ou apóstrofos.",
+                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",  # Não permite múltiplos espaços
+                message="O sobrenome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
     )
@@ -133,8 +133,8 @@ class EditarUsuarioForm(FlaskForm):
             DataRequired("O campo nome é obrigatório."),
             Length(min=3, max=50, message="O nome deve ter entre 3 e 50 caracteres."),
             Regexp(
-                r"^[a-zA-ZÀ-ÿ\s'\-]+$",
-                message="O nome contém caracteres inválidos. Use apenas letras, espaços, hífens ou apóstrofos.",
+                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",  # Não permite múltiplos espaços
+                message="O nome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
     )
@@ -147,8 +147,8 @@ class EditarUsuarioForm(FlaskForm):
                 min=3, max=50, message="O sobrenome deve ter entre 3 e 50 caracteres."
             ),
             Regexp(
-                r"^[a-zA-ZÀ-ÿ\s'\-]+$",
-                message="O sobrenome contém caracteres inválidos. Use apenas letras, espaços, hífens ou apóstrofos.",
+                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",  # Não permite múltiplos espaços
+                message="O sobrenome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
     )
