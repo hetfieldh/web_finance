@@ -139,26 +139,14 @@ h6, .h6 { font-size: 0.95rem; }
 
 /* Fontes para campos de formulário */
 .form-control,
-.form-select {
-    font-size: 0.85rem;
-    padding: 0.25rem 0.5rem;
-    height: calc(1.5em + 0.5rem + 2px);
-}
-
+.form-select,
 .form-check-label {
-    font-size: 0.85rem;
-}
-
-.form-label {
-    font-size: 0.85rem;
-    margin-bottom: -0.2rem; /* Margem negativa para aproximar o rótulo */
-    padding-bottom: 0; /* Garante que não há padding extra */
-    line-height: 1; /* Reduz a altura da linha para o rótulo */
+    font-size: 0.9rem;
 }
 
 /* Texto auxiliar em formulários */
 .form-text {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
 }
 
 /* Fontes para mensagens flash */
@@ -172,7 +160,7 @@ h6, .h6 { font-size: 0.95rem; }
 }
 
 /* Links em listas de navegação e navbar */
-.list-group-item { /* Ajustado: Seleciona todos os itens da lista de grupo */
+.list-group-item {
     font-size: 0.9rem; /* Fonte ligeiramente menor para todos os itens do sidebar */
 }
 .navbar-nav .nav-link {
@@ -186,10 +174,20 @@ h6, .h6 { font-size: 0.95rem; }
     padding: 0.25em 0.5em;
 }
 
-/* NOVO: Estilo para a informação do usuário logado no sidebar */
+/* Estilo para a informação do usuário logado no sidebar */
 .logged-in-user-info {
     font-size: 0.7rem; /* Fonte ainda menor para o info do usuário */
     color: #555; /* Uma cor um pouco mais escura para contraste */
+}
+
+/* Remover borda inferior dos itens de submenu */
+.collapse.list-group-flush .list-group-item {
+    border-bottom: none !important;
+}
+
+/* Estilo para ícones dentro de submenus */
+.collapse.list-group-flush .list-group-item i {
+    color: #007515 !important;
 }
 
 

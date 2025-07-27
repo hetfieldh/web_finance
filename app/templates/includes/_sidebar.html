@@ -1,4 +1,4 @@
-<!--- app/templates/includes/_sidebar.html -->
+<!-- app/templates/includes/_sidebar.html -->
 
 <div class="bg-light border-right" id="sidebar-wrapper">
     <!-- Seção do cabeçalho da sidebar com o logotipo -->
@@ -14,18 +14,30 @@
             <i class="fas fa-tachometer-alt me-2"></i>Dashboard
         </a>
 
+        <!-- Menu "Cadastro" -->
         <a href="#submenuCadastro" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">
             <i class="fas fa-folder me-2"></i>Cadastro
         </a>
         <div class="collapse list-group-flush" id="submenuCadastro">
-            <a href="{{ url_for('usuario.listar_usuarios') }}" class="list-group-item list-group-item-action bg-light ps-5">
+            <a href="{{ url_for('usuario.listar_usuarios') }}" class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-users me-2"></i>Usuários
             </a>
-            <a href="{{ url_for('conta.listar_contas') }}" class="list-group-item list-group-item-action bg-light ps-5">
+            <a href="{{ url_for('conta.listar_contas') }}" class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-wallet me-2"></i>Contas Bancárias
             </a>
         </div>
 
+        <!-- Menu "Movimentações" -->
+        <a href="#submenuMovimentacoes" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">
+            <i class="fas fa-exchange-alt me-2"></i>Movimentações
+        </a>
+        <div class="collapse list-group-flush" id="submenuMovimentacoes">
+            <a href="#" class="list-group-item list-group-item-action bg-light ps-4">
+                <i class="fas fa-file-invoice-dollar me-2"></i>Lançamentos
+            </a>
+        </div>
+
+        <!-- Links gerais de navegação -->
         <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-light text-danger">
             <i class="fas fa-sign-out-alt me-2"></i>Sair
         </a>
