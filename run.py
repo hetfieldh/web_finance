@@ -4,7 +4,7 @@ import os
 from app import create_app
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente
+# Garante que as variáveis de ambiente do .env sejam carregadas
 load_dotenv()
 
 # Cria a instância da aplicação Flask

@@ -1,4 +1,4 @@
-# app/templates/usuarios/list.html
+<!--- app/templates/usuarios/list.html -->
 
 {% extends "base.html" %}
 
@@ -75,12 +75,12 @@
                                 <td class="table-actions">
                                     <!-- Botão de Editar -->
                                     <a href="{{ url_for('usuario.editar_usuario', id=usuario.id) }}" class="btn btn-warning me-2" title="Editar">
-                                        <i class="fas fa-edit"></i>Editar
+                                        <i class="fas fa-edit"></i> Editar
                                     </a>
                                     <!-- Formulário para Excluir (com confirmação via JS) -->
                                     <form action="{{ url_for('usuario.excluir_usuario', id=usuario.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
                                         <button type="submit" class="btn btn-danger" title="Excluir">
-                                            <i class="fas fa-trash-alt"></i>Excluir
+                                            <i class="fas fa-trash-alt"></i> Excluir
                                         </button>
                                     </form>
                                 </td>

@@ -1,6 +1,6 @@
 # app/__init__.py
 
-from flask import Config, Flask, redirect, render_template, url_for, request
+from flask import Flask, redirect, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -16,6 +16,9 @@ login_manager = LoginManager()
 
 
 def create_app():
+    # Importa a classe Config AQUI DENTRO, para garantir a ordem de carregamento
+    from config import Config  # MOVIDO PARA AQUI
+
     # Cria a instância da aplicação Flask
     app = Flask(__name__)
     # Carrega as configurações da classe Config
@@ -111,3 +114,4 @@ def create_app():
         return render_template("500.html"), 500
 
     return app
+    
