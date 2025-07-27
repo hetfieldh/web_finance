@@ -1,6 +1,4 @@
-/* app/static/css/style.css */
-
-/* Ajustes da Sidebar */
+/* --- Ajustes da Sidebar --- */
 
 /* Wrapper principal: evita rolagem horizontal */
 #wrapper {
@@ -19,7 +17,7 @@
 
 /* Cabeçalho da sidebar */
 #sidebar-wrapper .sidebar-heading {
-    font-size: 1.25rem;
+    font-size: 1.2rem; /* Ajustado: Fonte um pouco menor para o cabeçalho da sidebar */
     padding: 0.875rem 1.25rem;
 }
 
@@ -38,7 +36,7 @@
     margin-left: 0;
 }
 
-/* Media Query para telas maiores (≥ 768px) */
+/* --- Media Query para telas maiores (≥ 768px) --- */
 @media (min-width: 768px) {
     /* Sidebar visível por padrão */
     #sidebar-wrapper {
@@ -57,7 +55,7 @@
     }
 }
 
-/* Estilos para a página de login */
+/* --- Estilos para a página de login --- */
 
 /* Corpo com conteúdo centralizado vertical e horizontalmente */
 body.login-body {
@@ -85,7 +83,7 @@ body.login-body {
     width: auto;
 }
 
-/* Estilos para botões de ação nas tabelas */
+/* --- Estilos para botões de ação nas tabelas --- */
 
 /* Botões de ação dentro das tabelas */
 .table-actions .btn {
@@ -105,7 +103,7 @@ body.login-body {
     margin-bottom: 0;
 }
 
-/* Ajustes de Tamanho de Fonte */
+/* --- Ajustes de Tamanho de Fonte --- */
 
 /* Fonte base do corpo */
 body {
@@ -174,10 +172,13 @@ h6, .h6 { font-size: 0.95rem; }
 }
 
 /* Links em listas de navegação e navbar */
-.list-group-item,
-.navbar-nav .nav-link {
-    font-size: 0.95rem;
+.list-group-item { /* Ajustado: Seleciona todos os itens da lista de grupo */
+    font-size: 0.9rem; /* Fonte ligeiramente menor para todos os itens do sidebar */
 }
+.navbar-nav .nav-link {
+    font-size: 0.95rem; /* Mantido para links da navbar superior */
+}
+
 
 /* Estilo para badges */
 .badge {
@@ -185,7 +186,14 @@ h6, .h6 { font-size: 0.95rem; }
     padding: 0.25em 0.5em;
 }
 
-/* Ajustes de Dimensões da Tabela */
+/* NOVO: Estilo para a informação do usuário logado no sidebar */
+.logged-in-user-info {
+    font-size: 0.7rem; /* Fonte ainda menor para o info do usuário */
+    color: #555; /* Uma cor um pouco mais escura para contraste */
+}
+
+
+/* --- Ajustes de Dimensões da Tabela --- */
 
 /* Container responsivo para tabelas */
 .table-responsive {
@@ -207,7 +215,7 @@ h6, .h6 { font-size: 0.95rem; }
 }
 
 
-/* Responsividade para telas menores (≤ 767.98px) */
+/* --- Responsividade para telas menores (≤ 767.98px) --- */
 @media (max-width: 767.98px) {
     /* Redução dos tamanhos dos cabeçalhos */
     h1, .h1 { font-size: 1.8rem; }

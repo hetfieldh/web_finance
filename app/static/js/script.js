@@ -15,3 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Exibe a data atual
+document.addEventListener("DOMContentLoaded", function () {
+    const dataAtual = new Date();
+
+    const opcoes = {
+        weekday: 'long', // dia da semana por extenso
+        day: 'numeric',
+        month: 'long',   // mês por extenso
+        year: 'numeric'
+    };
+
+    const formatoElegante = new Intl.DateTimeFormat('pt-BR', opcoes).format(dataAtual);
+
+    const elemento = document.getElementById("data-atual");
+
+    if (elemento) {
+        // Capitaliza a primeira letra do dia da semana (opcional, por estética)
+        const frase = formatoElegante.charAt(0).toUpperCase() + formatoElegante.slice(1);
+        elemento.innerText = frase;
+    }
+});

@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-dark text-white">
                 <h5 class="mb-0">Formulário de Cadastro de Tipo de Transação</h5>
             </div>
             <div class="card-body">
@@ -34,7 +34,7 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3"> {# Espaçamento final antes dos botões #}
+                    <div class="mb-3">
                     </div>
                     {{ form.submit(class="btn btn-success btn-add") }}
                     <a href="{{ url_for('conta_transacao.listar_tipos_transacao') }}" class="btn btn-secondary btn-add">Cancelar</a>

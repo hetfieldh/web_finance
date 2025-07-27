@@ -31,7 +31,7 @@ class CadastroContaTransacaoForm(FlaskForm):
         choices=TIPOS_MOVIMENTO,
         validators=[DataRequired("O tipo de movimento é obrigatório.")],
     )
-    submit = SubmitField("Adicionar Tipo de Transação")
+    submit = SubmitField("Adicionar")
 
     def validate_transacao_tipo(self, field):
         existing_transacao_tipo = ContaTransacao.query.filter_by(
@@ -81,7 +81,7 @@ class EditarContaTransacaoForm(FlaskForm):
         validators=[Optional()],
         render_kw={"disabled": True},
     )
-    submit = SubmitField("Atualizar Tipo de Transação")
+    submit = SubmitField("Atualizar")
 
     def __init__(self, original_transacao_tipo, original_tipo, *args, **kwargs):
         super().__init__(*args, **kwargs)
