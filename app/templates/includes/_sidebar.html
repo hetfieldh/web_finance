@@ -1,13 +1,24 @@
+# app/templates/includes/_sidebar.html
+
 <div class="bg-light border-right" id="sidebar-wrapper">
+    <!-- Seção do cabeçalho da sidebar com o logotipo -->
     <div class="sidebar-heading text-center py-4">
         <a href="{{ url_for('main.dashboard') }}">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Web Finance"
                  class="img-fluid" style="max-width: 120px; height: auto;">
         </a>
     </div>
+    <!-- Grupo de links de navegação na sidebar -->
     <div class="list-group list-group-flush">
         <a href="{{ url_for('main.dashboard') }}" class="list-group-item list-group-item-action bg-light">Dashboard</a>
         <a href="{{ url_for('usuario.listar_usuarios') }}" class="list-group-item list-group-item-action bg-light">Usuários</a>
-        <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-light text-danger mt-auto">Sair</a>
+        <!-- Links futuros para outras seções podem ser adicionados aqui -->
+        <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-light text-danger">Sair</a>
     </div>
+    <!-- Informação do usuário logado, exibida no rodapé do sidebar se o usuário estiver autenticado -->
+    {% if current_user.is_authenticated %}
+    <div class="list-group-item bg-light text-secondary mt-auto py-2 px-2 text-left extra-small"> 
+        Usuário: <strong>{{ current_user.login }}</strong>
+    </div>
+    {% endif %}
 </div>

@@ -1,3 +1,5 @@
+# app/templates/usuarios/edit.html
+
 {% extends "base.html" %}
 
 {% block title %}Editar Usuário{% endblock %}
@@ -6,14 +8,20 @@
 {% block content %}
 <div class="row">
     <div class="col-md-8 mx-auto">
+        <!-- Card principal para o formulário de edição de usuário -->
         <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
+            <!-- Cabeçalho do card com título e nome do usuário -->
+            <div class="card-header bg-warning text-white">
                 <h5 class="mb-0">Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}</h5>
             </div>
+            <!-- Corpo do card contendo o formulário -->
             <div class="card-body">
+                <!-- Formulário de edição de usuário -->
                 <form method="POST" action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
+                    <!-- Token CSRF para proteção de segurança -->
                     {{ form.csrf_token }}
 
+                    <!-- Campo Nome -->
                     <div class="mb-1">
                         {{ form.nome.label(class="form-label") }}
                         {{ form.nome(class="form-control") }}
@@ -23,7 +31,8 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1"> {# Alterado de mb-2 para mb-1 #}
+                    <!-- Campo Sobrenome -->
+                    <div class="mb-1">
                         {{ form.sobrenome.label(class="form-label") }}
                         {{ form.sobrenome(class="form-control") }}
                         {% if form.sobrenome.errors %}
@@ -32,6 +41,7 @@
                             </div>
                         {% endif %}
                     </div>
+                    <!-- Campo E-mail -->
                     <div class="mb-1">
                         {{ form.email.label(class="form-label") }}
                         {{ form.email(class="form-control") }}
@@ -41,7 +51,8 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1"> 
+                    <!-- Campo Login -->
+                    <div class="mb-1">
                         {{ form.login.label(class="form-label") }}
                         {{ form.login(class="form-control") }}
                         {% if form.login.errors %}
@@ -50,6 +61,7 @@
                             </div>
                         {% endif %}
                     </div>
+                    <!-- Campo Nova Senha -->
                     <div class="mb-1">
                         {{ form.senha.label(class="form-label") }}
                         {{ form.senha(class="form-control", placeholder="Deixe em branco para manter a senha atual") }}
@@ -60,7 +72,8 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1"> 
+                    <!-- Campo Confirmar Nova Senha -->
+                    <div class="mb-1">
                         {{ form.confirmar_senha.label(class="form-label") }}
                         {{ form.confirmar_senha(class="form-control", placeholder="Repita a nova senha") }}
                         {% if form.confirmar_senha.errors %}
@@ -69,6 +82,7 @@
                             </div>
                         {% endif %}
                     </div>
+                    <!-- Checkbox Ativo -->
                     <div class="mb-1 form-check">
                         {{ form.is_active(class="form-check-input") }}
                         {{ form.is_active.label(class="form-check-label") }}
@@ -78,6 +92,7 @@
                             </div>
                         {% endif %}
                     </div>
+                    <!-- Checkbox Administrador -->
                     <div class="mb-3 form-check">
                         {{ form.is_admin(class="form-check-input") }}
                         {{ form.is_admin.label(class="form-check-label") }}
@@ -87,8 +102,10 @@
                             </div>
                         {% endif %}
                     </div>
+                    <!-- Botão de submissão (Atualizar Usuário) -->
                     {{ form.submit(class="btn btn-primary btn-add") }}
-                    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary btn-add">Cancelar</a> 
+                    <!-- Botão de Cancelar -->
+                    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary btn-add">Cancelar</a>
                 </form>
             </div>
         </div>
