@@ -29,6 +29,7 @@ def create_app():
     from app.models.usuario_model import Usuario
     from app.models.conta_model import Conta
     from app.models.conta_transacao_model import ContaTransacao
+    from app.models.conta_movimento_model import ContaMovimento
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -39,12 +40,14 @@ def create_app():
     from app.routes.main_routes import main_bp
     from app.routes.conta_routes import conta_bp
     from app.routes.conta_transacao_routes import conta_transacao_bp
+    from app.routes.conta_movimento_routes import conta_movimento_bp
 
     app.register_blueprint(usuario_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(conta_bp)
     app.register_blueprint(conta_transacao_bp)
+    app.register_blueprint(conta_movimento_bp)
 
     @app.route("/")
     def index():
