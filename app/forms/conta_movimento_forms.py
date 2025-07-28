@@ -9,7 +9,7 @@ from wtforms import (
     DateField,
     TextAreaField,
     BooleanField,
-)  # Importa BooleanField
+)
 from wtforms.validators import (
     DataRequired,
     Length,
@@ -29,7 +29,7 @@ from datetime import date
 class CadastroContaMovimentoForm(FlaskForm):
     conta_id = SelectField(
         "Conta Bancária (Origem)",
-        validators=[DataRequired("A conta bancária é obrigatória.")],  # Rótulo ajustado
+        validators=[DataRequired("A conta bancária é obrigatória.")],
         coerce=int,
     )
 
@@ -67,26 +67,20 @@ class CadastroContaMovimentoForm(FlaskForm):
         ],
     )
 
-    # NOVO: Campo para indicar se é uma transferência entre contas
     is_transferencia = BooleanField("Transferência entre contas?")
 
-    # NOVO: Campo para a conta de destino (condicional)
     conta_destino_id = SelectField(
-        "Conta de Destino",
-        validators=[
-            Optional()  # Inicialmente opcional, será validado condicionalmente
-        ],
-        coerce=int,
+        "Conta de Destino", validators=[Optional()], coerce=int
     )
 
-    submit = SubmitField("Adicionar")
+    submit = SubmitField("Registrar Movimentação")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Carrega as contas do usuário logado para o SelectField de origem
+        # Carrega APENAS contas ativas do usuário logado para o SelectField de origem
         self.conta_id.choices = [
             (c.id, f"{c.nome_banco} - {c.conta} ({c.tipo})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id).all()
+            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True).all()
         ]
         # Carrega os tipos de transação do usuário logado para o SelectField
         self.conta_transacao_id.choices = [
@@ -94,16 +88,14 @@ class CadastroContaMovimentoForm(FlaskForm):
             for ct in ContaTransacao.query.filter_by(usuario_id=current_user.id).all()
         ]
 
-        # Carrega as contas do usuário logado para o SelectField de destino
-        # Excluímos a conta de origem, mas isso será feito na validação ou JS para ser dinâmico
+        # Carrega APENAS contas ativas do usuário logado para o SelectField de destino
         self.conta_destino_id.choices = [
             (c.id, f"{c.nome_banco} - {c.conta} ({c.tipo})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id).all()
+            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True).all()
         ]
 
-    # NOVO: Validador customizado para a lógica de transferência
     def validate_is_transferencia(self, field):
-        if field.data:  # Se o checkbox de transferência estiver marcado
+        if field.data:
             if not self.conta_destino_id.data:
                 raise ValidationError(
                     "A conta de destino é obrigatória para transferências."
@@ -114,8 +106,6 @@ class CadastroContaMovimentoForm(FlaskForm):
                     "A conta de origem e a conta de destino não podem ser a mesma."
                 )
 
-            # Validação: Tipo de transação para transferência deve ser 'Débito'
-            # e o transacao_tipo deve ser algo como 'TRANSFERÊNCIA' ou 'PIX ENVIADO'
             tipo_transacao_selecionado = ContaTransacao.query.get(
                 self.conta_transacao_id.data
             )
@@ -172,7 +162,7 @@ class EditarContaMovimentoForm(FlaskForm):
         ],
     )
 
-    submit = SubmitField("Atualizar")
+    submit = SubmitField("Atualizar Movimentação")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

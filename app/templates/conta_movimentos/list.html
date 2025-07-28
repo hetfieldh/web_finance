@@ -2,8 +2,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}Movimentações Bancárias{% endblock %}
-{% block page_title %}Movimentações Bancárias{% endblock %}
+{% block title %}Minhas Movimentações{% endblock %}
+{% block page_title %}Minhas Movimentações{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -12,7 +12,7 @@
             <h4 class="mb-0">Movimentações Registradas</h4>
             <div>
                 <a href="{{ url_for('conta_movimento.adicionar_movimentacao') }}" class="btn btn-success btn-add">
-                    <i class="fas fa-plus"></i> Movimentação
+                    <i class="fas fa-plus"></i> Registrar Movimentação
                 </a>
             </div>
         </div>
@@ -31,6 +31,7 @@
                                 <th>Data</th>
                                 <th>Valor</th>
                                 <th>Descrição</th>
+                                <th>Transferência</th>
                                 <th>Criação Registro</th>
                                 <th>Ações</th>
                             </tr>
@@ -53,6 +54,11 @@
                                 <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
                                 <td>R$ {{ "%.2f"|format(mov.valor) }}</td>
                                 <td>{{ mov.descricao if mov.descricao else 'N/A' }}</td>
+                                <td>
+                                    {% if mov.id_movimento_relacionado is not none %}
+                                        <i class="fas fa-exchange-alt" title="Movimentação de Transferência" data-bs-toggle="tooltip" data-bs-placement="top"></i>
+                                    {% endif %}
+                                </td>
                                 <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
                                 <td class="table-actions">
                                     <a href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}" class="btn btn-warning me-2" title="Editar">
@@ -76,4 +82,16 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
 {% endblock %}
