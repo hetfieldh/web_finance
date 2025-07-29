@@ -10,6 +10,10 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/")
 @login_required
 def dashboard():
-    contas_do_usuario = Conta.query.filter_by(usuario_id=current_user.id).all()
+    contas_do_usuario = (
+        Conta.query.filter_by(usuario_id=current_user.id)
+        .order_by(Conta.nome_banco.asc())
+        .all()
+    )
 
     return render_template("dashboard.html", contas_do_usuario=contas_do_usuario)

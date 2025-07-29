@@ -64,7 +64,7 @@ class CadastroContaForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo de Conta",
-        choices=[("", "Selecione...")] + TIPOS_CONTA,
+        choices=TIPOS_CONTA,
         validators=[DataRequired("O tipo de conta é obrigatório.")],
     )
     saldo_inicial = DecimalField(
@@ -93,25 +93,6 @@ class CadastroContaForm(FlaskForm):
     )
     ativa = BooleanField("Conta Ativa", default=True)
     submit = SubmitField("Adicionar Conta")
-
-    def validate(self, extra_validators=None):
-        initial_validation = super().validate(extra_validators)
-        if not initial_validation:
-            return False
-
-        existing_account = Conta.query.filter_by(
-            usuario_id=current_user.id,
-            nome_banco=self.nome_banco.data.strip().upper(),
-            agencia=self.agencia.data.strip(),
-            conta=self.conta.data.strip(),
-        ).first()
-
-        if existing_account:
-            raise ValidationError(
-                "Você já possui uma conta com este banco, agência e número de conta."
-            )
-
-        return True
 
     def validate_limite(self, field):
         tipos_com_limite = ["Corrente", "Digital"]
@@ -208,36 +189,6 @@ class EditarContaForm(FlaskForm):
         self.original_agencia = original_agencia
         self.original_conta = original_conta
         self.original_tipo = original_tipo
-
-    def validate(self, extra_validators=None):
-        initial_validation = super().validate(extra_validators)
-        if not initial_validation:
-            return False
-
-        if (
-            self.nome_banco.data.strip().upper()
-            != self.original_nome_banco.strip().upper()
-            or self.agencia.data.strip() != self.original_agencia.strip()
-            or self.conta.data.strip() != self.original_conta.strip()
-        ):
-
-            existing_account = Conta.query.filter(
-                Conta.usuario_id == current_user.id,
-                Conta.nome_banco == self.nome_banco.data.strip().upper(),
-                Conta.agencia == self.agencia.data.strip(),
-                Conta.conta == self.conta.data.strip(),
-            ).first()
-
-            if existing_account and (
-                existing_account.nome_banco != self.original_nome_banco.strip().upper()
-                or existing_account.agencia != self.original_agencia.strip()
-                or existing_account.conta != self.original_conta.strip()
-            ):
-                raise ValidationError(
-                    "Você já possui outra conta com este banco, agência e número de conta."
-                )
-
-        return True
 
     def validate_limite(self, field):
         tipos_com_limite = ["Corrente", "Digital"]

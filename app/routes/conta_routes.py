@@ -16,7 +16,8 @@ from app.models.conta_model import Conta
 from app.forms.conta_forms import CadastroContaForm, EditarContaForm
 from sqlalchemy.exc import IntegrityError
 from decimal import Decimal
-from sqlalchemy import asc, desc
+
+from app.models.conta_movimento_model import ContaMovimento
 
 conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
 
@@ -24,11 +25,7 @@ conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
 @conta_bp.route("/")
 @login_required
 def listar_contas():
-    contas = (
-        Conta.query.filter_by(usuario_id=current_user.id)
-        .order_by(Conta.ativa.desc(), Conta.nome_banco.asc(), Conta.tipo.asc())
-        .all()
-    )
+    contas = Conta.query.filter_by(usuario_id=current_user.id).all()
     return render_template("contas/list.html", contas=contas)
 
 
@@ -56,7 +53,7 @@ def adicionar_conta():
 
         if existing_account:
             flash(
-                "Você já possui uma conta com este banco, agência, número e tipo.",
+                "Você já possui uma conta com este banco, agência, número e tipo de conta.",
                 "danger",
             )
             return render_template("contas/add.html", form=form)
@@ -110,12 +107,39 @@ def editar_conta(id):
             form.ativa.data = conta.ativa
             return render_template("contas/edit.html", form=form, conta=conta)
 
-        conta.nome_banco = form.nome_banco.data.strip().upper()
-        conta.agencia = form.agencia.data.strip()
-        conta.conta = form.conta.data.strip()
+        nome_banco_form = form.nome_banco.data.strip().upper()
+        agencia_form = form.agencia.data.strip()
+        conta_num_form = form.conta.data.strip()
+        tipo_form = conta.tipo
+
+        if (
+            nome_banco_form != form.original_nome_banco.strip().upper()
+            or agencia_form != form.original_agencia.strip()
+            or conta_num_form != form.original_conta.strip()
+            or tipo_form != form.original_tipo
+        ):
+
+            existing_account = Conta.query.filter_by(
+                usuario_id=current_user.id,
+                nome_banco=nome_banco_form,
+                agencia=agencia_form,
+                conta=conta_num_form,
+                tipo=tipo_form,
+            ).first()
+
+            if existing_account and existing_account.id != conta.id:
+                flash(
+                    "Você já possui outra conta com este banco, agência, número e tipo de conta.",
+                    "danger",
+                )
+                return render_template("contas/edit.html", form=form, conta=conta)
+
+        conta.nome_banco = nome_banco_form
+        conta.agencia = agencia_form
+        conta.conta = conta_num_form
         conta.saldo_inicial = form.saldo_inicial.data
 
-        conta.tipo = conta.tipo
+        conta.tipo = tipo_form
 
         conta.limite = form.limite.data
         conta.ativa = form.ativa.data
