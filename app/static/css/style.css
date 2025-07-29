@@ -7,17 +7,17 @@
 
 /* Sidebar lateral oculta inicialmente */
 #sidebar-wrapper {
-    min-height: 100vh;           /* Altura total da viewport */
-    margin-left: -15rem;         /* Esconde a sidebar à esquerda */
-    transition: margin .25s ease-out; /* Transição suave de margem */
-    width: 14rem;                /* Largura da sidebar */
-    display: flex;               /* Torna o sidebar um contêiner flexível */
-    flex-direction: column;      /* Organiza os itens em coluna */
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin .25s ease-out;
+    width: 14rem;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Cabeçalho da sidebar */
 #sidebar-wrapper .sidebar-heading {
-    font-size: 1.2rem; /* Ajustado: Fonte um pouco menor para o cabeçalho da sidebar */
+    font-size: 1.2rem;
     padding: 0.875rem 1.25rem;
 }
 
@@ -38,6 +38,7 @@
 
 /* --- Media Query para telas maiores (≥ 768px) --- */
 @media (min-width: 768px) {
+
     /* Sidebar visível por padrão */
     #sidebar-wrapper {
         margin-left: 0;
@@ -73,7 +74,7 @@ body.login-body {
     padding: 20px;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
 }
 
@@ -112,16 +113,43 @@ body {
 }
 
 /* Tamanhos dos cabeçalhos */
-h1, .h1 { font-size: 2.2rem; }
-h2, .h2 { font-size: 1.8rem; }
-h3, .h3 { font-size: 1.5rem; }
-h4, .h4 { font-size: 1.3rem; }
-h5, .h5 { font-size: 1.1rem; }
-h6, .h6 { font-size: 0.95rem; }
+h1,
+.h1 {
+    font-size: 2.2rem;
+}
+
+h2,
+.h2 {
+    font-size: 1.8rem;
+}
+
+h3,
+.h3 {
+    font-size: 1.5rem;
+}
+
+h4,
+.h4 {
+    font-size: 1.3rem;
+}
+
+h5,
+.h5 {
+    font-size: 1.1rem;
+}
+
+h6,
+.h6 {
+    font-size: 0.95rem;
+}
 
 /* Classe para fontes extra pequenas */
 .extra-small {
     font-size: 0.7rem !important;
+}
+
+.extra-small-2 {
+    font-size: 0.6rem !important;
 }
 
 /* Fonte para tabelas */
@@ -161,10 +189,13 @@ h6, .h6 { font-size: 0.95rem; }
 
 /* Links em listas de navegação e navbar */
 .list-group-item {
-    font-size: 0.9rem; /* Fonte ligeiramente menor para todos os itens do sidebar */
+    font-size: 0.9rem;
+    /* Fonte ligeiramente menor para todos os itens do sidebar */
 }
+
 .navbar-nav .nav-link {
-    font-size: 0.95rem; /* Mantido para links da navbar superior */
+    font-size: 0.95rem;
+    /* Mantido para links da navbar superior */
 }
 
 
@@ -176,32 +207,32 @@ h6, .h6 { font-size: 0.95rem; }
 
 /* Estilo para a informação do usuário logado no sidebar */
 .logged-in-user-info {
-    font-size: 0.7rem; /* Fonte ainda menor para o info do usuário */
-    color: #555; /* Uma cor um pouco mais escura para contraste */
+    font-size: 0.7rem;
+    color: #555;
 }
 
 /* Remover borda inferior dos itens de submenu */
 .collapse.list-group-flush .list-group-item {
-    border-bottom: none !important; /* Adicionado !important para forçar a remoção da borda */
+    border-bottom: none !important;
 }
 
 /* Estilo para ícones dentro de submenus */
 .collapse.list-group-flush .list-group-item i {
-    color: #007bff !important; /* Adicionado !important para forçar a cor do ícone */
+    color: #007bff !important;
 }
 
-/* NOVO: Estilos para o destaque do Saldo Final no extrato */
+/* Estilos para o destaque do Saldo Final no extrato */
 .saldo-positivo-box {
-    background-color: #d4edda; /* Cor de fundo verde sutil (similar ao bg-success-subtle) */
-    border: 1px solid #28a745; /* Borda verde */
+    background-color: #d4edda;
+    border: 1px solid #28a745;
     padding: 0.5rem;
     border-radius: 0.25rem;
     font-weight: bold;
 }
 
 .saldo-negativo-box {
-    background-color: #f8d7da; /* Cor de fundo vermelha sutil (similar ao bg-danger-subtle) */
-    border: 1px solid #dc3545; /* Borda vermelha */
+    background-color: #f8d7da;
+    border: 1px solid #dc3545;
     padding: 0.5rem;
     border-radius: 0.25rem;
     font-weight: bold;
@@ -232,11 +263,27 @@ h6, .h6 { font-size: 0.95rem; }
 
 /* --- Responsividade para telas menores (≤ 767.98px) --- */
 @media (max-width: 767.98px) {
+
     /* Redução dos tamanhos dos cabeçalhos */
-    h1, .h1 { font-size: 1.8rem; }
-    h2, .h2 { font-size: 1.5rem; }
-    h3, .h3 { font-size: 1.3rem; }
-    h4, .h4 { font-size: 1.1rem; }
+    h1,
+    .h1 {
+        font-size: 1.8rem;
+    }
+
+    h2,
+    .h2 {
+        font-size: 1.5rem;
+    }
+
+    h3,
+    .h3 {
+        font-size: 1.3rem;
+    }
+
+    h4,
+    .h4 {
+        font-size: 1.1rem;
+    }
 
     /* Fonte maior para tabelas em telas pequenas */
     .table {

@@ -64,7 +64,7 @@ class CadastroContaForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo de Conta",
-        choices=TIPOS_CONTA,
+        choices=[("", "Selecione...")] + TIPOS_CONTA,
         validators=[DataRequired("O tipo de conta é obrigatório.")],
     )
     saldo_inicial = DecimalField(

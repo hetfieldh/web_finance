@@ -1,15 +1,9 @@
 // app/static/js/script.js
 
-// Exibe uma mensagem no console para confirmar que o script foi carregado
-console.log("script.js carregado com sucesso!");
-
 // Adiciona um listener para quando o DOM estiver completamente carregado
 document.addEventListener('DOMContentLoaded', () => {
-    // Obtém o botão de alternar a sidebar
     const sidebarToggle = document.getElementById("sidebarToggle");
-    // Verifica se o botão existe
     if (sidebarToggle) {
-        // Adiciona um evento de clique para alternar a classe 'toggled' no wrapper
         sidebarToggle.addEventListener("click", () => {
             document.getElementById("wrapper").classList.toggle("toggled");
         });
@@ -21,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const contaDestinoField = document.getElementById('conta_destino_field');
     const contaTransacaoSelect = document.getElementById('conta_transacao_id');
 
-    // Certifica-se de que todos os elementos existem antes de adicionar listeners
     if (contaTransacaoSelect && isTransferenciaCheckbox && contaDestinoField && isTransferenciaCheckboxContainer) {
         const tipoMovimentoMap = {};
         Array.from(contaTransacaoSelect.options).forEach(option => {
@@ -49,11 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Adiciona listeners
         contaTransacaoSelect.addEventListener('change', updateTransferenciaFieldsVisibility);
         isTransferenciaCheckbox.addEventListener('change', updateTransferenciaFieldsVisibility); 
         
-        // Chama a função uma vez ao carregar a página para definir o estado inicial
         updateTransferenciaFieldsVisibility();
     }
 
@@ -75,10 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formatoElegante = new Intl.DateTimeFormat('pt-BR', opcoes).format(dataAtual);
 
-    const elementoDataAtual = document.getElementById("data-atual"); // Renomeado para evitar conflito
+    const elementoDataAtual = document.getElementById("data-atual"); 
 
     if (elementoDataAtual) {
-        // Capitaliza a primeira letra do dia da semana (opcional, por estética)
         const frase = formatoElegante.charAt(0).toUpperCase() + formatoElegante.slice(1);
         elementoDataAtual.innerText = frase;
     }

@@ -12,7 +12,6 @@ class ExtratoBancarioForm(FlaskForm):
     conta_id = SelectField(
         "Conta Bancária",
         validators=[DataRequired("A conta bancária é obrigatória.")],
-        coerce=int,
     )
 
     mes_ano = SelectField(
@@ -23,15 +22,17 @@ class ExtratoBancarioForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.conta_id.choices = [
+
+        self.conta_id.choices = [("", "Selecione...")] + [
             (c.id, f"{c.nome_banco} - {c.conta} ({c.tipo})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id).all()
+            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+            .order_by(Conta.nome_banco)
+            .all()
         ]
 
         meses_anos = []
         hoje = date.today()
 
-        # Mapeamento de números de mês para nomes em PT-BR
         nomes_meses_ptbr = {
             1: "Janeiro",
             2: "Fevereiro",
@@ -47,7 +48,7 @@ class ExtratoBancarioForm(FlaskForm):
             12: "Dezembro",
         }
 
-        for i in range(12):  # Gerar para os últimos 12 meses
+        for i in range(12):
             mes = hoje.month - i
             ano = hoje.year
             while mes <= 0:
@@ -57,8 +58,10 @@ class ExtratoBancarioForm(FlaskForm):
             mes_formatado = f"{mes:02d}"
 
             value = f"{ano}-{mes_formatado}"
-            label = f"{nomes_meses_ptbr[mes]}/{ano}"  # Usa o nome do mês em PT-BR
+            label = f"{nomes_meses_ptbr[mes]}/{ano}"
 
             meses_anos.append((value, label))
 
-        self.mes_ano.choices = sorted(meses_anos, key=lambda x: x[0], reverse=True)
+        self.mes_ano.choices = [("", "Selecione um período...")] + sorted(
+            meses_anos, key=lambda x: x[0], reverse=True
+        )

@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Editar Tipo de Transação{% endblock %}
+{% block title %}Web Finance - TR Bancárias{% endblock %}
 {% block page_title %}Editar Tipo de Transação{% endblock %}
 
 {% block content %}
@@ -18,7 +18,7 @@
 
                     <div class="mb-1">
                         {{ form.transacao_tipo.label(class="form-label") }}
-                        {{ form.transacao_tipo(class="form-control") }} {# readonly é adicionado via render_kw no form #}
+                        {{ form.transacao_tipo(class="form-control") }}
                         {% if form.transacao_tipo.errors %}
                             <div class="text-danger">
                                 {% for error in form.transacao_tipo.errors %}{{ error }}{% endfor %}
@@ -27,14 +27,14 @@
                     </div>
                     <div class="mb-1">
                         {{ form.tipo.label(class="form-label") }}
-                        {{ form.tipo(class="form-select") }} {# disabled é adicionado via render_kw no form #}
+                        {{ form.tipo(class="form-select") }}
                         {% if form.tipo.errors %}
                             <div class="text-danger">
                                 {% for error in form.tipo.errors %}{{ error }}{% endfor %}
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3"> {# Espaçamento final antes dos botões #}
+                    <div class="mb-3">
                     </div>
                     {{ form.submit(class="btn btn-primary btn-add") }}
                     <a href="{{ url_for('conta_transacao.listar_tipos_transacao') }}" class="btn btn-secondary btn-add">Cancelar</a>

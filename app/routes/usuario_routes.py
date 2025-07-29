@@ -12,18 +12,12 @@ from flask import (
 )
 from app import db
 from app.models.usuario_model import Usuario
-
-# As importações de Conta e ContaMovimento não são necessárias aqui se não forem usadas em outras partes
-# from app.models.conta_model import Conta
-# from app.models.conta_movimento_model import ContaMovimento
 from werkzeug.security import generate_password_hash
 from flask_login import login_required, current_user
 import functools
 import re
 from app.forms.usuario_forms import CadastroUsuarioForm, EditarUsuarioForm
-
-# A importação de Decimal não é necessária aqui se não for usada em outras partes
-# from decimal import Decimal
+from sqlalchemy import asc, desc
 
 usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
 
@@ -53,7 +47,7 @@ def validar_senha_forte(senha):
 @usuario_bp.route("/")
 @admin_required
 def listar_usuarios():
-    usuarios = Usuario.query.all()
+    usuarios = Usuario.query.order_by(Usuario.nome.asc()).all()
     return render_template("usuarios/list.html", usuarios=usuarios)
 
 
@@ -95,17 +89,6 @@ def editar_usuario(id):
     form = EditarUsuarioForm(original_email=usuario.email, original_login=usuario.login)
 
     if form.validate_on_submit():
-        # REMOVIDO: Lógica de validação de saldo e ativação de conta, pois não pertence a Usuario
-        # if not form.ativa.data and Decimal(str(usuario.saldo_atual)) != Decimal('0.00'):
-        #     flash('Não é possível inativar a conta. O saldo atual deve ser zero para inativação.', 'danger')
-        #     form.nome.data = usuario.nome
-        #     form.sobrenome.data = usuario.sobrenome
-        #     form.email.data = usuario.email
-        #     form.login.data = usuario.login
-        #     form.is_active.data = usuario.is_active
-        #     form.is_admin.data = usuario.is_admin
-        #     return render_template('usuarios/edit.html', form=form, usuario=usuario)
-
         usuario.nome = form.nome.data.strip().upper()
         usuario.sobrenome = form.sobrenome.data.strip().upper()
         usuario.email = form.email.data.strip()
@@ -148,7 +131,6 @@ def excluir_usuario(id):
         )
         return redirect(url_for("usuario.listar_usuarios"))
 
-    # NOVO: Verificar se o usuário possui contas bancárias associadas
     if len(usuario.contas) > 0:
         flash(
             "Não é possível excluir o usuário. Existem contas bancárias associadas a ele.",
@@ -156,21 +138,14 @@ def excluir_usuario(id):
         )
         return redirect(url_for("usuario.listar_usuarios"))
 
-    # NOVO: Verificar se o usuário possui movimentações associadas
-    # (Embora as contas já cubram isso, é bom ter uma verificação direta se a regra for mais estrita)
-    if (
-        len(usuario.movimentos) > 0
-    ):  # 'movimentos' é o backref de ContaMovimento para Usuario
+    if len(usuario.movimentos) > 0:
         flash(
             "Não é possível excluir o usuário. Existem movimentações associadas a ele.",
             "danger",
         )
         return redirect(url_for("usuario.listar_usuarios"))
 
-    # NOVO: Verificar se o usuário possui tipos de transação associados
-    if (
-        len(usuario.tipos_transacao) > 0
-    ):  # 'tipos_transacao' é o backref de ContaTransacao para Usuario
+    if len(usuario.tipos_transacao) > 0:
         flash(
             "Não é possível excluir o usuário. Existem tipos de transação associados a ele.",
             "danger",

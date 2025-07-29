@@ -2,17 +2,17 @@
 
 {% extends "base.html" %}
 
-{% block title %}Minhas Movimentações{% endblock %}
-{% block page_title %}Minhas Movimentações{% endblock %}
+{% block title %}Web Finance - Movimentações{% endblock %}
+{% block page_title %}Movimentações Bancárias{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Movimentações Registradas</h4>
+            <h4 class="mb-0">Registros</h4>
             <div>
                 <a href="{{ url_for('conta_movimento.adicionar_movimentacao') }}" class="btn btn-success btn-add">
-                    <i class="fas fa-plus"></i> Registrar Movimentação
+                    <i class="fas fa-plus"></i> Movimentação
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
                                 <th>Data</th>
                                 <th>Valor</th>
                                 <th>Descrição</th>
-                                <th>Transferência</th>
+                                <th>TIC</th>
                                 <th>Criação Registro</th>
                                 <th>Ações</th>
                             </tr>
@@ -83,15 +83,4 @@
     </div>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    });
-</script>
 {% endblock %}

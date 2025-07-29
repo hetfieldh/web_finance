@@ -2,8 +2,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}Minhas Contas Bancárias{% endblock %}
-{% block page_title %}Minhas Contas Bancárias{% endblock %}
+{% block title %}Web Finance - Contas Bancárias{% endblock %}
+{% block page_title %}Contas Bancárias{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -48,7 +48,7 @@
                                 <td>{{ conta.agencia }}</td>
                                 <td>{{ conta.conta }}</td>
                                 <td>{{ conta.tipo }}</td>
-                                <td>R$ {{ "%.2f"|format(conta.saldo_inicial) }}</td> {# Adicionado Saldo Inicial #}
+                                <td>R$ {{ "%.2f"|format(conta.saldo_inicial) }}</td>
                                 <td>R$ {{ "%.2f"|format(conta.saldo_atual) }}</td>
                                 <td>R$ {{ "%.2f"|format(conta.limite) if conta.limite is not none else 'N/A' }}</td>
                                 <td>

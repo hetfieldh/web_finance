@@ -16,6 +16,7 @@ from app.models.conta_model import Conta
 from app.forms.conta_forms import CadastroContaForm, EditarContaForm
 from sqlalchemy.exc import IntegrityError
 from decimal import Decimal
+from sqlalchemy import asc, desc
 
 conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
 
@@ -23,7 +24,11 @@ conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
 @conta_bp.route("/")
 @login_required
 def listar_contas():
-    contas = Conta.query.filter_by(usuario_id=current_user.id).all()
+    contas = (
+        Conta.query.filter_by(usuario_id=current_user.id)
+        .order_by(Conta.ativa.desc(), Conta.nome_banco.asc(), Conta.tipo.asc())
+        .all()
+    )
     return render_template("contas/list.html", contas=contas)
 
 
@@ -139,8 +144,6 @@ def editar_conta(id):
 def excluir_conta(id):
     conta = Conta.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
 
-    # Antes de excluir, verificar se há movimentações associadas
-    # CORRIGIDO: Usando len() para verificar o tamanho da coleção
     if len(conta.movimentos) > 0:
         flash(
             "Não é possível excluir a conta. Existem movimentações associadas a ela.",
@@ -148,7 +151,6 @@ def excluir_conta(id):
         )
         return redirect(url_for("conta.listar_contas"))
 
-    # Se a conta não tiver saldo zero, não permitir exclusão
     if Decimal(str(conta.saldo_atual)) != Decimal("0.00"):
         flash("Não é possível excluir a conta. O saldo atual deve ser zero.", "danger")
         return redirect(url_for("conta.listar_contas"))

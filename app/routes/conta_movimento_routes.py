@@ -27,19 +27,17 @@ from app.forms.conta_movimento_forms import (
 conta_movimento_bp = Blueprint("conta_movimento", __name__, url_prefix="/movimentacoes")
 
 
-# Listagem de movimentações
 @conta_movimento_bp.route("/")
 @login_required
 def listar_movimentacoes():
     movimentacoes = (
         ContaMovimento.query.filter_by(usuario_id=current_user.id)
-        .order_by(ContaMovimento.data_movimento.desc())
+        .order_by(ContaMovimento.data_movimento.desc(), ContaMovimento.id.desc())
         .all()
     )
     return render_template("conta_movimentos/list.html", movimentacoes=movimentacoes)
 
 
-# Adicionar nova movimentação
 @conta_movimento_bp.route("/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_movimentacao():
@@ -54,7 +52,6 @@ def adicionar_movimentacao():
         is_transferencia = form.is_transferencia.data
         conta_destino_id = form.conta_destino_id.data if is_transferencia else None
 
-        # Recarrega a conta para garantir o estado mais recente do DB
         conta_origem = db.session.query(Conta).get(conta_origem_id)
         tipo_transacao = ContaTransacao.query.get(tipo_transacao_id)
         conta_destino = Conta.query.get(conta_destino_id) if is_transferencia else None
@@ -63,16 +60,13 @@ def adicionar_movimentacao():
             flash("Erro: Conta ou Tipo de Transação inválidos.", "danger")
             return render_template("conta_movimentos/add.html", form=form)
 
-        # Validação de valor
         if valor <= 0:
             flash("O valor da movimentação deve ser maior que zero.", "danger")
             return render_template("conta_movimentos/add.html", form=form)
 
         valor_decimal = Decimal(str(valor))
-        # Garante que saldo_atual é um Decimal antes de qualquer operação
         saldo_origem_decimal = Decimal(str(conta_origem.saldo_atual))
 
-        # Validação de débito e limite
         if tipo_transacao.tipo == "Débito":
             tipos_com_limite = ["Corrente", "Digital"]
             if saldo_origem_decimal < valor_decimal:
@@ -90,7 +84,6 @@ def adicionar_movimentacao():
                     flash("Saldo insuficiente para a movimentação.", "danger")
                     return render_template("conta_movimentos/add.html", form=form)
 
-        # Validação de transferência
         if is_transferencia:
             if not conta_destino:
                 flash("Conta de destino inválida.", "danger")
@@ -121,7 +114,6 @@ def adicionar_movimentacao():
                 return render_template("conta_movimentos/add.html", form=form)
 
         try:
-            # Criação da movimentação de origem
             movimento_origem = ContaMovimento(
                 usuario_id=current_user.id,
                 conta_id=conta_origem_id,
@@ -131,31 +123,21 @@ def adicionar_movimentacao():
                 descricao=descricao,
             )
             db.session.add(movimento_origem)
-            db.session.flush()  # Força o ID para o movimento de origem
+            db.session.flush()
 
-            # Atualização do saldo da conta de origem
-            # Garante que a operação é feita com Decimal a partir do valor DO BANCO DE DADOS
-            # Recarrega o saldo_atual da conta_origem do DB novamente antes de operar
-            db.session.refresh(conta_origem)  # NOVO: Recarrega o objeto do DB
-            saldo_origem_atualizado = Decimal(
-                str(conta_origem.saldo_atual)
-            )  # NOVO: Usa o valor recarregado
+            db.session.refresh(conta_origem)
+            saldo_origem_atualizado = Decimal(str(conta_origem.saldo_atual))
 
             if tipo_transacao.tipo == "Débito":
                 conta_origem.saldo_atual = saldo_origem_atualizado - valor_decimal
             elif tipo_transacao.tipo == "Crédito":
                 conta_origem.saldo_atual = saldo_origem_atualizado + valor_decimal
             else:
-                # Caso um tipo inesperado passe, o que não deveria ocorrer com ENUM
                 pass
 
-            # Transferência: movimentação na conta de destino
             if is_transferencia:
-                # Recarrega a conta de destino para garantir o estado mais recente do DB
-                db.session.refresh(conta_destino)  # NOVO: Recarrega o objeto do DB
-                saldo_destino_atualizado = Decimal(
-                    str(conta_destino.saldo_atual)
-                )  # NOVO: Usa o valor recarregado
+                db.session.refresh(conta_destino)
+                saldo_destino_atualizado = Decimal(str(conta_destino.saldo_atual))
 
                 movimento_destino = ContaMovimento(
                     usuario_id=current_user.id,
@@ -170,7 +152,6 @@ def adicionar_movimentacao():
 
                 conta_destino.saldo_atual = saldo_destino_atualizado + valor_decimal
 
-                # Vincular os dois movimentos
                 movimento_origem.id_movimento_relacionado = movimento_destino.id
                 movimento_destino.id_movimento_relacionado = movimento_origem.id
 
@@ -193,7 +174,6 @@ def adicionar_movimentacao():
     return render_template("conta_movimentos/add.html", form=form)
 
 
-# Edição de movimentação (sem ajuste de saldo)
 @conta_movimento_bp.route("/editar/<int:id>", methods=["GET", "POST"])
 @login_required
 def editar_movimentacao(id):
@@ -204,7 +184,6 @@ def editar_movimentacao(id):
     form = EditarContaMovimentoForm()
 
     if form.validate_on_submit():
-        # Obs: não atualiza valor, tipo ou conta — apenas descrição
         movimento.descricao = (
             form.descricao.data.strip() if form.descricao.data else None
         )
@@ -226,13 +205,27 @@ def editar_movimentacao(id):
     return render_template("conta_movimentos/edit.html", form=form, movimento=movimento)
 
 
-# Exclusão de movimentação
 @conta_movimento_bp.route("/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_movimentacao(id):
     movimento = ContaMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
+
+    ultima_movimentacao = (
+        ContaMovimento.query.filter_by(
+            conta_id=movimento.conta_id, usuario_id=current_user.id
+        )
+        .order_by(ContaMovimento.data_movimento.desc(), ContaMovimento.id.desc())
+        .first()
+    )
+
+    if ultima_movimentacao and ultima_movimentacao.id != movimento.id:
+        flash(
+            "Não é possível excluir esta movimentação. Apenas o último registro (mais atual) da conta pode ser excluído.",
+            "danger",
+        )
+        return redirect(url_for("conta_movimento.listar_movimentacoes"))
 
     conta_afetada = Conta.query.get(movimento.conta_id)
     tipo_transacao = ContaTransacao.query.get(movimento.conta_transacao_id)
@@ -243,10 +236,9 @@ def excluir_movimentacao(id):
 
         if tipo_transacao.tipo == "Débito":
             conta_afetada.saldo_atual += valor_decimal
-        else:  # Crédito
+        else:
             conta_afetada.saldo_atual -= valor_decimal
 
-    # Remoção de transferência relacionada, se houver
     if movimento.id_movimento_relacionado:
         movimento_relacionado = ContaMovimento.query.get(
             movimento.id_movimento_relacionado
@@ -266,7 +258,6 @@ def excluir_movimentacao(id):
                 else:
                     conta_destino.saldo_atual += valor_rel
 
-            # Remover relação circular antes de excluir
             movimento.id_movimento_relacionado = None
             movimento_relacionado.id_movimento_relacionado = None
             db.session.add(movimento)

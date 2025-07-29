@@ -72,7 +72,7 @@ def extrato_bancario():
                 ContaMovimento.data_movimento >= data_inicio_mes,
                 ContaMovimento.data_movimento <= data_fim_mes,
             )
-            .order_by(ContaMovimento.data_movimento.asc())
+            .order_by(ContaMovimento.data_movimento.desc())
             .all()
         )
 

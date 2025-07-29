@@ -1,7 +1,6 @@
 <!--- app/templates/includes/_sidebar.html -->
 
 <div class="bg-light border-right" id="sidebar-wrapper">
-    <!-- Seção do cabeçalho da sidebar com o logotipo -->
     <div class="sidebar-heading text-center py-4">
         <a href="{{ url_for('main.dashboard') }}">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Web Finance"
@@ -46,14 +45,12 @@
                 <i class="fas fa-university me-2"></i>Bancário
             </a>
         </div>
-        <!-- FIM do menu "Extratos" -->
 
         <!-- Links gerais de navegação -->
         <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-light text-danger">
             <i class="fas fa-sign-out-alt me-2"></i>Sair
         </a>
     </div>
-    <!-- Informação do usuário logado, exibida no rodapé do sidebar se o usuário estiver autenticado -->
     {% if current_user.is_authenticated %}
     <div class="list-group-item bg-light text-secondary mt-auto py-2 px-2 text-left logged-in-user-info">
         Usuário: <strong>{{ current_user.login }}</strong>

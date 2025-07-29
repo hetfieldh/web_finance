@@ -2,103 +2,99 @@
 
 {% extends "base.html" %}
 
-{% block title %}Adicionar Usuário{% endblock %}
-{% block page_title %}Adicionar Novo Usuário{% endblock %}
+{% block title %}Web Finance - Usuários{% endblock %}
+{% block page_title %}Adicionar Usuário{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 mx-auto">
-        <!-- Card principal para o formulário de cadastro de usuário -->
         <div class="card shadow-sm">
-            <!-- Cabeçalho do card com título -->
             <div class="card-header bg-dark text-white">
                 <h5 class="mb-0">Formulário de Cadastro de Usuário</h5>
             </div>
-            <!-- Corpo do card contendo o formulário -->
             <div class="card-body">
-                <!-- Formulário de adição de usuário -->
-                <form method="POST" action="{{ url_for('usuario.adicionar_usuario') }}">
-                    <!-- Token CSRF para proteção de segurança -->
+                <form method="POST"
+                    action="{{ url_for('usuario.adicionar_usuario') }}">
                     {{ form.csrf_token }}
 
-                    <!-- Campo Nome -->
                     <div class="mb-1">
                         {{ form.nome.label(class="form-label") }}
                         {{ form.nome(class="form-control") }}
                         {% if form.nome.errors %}
-                            <div class="text-danger">
-                                {% for error in form.nome.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.nome.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Campo Sobrenome -->
                     <div class="mb-1">
                         {{ form.sobrenome.label(class="form-label") }}
                         {{ form.sobrenome(class="form-control") }}
                         {% if form.sobrenome.errors %}
-                            <div class="text-danger">
-                                {% for error in form.sobrenome.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.sobrenome.errors %}{{ error
+                            }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Campo E-mail -->
                     <div class="mb-1">
                         {{ form.email.label(class="form-label") }}
                         {{ form.email(class="form-control") }}
                         {% if form.email.errors %}
-                            <div class="text-danger">
-                                {% for error in form.email.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.email.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Campo Login -->
                     <div class="mb-1">
                         {{ form.login.label(class="form-label") }}
                         {{ form.login(class="form-control") }}
                         {% if form.login.errors %}
-                            <div class="text-danger">
-                                {% for error in form.login.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.login.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Campo Senha -->
                     <div class="mb-1">
                         {{ form.senha.label(class="form-label") }}
                         {{ form.senha(class="form-control") }}
-                        <small class="form-text text-muted">Mínimo 8 caracteres, com pelo menos uma letra maiúscula e um caractere especial.</small>
+                        <small class="form-text text-muted">Mínimo 8 caracteres,
+                            com pelo menos uma letra maiúscula e um caractere
+                            especial.</small>
                         {% if form.senha.errors %}
-                            <div class="text-danger">
-                                {% for error in form.senha.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.senha.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Campo Confirmar Senha -->
                     <div class="mb-1">
                         {{ form.confirmar_senha.label(class="form-label") }}
                         {{ form.confirmar_senha(class="form-control") }}
                         {% if form.confirmar_senha.errors %}
-                            <div class="text-danger">
-                                {% for error in form.confirmar_senha.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.confirmar_senha.errors %}{{
+                            error }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Checkbox Administrador -->
                     <div class="mb-1 form-check">
                         {{ form.is_admin(class="form-check-input") }}
                         {{ form.is_admin.label(class="form-check-label") }}
                         {% if form.is_admin.errors %}
-                            <div class="text-danger">
-                                {% for error in form.is_admin.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.is_admin.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    <!-- Div de espaçamento antes dos botões -->
                     <div class="mb-3">
                     </div>
-                    <!-- Botão de submissão (Adicionar Usuário) -->
                     {{ form.submit(class="btn btn-success btn-add") }}
-                    <!-- Botão de Cancelar -->
-                    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary btn-add">Cancelar</a>
+                    <a href="{{ url_for('usuario.listar_usuarios') }}"
+                        class="btn btn-secondary btn-add">Cancelar</a>
                 </form>
             </div>
         </div>

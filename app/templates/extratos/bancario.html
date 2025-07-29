@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Extrato Bancário{% endblock %}
+{% block title %}Web Finance - Extratos{% endblock %}
 {% block page_title %}Extrato Bancário{% endblock %}
 
 {% block content %}
@@ -58,20 +58,19 @@
                     <div class="col-md-3">
                         <p class="mb-0"><strong>Débitos no Mês:</strong> <span class="text-danger">R$ {{ "%.2f"|format(total_debitos) }}</span></p>
                     </div>
-                    
-                    {# Exibe o Limite Disponível para todas as contas #}
-                    <div class="col-md-3 mt-0"> {# Ajustado mt-0 para alinhamento #}
-                        <p class="mb-0"><strong>Limite Disponível:</strong> 
+
+                    <div class="col-md-3 mt-0">
+                        <p class="mb-0"><strong>Limite Disponível:</strong>
                             {% if limite_conta is not none and limite_conta > 0 %}
                                 R$ {{ "%.2f"|format(limite_conta) }}
                             {% else %}
-                                R$ 0.00 {# Exibe 0.00 se não há limite ou é zero #}
+                                R$ 0.00
                             {% endif %}
                         </p>
                     </div>
 
-                    <div class="col-md-3 mt-2 {% if saldo_final_mes >= 0 %}saldo-positivo-box{% else %}saldo-negativo-box{% endif %}"> {# ADICIONADO: mt-2 #}
-                        <p class="mb-0"><strong>Saldo Final:</strong> 
+                    <div class="col-md-3 mt-2 {% if saldo_final_mes >= 0 %}saldo-positivo-box{% else %}saldo-negativo-box{% endif %}">
+                        <p class="mb-0"><strong>Saldo Final:</strong>
                             {% if saldo_final_mes >= 0 %}
                                 <span class="text-success">R$ {{ "%.2f"|format(saldo_final_mes) }}</span>
                             {% else %}
@@ -122,8 +121,7 @@
             </div>
         </div>
         {% elif form.is_submitted() and not movimentacoes and not conta_selecionada %}
-            {# Este caso é para quando o formulário é submetido, mas a conta é inválida #}
-            {# A mensagem de erro já é tratada pelo flash #}
+
         {% endif %}
     </div>
 </div>

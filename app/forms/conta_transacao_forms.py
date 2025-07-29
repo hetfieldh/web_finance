@@ -28,7 +28,7 @@ class CadastroContaTransacaoForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo de Movimento",
-        choices=TIPOS_MOVIMENTO,
+        choices=[("", "Selecione...")] + TIPOS_MOVIMENTO,
         validators=[DataRequired("O tipo de movimento é obrigatório.")],
     )
     submit = SubmitField("Adicionar")

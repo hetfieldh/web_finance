@@ -2,25 +2,22 @@
 
 {% extends "base.html" %}
 
-{% block title %}Lista de Usuários{% endblock %}
+{% block title %}Web Finance - Usuários{% endblock %}
 {% block page_title %}Gerenciamento de Usuários{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- Cabeçalho da seção de usuários com botão de adicionar -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Usuários Cadastrados</h4>
             <a href="{{ url_for('usuario.adicionar_usuario') }}" class="btn btn-success btn-add">
                 <i class="fas fa-plus"></i> Usuário
             </a>
         </div>
-        
-        <!-- Card que contém a tabela de usuários -->
+
         <div class="card shadow-sm">
             <div class="card-body">
                 {% if usuarios %}
-                <!-- Tabela responsiva para exibir a lista de usuários -->
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -43,7 +40,6 @@
                                 <td>{{ usuario.login }}</td>
                                 <td>{{ usuario.email }}</td>
                                 <td>
-                                    <!-- Badge para indicar se o usuário é administrador -->
                                     {% if usuario.is_admin %}
                                         <span class="badge bg-primary">Sim</span>
                                     {% else %}
@@ -51,7 +47,6 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <!-- Badge para indicar se o usuário está ativo -->
                                     {% if usuario.is_active %}
                                         <span class="badge bg-success">Sim</span>
                                     {% else %}
@@ -59,13 +54,10 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ usuario.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
-                                <!-- Coluna de ações (Editar e Excluir) -->
                                 <td class="table-actions">
-                                    <!-- Botão de Editar -->
                                     <a href="{{ url_for('usuario.editar_usuario', id=usuario.id) }}" class="btn btn-warning me-2" title="Editar">
                                         <i class="fas fa-edit"></i> Editar
                                     </a>
-                                    <!-- Formulário para Excluir (com confirmação via JS) -->
                                     <form action="{{ url_for('usuario.excluir_usuario', id=usuario.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
                                         <button type="submit" class="btn btn-danger" title="Excluir">
                                             <i class="fas fa-trash-alt"></i> Excluir
@@ -78,7 +70,6 @@
                     </table>
                 </div>
                 {% else %}
-                <!-- Mensagem se não houver usuários cadastrados -->
                 <p class="text-center">Nenhum usuário cadastrado ainda.</p>
                 {% endif %}
             </div>

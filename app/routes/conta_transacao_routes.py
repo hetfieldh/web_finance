@@ -17,6 +17,8 @@ from app.forms.conta_transacao_forms import (
     CadastroContaTransacaoForm,
     EditarContaTransacaoForm,
 )
+from sqlalchemy import asc, desc
+
 
 conta_transacao_bp = Blueprint(
     "conta_transacao", __name__, url_prefix="/tipos_transacao"
@@ -26,7 +28,11 @@ conta_transacao_bp = Blueprint(
 @conta_transacao_bp.route("/")
 @login_required
 def listar_tipos_transacao():
-    tipos_transacao = ContaTransacao.query.filter_by(usuario_id=current_user.id).all()
+    tipos_transacao = (
+        ContaTransacao.query.filter_by(usuario_id=current_user.id)
+        .order_by(ContaTransacao.transacao_tipo.asc(), ContaTransacao.tipo.asc())
+        .all()
+    )
     return render_template(
         "conta_transacoes/list.html", tipos_transacao=tipos_transacao
     )
