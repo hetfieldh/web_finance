@@ -303,3 +303,13 @@ h6,
         padding: 0;
     }
 }
+
+/* Estilos para as páginas de erro (404 e 500) */
+.error-container {
+    background: #e9ecef;
+    padding: 3rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    max-width: 800px;
+    width: 90%;
+}

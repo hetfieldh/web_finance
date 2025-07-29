@@ -92,6 +92,14 @@ def create_app():
             )
         return response
 
+    @app.errorhandler(404)
+    def not_found_error(error):
+        user_info = current_user.login if current_user.is_authenticated else "Anônimo"
+        app.logger.warning(
+            f"Erro 404: Página não encontrada em {request.path} por {user_info}"
+        )
+        return render_template("errors/404.html"), 404
+
     @app.errorhandler(500)
     def internal_error(error):
         user_info = current_user.login if current_user.is_authenticated else "Anônimo"
@@ -100,6 +108,6 @@ def create_app():
             exc_info=True,
         )
         db.session.rollback()
-        return render_template("500.html"), 500
+        return render_template("errors/500.html"), 500
 
     return app
