@@ -3,56 +3,74 @@
 <div class="bg-light border-right" id="sidebar-wrapper">
     <div class="sidebar-heading text-center py-4">
         <a href="{{ url_for('main.dashboard') }}">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Web Finance"
-                 class="img-fluid" style="max-width: 120px; height: auto;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="Logo Web Finance"
+                class="img-fluid" style="max-width: 120px; height: auto;">
         </a>
     </div>
     <!-- Grupo de links de navegação na sidebar -->
     <div class="list-group list-group-flush">
-        <a href="{{ url_for('main.dashboard') }}" class="list-group-item list-group-item-action bg-light">
+        <a href="{{ url_for('main.dashboard') }}"
+            class="list-group-item list-group-item-action bg-light">
             <i class="fas fa-tachometer-alt me-2"></i>Dashboard
         </a>
 
         <!-- Menu "Cadastro" com submenus -->
-        <a href="#submenuCadastro" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">
+        <a href="#submenuCadastro" data-bs-toggle="collapse"
+            aria-expanded="false"
+            class="list-group-item list-group-item-action bg-light dropdown-toggle">
             <i class="fas fa-folder me-2"></i>Cadastro
         </a>
         <div class="collapse list-group-flush" id="submenuCadastro">
-            <a href="{{ url_for('usuario.listar_usuarios') }}" class="list-group-item list-group-item-action bg-light ps-4">
+            <a href="{{ url_for('usuario.listar_usuarios') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-users me-2"></i>Usuários
             </a>
-            <a href="{{ url_for('conta.listar_contas') }}" class="list-group-item list-group-item-action bg-light ps-4">
+            <a href="{{ url_for('conta.listar_contas') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-wallet me-2"></i>Contas Bancárias
+            </a>
+            <a href="{{ url_for('crediario.listar_crediarios') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
+                <i class="fas fa-credit-card me-2"></i>Crediários
             </a>
         </div>
 
         <!-- Menu "Movimentações" com submenus -->
-        <a href="#submenuMovimentacoes" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">
+        <a href="#submenuMovimentacoes" data-bs-toggle="collapse"
+            aria-expanded="false"
+            class="list-group-item list-group-item-action bg-light dropdown-toggle">
             <i class="fas fa-exchange-alt me-2"></i>Movimentações
         </a>
         <div class="collapse list-group-flush" id="submenuMovimentacoes">
-            <a href="{{ url_for('conta_movimento.listar_movimentacoes') }}" class="list-group-item list-group-item-action bg-light ps-4">
+            <a href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-file-invoice-dollar me-2"></i>Bancária
             </a>
         </div>
 
         <!-- Menu "Extratos" com submenus -->
-        <a href="#submenuExtratos" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-light dropdown-toggle">
+        <a href="#submenuExtratos" data-bs-toggle="collapse"
+            aria-expanded="false"
+            class="list-group-item list-group-item-action bg-light dropdown-toggle">
             <i class="fas fa-file-alt me-2"></i>Extratos
         </a>
         <div class="collapse list-group-flush" id="submenuExtratos">
-            <a href="{{ url_for('extrato.extrato_bancario') }}" class="list-group-item list-group-item-action bg-light ps-4">
+            <a href="{{ url_for('extrato.extrato_bancario') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-university me-2"></i>Bancário
             </a>
         </div>
 
         <!-- Links gerais de navegação -->
-        <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action bg-light text-danger">
+        <a href="{{ url_for('auth.logout') }}"
+            class="list-group-item list-group-item-action bg-light text-danger">
             <i class="fas fa-sign-out-alt me-2"></i>Sair
         </a>
     </div>
     {% if current_user.is_authenticated %}
-    <div class="list-group-item bg-light text-secondary mt-auto py-2 px-2 text-left logged-in-user-info">
+    <div
+        class="list-group-item bg-light text-secondary mt-auto py-2 px-2 text-left logged-in-user-info">
         Usuário: <strong>{{ current_user.login }}</strong>
     </div>
     {% endif %}

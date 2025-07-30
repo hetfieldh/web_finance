@@ -1,13 +1,13 @@
 # app/__init__.py
 
-from flask import Flask, redirect, render_template, url_for, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager, current_user
-
 import logging
-from logging.handlers import RotatingFileHandler
 import os
+from logging.handlers import RotatingFileHandler
+
+from flask import Flask, redirect, render_template, request, url_for
+from flask_login import LoginManager, current_user
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -26,22 +26,28 @@ def create_app():
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
 
-    from app.models.usuario_model import Usuario
     from app.models.conta_model import Conta
-    from app.models.conta_transacao_model import ContaTransacao
     from app.models.conta_movimento_model import ContaMovimento
+    from app.models.conta_transacao_model import ContaTransacao
+    from app.models.crediario_grupo_model import CrediarioGrupo
+    from app.models.crediario_model import Crediario
+    from app.models.crediario_movimento_model import CrediarioMovimento
+    from app.models.crediario_parcela_model import CrediarioParcela
+    from app.models.usuario_model import Usuario
 
     @login_manager.user_loader
     def load_user(user_id):
         return Usuario.query.get(int(user_id))
 
-    from app.routes.usuario_routes import usuario_bp
     from app.routes.auth_routes import auth_bp
-    from app.routes.main_routes import main_bp
+    from app.routes.conta_movimento_routes import conta_movimento_bp
     from app.routes.conta_routes import conta_bp
     from app.routes.conta_transacao_routes import conta_transacao_bp
-    from app.routes.conta_movimento_routes import conta_movimento_bp
+    from app.routes.crediario_grupo_routes import crediario_grupo_bp
+    from app.routes.crediario_routes import crediario_bp
     from app.routes.extrato_routes import extrato_bp
+    from app.routes.main_routes import main_bp
+    from app.routes.usuario_routes import usuario_bp
 
     app.register_blueprint(usuario_bp)
     app.register_blueprint(auth_bp)
@@ -50,6 +56,8 @@ def create_app():
     app.register_blueprint(conta_transacao_bp)
     app.register_blueprint(conta_movimento_bp)
     app.register_blueprint(extrato_bp)
+    app.register_blueprint(crediario_grupo_bp)
+    app.register_blueprint(crediario_bp)
 
     @app.route("/")
     def index():
