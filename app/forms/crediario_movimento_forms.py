@@ -93,7 +93,7 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
         default=1,
     )
 
-    submit = SubmitField("Registrar Compra")
+    submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -197,7 +197,7 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         ],
     )
 
-    submit = SubmitField("Atualizar Compra")
+    submit = SubmitField("Atualizar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

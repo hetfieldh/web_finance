@@ -149,6 +149,7 @@ def editar_movimento_crediario(id):
     form = EditarCrediarioMovimentoForm(obj=movimento)
 
     if form.validate_on_submit():
+        movimento.data_compra = form.data_compra.data
         movimento.valor_total_compra = form.valor_total_compra.data
         movimento.data_primeira_parcela = form.data_primeira_parcela.data
         movimento.numero_parcelas = form.numero_parcelas.data
@@ -156,16 +157,12 @@ def editar_movimento_crediario(id):
             form.descricao.data.strip() if form.descricao.data else None
         )
 
-        parcelas_existentes = CrediarioParcela.query.filter_by(
-            crediario_movimento_id=movimento.id
-        ).all()
-
         if (
             movimento.valor_total_compra != form.valor_total_compra.data
             or movimento.numero_parcelas != form.numero_parcelas.data
             or movimento.data_primeira_parcela != form.data_primeira_parcela.data
         ):
-            if any(p.pago for p in parcelas_existentes):
+            if any(p.pago for p in movimento.parcelas):
                 flash(
                     "Não é possível reajustar a compra. Existem parcelas que já foram pagas.",
                     "danger",
@@ -174,7 +171,7 @@ def editar_movimento_crediario(id):
                     "crediario_movimentos/edit.html", form=form, movimento=movimento
                 )
 
-            for parcela in parcelas_existentes:
+            for parcela in movimento.parcelas:
                 db.session.delete(parcela)
 
             valor_por_parcela = form.valor_total_compra.data / Decimal(

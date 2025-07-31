@@ -44,7 +44,7 @@
                                     fatura.crediario.tipo_crediario }})</td>
                                 <td>{{ fatura.mes_referencia }}</td>
                                 <td>{{
-                                    fatura.data_vencimento_fatura.strftime('%d/%m/%Y')
+                                    fatura.data_vencimento_fatura.strftime('%m/%Y')
                                     }}</td>
                                 <td>R$ {{
                                     "%.2f"|format(fatura.valor_total_fatura)

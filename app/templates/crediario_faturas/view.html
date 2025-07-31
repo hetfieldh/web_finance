@@ -73,8 +73,6 @@
                                 <th>Parcela</th>
                                 <th>Vencimento</th>
                                 <th>Valor Parcela</th>
-                                <th>Paga</th>
-                                <th>Data Pagamento</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,22 +80,14 @@
                             <tr>
                                 <td>{{ parcela.crediario_movimento_id }}</td>
                                 <td>{{ parcela.movimento_pai.descricao }}</td>
-                                <td>{{ parcela.numero_parcela }}</td>
+                                <td>{{ parcela.numero_parcela }}/{{
+                                    parcela.movimento_pai.numero_parcelas
+                                    }}</td>
                                 <td>{{
                                     parcela.data_vencimento.strftime('%d/%m/%Y')
                                     }}</td>
                                 <td>R$ {{ "%.2f"|format(parcela.valor_parcela)
                                     }}</td>
-                                <td>
-                                    {% if parcela.pago %}
-                                    <span class="badge bg-success">Sim</span>
-                                    {% else %}
-                                    <span class="badge bg-danger">Não</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{
-                                    parcela.data_pagamento.strftime('%d/%m/%Y')
-                                    if parcela.data_pagamento else 'N/A' }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
