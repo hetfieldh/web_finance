@@ -1,5 +1,6 @@
 # app/__init__.py
 
+import locale
 import logging
 import os
 from logging.handlers import RotatingFileHandler
@@ -20,6 +21,16 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    try:
+        locale.setlocale(locale.LC_TIME, "pt_BR.UTF-8")
+    except locale.Error:
+        try:
+            locale.setlocale(locale.LC_TIME, "Portuguese_Brazil.1252")
+        except locale.Error:
+            app.logger.warning(
+                "Não foi possível configurar o locale para pt-BR. Os nomes dos meses podem aparecer em inglês."
+            )
+
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
@@ -29,6 +40,7 @@ def create_app():
     from app.models.conta_model import Conta
     from app.models.conta_movimento_model import ContaMovimento
     from app.models.conta_transacao_model import ContaTransacao
+    from app.models.crediario_fatura_model import CrediarioFatura
     from app.models.crediario_grupo_model import CrediarioGrupo
     from app.models.crediario_model import Crediario
     from app.models.crediario_movimento_model import CrediarioMovimento
@@ -43,6 +55,7 @@ def create_app():
     from app.routes.conta_movimento_routes import conta_movimento_bp
     from app.routes.conta_routes import conta_bp
     from app.routes.conta_transacao_routes import conta_transacao_bp
+    from app.routes.crediario_fatura_routes import crediario_fatura_bp
     from app.routes.crediario_grupo_routes import crediario_grupo_bp
     from app.routes.crediario_movimento_routes import crediario_movimento_bp
     from app.routes.crediario_routes import crediario_bp
@@ -57,9 +70,10 @@ def create_app():
     app.register_blueprint(conta_transacao_bp)
     app.register_blueprint(conta_movimento_bp)
     app.register_blueprint(extrato_bp)
-    app.register_blueprint(crediario_grupo_bp)
     app.register_blueprint(crediario_bp)
+    app.register_blueprint(crediario_grupo_bp)
     app.register_blueprint(crediario_movimento_bp)
+    app.register_blueprint(crediario_fatura_bp)
 
     @app.route("/")
     def index():
@@ -118,6 +132,6 @@ def create_app():
             exc_info=True,
         )
         db.session.rollback()
-        return render_template("errors/500.html"), 500
+        return render_template("500.html"), 500
 
     return app

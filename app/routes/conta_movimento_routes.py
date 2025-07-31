@@ -1,28 +1,29 @@
 # app/routes/conta_movimento_routes.py
 
+from decimal import Decimal, getcontext
+
 from flask import (
     Blueprint,
+    current_app,
+    flash,
+    redirect,
     render_template,
     request,
-    redirect,
     url_for,
-    flash,
-    current_app,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
-from decimal import Decimal, getcontext
 
 getcontext().prec = 10
 
 from app import db
-from app.models.conta_movimento_model import ContaMovimento
-from app.models.conta_model import Conta
-from app.models.conta_transacao_model import ContaTransacao
 from app.forms.conta_movimento_forms import (
     CadastroContaMovimentoForm,
     EditarContaMovimentoForm,
 )
+from app.models.conta_model import Conta
+from app.models.conta_movimento_model import ContaMovimento
+from app.models.conta_transacao_model import ContaTransacao
 
 conta_movimento_bp = Blueprint("conta_movimento", __name__, url_prefix="/movimentacoes")
 

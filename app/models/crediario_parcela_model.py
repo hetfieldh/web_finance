@@ -24,11 +24,6 @@ class CrediarioParcela(db.Model):
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    # REMOVIDO: Este relacionamento explícito é redundante e causa conflito
-    # com o backref='movimento_pai' definido em CrediarioMovimento.
-    # O backref já cria a propriedade 'movimento_pai' em CrediarioParcela.
-    # crediario_movimento = db.relationship('CrediarioMovimento', backref=db.backref('parcelas', lazy=True))
-
     __table_args__ = (
         UniqueConstraint(
             "crediario_movimento_id", "numero_parcela", name="_crediario_parcela_uc"

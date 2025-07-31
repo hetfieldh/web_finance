@@ -71,6 +71,17 @@
                         {% endif %}
                     </div>
                     <div class="mb-1">
+                        {{ form.data_primeira_parcela.label(class="form-label")
+                        }}
+                        {{ form.data_primeira_parcela(class="form-select") }}
+                        {% if form.data_primeira_parcela.errors %}
+                        <div class="text-danger">
+                            {% for error in form.data_primeira_parcela.errors
+                            %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
                         {{ form.numero_parcelas.label(class="form-label") }}
                         {{ form.numero_parcelas(class="form-control",
                         type="number", min="1") }}

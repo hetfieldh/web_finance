@@ -19,28 +19,22 @@
                     {{ form.csrf_token }}
 
                     <div class="mb-1">
-                        {{ form.crediario_id.label(class="form-label") }}
-                        {{ form.crediario_id(class="form-select") }}
-                        {% if form.crediario_id.errors %}
-                        <div class="text-danger">
-                            {% for error in form.crediario_id.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
+                        <label class="form-label">Crediário:</label>
+                        <input type="text" class="form-control"
+                            value="{{ movimento.crediario.nome_crediario }} ({{ movimento.crediario.tipo_crediario }})"
+                            readonly>
                     </div>
                     <div class="mb-1">
-                        {{ form.crediario_grupo_id.label(class="form-label") }}
-                        {{ form.crediario_grupo_id(class="form-select") }}
-                        {% if form.crediario_grupo_id.errors %}
-                        <div class="text-danger">
-                            {% for error in form.crediario_grupo_id.errors %}{{
-                            error }}{% endfor %}
-                        </div>
-                        {% endif %}
+                        <label class="form-label">Grupo de Crediário:</label>
+                        <input type="text" class="form-control"
+                            value="{{ movimento.crediario_grupo.grupo_crediario if movimento.crediario_grupo else 'N/A' }}"
+                            readonly>
                     </div>
+
                     <div class="mb-1">
                         {{ form.data_compra.label(class="form-label") }}
-                        {{ form.data_compra(class="form-control", type="date")
+                        {{ form.data_compra(class="form-control", type="date",
+                        disabled=True)
                         }}
                         {% if form.data_compra.errors %}
                         <div class="text-danger">
@@ -61,12 +55,13 @@
                         {% endif %}
                     </div>
                     <div class="mb-1">
-                        {{ form.descricao.label(class="form-label") }}
-                        {{ form.descricao(class="form-control", rows="3") }}
-                        {% if form.descricao.errors %}
+                        {{ form.data_primeira_parcela.label(class="form-label")
+                        }}
+                        {{ form.data_primeira_parcela(class="form-select") }}
+                        {% if form.data_primeira_parcela.errors %}
                         <div class="text-danger">
-                            {% for error in form.descricao.errors %}{{ error
-                            }}{% endfor %}
+                            {% for error in form.data_primeira_parcela.errors
+                            %}{{ error }}{% endfor %}
                         </div>
                         {% endif %}
                     </div>
@@ -81,7 +76,18 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3"> {# Espaçamento final antes dos botões #}
+
+                    <div class="mb-1">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="3") }}
+                        {% if form.descricao.errors %}
+                        <div class="text-danger">
+                            {% for error in form.descricao.errors %}{{ error
+                            }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
                     </div>
                     {{ form.submit(class="btn btn-primary btn-add") }}
                     <a

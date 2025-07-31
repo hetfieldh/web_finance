@@ -32,6 +32,7 @@
                                 <th>Data Compra</th>
                                 <th>Valor Total</th>
                                 <th>Parcelas</th>
+                                <th>1ª Parcela</th>
                                 <th>Descrição</th>
                                 <th>Criação Registro</th>
                                 <th>Ações</th>
@@ -50,6 +51,9 @@
                                 <td>R$ {{ "%.2f"|format(mov.valor_total_compra)
                                     }}</td>
                                 <td>{{ mov.numero_parcelas }}</td>
+                                <td>{{
+                                    mov.data_primeira_parcela.strftime('%m/%Y')
+                                    }}</td>
                                 <td>{{ mov.descricao }}</td>
                                 <td>{{
                                     mov.data_criacao.strftime('%d/%m/%Y %H:%M')

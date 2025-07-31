@@ -1,10 +1,11 @@
 # app/forms/crediario_movimento_forms.py
 
-from datetime import date
+from datetime import date, datetime
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
+    BooleanField,
     DateField,
     DecimalField,
     IntegerField,
@@ -26,6 +27,18 @@ from app import db
 from app.models.crediario_grupo_model import CrediarioGrupo
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
+
+
+def coerce_month_year_to_date(value):
+    if isinstance(value, date):
+        return value
+    if value:
+        try:
+            year, month = map(int, value.split("-"))
+            return date(year, month, 1)
+        except ValueError:
+            raise ValidationError("Formato de mês/ano inválido. Use AAAA-MM.")
+    return None
 
 
 class CadastroCrediarioMovimentoForm(FlaskForm):
@@ -60,9 +73,15 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     descricao = TextAreaField(
         "Descrição (opcional)",
         validators=[
+            DataRequired("A descrição é obrigatória."),
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
-            Optional(),
         ],
+    )
+
+    data_primeira_parcela = SelectField(
+        "Mês/Ano da 1ª Parcela",
+        validators=[DataRequired("O mês/ano da primeira parcela é obrigatório.")],
+        coerce=coerce_month_year_to_date,
     )
 
     numero_parcelas = IntegerField(
@@ -74,28 +93,56 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
         default=1,
     )
 
-    submit = SubmitField("Adicionar")
+    submit = SubmitField("Registrar Compra")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.crediario_id.choices = [("", "Selecione...")] + [
-            (
-                str(c.id),
-                f"{c.nome_crediario} ({c.tipo_crediario})",
-            )
+            (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})")
             for c in Crediario.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Crediario.nome_crediario.asc())
             .all()
         ]
         self.crediario_grupo_id.choices = [("", "Nenhum")] + [
-            (
-                str(cg.id),
-                f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})",
-            )
+            (str(cg.id), f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})")
             for cg in CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
             .order_by(CrediarioGrupo.grupo_crediario.asc())
             .all()
         ]
+
+        meses_anos = []
+        hoje = date.today()
+        nomes_meses_ptbr = {
+            1: "Janeiro",
+            2: "Fevereiro",
+            3: "Março",
+            4: "Abril",
+            5: "Maio",
+            6: "Junho",
+            7: "Julho",
+            8: "Agosto",
+            9: "Setembro",
+            10: "Outubro",
+            11: "Novembro",
+            12: "Dezembro",
+        }
+
+        for i in range(2):
+            mes = hoje.month + i
+            ano = hoje.year
+            while mes > 12:
+                mes -= 12
+                ano += 1
+
+            mes_formatado = f"{mes:02d}"
+            value = f"{ano}-{mes_formatado}"
+            label = f"{nomes_meses_ptbr[mes]}/{ano}"
+
+            meses_anos.append((value, label))
+
+        self.data_primeira_parcela.choices = [
+            ("", "Selecione um mês/ano...")
+        ] + meses_anos
 
 
 class EditarCrediarioMovimentoForm(FlaskForm):
@@ -117,7 +164,6 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Data da Compra",
         format="%Y-%m-%d",
         validators=[DataRequired("A data da compra é obrigatória.")],
-        render_kw={"readonly": True},
     )
 
     valor_total_compra = DecimalField(
@@ -127,7 +173,6 @@ class EditarCrediarioMovimentoForm(FlaskForm):
             NumberRange(min=0.01, message="O valor deve ser maior que zero."),
         ],
         places=2,
-        render_kw={"readonly": True},
     )
 
     descricao = TextAreaField(
@@ -138,34 +183,67 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         ],
     )
 
+    data_primeira_parcela = SelectField(
+        "Mês/Ano da 1ª Parcela",
+        validators=[DataRequired("A data da primeira parcela é obrigatória.")],
+        coerce=coerce_month_year_to_date,
+    )
+
     numero_parcelas = IntegerField(
         "Número de Parcelas",
         validators=[
             DataRequired("O número de parcelas é obrigatório."),
             NumberRange(min=1, message="O número de parcelas deve ser no mínimo 1."),
         ],
-        render_kw={"readonly": True},
     )
 
-    submit = SubmitField("Atualizar")
+    submit = SubmitField("Atualizar Compra")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.crediario_id.choices = [("", "Selecione...")] + [
-            (
-                str(c.id),
-                f"{c.nome_crediario} ({c.tipo_crediario})",
-            )
+            (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})")
             for c in Crediario.query.filter_by(usuario_id=current_user.id)
             .order_by(Crediario.nome_crediario.asc())
             .all()
         ]
         self.crediario_grupo_id.choices = [("", "Nenhum")] + [
-            (
-                str(cg.id),
-                f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})",
-            )
+            (str(cg.id), f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})")
             for cg in CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
             .order_by(CrediarioGrupo.grupo_crediario.asc())
             .all()
         ]
+
+        meses_anos = []
+        hoje = date.today()
+        nomes_meses_ptbr = {
+            1: "Janeiro",
+            2: "Fevereiro",
+            3: "Março",
+            4: "Abril",
+            5: "Maio",
+            6: "Junho",
+            7: "Julho",
+            8: "Agosto",
+            9: "Setembro",
+            10: "Outubro",
+            11: "Novembro",
+            12: "Dezembro",
+        }
+
+        for i in range(12):
+            mes = hoje.month + i
+            ano = hoje.year
+            while mes > 12:
+                mes -= 12
+                ano += 1
+
+            mes_formatado = f"{mes:02d}"
+            value = f"{ano}-{mes_formatado}"
+            label = f"{nomes_meses_ptbr[mes]}/{ano}"
+
+            meses_anos.append((value, label))
+
+        self.data_primeira_parcela.choices = [
+            ("", "Selecione um mês/ano...")
+        ] + meses_anos

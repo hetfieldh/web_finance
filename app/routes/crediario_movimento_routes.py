@@ -1,7 +1,6 @@
 # app/routes/crediario_movimento_routes.py
 
-from datetime import date, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, getcontext
 
 from flask import (
     Blueprint,
@@ -15,11 +14,18 @@ from flask import (
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 
+getcontext().prec = 10
+
+from datetime import date, timedelta
+
+from dateutil.relativedelta import relativedelta
+
 from app import db
 from app.forms.crediario_movimento_forms import (
     CadastroCrediarioMovimentoForm,
     EditarCrediarioMovimentoForm,
 )
+from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_grupo_model import CrediarioGrupo
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
@@ -56,7 +62,15 @@ def adicionar_movimento_crediario():
         data_compra = form.data_compra.data
         valor_total_compra = form.valor_total_compra.data
         descricao = form.descricao.data.strip()
+        data_primeira_parcela_obj = form.data_primeira_parcela.data
         numero_parcelas = form.numero_parcelas.data
+
+        crediario_obj = db.session.query(Crediario).get(crediario_id)
+        crediario_grupo_obj = (
+            db.session.query(CrediarioGrupo).get(crediario_grupo_id)
+            if crediario_grupo_id
+            else None
+        )
 
         if valor_total_compra <= 0:
             flash("O valor total da compra deve ser maior que zero.", "danger")
@@ -74,6 +88,7 @@ def adicionar_movimento_crediario():
                 data_compra=data_compra,
                 valor_total_compra=valor_total_compra,
                 descricao=descricao,
+                data_primeira_parcela=data_primeira_parcela_obj,
                 numero_parcelas=numero_parcelas,
             )
             db.session.add(novo_movimento)
@@ -81,32 +96,12 @@ def adicionar_movimento_crediario():
 
             valor_por_parcela = valor_total_compra / Decimal(str(numero_parcelas))
 
-            for i in range(1, numero_parcelas + 1):
-                mes_vencimento = data_compra.month + i
-                ano_vencimento = data_compra.year
-                while mes_vencimento > 12:
-                    mes_vencimento -= 12
-                    ano_vencimento += 1
-
-                dia_vencimento = min(
-                    data_compra.day,
-                    (
-                        (
-                            datetime(ano_vencimento, mes_vencimento + 1, 1)
-                            - timedelta(days=1)
-                        ).day
-                        if mes_vencimento < 12
-                        else (
-                            datetime(ano_vencimento + 1, 1, 1) - timedelta(days=1)
-                        ).day
-                    ),
-                )
-
-                data_vencimento = date(ano_vencimento, mes_vencimento, dia_vencimento)
+            for i in range(numero_parcelas):
+                data_vencimento = data_primeira_parcela_obj + relativedelta(months=i)
 
                 nova_parcela = CrediarioParcela(
                     crediario_movimento_id=novo_movimento.id,
-                    numero_parcela=i,
+                    numero_parcela=i + 1,
                     data_vencimento=data_vencimento,
                     valor_parcela=valor_por_parcela,
                     pago=False,
@@ -151,25 +146,74 @@ def editar_movimento_crediario(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    form = EditarCrediarioMovimentoForm()
+    form = EditarCrediarioMovimentoForm(obj=movimento)
 
     if form.validate_on_submit():
-        movimento.descricao = form.descricao.data.strip()
-
-        db.session.commit()
-        flash("Movimento de crediário atualizado com sucesso!", "success")
-        current_app.logger.info(
-            f"Movimento de crediário (ID: {movimento.id}) atualizado por {current_user.login}."
+        movimento.valor_total_compra = form.valor_total_compra.data
+        movimento.data_primeira_parcela = form.data_primeira_parcela.data
+        movimento.numero_parcelas = form.numero_parcelas.data
+        movimento.descricao = (
+            form.descricao.data.strip() if form.descricao.data else None
         )
-        return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
 
-    elif request.method == "GET":
-        form.crediario_id.data = movimento.crediario_id
-        form.crediario_grupo_id.data = movimento.crediario_grupo_id
-        form.data_compra.data = movimento.data_compra
-        form.valor_total_compra.data = movimento.valor_total_compra
-        form.descricao.data = movimento.descricao
-        form.numero_parcelas.data = movimento.numero_parcelas
+        parcelas_existentes = CrediarioParcela.query.filter_by(
+            crediario_movimento_id=movimento.id
+        ).all()
+
+        if (
+            movimento.valor_total_compra != form.valor_total_compra.data
+            or movimento.numero_parcelas != form.numero_parcelas.data
+            or movimento.data_primeira_parcela != form.data_primeira_parcela.data
+        ):
+            if any(p.pago for p in parcelas_existentes):
+                flash(
+                    "Não é possível reajustar a compra. Existem parcelas que já foram pagas.",
+                    "danger",
+                )
+                return render_template(
+                    "crediario_movimentos/edit.html", form=form, movimento=movimento
+                )
+
+            for parcela in parcelas_existentes:
+                db.session.delete(parcela)
+
+            valor_por_parcela = form.valor_total_compra.data / Decimal(
+                str(form.numero_parcelas.data)
+            )
+            for i in range(form.numero_parcelas.data):
+                data_vencimento = form.data_primeira_parcela.data + relativedelta(
+                    months=i
+                )
+                nova_parcela = CrediarioParcela(
+                    crediario_movimento_id=movimento.id,
+                    numero_parcela=i + 1,
+                    data_vencimento=data_vencimento,
+                    valor_parcela=valor_por_parcela,
+                    pago=False,
+                )
+                db.session.add(nova_parcela)
+
+            movimento.valor_total_compra = form.valor_total_compra.data
+            movimento.data_primeira_parcela = form.data_primeira_parcela.data
+            movimento.numero_parcelas = form.numero_parcelas.data
+
+        try:
+            db.session.commit()
+            flash("Movimento de crediário atualizado com sucesso!", "success")
+            current_app.logger.info(
+                f"Movimento de crediário (ID: {movimento.id}) atualizado por {current_user.login}."
+            )
+            return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(
+                f"Erro ao salvar atualização de movimento de crediário: {e}",
+                exc_info=True,
+            )
+            flash("Ocorreu um erro ao atualizar a compra. Tente novamente.", "danger")
+            return render_template(
+                "crediario_movimentos/edit.html", form=form, movimento=movimento
+            )
 
     return render_template(
         "crediario_movimentos/edit.html", form=form, movimento=movimento
@@ -183,20 +227,19 @@ def excluir_movimento_crediario(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    ultima_movimentacao = (
-        CrediarioMovimento.query.filter_by(
-            crediario_id=movimento.crediario_id, usuario_id=current_user.id
-        )
-        .order_by(CrediarioMovimento.data_compra.desc(), CrediarioMovimento.id.desc())
-        .first()
-    )
-
-    if ultima_movimentacao and ultima_movimentacao.id != movimento.id:
-        flash(
-            "Não é possível excluir esta compra. Apenas a última compra (mais recente) do crediário pode ser excluída.",
-            "danger",
-        )
-        return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
+    for parcela in movimento.parcelas:
+        mes_referencia = parcela.data_vencimento.strftime("%Y-%m")
+        fatura = CrediarioFatura.query.filter_by(
+            crediario_id=movimento.crediario_id,
+            usuario_id=current_user.id,
+            mes_referencia=mes_referencia,
+        ).first()
+        if fatura:
+            flash(
+                f"Não é possível excluir esta compra. A fatura do mês {mes_referencia} já foi gerada para o crediário.",
+                "danger",
+            )
+            return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
 
     if any(parcela.pago for parcela in movimento.parcelas):
         flash(
@@ -209,6 +252,6 @@ def excluir_movimento_crediario(id):
     db.session.commit()
     flash("Compra no crediário excluída com sucesso!", "success")
     current_app.logger.info(
-        f"Movimento de crediário (ID: {movimento.id}) excluído por {current_user.login}."
+        f"Movimentação {movimento.id} excluída por {current_user.login}."
     )
     return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
