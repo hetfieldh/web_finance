@@ -18,15 +18,16 @@ class CrediarioParcela(db.Model):
     data_vencimento = db.Column(db.Date, nullable=False)
     valor_parcela = db.Column(Numeric(12, 2), nullable=False)
     pago = db.Column(db.Boolean, nullable=False, default=False)
-    data_pagamento = db.Column(db.Date, nullable=True) 
+    data_pagamento = db.Column(db.Date, nullable=True)
 
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
-    crediario_movimento = db.relationship(
-        "CrediarioMovimento", backref=db.backref("parcelas", lazy=True)
-    )
+    # REMOVIDO: Este relacionamento explícito é redundante e causa conflito
+    # com o backref='movimento_pai' definido em CrediarioMovimento.
+    # O backref já cria a propriedade 'movimento_pai' em CrediarioParcela.
+    # crediario_movimento = db.relationship('CrediarioMovimento', backref=db.backref('parcelas', lazy=True))
 
     __table_args__ = (
         UniqueConstraint(

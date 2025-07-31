@@ -44,6 +44,7 @@ def create_app():
     from app.routes.conta_routes import conta_bp
     from app.routes.conta_transacao_routes import conta_transacao_bp
     from app.routes.crediario_grupo_routes import crediario_grupo_bp
+    from app.routes.crediario_movimento_routes import crediario_movimento_bp
     from app.routes.crediario_routes import crediario_bp
     from app.routes.extrato_routes import extrato_bp
     from app.routes.main_routes import main_bp
@@ -58,6 +59,7 @@ def create_app():
     app.register_blueprint(extrato_bp)
     app.register_blueprint(crediario_grupo_bp)
     app.register_blueprint(crediario_bp)
+    app.register_blueprint(crediario_movimento_bp)
 
     @app.route("/")
     def index():
