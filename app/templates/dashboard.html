@@ -1,4 +1,5 @@
-<!-- app/templates/dashboard.html -->
+# app/templates/dashboard.html
+
 {% extends 'base.html' %}
 
 {% block title %}Web Finance - Dashboard{% endblock %}
@@ -7,54 +8,140 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="mt-0">Bem-vindo(a), {{ current_user.nome or current_user.login }}!</h2>
+        <h2 class="mt-0">Bem-vindo(a), {{ current_user.nome or
+            current_user.login }}!</h2>
         <p id="data-atual"></p>
     </div>
 </div>
 
 <div class="row g-1 mt-0">
-    {% if contas_do_usuario %}
-        {% for conta in contas_do_usuario %}
-        <div class="col-xl-2 col-md-6 col-sm-12">
-            <div class="card border-start {% if conta.saldo_atual >= 0 %}border-success{% else %}border-danger{% endif %} shadow-sm h-100">
-                <div class="card-body pt-1 pb-0 ps-2 pe-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-uppercase fw-bold text-dark extra-small-2">
-                                {{ conta.nome_banco }}
+    <!--- Bloco de contas bancárias -->
+    <div class="col-12">
+        <div class="card card-borders shadow-sm mb-0">
+            <div class="card-header bg-light text-secondary py-0 border-0">
+                <h6 class="fw-semibold mb-1 mt-1">Contas Bancárias Ativas</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-1">
+                    {% if contas_do_usuario %}
+                    {% for conta in contas_do_usuario %}
+                    <div class="col-xl-2 col-md-4 col-sm-6 mb-0 mt-0">
+                        <div
+                            class="card border-start {% if conta.saldo_atual >= 0 %}border-success{% else %}border-danger{% endif %} shadow-sm h-100">
+                            <div class="card-body pt-1 pb-0 ps-2 pe-2">
+                                <div
+                                    class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div
+                                            class="text-uppercase fw-bold text-dark extra-small-2">
+                                            {{ conta.nome_banco }}
+                                        </div>
+                                        <div
+                                            class="text-uppercase fw-regular text-dark extra-small-2">
+                                            {{ conta.tipo }}
+                                        </div>
+                                        <div
+                                            class="h5 fw-bold {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            R$ {{
+                                            "%.2f"|format(conta.saldo_atual) }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <i
+                                            class="fas fa-wallet fa-2x text-secondary"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-uppercase fw-regular text-dark extra-small-2">
-                                {{ conta.tipo }}
-                            </div>
-                            <div class="h5 fw-bold {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                R$ {{ "%.2f"|format(conta.saldo_atual) }}
-                            </div>
-                        </div>
-                        <div>
-                            <i class="fas fa-wallet fa-2x text-secondary"></i>
                         </div>
                     </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="col-12">
+                        <p class="text-center text-muted">Nenhuma conta bancária
+                            cadastrada.</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="col-12">
-            <p class="text-center text-muted">Nenhuma conta bancária cadastrada.</p>
+    </div>
+
+    </br> </br>
+
+    <!--- Bloco das Faturas de Crediário -->
+    <div class="col-12">
+        <div class="card carb-borders shadow-sm mb-0">
+            <div class="card-header bg-light text-secondary py-0 border-0">
+                <h6 class="fw-semibold mb-1 mt-1">Faturas de Crediário em Aberto</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-1">
+                    {% if faturas_do_mes %}
+                    {% for fatura in faturas_do_mes %}
+                    <div class="col-xl-2 col-md-4 col-sm-6 mb-0 mt-0">
+                        <div
+                            class="card border-start {% if fatura.status == 'Paga' %}border-success{% elif fatura.status == 'Atrasada' %}border-danger{% else %}border-warning{% endif %} shadow-sm h-100">
+                            <div class="card-body pt-1 pb-0 ps-2 pe-2">
+                                <div
+                                    class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div
+                                            class="text-uppercase fw-bold text-dark extra-small-2">
+                                            Fatura {{
+                                            fatura.crediario.nome_crediario }}
+                                        </div>
+                                        <div
+                                            class="text-uppercase fw-regular text-dark extra-small-2">
+                                            <strong class="text-secondary">{{
+                                                fatura.status }}</strong>:
+                                            <span class="text-secondary">
+                                                {{
+                                                fatura.data_vencimento_fatura.strftime('%m/%Y')
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="h5 fw-bold {% if fatura.status == 'Paga' %}text-success{% elif fatura.status == 'Atrasada' %}text-danger{% else %}text-danger{% endif %}">
+                                            R$ {{
+                                            "%.2f"|format(fatura.valor_total_fatura)
+                                            }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <i
+                                            class="fas fa-receipt fa-2x text-secondary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="col-12">
+                        <p class="text-center text-muted">Nenhuma fatura a
+                            vencer neste mês.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-    {% endif %}
+    </div>
 </div>
 
-</br>
+<br />
 
 <div class="row g-1 mt-0">
+    <!-- Card de Receitas do Mês -->
     <div class="col-xl-2 col-md-6 col-sm-12">
         <div class="card border-start border-success shadow-sm h-100">
             <div class="card-body pt-1 pb-0 ps-2 pe-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-uppercase fw-bold text-success extra-small-2">Receitas</div>
-                        <div class="text-uppercase fw-regular text-dark extra-small-2">Este mês</div>
+                        <div
+                            class="text-uppercase fw-bold text-success extra-small-2">Receitas</div>
+                        <div
+                            class="text-uppercase fw-regular text-dark extra-small-2">Este
+                            mês</div>
                         <div class="h5 fw-bold text-dark">R$ 5.000,00</div>
                     </div>
                     <i class="fas fa-calendar fa-2x text-success"></i>
@@ -63,13 +150,17 @@
         </div>
     </div>
 
+    <!-- Card de Despesas do Mês -->
     <div class="col-xl-2 col-md-6 col-sm-12">
         <div class="card border-start border-warning shadow-sm h-100">
             <div class="card-body pt-1 pb-0 ps-2 pe-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-uppercase fw-bold text-warning extra-small-2">Despesas</div>
-                        <div class="text-uppercase fw-regular text-dark extra-small-2">Este mês</div>
+                        <div
+                            class="text-uppercase fw-bold text-warning extra-small-2">Despesas</div>
+                        <div
+                            class="text-uppercase fw-regular text-dark extra-small-2">Este
+                            mês</div>
                         <div class="h5 fw-bold text-dark">R$ 2.500,00</div>
                     </div>
                     <i class="fas fa-money-bill-wave fa-2x text-warning"></i>
@@ -78,14 +169,19 @@
         </div>
     </div>
 
+    <!-- Card de Última Transação -->
     <div class="col-xl-2 col-md-6 col-sm-12">
         <div class="card border-start border-info shadow-sm h-100">
             <div class="card-body pt-1 pb-0 ps-2 pe-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-uppercase fw-bold text-info extra-small-2">Última Transação</div>
-                        <div class="text-uppercase fw-regular text-dark extra-small-2">Supermercado</div>
-                        <div class="h6 fw-semibold text-dark mb-0">R$ 320,00</div>
+                        <div
+                            class="text-uppercase fw-bold text-info extra-small-2">Última
+                            Transação</div>
+                        <div
+                            class="text-uppercase fw-regular text-dark extra-small-2">Supermercado</div>
+                        <div class="h6 fw-semibold text-dark mb-0">R$
+                            320,00</div>
                     </div>
                     <i class="fas fa-receipt fa-2x text-info"></i>
                 </div>
@@ -93,5 +189,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

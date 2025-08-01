@@ -187,6 +187,12 @@ h6,
     font-size: 1.05rem;
 }
 
+/* Cores do bloco de cards */
+.card-borders {
+    border: 1px solid #6b737a36;
+    border-radius: 0rem;
+}
+
 /* Links em listas de navegação e navbar */
 .list-group-item {
     font-size: 0.9rem;
