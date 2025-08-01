@@ -41,7 +41,10 @@ crediario_movimento_bp = Blueprint(
 def listar_movimentos_crediario():
     movimentos_crediario = (
         CrediarioMovimento.query.filter_by(usuario_id=current_user.id)
-        .order_by(CrediarioMovimento.data_compra.desc())
+        .order_by(
+            CrediarioMovimento.data_compra.desc(),
+            CrediarioMovimento.data_criacao .desc(),
+        )
         .all()
     )
     return render_template(

@@ -144,7 +144,9 @@ def gerar_fatura():
                         "danger",
                     )
             else:
-                flash("Não há movimentações para gerar fatura neste período.", "warning")
+                flash(
+                    "Não há movimentações para gerar fatura neste período.", "warning"
+                )
                 return redirect(url_for("crediario_fatura.listar_faturas"))
 
     elif request.method == "GET":

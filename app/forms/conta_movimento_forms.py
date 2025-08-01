@@ -74,7 +74,7 @@ class CadastroContaMovimentoForm(FlaskForm):
         coerce=lambda x: int(x) if x else None,
     )
 
-    submit = SubmitField("Registrar Movimentação")
+    submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -159,7 +159,7 @@ class EditarContaMovimentoForm(FlaskForm):
         ],
     )
 
-    submit = SubmitField("Atualizar Movimentação")
+    submit = SubmitField("Atualizar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -13,29 +13,34 @@
                 <h5 class="mb-0">Gerar Extrato Bancário</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('extrato.extrato_bancario') }}">
+                <form method="POST"
+                    action="{{ url_for('extrato.extrato_bancario') }}">
                     {{ form.csrf_token }}
                     <div class="row">
                         <div class="col-md-6 mb-1">
                             {{ form.conta_id.label(class="form-label") }}
                             {{ form.conta_id(class="form-select") }}
                             {% if form.conta_id.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.conta_id.errors %}{{ error }}{% endfor %}
-                                </div>
+                            <div class="text-danger">
+                                {% for error in form.conta_id.errors %}{{ error
+                                }}{% endfor %}
+                            </div>
                             {% endif %}
                         </div>
                         <div class="col-md-4 mb-1">
                             {{ form.mes_ano.label(class="form-label") }}
                             {{ form.mes_ano(class="form-select") }}
                             {% if form.mes_ano.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.mes_ano.errors %}{{ error }}{% endfor %}
-                                </div>
+                            <div class="text-danger">
+                                {% for error in form.mes_ano.errors %}{{ error
+                                }}{% endfor %}
+                            </div>
                             {% endif %}
                         </div>
                         <div class="col-md-2 d-flex align-items-end mb-1">
-                            {{ form.submit(class="btn btn-primary btn-add w-100") }}
+                            {{
+                            form.submit(class="btn btn-primary btn-add w-100")
+                            }}
                         </div>
                     </div>
                 </form>
@@ -45,36 +50,47 @@
         {% if movimentacoes or (form.is_submitted() and conta_selecionada) %}
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Extrato de {{ conta_selecionada.nome_banco }} - {{ conta_selecionada.conta }} ({{ conta_selecionada.tipo }})</h5>
+                <h5 class="mb-0">Extrato de {{ conta_selecionada.nome_banco }} -
+                    {{ conta_selecionada.conta }} ({{ conta_selecionada.tipo
+                    }})</h5>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-3">
-                        <p class="mb-0"><strong>Saldo Anterior:</strong> R$ {{ "%.2f"|format(saldo_anterior) }}</p>
+                        <p class="mb-0"><strong>Saldo Anterior:</strong> R$ {{
+                            "%.2f"|format(saldo_anterior) }}</p>
                     </div>
                     <div class="col-md-3">
-                        <p class="mb-0"><strong>Créditos no Mês:</strong> <span class="text-success">R$ {{ "%.2f"|format(total_creditos) }}</span></p>
+                        <p class="mb-0"><strong>Créditos no Mês:</strong> <span
+                                class="text-success">R$ {{
+                                "%.2f"|format(total_creditos) }}</span></p>
                     </div>
                     <div class="col-md-3">
-                        <p class="mb-0"><strong>Débitos no Mês:</strong> <span class="text-danger">R$ {{ "%.2f"|format(total_debitos) }}</span></p>
+                        <p class="mb-0"><strong>Débitos no Mês:</strong> <span
+                                class="text-danger">R$ {{
+                                "%.2f"|format(total_debitos) }}</span></p>
                     </div>
 
                     <div class="col-md-3 mt-0">
                         <p class="mb-0"><strong>Limite Disponível:</strong>
-                            {% if limite_conta is not none and limite_conta > 0 %}
-                                R$ {{ "%.2f"|format(limite_conta) }}
+                            {% if limite_conta is not none and limite_conta > 0
+                            %}
+                            R$ {{ "%.2f"|format(limite_conta) }}
                             {% else %}
-                                R$ 0.00
+                            R$ 0.00
                             {% endif %}
                         </p>
                     </div>
 
-                    <div class="col-md-3 mt-2 {% if saldo_final_mes >= 0 %}saldo-positivo-box{% else %}saldo-negativo-box{% endif %}">
+                    <div
+                        class="col-md-3 mt-2 {% if saldo_final_mes >= 0 %}saldo-positivo-box{% else %}saldo-negativo-box{% endif %}">
                         <p class="mb-0"><strong>Saldo Final:</strong>
                             {% if saldo_final_mes >= 0 %}
-                                <span class="text-success">R$ {{ "%.2f"|format(saldo_final_mes) }}</span>
+                            <span class="text-success">R$ {{
+                                "%.2f"|format(saldo_final_mes) }}</span>
                             {% else %}
-                                <span class="text-danger">R$ {{ "%.2f"|format(saldo_final_mes) }}</span>
+                            <span class="text-danger">R$ {{
+                                "%.2f"|format(saldo_final_mes) }}</span>
                             {% endif %}
                         </p>
                     </div>
@@ -96,31 +112,37 @@
                         <tbody>
                             {% for mov in movimentacoes %}
                             <tr>
-                                <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
+                                <td>{{mov.data_movimento.strftime('%d/%m/%Y')}}</td>
                                 <td>{{ mov.tipo_transacao_nome }}</td>
                                 <td>
                                     {% if mov.tipo_movimento == 'Crédito' %}
-                                        <span class="badge bg-success">{{ mov.tipo_movimento }}</span>
+                                    <span class="badge bg-success">{{
+                                        mov.tipo_movimento }}</span>
                                     {% elif mov.tipo_movimento == 'Débito' %}
-                                        <span class="badge bg-danger">{{ mov.tipo_movimento }}</span>
+                                    <span class="badge bg-danger">{{
+                                        mov.tipo_movimento }}</span>
                                     {% else %}
-                                        {{ mov.tipo_movimento }}
+                                    {{ mov.tipo_movimento }}
                                     {% endif %}
                                 </td>
                                 <td>R$ {{ "%.2f"|format(mov.valor) }}</td>
-                                <td>{{ mov.descricao if mov.descricao else 'N/A' }}</td>
-                                <td>R$ {{ "%.2f"|format(mov.saldo_acumulado) }}</td>
+                                <td>{{ mov.descricao if mov.descricao else
+                                    'N/A'}}</td>
+                                <td>R$ {{ "%.2f"|format(mov.saldo_acumulado)
+                                    }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 {% else %}
-                <p class="text-center alert alert-info mt-3">Nenhuma movimentação encontrada para o período selecionado.</p>
+                <p class="text-center alert alert-info mt-3">Nenhuma
+                    movimentação encontrada para o período selecionado.</p>
                 {% endif %}
             </div>
         </div>
-        {% elif form.is_submitted() and not movimentacoes and not conta_selecionada %}
+        {% elif form.is_submitted() and not movimentacoes and not
+        conta_selecionada %}
 
         {% endif %}
     </div>

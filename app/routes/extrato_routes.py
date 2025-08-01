@@ -1,14 +1,16 @@
 # app/routes/extrato_routes.py
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
+from datetime import date, datetime, timedelta
+from decimal import Decimal
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+
 from app import db
+from app.forms.extrato_forms import ExtratoBancarioForm
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
-from app.forms.extrato_forms import ExtratoBancarioForm
-from datetime import datetime, date, timedelta
-from decimal import Decimal
 
 extrato_bp = Blueprint("extrato", __name__, url_prefix="/extratos")
 
