@@ -1,0 +1,95 @@
+<!--- app/templates/financiamentos/edit.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Editar Financiamento{% endblock %}
+{% block page_title %}Editar Financiamento{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">Editar Financiamento: {{
+                    financiamento.nome_financiamento }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST"
+                    action="{{ url_for('financiamento.editar_financiamento', id=financiamento.id) }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-1">
+                        {{ form.nome_financiamento.label(class="form-label") }}
+                        {{ form.nome_financiamento(class="form-control") }}
+                        {% if form.nome_financiamento.errors %}
+                        <div class="text-danger">
+                            {% for error in form.nome_financiamento.errors %}{{
+                            error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Conta Bancária:</label>
+                        <input type="text" class="form-control"
+                            value="{{ financiamento.conta.nome_banco }} ({{ financiamento.conta.conta }})"
+                            readonly>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Valor Total
+                            Financiado:</label>
+                        <input type="text" class="form-control"
+                            value="R$ {{ '%.2f'|format(financiamento.valor_total_financiado) }}"
+                            readonly>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Saldo Devedor Atual:</label>
+                        <input type="text" class="form-control"
+                            value="R$ {{ '%.2f'|format(financiamento.saldo_devedor_atual) }}"
+                            readonly>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Taxa de Juros Anual
+                            (%):</label>
+                        <input type="text" class="form-control"
+                            value="{{ '%.4f'|format(financiamento.taxa_juros_anual) }}%"
+                            readonly>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Data de Início:</label>
+                        <input type="text" class="form-control"
+                            value="{{ financiamento.data_inicio.strftime('%d/%m/%Y') }}"
+                            readonly>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Prazo (em meses):</label>
+                        <input type="text" class="form-control"
+                            value="{{ financiamento.prazo_meses }}" readonly>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Tipo de Amortização:</label>
+                        <input type="text" class="form-control"
+                            value="{{ financiamento.tipo_amortizacao }}"
+                            readonly>
+                    </div>
+                    <div class="mb-1">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="3") }}
+                        {% if form.descricao.errors %}
+                        <div class="text-danger">
+                            {% for error in form.descricao.errors %}{{ error
+                            }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3"> {# Espaçamento final antes dos botões #}
+                    </div>
+                    {{ form.submit(class="btn btn-primary btn-add") }}
+                    <a
+                        href="{{ url_for('financiamento.listar_financiamentos') }}"
+                        class="btn btn-secondary btn-add">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

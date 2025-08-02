@@ -45,6 +45,8 @@ def create_app():
     from app.models.crediario_model import Crediario
     from app.models.crediario_movimento_model import CrediarioMovimento
     from app.models.crediario_parcela_model import CrediarioParcela
+    from app.models.financiamento_model import Financiamento
+    from app.models.financiamento_parcela_model import FinanciamentoParcela
     from app.models.usuario_model import Usuario
 
     @login_manager.user_loader
@@ -60,6 +62,7 @@ def create_app():
     from app.routes.crediario_movimento_routes import crediario_movimento_bp
     from app.routes.crediario_routes import crediario_bp
     from app.routes.extrato_routes import extrato_bp
+    from app.routes.financiamento_routes import financiamento_bp
     from app.routes.main_routes import main_bp
     from app.routes.usuario_routes import usuario_bp
 
@@ -74,6 +77,7 @@ def create_app():
     app.register_blueprint(crediario_grupo_bp)
     app.register_blueprint(crediario_movimento_bp)
     app.register_blueprint(crediario_fatura_bp)
+    app.register_blueprint(financiamento_bp)
 
     @app.route("/")
     def index():
