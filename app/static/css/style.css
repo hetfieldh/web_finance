@@ -1,110 +1,15 @@
-/* --- Ajustes da Sidebar --- */
+/* app/static/css/style.css */
 
-/* Wrapper principal: evita rolagem horizontal */
-#wrapper {
-    overflow-x: hidden;
+/* ==========================================================================
+   1. ESTILOS DE BASE E TIPOGRAFIA
+   ========================================================================== */
+
+/* Configuração base para layout de rolagem controlada */
+body,
+html {
+    overflow: hidden;
+    height: 100%;
 }
-
-/* Sidebar lateral oculta inicialmente */
-#sidebar-wrapper {
-    min-height: 100vh;
-    margin-left: -15rem;
-    transition: margin .25s ease-out;
-    width: 14rem;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Cabeçalho da sidebar */
-#sidebar-wrapper .sidebar-heading {
-    font-size: 1.2rem;
-    padding: 0.875rem 1.25rem;
-}
-
-/* Lista de itens na sidebar ocupa 100% da largura */
-#sidebar-wrapper .list-group {
-    width: 100%;
-}
-
-/* Área principal do conteúdo da página */
-#page-content-wrapper {
-    min-width: 100vw;
-}
-
-/* Quando wrapper possui "toggled", mostra a sidebar */
-#wrapper.toggled #sidebar-wrapper {
-    margin-left: 0;
-}
-
-/* --- Media Query para telas maiores (≥ 768px) --- */
-@media (min-width: 768px) {
-
-    /* Sidebar visível por padrão */
-    #sidebar-wrapper {
-        margin-left: 0;
-    }
-
-    /* Ajusta o conteúdo para preencher a largura */
-    #page-content-wrapper {
-        min-width: 0;
-        width: 100%;
-    }
-
-    /* Quando toggled, oculta a sidebar */
-    #wrapper.toggled #sidebar-wrapper {
-        margin-left: -14rem;
-    }
-}
-
-/* --- Estilos para a página de login --- */
-
-/* Corpo com conteúdo centralizado vertical e horizontalmente */
-body.login-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #323232;
-}
-
-/* Container do formulário de login */
-.login-container {
-    max-width: 400px;
-    min-width: 300px;
-    padding: 20px;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-}
-
-/* Logotipo na página de login */
-.logo-login {
-    max-height: 50px;
-    width: auto;
-}
-
-/* --- Estilos para botões de ação nas tabelas --- */
-
-/* Botões de ação dentro das tabelas */
-.table-actions .btn {
-    min-width: 0.6px;
-    height: 20px;
-    font-size: 0.7rem;
-    padding: 0.01rem 0.5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0px;
-}
-
-/* Formulários dentro das ações da tabela */
-.table-actions form {
-    display: inline-block;
-    margin-bottom: 0;
-}
-
-/* --- Ajustes de Tamanho de Fonte --- */
 
 /* Fonte base do corpo */
 body {
@@ -143,21 +48,56 @@ h6,
     font-size: 0.95rem;
 }
 
-/* Classe para fontes extra pequenas */
-.extra-small {
-    font-size: 0.7rem !important;
+
+/* ==========================================================================
+   2. LAYOUT PRINCIPAL (SIDEBAR E CONTEÚDO)
+   ========================================================================== */
+
+/* Wrapper principal: ocupa toda a altura da tela */
+#wrapper {
+    overflow-x: hidden;
+    height: 100vh;
 }
 
-.extra-small-2 {
-    font-size: 0.6rem !important;
+/* Sidebar lateral */
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin .25s ease-out;
+    width: 14rem;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Fonte para tabelas */
+/* Área principal do conteúdo da página (container da rolagem) */
+#page-content-wrapper {
+    min-width: 100vw;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* Barra de navegação superior: "pegajosa" (sticky) no topo */
+#page-content-wrapper>.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+/* Comportamento do Toggled para mostrar/esconder a sidebar */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+
+/* ==========================================================================
+   3. ESTILOS DE COMPONENTES
+   ========================================================================== */
+
+/* --- Tabelas --- */
 .table {
     font-size: 0.75rem;
 }
 
-/* Altura e espaçamento interno das células da tabela */
 .table td,
 .table th {
     padding: 0.1rem 0.2rem;
@@ -165,69 +105,82 @@ h6,
     vertical-align: middle;
 }
 
-/* Fontes para campos de formulário */
+.table-responsive {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+}
+
+.table-actions .btn {
+    min-width: 0.6px;
+    height: 20px;
+    font-size: 0.7rem;
+    padding: 0.01rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0px;
+}
+
+.table-actions form {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+/* --- Formulários --- */
 .form-control,
 .form-select,
 .form-check-label {
     font-size: 0.9rem;
 }
 
-/* Texto auxiliar em formulários */
 .form-text {
     font-size: 0.7rem;
 }
 
-/* Fontes para mensagens flash */
-.alert {
-    font-size: 0.85rem;
-}
-
-/* Título nos cabeçalhos dos cards */
+/* --- Cards e Alertas --- */
 .card-header h5 {
     font-size: 1.05rem;
 }
 
-/* Cores do bloco de cards */
 .card-borders {
     border: 1px solid #6b737a36;
     border-radius: 0rem;
 }
 
-/* Links em listas de navegação e navbar */
-.list-group-item {
-    font-size: 0.9rem;
-    /* Fonte ligeiramente menor para todos os itens do sidebar */
+.alert {
+    font-size: 0.85rem;
 }
 
+/* --- Navegação e Itens da Sidebar --- */
 .navbar-nav .nav-link {
     font-size: 0.95rem;
-    /* Mantido para links da navbar superior */
 }
 
-
-/* Estilo para badges */
-.badge {
-    font-size: 0.7rem;
-    padding: 0.25em 0.5em;
+.list-group-item {
+    font-size: 0.9rem;
 }
 
-/* Estilo para a informação do usuário logado no sidebar */
+.collapse.list-group-flush .list-group-item {
+    border-bottom: none !important;
+}
+
+.collapse.list-group-flush .list-group-item i {
+    color: #007bff !important;
+}
+
 .logged-in-user-info {
     font-size: 0.7rem;
     color: #555;
 }
 
-/* Remover borda inferior dos itens de submenu */
-.collapse.list-group-flush .list-group-item {
-    border-bottom: none !important;
+/* --- Outros Componentes --- */
+.badge {
+    font-size: 0.7rem;
+    padding: 0.25em 0.5em;
 }
 
-/* Estilo para ícones dentro de submenus */
-.collapse.list-group-flush .list-group-item i {
-    color: #007bff !important;
-}
-
-/* Estilos para o destaque do Saldo Final no extrato */
 .saldo-positivo-box {
     background-color: #d4edda;
     border: 1px solid #28a745;
@@ -244,33 +197,103 @@ h6,
     font-weight: bold;
 }
 
-
-/* --- Ajustes de Dimensões da Tabela --- */
-
-/* Container responsivo para tabelas */
-.table-responsive {
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 15px;
+#back-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+    z-index: 1080;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    line-height: 1;
 }
 
-/* Botão genérico "Adicionar" */
+
+/* ==========================================================================
+   4. CLASSES UTILITÁRIAS
+   ========================================================================== */
+
+.extra-small {
+    font-size: 0.7rem !important;
+}
+
+.extra-small-2 {
+    font-size: 0.6rem !important;
+}
+
 .btn-add {
     font-size: 0.9rem !important;
     padding: 0.2rem 1rem !important;
 }
 
-/* Espaço entre ícone e texto no botão "Adicionar" */
 .btn-add i {
     margin-right: 1px;
 }
 
 
-/* --- Responsividade para telas menores (≤ 767.98px) --- */
+/* ==========================================================================
+   5. ESTILOS DE PÁGINAS ESPECÍFICAS
+   ========================================================================== */
+
+/* --- Página de Login --- */
+body.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #323232;
+    overflow: auto;
+}
+
+.login-container {
+    max-width: 400px;
+    min-width: 300px;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+.logo-login {
+    max-height: 50px;
+    width: auto;
+}
+
+/* --- Páginas de Erro --- */
+.error-container {
+    background: #e9ecef;
+    padding: 3rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    max-width: 800px;
+    width: 90%;
+}
+
+
+/* ==========================================================================
+   6. RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -14rem;
+    }
+}
+
 @media (max-width: 767.98px) {
 
-    /* Redução dos tamanhos dos cabeçalhos */
     h1,
     .h1 {
         font-size: 1.8rem;
@@ -291,31 +314,18 @@ h6,
         font-size: 1.1rem;
     }
 
-    /* Fonte maior para tabelas em telas pequenas */
     .table {
         font-size: 0.8rem;
     }
 
-    /* Botões de ação menores em telas pequenas */
     .table-actions .btn {
         min-width: auto;
         font-size: 0.7rem;
         padding: 0.2rem 0.4rem;
     }
 
-    /* Remove padding e ajusta largura máxima da tabela responsiva */
     .table-responsive {
         max-width: 100%;
         padding: 0;
     }
-}
-
-/* Estilos para as páginas de erro (404 e 500) */
-.error-container {
-    background: #e9ecef;
-    padding: 3rem;
-    border-radius: 1rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    max-width: 800px;
-    width: 90%;
 }

@@ -13,7 +13,7 @@
             <div>
                 <a href="{{ url_for('financiamento.adicionar_financiamento') }}"
                     class="btn btn-success btn-add">
-                    <i class="fas fa-plus"></i> Adicionar Financiamento
+                    <i class="fas fa-plus"></i> Adicionar
                 </a>
             </div>
         </div>
@@ -60,7 +60,12 @@
                                 <td>{{
                                     financ.data_criacao.strftime('%d/%m/%Y %H:%M')
                                     }}</td>
-                                <td class="table-actions">
+                                <td class="table-actions d-flex">
+
+                                    <a href="{{ url_for('financiamento.visualizar_parcelas', id=financ.id) }}" class="btn btn-info me-2" title="Visualizar Parcelas">
+                                        <i class="fas fa-list-ol"></i> Parcelas
+                                    </a>
+
                                     <a
                                         href="{{ url_for('financiamento.editar_financiamento', id=financ.id) }}"
                                         class="btn btn-warning me-2"

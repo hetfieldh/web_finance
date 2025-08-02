@@ -1,0 +1,101 @@
+<!--- app\templates\financiamentos\importar_parcelas.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Importar Parcelas do Financiamento{% endblock %}
+{% block page_title %}Importar Parcelas do Financiamento{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Financiamento: {{
+                    financiamento.nome_financiamento }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Valor Total:</strong> R$ {{
+                            "%.2f"|format(financiamento.valor_total_financiado)
+                            }}</p>
+                        <p class="mb-1"><strong>Prazo:</strong> {{
+                            financiamento.prazo_meses }} meses</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Conta Associada:</strong> {{
+                            financiamento.conta.nome_banco }}</p>
+                        <p class="mb-1"><strong>Taxa Anual:</strong> {{
+                            "%.4f"|format(financiamento.taxa_juros_anual)
+                            }}%</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Data de Início:</strong> {{
+                            financiamento.data_inicio.strftime('%d/%m/%Y')
+                            }}</p>
+                        <p class="mb-0"><strong>Amortização:</strong> {{
+                            financiamento.tipo_amortizacao }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Instruções e Upload do Arquivo</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info" role="alert">
+                    <h6 class="alert-heading">Atenção ao Formato do Arquivo
+                        CSV!</h6>
+                    <p>O arquivo .csv deve conter um cabeçalho e as seguintes
+                        <strong>11 colunas</strong>, exatamente nesta ordem:</p>
+                    <ul>
+                        <li><strong>numero_parcela</strong> (Ex: 1)</li>
+                        <li><strong>data_vencimento</strong> (Formato:
+                            AAAA-MM-DD, Ex: 2025-08-25)</li>
+                        <li><strong>valor_principal</strong> (Formato numérico
+                            com ponto, Ex: 1500.50)</li>
+                        <li><strong>valor_juros</strong> (Ex: 350.20)</li>
+                        <li><strong>valor_seguro</strong> (Ex: 25.00)</li>
+                        <li><strong>valor_seguro_2</strong> (Ex: 15.00)</li>
+                        <li><strong>valor_seguro_3</strong> (Ex: 10.00)</li>
+                        <li><strong>valor_taxas</strong> (Ex: 5.50)</li>
+                        <li><strong>ajustes</strong> (Ex: 0.00)</li>
+                        <li><strong>valor_total_previsto</strong> (Ex:
+                            1906.20)</li>
+                        <li><strong>observacoes</strong> (Texto opcional)</li>
+                    </ul>
+                    <hr>
+                    <p class="mb-0">Qualquer desvio deste formato resultará em
+                        erro na importação.</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data"
+                    action="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-3">
+                        {{ form.csv_file.label(class="form-label fw-bold") }}
+                        {{ form.csv_file(class="form-control") }}
+                        {% if form.csv_file.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.csv_file.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4">
+                        {{ form.submit(class="btn btn-success btn-add") }}
+                        <a
+                            href="{{ url_for('financiamento.listar_financiamentos') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

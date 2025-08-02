@@ -4,6 +4,7 @@ from datetime import date
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (
     DateField,
     DecimalField,
@@ -99,7 +100,7 @@ class CadastroFinanciamentoForm(FlaskForm):
         ],
     )
 
-    submit = SubmitField("Adicionar Financiamento")
+    submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -188,7 +189,7 @@ class EditarFinanciamentoForm(FlaskForm):
         ],
     )
 
-    submit = SubmitField("Atualizar Financiamento")
+    submit = SubmitField("Atualizar")
 
     def __init__(self, original_nome_financiamento, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -218,4 +219,14 @@ class EditarFinanciamentoForm(FlaskForm):
                 )
 
         return True
-    
+
+
+class ImportarParcelasForm(FlaskForm):
+    csv_file = FileField(
+        "Arquivo CSV das Parcelas",
+        validators=[
+            FileRequired("Por favor, selecione um arquivo."),
+            FileAllowed(["csv"], "Apenas arquivos .csv são permitidos!"),
+        ],
+    )
+    submit = SubmitField("Importar Parcelas")

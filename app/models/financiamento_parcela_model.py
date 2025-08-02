@@ -1,6 +1,6 @@
 # app/models/financiamento_parcela_model.py
 
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import Enum, Numeric, UniqueConstraint
 
@@ -16,29 +16,32 @@ class FinanciamentoParcela(db.Model):
     )
 
     numero_parcela = db.Column(db.Integer, nullable=False)
+    data_vencimento = db.Column(db.Date, nullable=False)
+
     valor_principal = db.Column(Numeric(12, 2), nullable=False)
     valor_juros = db.Column(Numeric(12, 2), nullable=False)
     valor_seguro = db.Column(Numeric(12, 2), nullable=False, default=0.00)
+    valor_seguro_2 = db.Column(Numeric(12, 2), nullable=False, default=0.00)
+    valor_seguro_3 = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     valor_taxas = db.Column(Numeric(12, 2), nullable=False, default=0.00)
+    ajustes = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     valor_total_previsto = db.Column(Numeric(12, 2), nullable=False)
 
-    data_vencimento = db.Column(db.Date, nullable=False)
     pago = db.Column(db.Boolean, nullable=False, default=False)
     data_pagamento = db.Column(db.Date, nullable=True)
-
     movimento_bancario_id = db.Column(
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
-    )
-
-    data_criacao = db.Column(
-        db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     status = db.Column(
         Enum("A Pagar", "Paga", "Atrasada", "Amortizada", name="status_parcela_enum"),
         nullable=False,
         default="A Pagar",
     )
+
     observacoes = db.Column(db.String(255), nullable=True)
+    data_criacao = db.Column(
+        db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
+    )
 
     financiamento = db.relationship(
         "Financiamento",

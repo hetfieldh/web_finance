@@ -13,7 +13,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-from sqlalchemy import extract, func
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from app import db
@@ -36,7 +36,37 @@ def listar_faturas():
         .order_by(CrediarioFatura.mes_referencia.desc())
         .all()
     )
-    return render_template("crediario_faturas/list.html", faturas=faturas)
+
+    faturas_com_status = []
+    for fatura in faturas:
+        ano = int(fatura.mes_referencia.split("-")[0])
+        mes = int(fatura.mes_referencia.split("-")[1])
+        data_inicio_mes = date(ano, mes, 1)
+        if mes == 12:
+            data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
+        else:
+            data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
+
+        soma_real_parcelas = (
+            db.session.query(
+                func.coalesce(func.sum(CrediarioParcela.valor_parcela), Decimal("0.00"))
+            )
+            .join(CrediarioMovimento)
+            .filter(
+                CrediarioMovimento.id == CrediarioParcela.crediario_movimento_id,
+                CrediarioMovimento.crediario_id == fatura.crediario_id,
+                CrediarioMovimento.usuario_id == current_user.id,
+                CrediarioParcela.data_vencimento >= data_inicio_mes,
+                CrediarioParcela.data_vencimento <= data_fim_mes,
+            )
+            .scalar()
+        )
+
+        desatualizada = fatura.valor_total_fatura != soma_real_parcelas
+
+        faturas_com_status.append({"fatura": fatura, "desatualizada": desatualizada})
+
+    return render_template("crediario_faturas/list.html", faturas=faturas_com_status)
 
 
 @crediario_fatura_bp.route("/gerar", methods=["GET", "POST"])

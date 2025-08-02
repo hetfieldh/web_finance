@@ -1,10 +1,10 @@
 # app/routes/financiamento_routes.py
 
-import math
-from datetime import date
+import csv
+import io
+from datetime import datetime
 from decimal import Decimal
 
-from dateutil.relativedelta import relativedelta
 from flask import (
     Blueprint,
     current_app,
@@ -21,6 +21,7 @@ from app import db
 from app.forms.financiamento_forms import (
     CadastroFinanciamentoForm,
     EditarFinanciamentoForm,
+    ImportarParcelasForm,
 )
 from app.models.conta_model import Conta
 from app.models.financiamento_model import Financiamento
@@ -56,13 +57,12 @@ def adicionar_financiamento():
         descricao = form.descricao.data.strip() if form.descricao.data else None
 
         try:
-            # 1. Cria o financiamento principal
             novo_financiamento = Financiamento(
                 usuario_id=current_user.id,
                 conta_id=conta_id,
                 nome_financiamento=nome_financiamento,
                 valor_total_financiado=valor_total_financiado,
-                saldo_devedor_atual=valor_total_financiado,  # Saldo devedor inicial
+                saldo_devedor_atual=valor_total_financiado,
                 taxa_juros_anual=taxa_juros_anual,
                 data_inicio=data_inicio,
                 prazo_meses=prazo_meses,
@@ -70,83 +70,18 @@ def adicionar_financiamento():
                 descricao=descricao,
             )
             db.session.add(novo_financiamento)
-            db.session.flush()  # Força o ID para o novo_financiamento
-
-            # 2. Geração da tabela de amortização (parcelas)
-            taxa_juros_mensal = taxa_juros_anual / Decimal(
-                "1200"
-            )  # Converte % anual para decimal mensal
-
-            if tipo_amortizacao == "PRICE":
-                # Lógica de amortização PRICE
-                if taxa_juros_mensal > 0:
-                    parcela_fixa = valor_total_financiado * (
-                        taxa_juros_mensal
-                        / (
-                            Decimal("1")
-                            - (Decimal("1") + taxa_juros_mensal) ** -prazo_meses
-                        )
-                    )
-                else:
-                    parcela_fixa = valor_total_financiado / Decimal(str(prazo_meses))
-
-                saldo_devedor = valor_total_financiado
-                for i in range(prazo_meses):
-                    juros_parcela = saldo_devedor * taxa_juros_mensal
-                    amortizacao_principal = parcela_fixa - juros_parcela
-                    saldo_devedor -= amortizacao_principal
-
-                    nova_parcela = FinanciamentoParcela(
-                        financiamento_id=novo_financiamento.id,
-                        numero_parcela=i + 1,
-                        valor_principal=amortizacao_principal,
-                        valor_juros=juros_parcela,
-                        valor_total_previsto=parcela_fixa,
-                        data_vencimento=data_inicio + relativedelta(months=i + 1),
-                    )
-                    db.session.add(nova_parcela)
-
-            elif tipo_amortizacao == "SAC":
-                # Lógica de amortização SAC
-                amortizacao_principal = valor_total_financiado / Decimal(
-                    str(prazo_meses)
-                )
-                saldo_devedor = valor_total_financiado
-                for i in range(prazo_meses):
-                    juros_parcela = saldo_devedor * taxa_juros_mensal
-                    valor_total_previsto = amortizacao_principal + juros_parcela
-                    saldo_devedor -= amortizacao_principal
-
-                    nova_parcela = FinanciamentoParcela(
-                        financiamento_id=novo_financiamento.id,
-                        numero_parcela=i + 1,
-                        valor_principal=amortizacao_principal,
-                        valor_juros=juros_parcela,
-                        valor_total_previsto=valor_total_previsto,
-                        data_vencimento=data_inicio + relativedelta(months=i + 1),
-                    )
-                    db.session.add(nova_parcela)
-
-            else:  # Outro tipo de amortização
-                # Por simplicidade, dividimos o valor total igualmente.
-                valor_por_parcela = valor_total_financiado / Decimal(str(prazo_meses))
-                for i in range(prazo_meses):
-                    nova_parcela = FinanciamentoParcela(
-                        financiamento_id=novo_financiamento.id,
-                        numero_parcela=i + 1,
-                        valor_principal=valor_por_parcela,
-                        valor_juros=Decimal("0.00"),
-                        valor_total_previsto=valor_por_parcela,
-                        data_vencimento=data_inicio + relativedelta(months=i + 1),
-                    )
-                    db.session.add(nova_parcela)
-
             db.session.commit()
-            flash("Financiamento adicionado e parcelas geradas com sucesso!", "success")
+
+            flash(
+                "Financiamento principal criado com sucesso! Agora, importe o arquivo .csv com as parcelas.",
+                "success",
+            )
             current_app.logger.info(
                 f'Financiamento "{nome_financiamento}" (ID: {novo_financiamento.id}) adicionado por {current_user.login}.'
             )
-            return redirect(url_for("financiamento.listar_financiamentos"))
+            return redirect(
+                url_for("financiamento.importar_parcelas", id=novo_financiamento.id)
+            )
 
         except IntegrityError as e:
             db.session.rollback()
@@ -181,7 +116,6 @@ def editar_financiamento(id):
         )
         return redirect(url_for("financiamento.listar_financiamentos"))
 
-    # CORRIGIDO: Passa o original_nome_financiamento ao inicializar o formulário
     form = EditarFinanciamentoForm(
         obj=financiamento, original_nome_financiamento=financiamento.nome_financiamento
     )
@@ -190,7 +124,6 @@ def editar_financiamento(id):
         financiamento.descricao = (
             form.descricao.data.strip() if form.descricao.data else None
         )
-
         try:
             db.session.commit()
             flash("Financiamento atualizado com sucesso!", "success")
@@ -207,12 +140,6 @@ def editar_financiamento(id):
                 "Ocorreu um erro ao atualizar o financiamento. Tente novamente.",
                 "danger",
             )
-            return render_template(
-                "financiamentos/edit.html", form=form, financiamento=financiamento
-            )
-
-    elif request.method == "GET":
-        pass
 
     return render_template(
         "financiamentos/edit.html", form=form, financiamento=financiamento
@@ -240,3 +167,126 @@ def excluir_financiamento(id):
         f"Financiamento (ID: {financiamento.id}) excluído por {current_user.login}."
     )
     return redirect(url_for("financiamento.listar_financiamentos"))
+
+
+@financiamento_bp.route("/<int:id>/importar", methods=["GET", "POST"])
+@login_required
+def importar_parcelas(id):
+    financiamento = Financiamento.query.filter_by(
+        id=id, usuario_id=current_user.id
+    ).first_or_404()
+    form = ImportarParcelasForm()
+
+    if form.validate_on_submit():
+        csv_file = form.csv_file.data
+        if not csv_file or not csv_file.filename.endswith(".csv"):
+            flash("Por favor, selecione um arquivo .csv válido.", "danger")
+            return redirect(url_for("financiamento.importar_parcelas", id=id))
+
+        try:
+            stream = io.StringIO(csv_file.stream.read().decode("UTF-8"), newline=None)
+            csv_reader = csv.reader(stream)
+
+            header = next(csv_reader, None)
+
+            all_rows = list(csv_reader)
+
+            if len(all_rows) != financiamento.prazo_meses:
+                flash(
+                    f"Erro: O arquivo CSV contém {len(all_rows)} parcelas, mas o financiamento espera {financiamento.prazo_meses}. Por favor, verifique o arquivo.",
+                    "danger",
+                )
+                return redirect(url_for("financiamento.importar_parcelas", id=id))
+
+            FinanciamentoParcela.query.filter_by(financiamento_id=id).delete()
+
+            parcelas_para_adicionar = []
+
+            for i, row in enumerate(all_rows, start=2):
+                if not row:
+                    continue
+
+                (
+                    numero_parcela,
+                    data_vencimento_str,
+                    valor_principal,
+                    valor_juros,
+                    valor_seguro,
+                    valor_seguro_2,
+                    valor_seguro_3,
+                    valor_taxas,
+                    ajustes,
+                    valor_total_previsto,
+                    *observacoes_tuple,
+                ) = row
+
+                observacoes = observacoes_tuple[0] if observacoes_tuple else None
+
+                nova_parcela = FinanciamentoParcela(
+                    financiamento_id=id,
+                    numero_parcela=int(numero_parcela),
+                    data_vencimento=datetime.strptime(
+                        data_vencimento_str, "%Y-%m-%d"
+                    ).date(),
+                    valor_principal=Decimal(valor_principal),
+                    valor_juros=Decimal(valor_juros),
+                    valor_seguro=Decimal(valor_seguro),
+                    valor_seguro_2=Decimal(valor_seguro_2),
+                    valor_seguro_3=Decimal(valor_seguro_3),
+                    valor_taxas=Decimal(valor_taxas),
+                    ajustes=Decimal(ajustes),
+                    valor_total_previsto=Decimal(valor_total_previsto),
+                    observacoes=observacoes,
+                )
+                parcelas_para_adicionar.append(nova_parcela)
+
+            db.session.bulk_save_objects(parcelas_para_adicionar)
+            db.session.commit()
+
+            flash(
+                f"{len(parcelas_para_adicionar)} parcelas importadas com sucesso!",
+                "success",
+            )
+            current_app.logger.info(
+                f"{len(parcelas_para_adicionar)} parcelas importadas para o financiamento ID {id} por {current_user.login}."
+            )
+            return redirect(url_for("financiamento.listar_financiamentos"))
+
+        except (ValueError, IndexError) as e:
+            db.session.rollback()
+            flash(
+                f"Erro ao processar o arquivo CSV na linha {i}. Verifique se todas as 11 colunas estão presentes e no formato correto (data como AAAA-MM-DD, números com ponto decimal). Detalhe: {e}",
+                "danger",
+            )
+            current_app.logger.error(
+                f"Erro de formato no CSV para financiamento ID {id}: {e}", exc_info=True
+            )
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Ocorreu um erro inesperado durante a importação: {e}", "danger")
+            current_app.logger.error(
+                f"Erro inesperado na importação para financiamento ID {id}: {e}",
+                exc_info=True,
+            )
+
+    return render_template(
+        "financiamentos/importar_parcelas.html", form=form, financiamento=financiamento
+    )
+
+
+@financiamento_bp.route("/<int:id>/parcelas")
+@login_required
+def visualizar_parcelas(id):
+    financiamento = Financiamento.query.filter_by(
+        id=id, usuario_id=current_user.id
+    ).first_or_404()
+
+    parcelas = (
+        FinanciamentoParcela.query.filter_by(financiamento_id=id)
+        .order_by(FinanciamentoParcela.numero_parcela.asc())
+        .all()
+    )
+
+    return render_template(
+        "financiamentos/parcelas.html", financiamento=financiamento, parcelas=parcelas
+    )
