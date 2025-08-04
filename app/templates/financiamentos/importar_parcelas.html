@@ -1,4 +1,4 @@
-<!--- app\templates\financiamentos\importar_parcelas.html -->
+<!-- app/templates/financiamentos/importar_parcelas.html -->
 
 {% extends "base.html" %}
 
@@ -8,6 +8,7 @@
 {% block content %}
 <div class="row">
     <div class="col-md-10 mx-auto">
+        <!-- Card com detalhes do Financiamento -->
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-secondary text-white">
                 <h5 class="mb-0">Financiamento: {{
@@ -40,6 +41,7 @@
             </div>
         </div>
 
+        <!-- Card com o formulário de importação -->
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
                 <h5 class="mb-0">Instruções e Upload do Arquivo</h5>
@@ -49,7 +51,7 @@
                     <h6 class="alert-heading">Atenção ao Formato do Arquivo
                         CSV!</h6>
                     <p>O arquivo .csv deve conter um cabeçalho e as seguintes
-                        <strong>11 colunas</strong>, exatamente nesta ordem:</p>
+                        <strong>14 colunas</strong>, exatamente nesta ordem:</p>
                     <ul>
                         <li><strong>numero_parcela</strong> (Ex: 1)</li>
                         <li><strong>data_vencimento</strong> (Formato:
@@ -61,9 +63,13 @@
                         <li><strong>valor_seguro_2</strong> (Ex: 15.00)</li>
                         <li><strong>valor_seguro_3</strong> (Ex: 10.00)</li>
                         <li><strong>valor_taxas</strong> (Ex: 5.50)</li>
+                        <li><strong>multa</strong> (Ex: 0.00)</li>
+                        <li><strong>mora</strong> (Ex: 0.00)</li>
                         <li><strong>ajustes</strong> (Ex: 0.00)</li>
-                        <li><strong>valor_total_previsto</strong> (Ex:
-                            1906.20)</li>
+                        <li><strong>valor_total_previsto</strong> (Ex: 1906.20 -
+                            será recalculado pelo sistema)</li>
+                        <li><strong>saldo_devedor</strong> (Ex: 448500.00 - será
+                            recalculado pelo sistema)</li>
                         <li><strong>observacoes</strong> (Texto opcional)</li>
                     </ul>
                     <hr>

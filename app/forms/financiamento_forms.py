@@ -229,4 +229,4 @@ class ImportarParcelasForm(FlaskForm):
             FileAllowed(["csv"], "Apenas arquivos .csv são permitidos!"),
         ],
     )
-    submit = SubmitField("Importar Parcelas")
+    submit = SubmitField("Importar")

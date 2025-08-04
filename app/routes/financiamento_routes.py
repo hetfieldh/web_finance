@@ -24,6 +24,7 @@ from app.forms.financiamento_forms import (
     ImportarParcelasForm,
 )
 from app.models.conta_model import Conta
+from app.models.conta_movimento_model import ContaMovimento
 from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 
@@ -186,20 +187,23 @@ def importar_parcelas(id):
         try:
             stream = io.StringIO(csv_file.stream.read().decode("UTF-8"), newline=None)
             csv_reader = csv.reader(stream)
-
             header = next(csv_reader, None)
-
             all_rows = list(csv_reader)
 
             if len(all_rows) != financiamento.prazo_meses:
                 flash(
-                    f"Erro: O arquivo CSV contém {len(all_rows)} parcelas, mas o financiamento espera {financiamento.prazo_meses}. Por favor, verifique o arquivo.",
+                    (
+                        f"Erro: O arquivo CSV contém {len(all_rows)} parcelas, "
+                        f"mas o financiamento espera {financiamento.prazo_meses}. "
+                        "Por favor, verifique o arquivo."
+                    ),
                     "danger",
                 )
                 return redirect(url_for("financiamento.importar_parcelas", id=id))
 
             FinanciamentoParcela.query.filter_by(financiamento_id=id).delete()
 
+            saldo_devedor_corrente = financiamento.valor_total_financiado
             parcelas_para_adicionar = []
 
             for i, row in enumerate(all_rows, start=2):
@@ -209,18 +213,44 @@ def importar_parcelas(id):
                 (
                     numero_parcela,
                     data_vencimento_str,
-                    valor_principal,
-                    valor_juros,
-                    valor_seguro,
-                    valor_seguro_2,
-                    valor_seguro_3,
-                    valor_taxas,
-                    ajustes,
-                    valor_total_previsto,
+                    valor_principal_str,
+                    valor_juros_str,
+                    valor_seguro_str,
+                    valor_seguro_2_str,
+                    valor_seguro_3_str,
+                    valor_taxas_str,
+                    multa_str,
+                    mora_str,
+                    ajustes_str,
+                    _,
+                    _,
                     *observacoes_tuple,
                 ) = row
 
+                valor_principal = Decimal(valor_principal_str)
+                valor_juros = Decimal(valor_juros_str)
+                valor_seguro = Decimal(valor_seguro_str)
+                valor_seguro_2 = Decimal(valor_seguro_2_str)
+                valor_seguro_3 = Decimal(valor_seguro_3_str)
+                valor_taxas = Decimal(valor_taxas_str)
+                multa = Decimal(multa_str)
+                mora = Decimal(mora_str)
+                ajustes = Decimal(ajustes_str)
                 observacoes = observacoes_tuple[0] if observacoes_tuple else None
+
+                valor_total_calculado = (
+                    valor_principal
+                    + valor_juros
+                    + valor_seguro
+                    + valor_seguro_2
+                    + valor_seguro_3
+                    + valor_taxas
+                    + multa
+                    + mora
+                    + ajustes
+                )
+
+                saldo_devedor_corrente -= valor_principal
 
                 nova_parcela = FinanciamentoParcela(
                     financiamento_id=id,
@@ -228,14 +258,17 @@ def importar_parcelas(id):
                     data_vencimento=datetime.strptime(
                         data_vencimento_str, "%Y-%m-%d"
                     ).date(),
-                    valor_principal=Decimal(valor_principal),
-                    valor_juros=Decimal(valor_juros),
-                    valor_seguro=Decimal(valor_seguro),
-                    valor_seguro_2=Decimal(valor_seguro_2),
-                    valor_seguro_3=Decimal(valor_seguro_3),
-                    valor_taxas=Decimal(valor_taxas),
-                    ajustes=Decimal(ajustes),
-                    valor_total_previsto=Decimal(valor_total_previsto),
+                    valor_principal=valor_principal,
+                    valor_juros=valor_juros,
+                    valor_seguro=valor_seguro,
+                    valor_seguro_2=valor_seguro_2,
+                    valor_seguro_3=valor_seguro_3,
+                    valor_taxas=valor_taxas,
+                    multa=multa,
+                    mora=mora,
+                    ajustes=ajustes,
+                    valor_total_previsto=valor_total_calculado,
+                    saldo_devedor=saldo_devedor_corrente,
                     observacoes=observacoes,
                 )
                 parcelas_para_adicionar.append(nova_parcela)
@@ -247,27 +280,21 @@ def importar_parcelas(id):
                 f"{len(parcelas_para_adicionar)} parcelas importadas com sucesso!",
                 "success",
             )
-            current_app.logger.info(
-                f"{len(parcelas_para_adicionar)} parcelas importadas para o financiamento ID {id} por {current_user.login}."
-            )
             return redirect(url_for("financiamento.listar_financiamentos"))
 
         except (ValueError, IndexError) as e:
             db.session.rollback()
             flash(
-                f"Erro ao processar o arquivo CSV na linha {i}. Verifique se todas as 11 colunas estão presentes e no formato correto (data como AAAA-MM-DD, números com ponto decimal). Detalhe: {e}",
+                (
+                    f"Erro ao processar o arquivo CSV na linha {i}. Verifique se todas as "
+                    "14 colunas estão presentes e no formato correto (data como AAAA-MM-DD, "
+                    f"números com ponto decimal). Detalhe: {e}"
+                ),
                 "danger",
-            )
-            current_app.logger.error(
-                f"Erro de formato no CSV para financiamento ID {id}: {e}", exc_info=True
             )
         except Exception as e:
             db.session.rollback()
             flash(f"Ocorreu um erro inesperado durante a importação: {e}", "danger")
-            current_app.logger.error(
-                f"Erro inesperado na importação para financiamento ID {id}: {e}",
-                exc_info=True,
-            )
 
     return render_template(
         "financiamentos/importar_parcelas.html", form=form, financiamento=financiamento
@@ -281,12 +308,20 @@ def visualizar_parcelas(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    parcelas = (
-        FinanciamentoParcela.query.filter_by(financiamento_id=id)
+    # Consulta atualizada para buscar a parcela e o valor do movimento relacionado
+    parcelas_data = (
+        db.session.query(FinanciamentoParcela, ContaMovimento.valor)
+        .outerjoin(
+            ContaMovimento,
+            FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
+        )
+        .filter(FinanciamentoParcela.financiamento_id == id)
         .order_by(FinanciamentoParcela.numero_parcela.asc())
         .all()
     )
 
     return render_template(
-        "financiamentos/parcelas.html", financiamento=financiamento, parcelas=parcelas
+        "financiamentos/parcelas.html",
+        financiamento=financiamento,
+        parcelas_data=parcelas_data,
     )

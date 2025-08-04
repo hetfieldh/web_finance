@@ -1,4 +1,4 @@
-<!--- app\templates\financiamentos\parcelas.html -->
+<!-- app/templates/financiamentos/parcelas.html -->
 
 {% extends "base.html" %}
 
@@ -19,62 +19,83 @@ endblock %}
 
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Parcelas do Financiamento</h5>
+                <h5 class="mb-0">Tabela de Amortização</h5>
             </div>
             <div class="card-body">
-                {% if parcelas %}
+                {% if parcelas_data %}
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Vencimento</th>
-                                <th>Valor Principal</th>
+                                <th>Principal</th>
                                 <th>Juros</th>
                                 <th>Seguros</th>
                                 <th>Taxas</th>
+                                <th>Multa</th>
+                                <th>Mora</th>
                                 <th>Ajustes</th>
-                                <th>Valor Total</th>
+                                <th>Total Previsto</th>
+                                <th>Valor Pago</th> <!-- NOVA COLUNA -->
+                                <th>Saldo Devedor</th>
                                 <th>Status</th>
                                 <th>Data Pagamento</th>
-                                <th>Observações</th>
+                                <th>Obs.</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for p in parcelas %}
+                            {% for parcela, valor_pago in parcelas_data %}
                             <tr>
-                                <td>{{ p.numero_parcela }}</td>
-                                <td>{{ p.data_vencimento.strftime('%d/%m/%Y')
+                                <td>{{ parcela.numero_parcela }}</td>
+                                <td>{{
+                                    parcela.data_vencimento.strftime('%d/%m/%Y')
                                     }}</td>
-                                <td>R$ {{ "%.2f"|format(p.valor_principal)
+                                <td>R$ {{ "%.2f"|format(parcela.valor_principal)
                                     }}</td>
-                                <td>R$ {{ "%.2f"|format(p.valor_juros) }}</td>
-                                <td>R$ {{ "%.2f"|format(p.valor_seguro +
-                                    p.valor_seguro_2 + p.valor_seguro_3) }}</td>
-                                <td>R$ {{ "%.2f"|format(p.valor_taxas) }}</td>
-                                <td>R$ {{ "%.2f"|format(p.ajustes) }}</td>
+                                <td>R$ {{ "%.2f"|format(parcela.valor_juros)
+                                    }}</td>
+                                <td>R$ {{ "%.2f"|format(parcela.valor_seguro +
+                                    parcela.valor_seguro_2 +
+                                    parcela.valor_seguro_3) }}</td>
+                                <td>R$ {{ "%.2f"|format(parcela.valor_taxas)
+                                    }}</td>
+                                <td>R$ {{ "%.2f"|format(parcela.multa) }}</td>
+                                <td>R$ {{ "%.2f"|format(parcela.mora) }}</td>
+                                <td>R$ {{ "%.2f"|format(parcela.ajustes) }}</td>
                                 <td class="fw-bold">R$ {{
-                                    "%.2f"|format(p.valor_total_previsto)
+                                    "%.2f"|format(parcela.valor_total_previsto)
                                     }}</td>
-                                <td>
-                                    {% if p.status == 'Paga' %}
-                                    <span class="badge bg-success">{{ p.status
-                                        }}</span>
-                                    {% elif p.status == 'Atrasada' %}
-                                    <span class="badge bg-danger">{{ p.status
-                                        }}</span>
-                                    {% elif p.status == 'Amortizada' %}
-                                    <span class="badge bg-primary">{{ p.status
-                                        }}</span>
+                                <!-- NOVO CAMPO DE DADO -->
+                                <td class="fw-bold text-success">
+                                    {% if valor_pago %}
+                                    R$ {{ "%.2f"|format(valor_pago) }}
                                     {% else %}
-                                    <span class="badge bg-secondary">{{ p.status
-                                        }}</span>
+                                    R$ 0.00
                                     {% endif %}
                                 </td>
-                                <td>{{ p.data_pagamento.strftime('%d/%m/%Y') if
-                                    p.data_pagamento else 'N/A' }}</td>
-                                <td>{{ p.observacoes if p.observacoes else ''
-                                    }}</td>
+                                <td class="fw-bold text-danger">R$ {{
+                                    "%.2f"|format(parcela.saldo_devedor) }}</td>
+                                <td>
+                                    {% if parcela.status == 'Paga' %}<span
+                                        class="badge bg-success">{{
+                                        parcela.status }}</span>
+                                    {% elif parcela.status == 'Atrasada' %}<span
+                                        class="badge bg-danger">{{
+                                        parcela.status }}</span>
+                                    {% elif parcela.status == 'Amortizada'
+                                    %}<span class="badge bg-primary">{{
+                                        parcela.status }}</span>
+                                    {% else %}<span
+                                        class="badge bg-secondary">{{
+                                        parcela.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{
+                                    parcela.data_pagamento.strftime('%d/%m/%Y')
+                                    if parcela.data_pagamento else 'N/A' }}</td>
+                                <td>{{ parcela.observacoes if
+                                    parcela.observacoes else '' }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -82,8 +103,7 @@ endblock %}
                 </div>
                 {% else %}
                 <div class="alert alert-warning text-center">
-                    Nenhuma parcela encontrada para este financiamento.
-                    <a
+                    Nenhuma parcela encontrada. <a
                         href="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}"
                         class="alert-link">Clique aqui para importá-las</a>.
                 </div>

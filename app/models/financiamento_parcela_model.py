@@ -14,7 +14,6 @@ class FinanciamentoParcela(db.Model):
     financiamento_id = db.Column(
         db.Integer, db.ForeignKey("financiamento.id"), nullable=False
     )
-
     numero_parcela = db.Column(db.Integer, nullable=False)
     data_vencimento = db.Column(db.Date, nullable=False)
 
@@ -24,8 +23,11 @@ class FinanciamentoParcela(db.Model):
     valor_seguro_2 = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     valor_seguro_3 = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     valor_taxas = db.Column(Numeric(12, 2), nullable=False, default=0.00)
+    multa = db.Column(Numeric(12, 2), nullable=False, default=0.00)
+    mora = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     ajustes = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     valor_total_previsto = db.Column(Numeric(12, 2), nullable=False)
+    saldo_devedor = db.Column(Numeric(12, 2), nullable=False)
 
     pago = db.Column(db.Boolean, nullable=False, default=False)
     data_pagamento = db.Column(db.Date, nullable=True)
