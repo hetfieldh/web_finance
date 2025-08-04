@@ -1,0 +1,76 @@
+<!-- app/templates/desp_rec/edit.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Editando: {{ cadastro.nome }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST"
+                    action="{{ url_for('desp_rec.editar_cadastro', id=cadastro.id) }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-3">
+                        {{ form.nome.label(class="form-label") }}
+                        {{ form.nome(class="form-control") }}
+                        {% if form.nome.errors %}
+                        <div class="text-danger mt-1"><small>{{
+                                form.nome.errors[0] }}</small></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.natureza.label(class="form-label") }}
+                            {{ form.natureza(class="form-select") }}
+                            {% if form.natureza.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.natureza.errors[0] }}</small></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.tipo.label(class="form-label") }}
+                            {{ form.tipo(class="form-select") }}
+                            {% if form.tipo.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.tipo.errors[0] }}</small></div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.dia_vencimento.label(class="form-label") }}
+                        {{ form.dia_vencimento(class="form-control",
+                        type="number", min="1", max="31") }}
+                        {% if form.dia_vencimento.errors %}
+                        <div class="text-danger mt-1"><small>{{
+                                form.dia_vencimento.errors[0] }}</small></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.ativo(class="form-check-input") }}
+                        {{ form.ativo.label(class="form-check-label") }}
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a href="{{ url_for('desp_rec.listar_cadastros') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

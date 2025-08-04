@@ -1,4 +1,4 @@
-<!--- app/templates/includes/_sidebar.html -->
+<!-- app/templates/includes/_sidebar.html -->
 
 <div class="bg-light border-right" id="sidebar-wrapper">
     <div class="sidebar-heading text-center py-4">
@@ -34,6 +34,10 @@
                 class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-credit-card me-2"></i>Crediários
             </a>
+            <a href="{{ url_for('desp_rec.listar_cadastros') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
+                <i class="fas fa-money-check-alt me-2"></i>Despesas e Receitas
+            </a>
         </div>
 
         <!-- Menu "Financiamentos" -->
@@ -49,7 +53,6 @@
                 Financiamentos
             </a>
         </div>
-        <!-- FIM do menu "Financiamentos" -->
 
         <!-- Menu "Movimentações" -->
         <a href="#submenuMovimentacoes" data-bs-toggle="collapse"
@@ -67,9 +70,13 @@
                 class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-shopping-cart me-2"></i>Crediário
             </a>
+            <a href="{{ url_for('desp_rec_movimento.listar_movimentos') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
+                <i class="fas fa-calendar-alt me-2"></i>Despesas e Receitas
+            </a>
         </div>
 
-        <!-- Menu "Extratos" com submenus -->
+        <!-- Menu "Extratos" -->
         <a href="#submenuExtratos" data-bs-toggle="collapse"
             aria-expanded="false"
             class="list-group-item list-group-item-action bg-light dropdown-toggle">
@@ -83,6 +90,11 @@
             <a href="{{ url_for('crediario_fatura.listar_faturas') }}"
                 class="list-group-item list-group-item-action bg-light ps-4">
                 <i class="fas fa-receipt me-2"></i>Crediário
+            </a>
+            <a
+                href="{{ url_for('extrato_desp_rec.extrato_despesas_receitas') }}"
+                class="list-group-item list-group-item-action bg-light ps-4">
+                <i class="fas fa-chart-line me-2"></i>Despesas e Receitas
             </a>
         </div>
 

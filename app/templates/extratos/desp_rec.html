@@ -1,0 +1,215 @@
+<!-- app/templates/extratos/desp_rec.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Card de Filtros -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtros do
+                    Extrato</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST"
+                    action="{{ url_for('extrato_desp_rec.extrato_despesas_receitas') }}">
+                    {{ form.csrf_token }}
+                    <div class="row align-items-end">
+                        <div class="col-md-3">
+                            {{ form.tipo_relatorio.label(class="form-label") }}
+                            {{ form.tipo_relatorio(class="form-select",
+                            id="tipo_relatorio") }}
+                        </div>
+
+                        <!-- Filtros para Visão Mensal -->
+                        <div class="col-md-3" id="filtro_mensal">
+                            {{ form.mes_ano.label(class="form-label") }}
+                            {{ form.mes_ano(class="form-select") }}
+                        </div>
+
+                        <!-- Filtros para Análise por Período -->
+                        <div class="col-md-3" id="filtro_conta"
+                            style="display: none;">
+                            {{ form.desp_rec_id.label(class="form-label") }}
+                            {{ form.desp_rec_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-3" id="filtro_data_inicio"
+                            style="display: none;">
+                            {{ form.data_inicio.label(class="form-label") }}
+                            {{ form.data_inicio(class="form-control",
+                            type="date") }}
+                        </div>
+                        <div class="col-md-3" id="filtro_data_fim"
+                            style="display: none;">
+                            {{ form.data_fim.label(class="form-label") }}
+                            {{ form.data_fim(class="form-control", type="date")
+                            }}
+                        </div>
+
+                        <div class="col-md-3">
+                            <button type="submit"
+                                class="btn btn-primary btn-add w-100">
+                                <i class="fas fa-search me-1"></i> {{
+                                form.submit.label.text }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Card de Resumo dos Totais -->
+        {% if movimentos %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Resumo do
+                    Período</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Valores Previstos</h6>
+                        <p class="mb-1"><strong>Receitas:</strong> <span
+                                class="text-success">R$ {{
+                                "%.2f"|format(totais.receitas_previstas)
+                                }}</span></p>
+                        <p class="mb-1"><strong>Despesas:</strong> <span
+                                class="text-danger">R$ {{
+                                "%.2f"|format(totais.despesas_previstas)
+                                }}</span></p>
+                        <p class="fw-bold mb-0"><strong>Saldo:</strong> <span
+                                class="{% if totais.saldo_previsto >= 0 %}text-success{% else %}text-danger{% endif %}">R$
+                                {{ "%.2f"|format(totais.saldo_previsto)
+                                }}</span></p>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <h6 class="text-muted">Valores Realizados</h6>
+                        <p class="mb-1"><strong>Receitas:</strong> <span
+                                class="text-success">R$ {{
+                                "%.2f"|format(totais.receitas_realizadas)
+                                }}</span></p>
+                        <p class="mb-1"><strong>Despesas:</strong> <span
+                                class="text-danger">R$ {{
+                                "%.2f"|format(totais.despesas_realizadas)
+                                }}</span></p>
+                        <p class="fw-bold mb-0"><strong>Saldo:</strong> <span
+                                class="{% if totais.saldo_realizado >= 0 %}text-success{% else %}text-danger{% endif %}">R$
+                                {{ "%.2f"|format(totais.saldo_realizado)
+                                }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Card da Tabela de Resultados -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>Lançamentos
+                    Detalhados</h5>
+            </div>
+            <div class="card-body">
+                {% if movimentos %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Vencimento</th>
+                                <th>Nome</th>
+                                <th>Natureza</th>
+                                <th>Valor Previsto</th>
+                                <th>Valor Realizado</th>
+                                <th>Status</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movimento in movimentos %}
+                            <tr>
+                                <td>{{
+                                    movimento.data_vencimento.strftime('%d/%m/%Y')
+                                    }}</td>
+                                <td>{{ movimento.despesa_receita.nome }}</td>
+                                <td>
+                                    {% if movimento.despesa_receita.natureza ==
+                                    'Receita' %}
+                                    <span class="badge bg-success">{{
+                                        movimento.despesa_receita.natureza
+                                        }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{
+                                        movimento.despesa_receita.natureza
+                                        }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>R$ {{
+                                    "%.2f"|format(movimento.valor_previsto)
+                                    }}</td>
+                                <td>R$ {{
+                                    "%.2f"|format(movimento.valor_realizado) if
+                                    movimento.valor_realizado is not none else
+                                    'N/A' }}</td>
+                                <td>
+                                    {% if movimento.status == 'Pago' %}
+                                    <span class="badge bg-success">{{
+                                        movimento.status }}</span>
+                                    {% elif movimento.status == 'Atrasado' %}
+                                    <span class="badge bg-danger">{{
+                                        movimento.status }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{
+                                        movimento.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ movimento.descricao if
+                                    movimento.descricao else '' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">Nenhum lançamento encontrado para os
+                    filtros selecionados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoRelatorioSelect = document.getElementById('tipo_relatorio');
+
+    const filtroMensal = document.getElementById('filtro_mensal');
+    const filtroConta = document.getElementById('filtro_conta');
+    const filtroDataInicio = document.getElementById('filtro_data_inicio');
+    const filtroDataFim = document.getElementById('filtro_data_fim');
+
+    function toggleFilters() {
+        if (tipoRelatorioSelect.value === 'mensal') {
+            filtroMensal.style.display = 'block';
+            filtroConta.style.display = 'none';
+            filtroDataInicio.style.display = 'none';
+            filtroDataFim.style.display = 'none';
+        } else { // periodo
+            filtroMensal.style.display = 'none';
+            filtroConta.style.display = 'block';
+            filtroDataInicio.style.display = 'block';
+            filtroDataFim.style.display = 'block';
+        }
+    }
+
+    tipoRelatorioSelect.addEventListener('change', toggleFilters);
+
+    // Executa a função no carregamento da página para definir o estado inicial correto
+    toggleFilters();
+});
+</script>
+{% endblock %}

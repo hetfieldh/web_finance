@@ -45,6 +45,8 @@ def create_app():
     from app.models.crediario_model import Crediario
     from app.models.crediario_movimento_model import CrediarioMovimento
     from app.models.crediario_parcela_model import CrediarioParcela
+    from app.models.desp_rec_model import DespRec
+    from app.models.desp_rec_movimento_model import DespRecMovimento
     from app.models.financiamento_model import Financiamento
     from app.models.financiamento_parcela_model import FinanciamentoParcela
     from app.models.usuario_model import Usuario
@@ -61,6 +63,9 @@ def create_app():
     from app.routes.crediario_grupo_routes import crediario_grupo_bp
     from app.routes.crediario_movimento_routes import crediario_movimento_bp
     from app.routes.crediario_routes import crediario_bp
+    from app.routes.desp_rec_movimento_routes import desp_rec_movimento_bp
+    from app.routes.desp_rec_routes import desp_rec_bp
+    from app.routes.extrato_desp_rec_routes import extrato_desp_rec_bp
     from app.routes.extrato_routes import extrato_bp
     from app.routes.financiamento_routes import financiamento_bp
     from app.routes.main_routes import main_bp
@@ -78,6 +83,9 @@ def create_app():
     app.register_blueprint(crediario_movimento_bp)
     app.register_blueprint(crediario_fatura_bp)
     app.register_blueprint(financiamento_bp)
+    app.register_blueprint(desp_rec_bp)
+    app.register_blueprint(desp_rec_movimento_bp)
+    app.register_blueprint(extrato_desp_rec_bp)
 
     @app.route("/")
     def index():
