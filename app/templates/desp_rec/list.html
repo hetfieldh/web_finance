@@ -70,12 +70,12 @@
                                 <td>{{
                                     cadastro.data_criacao.strftime('%d/%m/%Y')
                                     }}</td>
-                                <td class="table-actions d-flex flex-nowrap">
+                                <td class="table-actions">
                                     <a
                                         href="{{ url_for('desp_rec.editar_cadastro', id=cadastro.id) }}"
                                         class="btn btn-warning me-2"
                                         title="Editar">
-                                        <i class="fas fa-edit"></i> Editar
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <form
                                         action="{{ url_for('desp_rec.excluir_cadastro', id=cadastro.id) }}"
@@ -85,7 +85,6 @@
                                             class="btn btn-danger"
                                             title="Excluir">
                                             <i class="fas fa-trash-alt"></i>
-                                            Excluir
                                         </button>
                                     </form>
                                 </td>

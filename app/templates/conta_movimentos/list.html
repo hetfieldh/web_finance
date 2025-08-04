@@ -1,4 +1,4 @@
-<!--- app/templates/conta_movimentos/list.html -->
+<!-- app/templates/conta_movimentos/list.html -->
 
 {% extends "base.html" %}
 
@@ -11,7 +11,9 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Registros</h4>
             <div>
-                <a href="{{ url_for('conta_movimento.adicionar_movimentacao') }}" class="btn btn-success btn-add">
+                <a
+                    href="{{ url_for('conta_movimento.adicionar_movimentacao') }}"
+                    class="btn btn-success btn-add">
                     <i class="fas fa-plus"></i> Movimentação
                 </a>
             </div>
@@ -40,33 +42,54 @@
                             {% for mov in movimentacoes %}
                             <tr>
                                 <td>{{ mov.id }}</td>
-                                <td>{{ mov.conta.nome_banco }} - {{ mov.conta.conta }}</td>
+                                <td>{{ mov.conta.nome_banco }} - {{
+                                    mov.conta.conta }}</td>
                                 <td>{{ mov.tipo_transacao.transacao_tipo }}</td>
                                 <td>
-                                    {% if mov.tipo_transacao.tipo == 'Crédito' %}
-                                        <span class="badge bg-success">{{ mov.tipo_transacao.tipo }}</span>
-                                    {% elif mov.tipo_transacao.tipo == 'Débito' %}
-                                        <span class="badge bg-danger">{{ mov.tipo_transacao.tipo }}</span>
+                                    {% if mov.tipo_transacao.tipo == 'Crédito'
+                                    %}
+                                    <span class="badge bg-success">{{
+                                        mov.tipo_transacao.tipo }}</span>
+                                    {% elif mov.tipo_transacao.tipo == 'Débito'
+                                    %}
+                                    <span class="badge bg-danger">{{
+                                        mov.tipo_transacao.tipo }}</span>
                                     {% else %}
-                                        {{ mov.tipo_transacao.tipo }}
+                                    {{ mov.tipo_transacao.tipo }}
                                     {% endif %}
                                 </td>
-                                <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ mov.data_movimento.strftime('%d/%m/%Y')
+                                    }}</td>
                                 <td>R$ {{ "%.2f"|format(mov.valor) }}</td>
-                                <td>{{ mov.descricao if mov.descricao else 'N/A' }}</td>
+                                <td>{{ mov.descricao if mov.descricao else 'N/A'
+                                    }}</td>
                                 <td>
-                                    {% if mov.id_movimento_relacionado is not none %}
-                                        <i class="fas fa-exchange-alt" title="Movimentação de Transferência" data-bs-toggle="tooltip" data-bs-placement="top"></i>
+                                    {% if mov.id_movimento_relacionado is not
+                                    none %}
+                                    <i class="fas fa-exchange-alt"
+                                        title="Movimentação de Transferência"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"></i>
                                     {% endif %}
                                 </td>
-                                <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>{{
+                                    mov.data_criacao.strftime('%d/%m/%Y %H:%M')
+                                    }}</td>
                                 <td class="table-actions">
-                                    <a href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}" class="btn btn-warning me-2" title="Editar">
-                                        <i class="fas fa-edit"></i> Editar
+                                    <a
+                                        href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}"
+                                        class="btn btn-warning me-2"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ url_for('conta_movimento.excluir_movimentacao', id=mov.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta movimentação?');">
-                                        <button type="submit" class="btn btn-danger" title="Excluir">
-                                            <i class="fas fa-trash-alt"></i> Excluir
+                                    <form
+                                        action="{{ url_for('conta_movimento.excluir_movimentacao', id=mov.id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Tem certeza que deseja excluir esta movimentação?');">
+                                        <button type="submit"
+                                            class="btn btn-danger"
+                                            title="Excluir">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
                                 </td>
@@ -76,7 +99,8 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="text-center">Nenhuma movimentação registrada ainda.</p>
+                <p class="text-center">Nenhuma movimentação registrada
+                    ainda.</p>
                 {% endif %}
             </div>
         </div>

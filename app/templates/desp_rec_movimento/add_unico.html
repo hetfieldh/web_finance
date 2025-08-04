@@ -1,0 +1,75 @@
+<!-- app/templates/desp_rec_movimento/add_unico.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Formulário de Lançamento Único</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST"
+                    action="{{ url_for('desp_rec_movimento.adicionar_lancamento_unico') }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-3">
+                        {{ form.desp_rec_id.label(class="form-label") }}
+                        {{ form.desp_rec_id(class="form-select") }}
+                        {% if form.desp_rec_id.errors %}
+                        <div class="text-danger mt-1"><small>{{
+                                form.desp_rec_id.errors[0] }}</small></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.data_vencimento.label(class="form-label") }}
+                            {{ form.data_vencimento(class="form-control",
+                            type="date") }}
+                            {% if form.data_vencimento.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.data_vencimento.errors[0]
+                                    }}</small></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.valor_previsto.label(class="form-label") }}
+                            {{ form.valor_previsto(class="form-control",
+                            type="number", step="0.01") }}
+                            {% if form.valor_previsto.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.valor_previsto.errors[0]
+                                    }}</small></div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="3") }}
+                        {% if form.descricao.errors %}
+                        <div class="text-danger mt-1"><small>{{
+                                form.descricao.errors[0] }}</small></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a
+                            href="{{ url_for('desp_rec_movimento.listar_movimentos') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

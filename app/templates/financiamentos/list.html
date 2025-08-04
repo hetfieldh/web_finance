@@ -1,4 +1,4 @@
-<!--- app/templates/financiamentos/list.html -->
+<!-- app/templates/financiamentos/list.html -->
 
 {% extends "base.html" %}
 
@@ -13,7 +13,7 @@
             <div>
                 <a href="{{ url_for('financiamento.adicionar_financiamento') }}"
                     class="btn btn-success btn-add">
-                    <i class="fas fa-plus"></i> Adicionar
+                    <i class="fas fa-plus"></i> Adicionar Financiamento
                 </a>
             </div>
         </div>
@@ -60,17 +60,18 @@
                                 <td>{{
                                     financ.data_criacao.strftime('%d/%m/%Y %H:%M')
                                     }}</td>
-                                <td class="table-actions d-flex">
-
-                                    <a href="{{ url_for('financiamento.visualizar_parcelas', id=financ.id) }}" class="btn btn-info me-2" title="Visualizar Parcelas">
-                                        <i class="fas fa-list-ol"></i> Parcelas
+                                <td class="table-actions">
+                                    <a
+                                        href="{{ url_for('financiamento.visualizar_parcelas', id=financ.id) }}"
+                                        class="btn btn-info me-2"
+                                        title="Visualizar Parcelas">
+                                        <i class="fas fa-list-ol"></i>
                                     </a>
-
                                     <a
                                         href="{{ url_for('financiamento.editar_financiamento', id=financ.id) }}"
                                         class="btn btn-warning me-2"
                                         title="Editar">
-                                        <i class="fas fa-edit"></i> Editar
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <form
                                         action="{{ url_for('financiamento.excluir_financiamento', id=financ.id) }}"
@@ -80,7 +81,6 @@
                                             class="btn btn-danger"
                                             title="Excluir">
                                             <i class="fas fa-trash-alt"></i>
-                                            Excluir
                                         </button>
                                     </form>
                                 </td>

@@ -174,3 +174,41 @@ class EditarMovimentoForm(FlaskForm):
         ],
     )
     submit = SubmitField("Salvar Alterações")
+
+
+# --- Formulário para lançamento único ---
+class LancamentoUnicoForm(FlaskForm):
+    desp_rec_id = SelectField(
+        "Conta", validators=[DataRequired("Selecione uma conta.")], coerce=int
+    )
+    data_vencimento = DateField(
+        "Data de Vencimento",
+        format="%Y-%m-%d",
+        validators=[DataRequired("A data de vencimento é obrigatória.")],
+        default=date.today,
+    )
+    valor_previsto = DecimalField(
+        "Valor",
+        validators=[
+            InputRequired("O valor é obrigatório."),
+            NumberRange(min=0.01, message="O valor deve ser maior que zero."),
+        ],
+        places=2,
+    )
+    descricao = TextAreaField(
+        "Descrição (opcional)",
+        validators=[
+            Optional(),
+            Length(max=255, message="A descrição não pode exceder 255 caracteres."),
+        ],
+    )
+    submit = SubmitField("Adicionar Lançamento")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.desp_rec_id.choices = [("", "Selecione...")] + [
+            (c.id, f"{c.nome} ({c.natureza})")
+            for c in DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
+            .order_by(DespRec.nome.asc())
+            .all()
+        ]

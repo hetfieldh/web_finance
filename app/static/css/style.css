@@ -101,7 +101,7 @@ h6,
 .table td,
 .table th {
     padding: 0.1rem 0.2rem;
-    height: 20px;
+    height: 15px;
     vertical-align: middle;
 }
 
@@ -112,21 +112,56 @@ h6,
     padding: 0 15px;
 }
 
+/* --- Estilos dos botões de ação --- */
+.table-actions {
+    white-space: nowrap;
+}
+
+.table-actions .btn,
+.table-actions form {
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+/* Estilo base para botões de ícone: fundo transparente, sem borda */
 .table-actions .btn {
-    min-width: 0.6px;
-    height: 20px;
-    font-size: 0.7rem;
-    padding: 0.01rem 0.5rem;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    font-size: 0.75rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: 0px;
+    margin-right: 5px;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-.table-actions form {
-    display: inline-block;
-    margin-bottom: 0;
+.table-actions .btn.btn-info i {
+    color: #0753c4;
 }
+
+.table-actions .btn.btn-warning i {
+    color: #c79c19;
+}
+
+.table-actions .btn.btn-danger i {
+    color: #dc3545;
+}
+
+.table-actions .btn.btn-primary i {
+    color: #0b6dff;
+}
+
+.table-actions .btn.btn-secondary i {
+    color: #6c757d;
+}
+
+.table-actions .btn:hover i {
+    opacity: 0.5;
+}
+
 
 /* --- Formulários --- */
 .form-control,

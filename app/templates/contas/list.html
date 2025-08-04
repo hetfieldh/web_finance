@@ -1,4 +1,4 @@
-<!--- app/templates/contas/list.html -->
+<!-- app/templates/contas/list.html -->
 
 {% extends "base.html" %}
 
@@ -72,7 +72,7 @@
                                         href="{{ url_for('conta.editar_conta', id=conta.id) }}"
                                         class="btn btn-warning me-2"
                                         title="Editar">
-                                        <i class="fas fa-edit"></i> Editar
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <form
                                         action="{{ url_for('conta.excluir_conta', id=conta.id) }}"
@@ -82,7 +82,6 @@
                                             class="btn btn-danger"
                                             title="Excluir">
                                             <i class="fas fa-trash-alt"></i>
-                                            Excluir
                                         </button>
                                     </form>
                                 </td>

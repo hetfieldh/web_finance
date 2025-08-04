@@ -18,7 +18,11 @@ from sqlalchemy import extract
 from sqlalchemy.exc import IntegrityError
 
 from app import db
-from app.forms.desp_rec_forms import EditarMovimentoForm, GerarPrevisaoForm
+from app.forms.desp_rec_forms import (
+    EditarMovimentoForm,
+    GerarPrevisaoForm,
+    LancamentoUnicoForm,
+)
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 
@@ -55,7 +59,6 @@ def gerar_previsao():
                 flash("Cadastro base não encontrado.", "danger")
                 return redirect(url_for("desp_rec_movimento.gerar_previsao"))
 
-            # --- NOVA VALIDAÇÃO DE UNICIDADE ---
             datas_a_verificar = [
                 data_inicio + relativedelta(months=i) for i in range(numero_meses)
             ]
@@ -81,7 +84,6 @@ def gerar_previsao():
                     "danger",
                 )
                 return redirect(url_for("desp_rec_movimento.gerar_previsao"))
-            # --- FIM DA VALIDAÇÃO ---
 
             novos_lancamentos = []
             for i in range(numero_meses):
@@ -124,6 +126,62 @@ def gerar_previsao():
     )
 
 
+@desp_rec_movimento_bp.route("/adicionar-lancamento", methods=["GET", "POST"])
+@login_required
+def adicionar_lancamento_unico():
+    form = LancamentoUnicoForm()
+    if form.validate_on_submit():
+        try:
+            desp_rec_id = form.desp_rec_id.data
+            data_vencimento = form.data_vencimento.data
+
+            conflito = DespRecMovimento.query.filter(
+                DespRecMovimento.usuario_id == current_user.id,
+                DespRecMovimento.desp_rec_id == desp_rec_id,
+                extract("year", DespRecMovimento.data_vencimento)
+                == data_vencimento.year,
+                extract("month", DespRecMovimento.data_vencimento)
+                == data_vencimento.month,
+            ).first()
+
+            if conflito:
+                cadastro_base = DespRec.query.get(desp_rec_id)
+                flash(
+                    f"Erro: Já existe um lançamento para '{cadastro_base.nome}' no mês {data_vencimento.strftime('%m/%Y')}.",
+                    "danger",
+                )
+                return render_template(
+                    "desp_rec_movimento/add_unico.html",
+                    form=form,
+                    title="Adicionar Lançamento Único",
+                )
+
+            novo_movimento = DespRecMovimento(
+                usuario_id=current_user.id,
+                desp_rec_id=desp_rec_id,
+                data_vencimento=data_vencimento,
+                valor_previsto=form.valor_previsto.data,
+                descricao=form.descricao.data.strip() if form.descricao.data else None,
+                status="Pendente",
+            )
+            db.session.add(novo_movimento)
+            db.session.commit()
+            flash("Lançamento adicionado com sucesso!", "success")
+            return redirect(url_for("desp_rec_movimento.listar_movimentos"))
+        except Exception as e:
+            db.session.rollback()
+            flash("Erro ao adicionar o lançamento. Tente novamente.", "danger")
+            current_app.logger.error(
+                f"Erro ao adicionar lançamento único: {e}", exc_info=True
+            )
+
+    return render_template(
+        "desp_rec_movimento/add_unico.html",
+        form=form,
+        title="Adicionar Lançamento Único",
+    )
+
+
 @desp_rec_movimento_bp.route("/editar/<int:id>", methods=["GET", "POST"])
 @login_required
 def editar_movimento(id):
@@ -136,7 +194,6 @@ def editar_movimento(id):
         try:
             nova_data_vencimento = form.data_vencimento.data
 
-            # --- NOVA VALIDAÇÃO DE UNICIDADE NA EDIÇÃO ---
             if (
                 nova_data_vencimento.year != movimento.data_vencimento.year
                 or nova_data_vencimento.month != movimento.data_vencimento.month
@@ -161,7 +218,6 @@ def editar_movimento(id):
                         title="Editar Lançamento",
                         movimento=movimento,
                     )
-            # --- FIM DA VALIDAÇÃO ---
 
             movimento.data_vencimento = nova_data_vencimento
             movimento.valor_previsto = form.valor_previsto.data

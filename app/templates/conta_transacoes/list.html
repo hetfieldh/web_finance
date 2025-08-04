@@ -1,4 +1,4 @@
-<!--- app/templates/conta_transacoes/list.html -->
+<!-- app/templates/conta_transacoes/list.html -->
 
 {% extends "base.html" %}
 
@@ -61,7 +61,7 @@
                                         href="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_t.id) }}"
                                         class="btn btn-warning me-2"
                                         title="Editar">
-                                        <i class="fas fa-edit"></i> Editar
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <form
                                         action="{{ url_for('conta_transacao.excluir_tipo_transacao', id=tipo_t.id) }}"
@@ -71,7 +71,6 @@
                                             class="btn btn-danger"
                                             title="Excluir">
                                             <i class="fas fa-trash-alt"></i>
-                                            Excluir
                                         </button>
                                     </form>
                                 </td>
