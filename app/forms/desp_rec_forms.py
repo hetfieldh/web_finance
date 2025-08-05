@@ -2,12 +2,15 @@
 
 from datetime import date
 
+# A importação desnecessária de 'salario_movimento_model' foi removida daqui.
+import dateutil.relativedelta
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
     DateField,
     DecimalField,
+    Form,
     IntegerField,
     SelectField,
     StringField,
@@ -60,13 +63,20 @@ class CadastroDespRecForm(FlaskForm):
     ativo = BooleanField("Ativo", default=True)
     submit = SubmitField("Salvar")
 
+    def __init__(self, original_nome=None, original_tipo=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.original_nome = original_nome
+        self.original_tipo = original_tipo
+
     def validate_nome(self, field):
-        nome_data = field.data.strip()
+        if field.data == self.original_nome and self.tipo.data == self.original_tipo:
+            return
+
         existing = DespRec.query.filter_by(
             usuario_id=current_user.id,
-            nome=nome_data,
-            natureza=self.natureza.data,
+            nome=field.data,
             tipo=self.tipo.data,
+            natureza=self.natureza.data,
         ).first()
 
         if existing:
@@ -77,16 +87,19 @@ class CadastroDespRecForm(FlaskForm):
 
 # --- Formulário para Editar um Cadastro Existente ---
 class EditarDespRecForm(FlaskForm):
-    nome = StringField("Nome da Despesa/Receita", render_kw={"readonly": True})
-    natureza = SelectField(
-        "Natureza",
-        choices=[("Despesa", "Despesa"), ("Receita", "Receita")],
-        render_kw={"disabled": True},
+    nome = StringField(
+        "Nome da Despesa/Receita",
+        render_kw={"readonly": True, "class": "form-control-plaintext"},
     )
     tipo = SelectField(
         "Tipo",
         choices=[("Fixa", "Fixa"), ("Variável", "Variável")],
-        render_kw={"disabled": True},
+        render_kw={"disabled": True, "class": "form-select"},
+    )
+    natureza = SelectField(
+        "Natureza",
+        choices=[("Despesa", "Despesa"), ("Receita", "Receita")],
+        render_kw={"disabled": True, "class": "form-select"},
     )
     dia_vencimento = IntegerField(
         "Dia Padrão de Vencimento (1-31)",
@@ -176,10 +189,12 @@ class EditarMovimentoForm(FlaskForm):
     submit = SubmitField("Salvar Alterações")
 
 
-# --- Formulário para lançamento único ---
+# --- Formulário para Lançamento Único ---
 class LancamentoUnicoForm(FlaskForm):
     desp_rec_id = SelectField(
-        "Conta", validators=[DataRequired("Selecione uma conta.")], coerce=int
+        "Conta",
+        validators=[DataRequired("Selecione uma conta.")],
+        coerce=lambda x: int(x) if x else None,
     )
     data_vencimento = DateField(
         "Data de Vencimento",
