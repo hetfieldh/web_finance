@@ -72,6 +72,7 @@ def create_app():
     from app.routes.extrato_routes import extrato_bp
     from app.routes.financiamento_routes import financiamento_bp
     from app.routes.main_routes import main_bp
+    from app.routes.pagamentos_routes import pagamentos_bp
     from app.routes.salario_routes import salario_bp
     from app.routes.usuario_routes import usuario_bp
 
@@ -91,6 +92,7 @@ def create_app():
     app.register_blueprint(desp_rec_movimento_bp)
     app.register_blueprint(extrato_desp_rec_bp)
     app.register_blueprint(salario_bp)
+    app.register_blueprint(pagamentos_bp)
 
     @app.route("/")
     def index():

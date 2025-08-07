@@ -1,5 +1,5 @@
 Estrutura do Projeto Atualizada
-05-08-2025
+07-08-2025
 
 
 web_finance/
@@ -21,13 +21,13 @@ web_finance/
 │   │   ├── extrato_desp_rec_forms.py
 │   │   ├── extrato_forms.py
 │   │   ├── financiamento_forms.py
+│   │   ├── salario_forms.py
 │   │   └── usuario_forms.py
 │   ├── models/
 │   │   ├── conta_model.py
 │   │   ├── conta_movimento_model.py
 │   │   ├── conta_transacao_model.py
 │   │   ├── crediario_fatura_model.py
-│   │   ├── crediario_forms.py
 │   │   ├── crediario_grupo_model.py
 │   │   ├── crediario_model.py
 │   │   ├── crediario_movimento_model.py
@@ -36,6 +36,9 @@ web_finance/
 │   │   ├── desp_rec_movimento_model.py
 │   │   ├── financiamento_model.py
 │   │   ├── financiamento_parcela_model.py
+│   │   ├── salario_item_model.py
+│   │   ├── salario_movimento_item_model.py
+│   │   ├── salario_movimento_model.py
 │   │   └── usuario_model.py
 │   ├── routes/
 │   │   ├── auth_routes.py
@@ -52,6 +55,7 @@ web_finance/
 │   │   ├── extrato_routes.py
 │   │   ├── financiamento_routes.py
 │   │   ├── main_routes.py
+│   │   ├── salario_routes.py
 │   │   └── usuario_routes.py
 │   ├── static/
 │   │   ├── css/
@@ -113,6 +117,14 @@ web_finance/
 │       │   └── parcelas.html
 │       ├── includes/
 │       │   └── _sidebar.html
+│       ├── salario_item/
+│       │   ├── add.html
+│       │   ├── edit.html
+│       │   └── list.html
+│       ├── salario_movimento/
+│       │   ├── add.html
+│       │   ├── gerenciar_itens.html
+│       │   └── list.html
 │       └── usuarios/
 │           ├── add.html
 │           ├── edit.html

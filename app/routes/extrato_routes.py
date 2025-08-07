@@ -68,19 +68,23 @@ def extrato_bancario():
                 else:
                     saldo_anterior -= mov_ant.valor
 
+        # --- LÓGICA DE ORDENAÇÃO E CÁLCULO CORRIGIDA ---
         movimentacoes_do_mes = (
             ContaMovimento.query.filter(
                 ContaMovimento.conta_id == conta_selecionada.id,
                 ContaMovimento.data_movimento >= data_inicio_mes,
                 ContaMovimento.data_movimento <= data_fim_mes,
             )
-            .order_by(ContaMovimento.data_movimento.desc())
-            .all()
+            # 1. Busca na ordem cronológica correta (ascendente) para o cálculo
+            .order_by(
+                ContaMovimento.data_movimento.asc(), ContaMovimento.id.asc()
+            ).all()
         )
 
         saldo_acumulado_temp = saldo_anterior
         movimentacoes_para_template = []
 
+        # 2. Calcula o saldo acumulado na ordem correta
         for mov in movimentacoes_do_mes:
             tipo_transacao_mov = ContaTransacao.query.get(mov.conta_transacao_id)
             if tipo_transacao_mov:
@@ -103,8 +107,10 @@ def extrato_bancario():
                     }
                 )
 
+        # 3. A lista já está na ordem cronológica correta para exibição.
         movimentacoes = movimentacoes_para_template
         saldo_final_mes = saldo_acumulado_temp
+        # --- FIM DA CORREÇÃO ---
 
     elif request.method == "GET":
         if form.conta_id.choices:
