@@ -1,0 +1,54 @@
+<!--- app\templates\salario_movimento\add.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Criar Nova Folha de Pagamento</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Primeiro, informe o mês de referência e a
+                    data de recebimento. Depois, você será direcionado para
+                    adicionar as verbas.</p>
+                <form method="POST"
+                    action="{{ url_for('salario.novo_lancamento_folha') }}">
+                    {{ form.csrf_token }}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.mes_referencia.label(class="form-label") }}
+                            {{ form.mes_referencia(class="form-select") }}
+                            {% if form.mes_referencia.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.mes_referencia.errors[0]
+                                    }}</small></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.data_recebimento.label(class="form-label")
+                            }}
+                            {{ form.data_recebimento(class="form-control",
+                            type="date") }}
+                            {% if form.data_recebimento.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.data_recebimento.errors[0]
+                                    }}</small></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        {{ form.submit(class="btn btn-success btn-add") }}
+                        <a href="{{ url_for('salario.listar_movimentos') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

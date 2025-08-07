@@ -1,0 +1,133 @@
+<!--- app\templates\salario_movimento\gerenciar_itens.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm mb-4">
+            <div
+                class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Resumo da Folha de {{ movimento.mes_referencia
+                    }}</h5>
+                <a href="{{ url_for('salario.listar_movimentos') }}"
+                    class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left"></i> Voltar para a Lista
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h6>Salário Bruto</h6>
+                        <p class="h5 text-primary">R$ {{
+                            "%.2f"|format(totais.salario_bruto) }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Descontos + Impostos</h6>
+                        <p class="h5 text-danger">R$ {{
+                            "%.2f"|format(totais.total_descontos_impostos)
+                            }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Salário Líquido</h6>
+                        <p class="h5 fw-bold text-success">R$ {{
+                            "%.2f"|format(totais.salario_liquido) }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Total de Benefícios</h6>
+                        <p class="h5 text-info">R$ {{
+                            "%.2f"|format(totais.beneficios) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Adicionar e Gerenciar Verbas</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST"
+                    action="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
+                    class="mb-4 p-3 border rounded bg-light">
+                    {{ form.csrf_token }}
+                    <div class="row align-items-end">
+                        <div class="col-md-5">
+                            {{ form.salario_item_id.label(class="form-label") }}
+                            {{ form.salario_item_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.valor.label(class="form-label") }}
+                            {{ form.valor(class="form-control", type="number",
+                            step="0.01", placeholder="0.00") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.submit(class="btn btn-primary w-100") }}
+                        </div>
+                    </div>
+                </form>
+
+                <h6 class="mt-4">Verbas Lançadas</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Verba</th>
+                                <th>Tipo</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in movimento.itens %}
+                            <tr>
+                                <td>{{ item.salario_item.nome }}</td>
+                                <td>
+                                    {% if item.salario_item.tipo == 'Provento'
+                                    %}<span class="badge bg-success">{{
+                                        item.salario_item.tipo }}</span>
+                                    {% elif item.salario_item.tipo ==
+                                    'Benefício' %}<span class="badge bg-info">{{
+                                        item.salario_item.tipo }}</span>
+                                    {% elif item.salario_item.tipo == 'Desconto'
+                                    %}<span
+                                        class="badge bg-warning text-dark">{{
+                                        item.salario_item.tipo }}</span>
+                                    {% elif item.salario_item.tipo == 'Imposto'
+                                    %}<span class="badge bg-danger">{{
+                                        item.salario_item.tipo }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">R$ {{
+                                    "%.2f"|format(item.valor) }}</td>
+                                <td class="text-center">
+                                    <form
+                                        action="{{ url_for('salario.excluir_item_folha', item_id=item.id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Tem certeza que deseja remover esta verba?');">
+                                        <button type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            title="Remover">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4"
+                                    class="text-center text-muted">Nenhuma verba
+                                    adicionada a esta folha de pagamento.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

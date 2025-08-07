@@ -1,0 +1,54 @@
+<!--- app\templates\salario_item\edit.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Editando Verba: {{ item.nome }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST"
+                    action="{{ url_for('salario.editar_item', id=item.id) }}">
+                    {{ form.csrf_token }}
+
+                    <div class="mb-3">
+                        {{ form.nome.label(class="form-label") }}
+                        {{ form.nome(class="form-control-plaintext") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.tipo.label(class="form-label") }}
+                        {{ form.tipo(class="form-select") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="3") }}
+                        {% if form.descricao.errors %}
+                        <div class="text-danger mt-1"><small>{{
+                                form.descricao.errors[0] }}</small></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.ativo(class="form-check-input") }}
+                        {{ form.ativo.label(class="form-check-label") }}
+                    </div>
+
+                    <div class="mt-4">
+                        {{ form.submit(class="btn btn-primary btn-add") }}
+                        <a href="{{ url_for('salario.listar_itens') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -49,6 +49,9 @@ def create_app():
     from app.models.desp_rec_movimento_model import DespRecMovimento
     from app.models.financiamento_model import Financiamento
     from app.models.financiamento_parcela_model import FinanciamentoParcela
+    from app.models.salario_item_model import SalarioItem
+    from app.models.salario_movimento_item_model import SalarioMovimentoItem
+    from app.models.salario_movimento_model import SalarioMovimento
     from app.models.usuario_model import Usuario
 
     @login_manager.user_loader
@@ -69,6 +72,7 @@ def create_app():
     from app.routes.extrato_routes import extrato_bp
     from app.routes.financiamento_routes import financiamento_bp
     from app.routes.main_routes import main_bp
+    from app.routes.salario_routes import salario_bp
     from app.routes.usuario_routes import usuario_bp
 
     app.register_blueprint(usuario_bp)
@@ -86,6 +90,7 @@ def create_app():
     app.register_blueprint(desp_rec_bp)
     app.register_blueprint(desp_rec_movimento_bp)
     app.register_blueprint(extrato_desp_rec_bp)
+    app.register_blueprint(salario_bp)
 
     @app.route("/")
     def index():
@@ -144,6 +149,6 @@ def create_app():
             exc_info=True,
         )
         db.session.rollback()
-        return render_template("500.html"), 500
+        return render_template("errors/500.html"), 500
 
     return app
