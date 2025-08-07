@@ -1,4 +1,4 @@
-<!--- app\templates\pagamentos\painel.html -->
+<!--- app\templates\recebimentos\painel.html -->
 
 {% extends "base.html" %}
 
@@ -14,7 +14,8 @@
                     Mês</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('pagamentos.painel') }}">
+                <form method="POST"
+                    action="{{ url_for('recebimentos.painel') }}">
                     {{ form.csrf_token }}
                     <div class="row align-items-end">
                         <div class="col-md-4">
@@ -33,36 +34,11 @@
             </div>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 text-secondary"><i
-                        class="fas fa-chart-pie me-2"></i>Resumo do Mês</h5>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-4">
-                        <h6>Total Previsto a Pagar</h6>
-                        <p class="h5 text-primary">R$ {{
-                            "%.2f"|format(totais.previsto) }}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h6>Total já Pago</h6>
-                        <p class="h5 text-success">R$ {{
-                            "%.2f"|format(totais.pago) }}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h6>Saldo Pendente</h6>
-                        <p class="h5 fw-bold text-danger">R$ {{
-                            "%.2f"|format(totais.pendente) }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Contas a
-                    Pagar</h5>
+                <h5 class="mb-0"><i
+                        class="fas fa-hand-holding-usd me-2"></i>Contas a
+                    Receber</h5>
             </div>
             <div class="card-body">
                 {% if contas %}
@@ -70,10 +46,10 @@
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Vencimento</th>
+                                <th>Data Prevista</th>
                                 <th>Origem</th>
                                 <th>Tipo</th>
-                                <th class="text-end">Valor</th>
+                                <th class="text-end">Valor Previsto</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Ações</th>
                             </tr>
@@ -84,16 +60,14 @@
                                 <td>{{ conta.vencimento.strftime('%d/%m/%Y')
                                     }}</td>
                                 <td>{{ conta.origem }}</td>
-                                <td><span class="badge bg-secondary">{{
-                                        conta.tipo }}</span></td>
-                                <td class="text-end fw-bold">R$ {{
+                                <td><span class="badge bg-primary">{{ conta.tipo
+                                        }}</span></td>
+                                <td class="text-end fw-bold text-success">R$ {{
                                     "%.2f"|format(conta.valor) }}</td>
                                 <td class="text-center">
-                                    {% if conta.status in ['Paga', 'Pago'] %}
+                                    {% if conta.status in ['Recebido', 'Pago']
+                                    %}
                                     <span class="badge bg-success">{{
-                                        conta.status }}</span>
-                                    {% elif conta.status in ['Atrasada'] %}
-                                    <span class="badge bg-danger">{{
                                         conta.status }}</span>
                                     {% else %}
                                     <span class="badge bg-warning text-dark">{{
@@ -101,22 +75,23 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    {% if conta.status not in ['Paga', 'Pago']
-                                    %}
+                                    {% if conta.status not in ['Recebido',
+                                    'Pago'] %}
                                     <button type="button"
-                                        class="btn btn-success btn-sm pagar-btn"
+                                        class="btn btn-success btn-sm"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#pagamentoModal"
+                                        data-bs-target="#recebimentoModal"
                                         data-item-id="{{ conta.id_original }}"
                                         data-item-tipo="{{ conta.tipo }}"
                                         data-item-valor="{{ '%.2f'|format(conta.valor) }}"
-                                        data-item-descricao="Pagamento: {{ conta.origem }}">
-                                        Pagar
+                                        data-item-descricao="{{ conta.origem }}"
+                                        data-item-data="{{ conta.vencimento.strftime('%Y-%m-%d') }}">
+                                        Registrar
                                     </button>
                                     {% else %}
                                     <form method="POST"
-                                        action="{{ url_for('pagamentos.estornar_pagamento') }}"
-                                        onsubmit="return confirm('Tem certeza que deseja estornar este pagamento?');"
+                                        action="{{ url_for('recebimentos.estornar_recebimento') }}"
+                                        onsubmit="return confirm('Tem certeza que deseja estornar este recebimento?');"
                                         style="display: inline;">
                                         <input type="hidden" name="item_id"
                                             value="{{ conta.id_original }}">
@@ -126,7 +101,7 @@
                                             value="{{ form.mes_ano.data }}">
                                         <button type="submit"
                                             class="btn btn-danger btn-sm"
-                                            title="Estornar Pagamento">
+                                            title="Estornar Recebimento">
                                             <i class="fas fa-undo"></i> Estornar
                                         </button>
                                     </form>
@@ -138,55 +113,59 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="text-center alert alert-success">Nenhuma conta a pagar
-                    encontrada para este mês. Parabéns!</p>
+                <p class="text-center alert alert-info">Nenhuma conta a receber
+                    encontrada para este mês.</p>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="pagamentoModal" tabindex="-1"
-    aria-labelledby="pagamentoModalLabel" aria-hidden="true">
+<div class="modal fade" id="recebimentoModal" tabindex="-1"
+    aria-labelledby="recebimentoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="pagamentoModalLabel">Registrar
-                    Pagamento</h5>
+                <h5 class="modal-title" id="recebimentoModalLabel">Registrar
+                    Recebimento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
             <form method="POST"
-                action="{{ url_for('pagamentos.pagar_conta') }}">
+                action="{{ url_for('recebimentos.registrar_recebimento') }}">
                 <div class="modal-body">
-                    {{ pagamento_form.csrf_token }}
-                    {{ pagamento_form.item_id(class="d-none") }}
-                    {{ pagamento_form.item_tipo(class="d-none") }}
-                    {{ pagamento_form.item_descricao(class="d-none") }}
+                    {{ recebimento_form.csrf_token }}
+                    {{ recebimento_form.item_id(class="d-none") }}
+                    {{ recebimento_form.item_tipo(class="d-none") }}
+                    {{ recebimento_form.item_descricao(class="d-none") }}
                     <input type="hidden" name="mes_ano"
                         value="{{ form.mes_ano.data }}">
 
                     <div class="mb-3">
-                        {{ pagamento_form.conta_id.label(class="form-label") }}
-                        {{ pagamento_form.conta_id(class="form-select") }}
+                        {{ recebimento_form.conta_id.label(class="form-label")
+                        }}
+                        {{ recebimento_form.conta_id(class="form-select") }}
                     </div>
                     <div class="mb-3">
                         {{
-                        pagamento_form.data_pagamento.label(class="form-label")
+                        recebimento_form.data_recebimento.label(class="form-label")
                         }}
-                        {{ pagamento_form.data_pagamento(class="form-control")
+                        {{
+                        recebimento_form.data_recebimento(class="form-control")
                         }}
                     </div>
                     <div class="mb-3">
-                        {{ pagamento_form.valor_pago.label(class="form-label")
+                        {{
+                        recebimento_form.valor_recebido.label(class="form-label")
                         }}
-                        {{ pagamento_form.valor_pago(class="form-control") }}
+                        {{ recebimento_form.valor_recebido(class="form-control")
+                        }}
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary"
                         data-bs-dismiss="modal">Cancelar</button>
-                    {{ pagamento_form.submit(class="btn btn-success") }}
+                    {{ recebimento_form.submit(class="btn btn-success") }}
                 </div>
             </form>
         </div>
@@ -197,20 +176,22 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var pagamentoModal = document.getElementById('pagamentoModal');
-    if (pagamentoModal) {
-        pagamentoModal.addEventListener('show.bs.modal', function (event) {
+    var recebimentoModal = document.getElementById('recebimentoModal');
+    if (recebimentoModal) {
+        recebimentoModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             var itemId = button.getAttribute('data-item-id');
             var itemTipo = button.getAttribute('data-item-tipo');
             var itemValor = button.getAttribute('data-item-valor');
             var itemDescricao = button.getAttribute('data-item-descricao');
+            var itemData = button.getAttribute('data-item-data');
 
             var modal = this;
             modal.querySelector('#item_id').value = itemId;
             modal.querySelector('#item_tipo').value = itemTipo;
-            modal.querySelector('#valor_pago').value = itemValor;
+            modal.querySelector('#valor_recebido').value = itemValor;
             modal.querySelector('#item_descricao').value = itemDescricao;
+            modal.querySelector('#data_recebimento').value = itemData;
         });
     }
 });

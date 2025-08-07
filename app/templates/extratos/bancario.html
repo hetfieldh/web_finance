@@ -125,11 +125,13 @@
                                     {{ mov.tipo_movimento }}
                                     {% endif %}
                                 </td>
-                                <td>R$ {{ "%.2f"|format(mov.valor) }}</td>
-                                <td>{{ mov.descricao if mov.descricao else
-                                    'N/A'}}</td>
-                                <td>R$ {{ "%.2f"|format(mov.saldo_acumulado)
-                                    }}</td>
+                                <td class="{% if mov.tipo_movimento == 'Débito' %}text-danger{% else %}text-success{% endif %}">
+                                    {% if mov.tipo_movimento == 'Débito' %}-{% endif %}R$ {{ "%.2f"|format(mov.valor) }}
+                                </td>
+                                <td>{{ mov.descricao if mov.descricao else 'N/A'}}</td>
+                                <td class="fw-bold {% if mov.saldo_acumulado < 0 %}text-danger{% endif %}">
+                                    R$ {{ "%.2f"|format(mov.saldo_acumulado) }}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -139,6 +141,7 @@
                 <p class="text-center alert alert-info mt-3">Nenhuma
                     movimentação encontrada para o período selecionado.</p>
                 {% endif %}
+                </div>
             </div>
         </div>
         {% elif form.is_submitted() and not movimentacoes and not
