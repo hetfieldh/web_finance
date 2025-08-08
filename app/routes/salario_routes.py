@@ -32,7 +32,7 @@ salario_bp = Blueprint("salario", __name__, url_prefix="/salario")
 def listar_itens():
     itens = (
         SalarioItem.query.filter_by(usuario_id=current_user.id)
-        .order_by(SalarioItem.tipo.asc(), SalarioItem.nome.asc())
+        .order_by(SalarioItem.ativo.desc(), SalarioItem.nome.asc())
         .all()
     )
     return render_template(
@@ -48,7 +48,7 @@ def adicionar_item():
         try:
             novo_item = SalarioItem(
                 usuario_id=current_user.id,
-                nome=form.nome.data.strip(),
+                nome=form.nome.data.strip().upper(),
                 tipo=form.tipo.data,
                 descricao=form.descricao.data.strip() if form.descricao.data else None,
                 ativo=form.ativo.data,

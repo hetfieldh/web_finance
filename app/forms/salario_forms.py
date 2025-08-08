@@ -42,7 +42,7 @@ class CadastroSalarioItemForm(FlaskForm):
         "Nome da Verba",
         validators=[
             DataRequired("O nome é obrigatório."),
-            Length(min=2, max=100, message="O nome deve ter entre 2 e 100 caracteres."),
+            Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ0-9\s'\-]+$",
                 message="O nome contém caracteres inválidos ou múltiplos espaços.",
@@ -62,7 +62,7 @@ class CadastroSalarioItemForm(FlaskForm):
         ],
     )
     ativo = BooleanField("Ativo", default=True)
-    submit = SubmitField("Salvar")
+    submit = SubmitField("Adicionar")
 
     def validate_nome(self, field):
         existing_item = SalarioItem.query.filter_by(
@@ -86,7 +86,7 @@ class EditarSalarioItemForm(FlaskForm):
         ],
     )
     ativo = BooleanField("Ativo")
-    submit = SubmitField("Salvar")
+    submit = SubmitField("Atualizar")
 
 
 class CabecalhoFolhaForm(FlaskForm):

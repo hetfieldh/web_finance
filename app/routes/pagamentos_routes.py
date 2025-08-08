@@ -169,11 +169,11 @@ def pagar_conta():
             # --- FIM DA LÓGICA DE VALIDAÇÃO ---
 
             tipo_transacao_debito = ContaTransacao.query.filter_by(
-                usuario_id=current_user.id, transacao_tipo="PAGAMENTOS", tipo="Débito"
+                usuario_id=current_user.id, transacao_tipo="PAGAMENTO", tipo="Débito"
             ).first()
             if not tipo_transacao_debito:
                 flash(
-                    'Tipo de transação "PAGAMENTOS" (Débito) não encontrado. Por favor, cadastre-o primeiro.',
+                    'Tipo de transação "PAGAMENTO" (Débito) não encontrado. Por favor, cadastre-o primeiro.',
                     "danger",
                 )
                 return redirect(url_for("pagamentos.painel"))

@@ -2,7 +2,6 @@
 
 from datetime import date
 
-# A importação desnecessária de 'salario_movimento_model' foi removida daqui.
 import dateutil.relativedelta
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -30,13 +29,12 @@ from wtforms.validators import (
 from app.models.desp_rec_model import DespRec
 
 
-# --- Formulário para o Cadastro Principal (Molde) ---
 class CadastroDespRecForm(FlaskForm):
     nome = StringField(
         "Nome da Despesa/Receita",
         validators=[
             DataRequired("O nome é obrigatório."),
-            Length(min=2, max=100, message="O nome deve ter entre 2 e 100 caracteres."),
+            Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ0-9\s'\-]+$",
                 message="O nome contém caracteres inválidos ou múltiplos espaços.",
@@ -61,7 +59,7 @@ class CadastroDespRecForm(FlaskForm):
         ],
     )
     ativo = BooleanField("Ativo", default=True)
-    submit = SubmitField("Salvar")
+    submit = SubmitField("Adicionar")
 
     def __init__(self, original_nome=None, original_tipo=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,7 +83,6 @@ class CadastroDespRecForm(FlaskForm):
             )
 
 
-# --- Formulário para Editar um Cadastro Existente ---
 class EditarDespRecForm(FlaskForm):
     nome = StringField(
         "Nome da Despesa/Receita",
@@ -109,15 +106,14 @@ class EditarDespRecForm(FlaskForm):
         ],
     )
     ativo = BooleanField("Ativo")
-    submit = SubmitField("Salvar Alterações")
+    submit = SubmitField("Atualizar")
 
 
-# --- Formulário para Gerar Previsões (Lançamento em Lote) ---
 class GerarPrevisaoForm(FlaskForm):
     desp_rec_id = SelectField(
         "Conta Fixa",
         validators=[DataRequired("Selecione uma conta fixa.")],
-        coerce=int,
+        coerce=lambda x: int(x) if x else None,
     )
     valor_previsto = DecimalField(
         "Valor Previsto Mensal",
@@ -150,12 +146,12 @@ class GerarPrevisaoForm(FlaskForm):
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
         ],
     )
-    submit = SubmitField("Gerar Previsão")
+    submit = SubmitField("Gerar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.desp_rec_id.choices = [
-            (c.id, f"{c.nome} ({c.natureza})")
+        self.desp_rec_id.choices = [("", "Selecione...")] + [
+            (c.id, f"{c.nome} ({c.natureza} {c.tipo})")
             for c in DespRec.query.filter_by(
                 usuario_id=current_user.id, tipo="Fixa", ativo=True
             )
@@ -164,7 +160,6 @@ class GerarPrevisaoForm(FlaskForm):
         ]
 
 
-# --- Formulário para Editar um Lançamento Individual ---
 class EditarMovimentoForm(FlaskForm):
     data_vencimento = DateField(
         "Data de Vencimento",
@@ -186,10 +181,9 @@ class EditarMovimentoForm(FlaskForm):
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
         ],
     )
-    submit = SubmitField("Salvar Alterações")
+    submit = SubmitField("Atualizar")
 
 
-# --- Formulário para Lançamento Único ---
 class LancamentoUnicoForm(FlaskForm):
     desp_rec_id = SelectField(
         "Conta",
@@ -217,13 +211,15 @@ class LancamentoUnicoForm(FlaskForm):
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
         ],
     )
-    submit = SubmitField("Adicionar Lançamento")
+    submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.desp_rec_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome} ({c.natureza})")
-            for c in DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
+            (c.id, f"{c.nome} ({c.natureza} {c.tipo})")
+            for c in DespRec.query.filter_by(
+                usuario_id=current_user.id, ativo=True, tipo="Variável"
+            )
             .order_by(DespRec.nome.asc())
             .all()
         ]

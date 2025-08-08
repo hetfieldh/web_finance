@@ -28,13 +28,13 @@ TIPOS_CREDIARIO = [
 
 class CadastroCrediarioForm(FlaskForm):
     nome_crediario = StringField(
-        "Nome do Crediário",
+        "Crediário",
         validators=[
             DataRequired("O nome do crediário é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O nome do crediário deve ter entre 2 e 100 caracteres.",
+                message="O nome do crediário deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
@@ -48,7 +48,7 @@ class CadastroCrediarioForm(FlaskForm):
         validators=[DataRequired("O tipo de crediário é obrigatório.")],
     )
     identificador_final = StringField(
-        "Identificador Final (opcional)",
+        "Final (opcional)",
         validators=[
             Length(max=50, message="O identificador não pode exceder 50 caracteres."),
             Optional(),
@@ -104,9 +104,9 @@ class EditarCrediarioForm(FlaskForm):
         validators=[
             DataRequired("O nome do crediário é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O nome do crediário deve ter entre 2 e 100 caracteres.",
+                message="O nome do crediário deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
@@ -122,7 +122,7 @@ class EditarCrediarioForm(FlaskForm):
         render_kw={"disabled": True},
     )
     identificador_final = StringField(
-        "Identificador Final (opcional)",
+        "Final (opcional)",
         validators=[
             Length(max=50, message="O identificador não pode exceder 50 caracteres."),
             Optional(),

@@ -43,7 +43,7 @@ def listar_movimentos_crediario():
         CrediarioMovimento.query.filter_by(usuario_id=current_user.id)
         .order_by(
             CrediarioMovimento.data_compra.desc(),
-            CrediarioMovimento.data_criacao .desc(),
+            CrediarioMovimento.data_criacao.desc(),
         )
         .all()
     )
@@ -68,16 +68,11 @@ def adicionar_movimento_crediario():
         data_primeira_parcela_obj = form.data_primeira_parcela.data
         numero_parcelas = form.numero_parcelas.data
 
-        crediario_obj = db.session.query(Crediario).get(crediario_id)
-        crediario_grupo_obj = (
-            db.session.query(CrediarioGrupo).get(crediario_grupo_id)
-            if crediario_grupo_id
-            else None
-        )
-
-        if valor_total_compra <= 0:
-            flash("O valor total da compra deve ser maior que zero.", "danger")
-            return render_template("crediario_movimentos/add.html", form=form)
+        valor_final_compra = valor_total_compra
+        if crediario_grupo_id:
+            grupo = CrediarioGrupo.query.get(crediario_grupo_id)
+            if grupo and grupo.tipo_grupo_crediario == "Estorno":
+                valor_final_compra = -valor_total_compra
 
         if numero_parcelas <= 0:
             flash("O número de parcelas deve ser no mínimo 1.", "danger")
@@ -89,7 +84,7 @@ def adicionar_movimento_crediario():
                 crediario_id=crediario_id,
                 crediario_grupo_id=crediario_grupo_id,
                 data_compra=data_compra,
-                valor_total_compra=valor_total_compra,
+                valor_total_compra=valor_final_compra,
                 descricao=descricao,
                 data_primeira_parcela=data_primeira_parcela_obj,
                 numero_parcelas=numero_parcelas,
@@ -97,7 +92,7 @@ def adicionar_movimento_crediario():
             db.session.add(novo_movimento)
             db.session.flush()
 
-            valor_por_parcela = valor_total_compra / Decimal(str(numero_parcelas))
+            valor_por_parcela = valor_final_compra / Decimal(str(numero_parcelas))
 
             for i in range(numero_parcelas):
                 data_vencimento = data_primeira_parcela_obj + relativedelta(months=i)
@@ -117,7 +112,7 @@ def adicionar_movimento_crediario():
                 "success",
             )
             current_app.logger.info(
-                f"Movimento de crediário (ID: {novo_movimento.id}) de R$ {valor_total_compra} em {numero_parcelas}x registrado por {current_user.login}."
+                f"Movimento de crediário (ID: {novo_movimento.id}) de R$ {valor_final_compra} em {numero_parcelas}x registrado por {current_user.login}."
             )
             return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
 
@@ -152,50 +147,45 @@ def editar_movimento_crediario(id):
     form = EditarCrediarioMovimentoForm(obj=movimento)
 
     if form.validate_on_submit():
+        valor_total_compra = form.valor_total_compra.data
+        if (
+            movimento.crediario_grupo
+            and movimento.crediario_grupo.tipo_grupo_crediario == "Estorno"
+        ):
+            valor_total_compra = -abs(valor_total_compra)
+
+        if any(p.pago for p in movimento.parcelas):
+            flash(
+                "Não é possível editar esta compra, pois ela possui parcelas que já foram pagas.",
+                "danger",
+            )
+            return render_template(
+                "crediario_movimentos/edit.html", form=form, movimento=movimento
+            )
+
         movimento.data_compra = form.data_compra.data
-        movimento.valor_total_compra = form.valor_total_compra.data
+        movimento.valor_total_compra = valor_total_compra
         movimento.data_primeira_parcela = form.data_primeira_parcela.data
         movimento.numero_parcelas = form.numero_parcelas.data
         movimento.descricao = (
             form.descricao.data.strip() if form.descricao.data else None
         )
 
-        if (
-            movimento.valor_total_compra != form.valor_total_compra.data
-            or movimento.numero_parcelas != form.numero_parcelas.data
-            or movimento.data_primeira_parcela != form.data_primeira_parcela.data
-        ):
-            if any(p.pago for p in movimento.parcelas):
-                flash(
-                    "Não é possível reajustar a compra. Existem parcelas que já foram pagas.",
-                    "danger",
-                )
-                return render_template(
-                    "crediario_movimentos/edit.html", form=form, movimento=movimento
-                )
+        for parcela in movimento.parcelas:
+            db.session.delete(parcela)
+        db.session.flush()
 
-            for parcela in movimento.parcelas:
-                db.session.delete(parcela)
-
-            valor_por_parcela = form.valor_total_compra.data / Decimal(
-                str(form.numero_parcelas.data)
+        valor_por_parcela = valor_total_compra / Decimal(str(form.numero_parcelas.data))
+        for i in range(form.numero_parcelas.data):
+            data_vencimento = form.data_primeira_parcela.data + relativedelta(months=i)
+            nova_parcela = CrediarioParcela(
+                crediario_movimento_id=movimento.id,
+                numero_parcela=i + 1,
+                data_vencimento=data_vencimento,
+                valor_parcela=valor_por_parcela,
+                pago=False,
             )
-            for i in range(form.numero_parcelas.data):
-                data_vencimento = form.data_primeira_parcela.data + relativedelta(
-                    months=i
-                )
-                nova_parcela = CrediarioParcela(
-                    crediario_movimento_id=movimento.id,
-                    numero_parcela=i + 1,
-                    data_vencimento=data_vencimento,
-                    valor_parcela=valor_por_parcela,
-                    pago=False,
-                )
-                db.session.add(nova_parcela)
-
-            movimento.valor_total_compra = form.valor_total_compra.data
-            movimento.data_primeira_parcela = form.data_primeira_parcela.data
-            movimento.numero_parcelas = form.numero_parcelas.data
+            db.session.add(nova_parcela)
 
         try:
             db.session.commit()
@@ -214,6 +204,9 @@ def editar_movimento_crediario(id):
             return render_template(
                 "crediario_movimentos/edit.html", form=form, movimento=movimento
             )
+
+    if movimento.valor_total_compra < 0:
+        form.valor_total_compra.data = abs(movimento.valor_total_compra)
 
     return render_template(
         "crediario_movimentos/edit.html", form=form, movimento=movimento

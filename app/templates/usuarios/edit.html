@@ -10,87 +10,105 @@
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}</h5>
+                <h5 class="mb-0">Editar Usuário: {{ usuario.nome }} {{
+                    usuario.sobrenome }}</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
+                <form method="POST"
+                    action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
                     {{ form.csrf_token }}
 
                     <div class="mb-1">
                         {{ form.nome.label(class="form-label") }}
                         {{ form.nome(class="form-control") }}
                         {% if form.nome.errors %}
-                            <div class="text-danger">
-                                {% for error in form.nome.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.nome.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1">
                         {{ form.sobrenome.label(class="form-label") }}
                         {{ form.sobrenome(class="form-control") }}
                         {% if form.sobrenome.errors %}
-                            <div class="text-danger">
-                                {% for error in form.sobrenome.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.sobrenome.errors %}{{ error
+                            }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1">
                         {{ form.email.label(class="form-label") }}
                         {{ form.email(class="form-control") }}
                         {% if form.email.errors %}
-                            <div class="text-danger">
-                                {% for error in form.email.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.email.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1">
                         {{ form.login.label(class="form-label") }}
                         {{ form.login(class="form-control") }}
                         {% if form.login.errors %}
-                            <div class="text-danger">
-                                {% for error in form.login.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.login.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1">
                         {{ form.senha.label(class="form-label") }}
-                        {{ form.senha(class="form-control", placeholder="Deixe em branco para manter a senha atual") }}
-                        <small class="form-text text-muted">Mínimo 8 caracteres, com pelo menos uma letra maiúscula e um caractere especial.</small>
+                        {{ form.senha(class="form-control",
+                        placeholder="Deixe em branco para manter a senha atual")
+                        }}
+                        <small class="form-text text-muted">Mínimo 8 caracteres,
+                            com pelo menos uma letra maiúscula e um caractere
+                            especial.</small>
                         {% if form.senha.errors %}
-                            <div class="text-danger">
-                                {% for error in form.senha.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.senha.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1">
                         {{ form.confirmar_senha.label(class="form-label") }}
-                        {{ form.confirmar_senha(class="form-control", placeholder="Repita a nova senha") }}
+                        {{ form.confirmar_senha(class="form-control",
+                        placeholder="Repita a nova senha") }}
                         {% if form.confirmar_senha.errors %}
-                            <div class="text-danger">
-                                {% for error in form.confirmar_senha.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.confirmar_senha.errors %}{{
+                            error }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1 form-check">
                         {{ form.is_active(class="form-check-input") }}
                         {{ form.is_active.label(class="form-check-label") }}
                         {% if form.is_active.errors %}
-                            <div class="text-danger">
-                                {% for error in form.is_active.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.is_active.errors %}{{ error
+                            }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-3 form-check">
                         {{ form.is_admin(class="form-check-input") }}
                         {{ form.is_admin.label(class="form-check-label") }}
                         {% if form.is_admin.errors %}
-                            <div class="text-danger">
-                                {% for error in form.is_admin.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.is_admin.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    {{ form.submit(class="btn btn-primary btn-add") }}
-                    <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary btn-add">Cancelar</a>
+                    <button type="submit" class="btn btn-info btn-add">
+                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                    </button>
+                    <a href="{{ url_for('usuario.listar_usuarios') }}"
+                        class="btn btn-secondary btn-add">Cancelar</a>
                 </form>
             </div>
         </div>

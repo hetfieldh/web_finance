@@ -1,23 +1,25 @@
 # app/routes/usuario_routes.py
 
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    abort,
-    current_app,
-)
-from app import db
-from app.models.usuario_model import Usuario
-from werkzeug.security import generate_password_hash
-from flask_login import login_required, current_user
 import functools
 import re
-from app.forms.usuario_forms import CadastroUsuarioForm, EditarUsuarioForm
+
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import current_user, login_required
 from sqlalchemy import asc, desc
+from werkzeug.security import generate_password_hash
+
+from app import db
+from app.forms.usuario_forms import CadastroUsuarioForm, EditarUsuarioForm
+from app.models.usuario_model import Usuario
 
 usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
 
@@ -47,7 +49,9 @@ def validar_senha_forte(senha):
 @usuario_bp.route("/")
 @admin_required
 def listar_usuarios():
-    usuarios = Usuario.query.order_by(Usuario.nome.asc()).all()
+    usuarios = Usuario.query.order_by(
+        Usuario.is_admin.asc(), Usuario.is_active.desc(), Usuario.nome.asc()
+    ).all()
     return render_template("usuarios/list.html", usuarios=usuarios)
 
 

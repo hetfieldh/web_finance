@@ -2,8 +2,9 @@
 
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}Web Finance - Lançamentos{% endblock %}
+{% block page_title %}Gerenciar Salário: {{movimento.mes_referencia}}{%
+endblock %}
 
 {% block content %}
 <div class="row">
@@ -11,11 +12,12 @@
         <div class="card shadow-sm mb-4">
             <div
                 class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Resumo da Folha de {{ movimento.mes_referencia
+                <h5 class="mb-0">Resumo do Salário de {{
+                    movimento.mes_referencia
                     }}</h5>
                 <a href="{{ url_for('salario.listar_movimentos') }}"
                     class="btn btn-light btn-sm">
-                    <i class="fas fa-arrow-left"></i> Voltar para a Lista
+                    <i class="fas fa-arrow-left"></i> Voltar
                 </a>
             </div>
             <div class="card-body">
@@ -65,7 +67,11 @@
                             step="0.01", placeholder="0.00") }}
                         </div>
                         <div class="col-md-3">
-                            {{ form.submit(class="btn btn-primary w-100") }}
+                            <button type="submit"
+                                class="btn btn-primary btn-add">
+                                <i class="fas fa-plus"></i> {{
+                                form.submit.label.text }}
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -103,13 +109,13 @@
                                 </td>
                                 <td class="text-end">R$ {{
                                     "%.2f"|format(item.valor) }}</td>
-                                <td class="text-center">
+                                <td class="table-actions text-center">
                                     <form
                                         action="{{ url_for('salario.excluir_item_folha', item_id=item.id) }}"
                                         method="POST"
                                         onsubmit="return confirm('Tem certeza que deseja remover esta verba?');">
                                         <button type="submit"
-                                            class="btn btn-danger btn-sm"
+                                            class="btn btn-danger"
                                             title="Remover">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>

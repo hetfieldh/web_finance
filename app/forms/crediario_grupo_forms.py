@@ -17,13 +17,13 @@ TIPOS_GRUPO_CREDIARIO = [
 
 class CadastroCrediarioGrupoForm(FlaskForm):
     grupo_crediario = StringField(
-        "Nome do Grupo",
+        "Grupo",
         validators=[
             DataRequired("O nome do grupo é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O nome do grupo deve ter entre 2 e 100 caracteres.",
+                message="O nome do grupo deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
@@ -32,7 +32,7 @@ class CadastroCrediarioGrupoForm(FlaskForm):
         ],
     )
     tipo_grupo_crediario = SelectField(
-        "Tipo de Grupo",
+        "Tipo",
         choices=TIPOS_GRUPO_CREDIARIO,
         validators=[DataRequired("O tipo de grupo é obrigatório.")],
     )
@@ -67,13 +67,13 @@ class CadastroCrediarioGrupoForm(FlaskForm):
 
 class EditarCrediarioGrupoForm(FlaskForm):
     grupo_crediario = StringField(
-        "Nome do Grupo",
+        "Grupo",
         validators=[
             DataRequired("O nome do grupo é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O nome do grupo deve ter entre 2 e 100 caracteres.",
+                message="O nome do grupo deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
@@ -83,7 +83,7 @@ class EditarCrediarioGrupoForm(FlaskForm):
         render_kw={"readonly": True},
     )
     tipo_grupo_crediario = SelectField(
-        "Tipo de Grupo",
+        "Tipo",
         choices=TIPOS_GRUPO_CREDIARIO,
         validators=[Optional()],
         render_kw={"disabled": True},

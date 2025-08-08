@@ -2,8 +2,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}Adicionar Grupo de Crediário{% endblock %}
-{% block page_title %}Adicionar Novo Grupo de Crediário{% endblock %}
+{% block title %}Web Finance - Grupos de Crediário{% endblock %}
+{% block page_title %}Adicionar Grupo de Crediário{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -49,9 +49,11 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3"> 
+                    <div class="mb-3">
                     </div>
-                    {{ form.submit(class="btn btn-success btn-add") }}
+                    <button type="submit" class="btn btn-success btn-add">
+                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                    </button>
                     <a
                         href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
                         class="btn btn-secondary btn-add">Cancelar</a>

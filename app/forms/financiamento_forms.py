@@ -36,7 +36,7 @@ class CadastroFinanciamentoForm(FlaskForm):
         "Nome do Financiamento",
         validators=[
             DataRequired("O nome do financiamento é obrigatório."),
-            Length(min=2, max=100, message="O nome deve ter entre 2 e 100 caracteres."),
+            Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ0-9\s'\-]+$",
                 message="O nome contém caracteres inválidos ou múltiplos espaços.",
@@ -133,7 +133,7 @@ class EditarFinanciamentoForm(FlaskForm):
         "Nome do Financiamento",
         validators=[
             DataRequired("O nome do financiamento é obrigatório."),
-            Length(min=2, max=100, message="O nome deve ter entre 2 e 100 caracteres."),
+            Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ0-9\s'\-]+$",
                 message="O nome contém caracteres inválidos ou múltiplos espaços.",

@@ -49,7 +49,7 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     )
 
     crediario_grupo_id = SelectField(
-        "Grupo de Crediário (opcional)",
+        "Grupo de Crediário",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
     )
@@ -71,7 +71,7 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     )
 
     descricao = TextAreaField(
-        "Descrição (opcional)",
+        "Descrição",
         validators=[
             DataRequired("A descrição é obrigatória."),
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),

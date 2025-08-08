@@ -30,7 +30,10 @@ crediario_grupo_bp = Blueprint(
 def listar_grupos_crediario():
     grupos_crediario = (
         CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
-        .order_by(CrediarioGrupo.grupo_crediario.asc())
+        .order_by(
+            CrediarioGrupo.grupo_crediario.asc(),
+            CrediarioGrupo.tipo_grupo_crediario.asc(),
+        )
         .all()
     )
     return render_template(

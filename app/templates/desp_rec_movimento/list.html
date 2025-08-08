@@ -2,8 +2,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}Lançamentos de Despesas e Receitas{% endblock %}
-{% block page_title %}Lançamentos de Despesas e Receitas{% endblock %}
+{% block title %}Web Finance - Lançamentos{% endblock %}
+{% block page_title %}Lançamento de Despesas e Receitas{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -14,11 +14,11 @@
                 <a
                     href="{{ url_for('desp_rec_movimento.adicionar_lancamento_unico') }}"
                     class="btn btn-success btn-add me-2">
-                    <i class="fas fa-plus-circle"></i> Lançamento Único
+                    <i class="fas fa-plus-circle"></i> Eventuais
                 </a>
                 <a href="{{ url_for('desp_rec_movimento.gerar_previsao') }}"
-                    class="btn btn-primary btn-add me-2">
-                    <i class="fas fa-cogs"></i> Gerar Previsão
+                    class="btn btn-info btn-add me-2">
+                    <i class="fas fa-plus-circle"></i> Contas Fixas
                 </a>
             </div>
         </div>

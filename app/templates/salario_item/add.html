@@ -2,8 +2,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}Web Finance - Salários{% endblock %}
+{% block page_title %}Adicionar Item de Salário{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -50,7 +50,10 @@
                     </div>
 
                     <div class="mt-4">
-                        {{ form.submit(class="btn btn-success btn-add") }}
+                        <button type="submit" class="btn btn-success btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
                         <a href="{{ url_for('salario.listar_itens') }}"
                             class="btn btn-secondary btn-add">Cancelar</a>
                     </div>

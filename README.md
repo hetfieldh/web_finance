@@ -3,13 +3,13 @@ Estrutura do Projeto Atualizada
 
 
 web_finance/
-├── .env
-├── .vscode/
+├── .env                     # Configuração das variáveis de ambiente (senhas, chaves)
+├── .vscode/                 # Configurações do VSCode
 │   ├── extensions.json
 │   └── settings.json
-├── app/
-│   ├── __init__.py
-│   ├── forms/
+├── app/                     # Pasta principal
+│   ├── __init__.py          # Inicializador da aplicação
+│   ├── forms/               # Contém todos os formulários
 │   │   ├── conta_forms.py
 │   │   ├── conta_movimento_forms.py
 │   │   ├── conta_transacao_forms.py
@@ -21,9 +21,10 @@ web_finance/
 │   │   ├── extrato_desp_rec_forms.py
 │   │   ├── extrato_forms.py
 │   │   ├── financiamento_forms.py
-│   │   ├── salario_forms.py
+│   │   ├── pagamentos_forms.py
+│   │   ├── recebimentos_forms.py
 │   │   └── usuario_forms.py
-│   ├── models/
+│   ├── models/              # Modelso que definem a estrutura das tabelas do banco de dados (SQLAlchemy)
 │   │   ├── conta_model.py
 │   │   ├── conta_movimento_model.py
 │   │   ├── conta_transacao_model.py
@@ -40,7 +41,7 @@ web_finance/
 │   │   ├── salario_movimento_item_model.py
 │   │   ├── salario_movimento_model.py
 │   │   └── usuario_model.py
-│   ├── routes/
+│   ├── routes/              # Contém a lógica das rotas e visualizações (Blueprints)
 │   │   ├── auth_routes.py
 │   │   ├── conta_movimento_routes.py
 │   │   ├── conta_routes.py
@@ -55,14 +56,16 @@ web_finance/
 │   │   ├── extrato_routes.py
 │   │   ├── financiamento_routes.py
 │   │   ├── main_routes.py
+│   │   ├── pagamentos_routes.py
+│   │   ├── recebimentos_routes.py
 │   │   ├── salario_routes.py
 │   │   └── usuario_routes.py
-│   ├── static/
+│   ├── static/              # Arquivos estáticos (CSS, JavaScript, Imagens)
 │   │   ├── css/
 │   │   │   └── style.css
 │   │   └── js/
 │   │       └── script.js
-│   └── templates/
+│   └── templates/           # Arquivos HTML (Jinja2)
 │       ├── base.html
 │       ├── dashboard.html
 │       ├── login.html
@@ -117,6 +120,10 @@ web_finance/
 │       │   └── parcelas.html
 │       ├── includes/
 │       │   └── _sidebar.html
+│       ├── pagamentos/
+│       │   └── painel.html
+│       ├── recebimentos/
+│       │   └── painel.html
 │       ├── salario_item/
 │       │   ├── add.html
 │       │   ├── edit.html
@@ -129,6 +136,6 @@ web_finance/
 │           ├── add.html
 │           ├── edit.html
 │           └── list.html
-├── config.py
-├── requirements.txt
-└── run.py
+├── config.py                # Configurações gerais da aplicação
+├── requirements.txt         # Bibliotecas Python
+└── run.py                   # Ponto de entrada para iniciar a aplicação

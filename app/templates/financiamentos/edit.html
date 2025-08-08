@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Editar Financiamento{% endblock %}
+{% block title %}Web Finance - Financiamentos{% endblock %}
 {% block page_title %}Editar Financiamento{% endblock %}
 
 {% block content %}
@@ -81,9 +81,11 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3"> {# Espaçamento final antes dos botões #}
+                    <div class="mb-3">
                     </div>
-                    {{ form.submit(class="btn btn-primary btn-add") }}
+                    <button type="submit" class="btn btn-info btn-add">
+                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                    </button>
                     <a
                         href="{{ url_for('financiamento.listar_financiamentos') }}"
                         class="btn btn-secondary btn-add">Cancelar</a>

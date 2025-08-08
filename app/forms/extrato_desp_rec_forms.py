@@ -18,14 +18,11 @@ class ExtratoDespRecForm(FlaskForm):
         default="mensal",
     )
 
-    # Filtros para Visão Mensal
     mes_ano = SelectField("Mês/Ano", validators=[Optional()])
 
-    # Filtros para Análise por Período
     desp_rec_id = SelectField(
         "Conta Específica",
         validators=[Optional()],
-        # CORREÇÃO: Lida com o valor vazio da opção "Todas"
         coerce=lambda x: int(x) if x else None,
     )
     data_inicio = DateField(
@@ -38,7 +35,6 @@ class ExtratoDespRecForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Popula o dropdown de Mês/Ano (últimos 12 meses + próximos 12)
         meses_anos = []
         hoje = date.today()
         nomes_meses_ptbr = {
@@ -61,10 +57,8 @@ class ExtratoDespRecForm(FlaskForm):
             label = f"{nomes_meses_ptbr[data_ref.month]}/{data_ref.year}"
             meses_anos.append((value, label))
 
-        # Ordena pela data, do mais recente para o mais antigo
         self.mes_ano.choices = sorted(meses_anos, key=lambda x: x[0], reverse=True)
 
-        # Popula o dropdown de Contas
         self.desp_rec_id.choices = [("", "Todas")] + [
             (c.id, f"{c.nome} ({c.natureza})")
             for c in DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)

@@ -10,34 +10,42 @@
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Editar Tipo de Transação: {{ tipo_transacao.transacao_tipo }}</h5>
+                <h5 class="mb-0">Editar Tipo de Transação: {{
+                    tipo_transacao.transacao_tipo }}</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_transacao.id) }}">
+                <form method="POST"
+                    action="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_transacao.id) }}">
                     {{ form.csrf_token }}
 
                     <div class="mb-1">
                         {{ form.transacao_tipo.label(class="form-label") }}
                         {{ form.transacao_tipo(class="form-control") }}
                         {% if form.transacao_tipo.errors %}
-                            <div class="text-danger">
-                                {% for error in form.transacao_tipo.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.transacao_tipo.errors %}{{
+                            error }}{% endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-1">
                         {{ form.tipo.label(class="form-label") }}
                         {{ form.tipo(class="form-select") }}
                         {% if form.tipo.errors %}
-                            <div class="text-danger">
-                                {% for error in form.tipo.errors %}{{ error }}{% endfor %}
-                            </div>
+                        <div class="text-danger">
+                            {% for error in form.tipo.errors %}{{ error }}{%
+                            endfor %}
+                        </div>
                         {% endif %}
                     </div>
                     <div class="mb-3">
                     </div>
-                    {{ form.submit(class="btn btn-primary btn-add") }}
-                    <a href="{{ url_for('conta_transacao.listar_tipos_transacao') }}" class="btn btn-secondary btn-add">Cancelar</a>
+                    <button type="submit" class="btn btn-info btn-add">
+                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                    </button>
+                    <a
+                        href="{{ url_for('conta_transacao.listar_tipos_transacao') }}"
+                        class="btn btn-secondary btn-add">Cancelar</a>
                 </form>
             </div>
         </div>

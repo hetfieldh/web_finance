@@ -24,7 +24,7 @@ desp_rec_bp = Blueprint("desp_rec", __name__, url_prefix="/despesas_receitas")
 def listar_cadastros():
     cadastros = (
         DespRec.query.filter_by(usuario_id=current_user.id)
-        .order_by(DespRec.natureza.asc(), DespRec.nome.asc())
+        .order_by(DespRec.ativo.desc(), DespRec.nome.asc(), DespRec.natureza.asc())
         .all()
     )
     return render_template("desp_rec/list.html", cadastros=cadastros)
@@ -38,7 +38,7 @@ def adicionar_cadastro():
         try:
             novo_cadastro = DespRec(
                 usuario_id=current_user.id,
-                nome=form.nome.data.strip(),
+                nome=form.nome.data.strip().upper(),
                 natureza=form.natureza.data,
                 tipo=form.tipo.data,
                 dia_vencimento=form.dia_vencimento.data,
@@ -67,7 +67,6 @@ def editar_cadastro(id):
 
     if form.validate_on_submit():
         try:
-            # Apenas os campos editáveis são atualizados a partir do formulário
             cadastro.dia_vencimento = form.dia_vencimento.data
             cadastro.ativo = form.ativo.data
             db.session.commit()
@@ -83,7 +82,6 @@ def editar_cadastro(id):
                 f"Erro ao editar DespRec ID {id}: {e}", exc_info=True
             )
 
-    # Popula o formulário com os dados existentes na primeira visita (GET)
     elif request.method == "GET":
         form.nome.data = cadastro.nome
         form.natureza.data = cadastro.natureza

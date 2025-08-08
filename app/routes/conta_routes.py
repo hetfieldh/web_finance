@@ -1,22 +1,23 @@
 # app/routes/conta_routes.py
 
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    current_app,
-)
-from flask_login import login_required, current_user
 import functools
-from app import db
-from app.models.conta_model import Conta
-from app.forms.conta_forms import CadastroContaForm, EditarContaForm
-from sqlalchemy.exc import IntegrityError
 from decimal import Decimal
 
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import current_user, login_required
+from sqlalchemy.exc import IntegrityError
+
+from app import db
+from app.forms.conta_forms import CadastroContaForm, EditarContaForm
+from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 
 conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
@@ -25,7 +26,11 @@ conta_bp = Blueprint("conta", __name__, url_prefix="/contas")
 @conta_bp.route("/")
 @login_required
 def listar_contas():
-    contas = Conta.query.filter_by(usuario_id=current_user.id).all()
+    contas = (
+        Conta.query.filter_by(usuario_id=current_user.id)
+        .order_by(Conta.ativa.desc(), Conta.nome_banco.asc(), Conta.tipo.asc())
+        .all()
+    )
     return render_template("contas/list.html", contas=contas)
 
 

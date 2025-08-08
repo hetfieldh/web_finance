@@ -2,8 +2,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}Web Finance - Salários{% endblock %}
+{% block page_title %}Itens de Salário{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -12,7 +12,7 @@
             <h4 class="mb-0">Verbas Cadastradas</h4>
             <a href="{{ url_for('salario.adicionar_item') }}"
                 class="btn btn-success btn-add">
-                <i class="fas fa-plus"></i> Adicionar
+                <i class="fas fa-plus"></i> Verba
             </a>
         </div>
 

@@ -32,9 +32,9 @@ class CadastroContaForm(FlaskForm):
         validators=[
             DataRequired("O nome do banco é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O nome do banco deve ter entre 2 e 100 caracteres.",
+                message="O nome do banco deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
@@ -110,9 +110,9 @@ class EditarContaForm(FlaskForm):
         validators=[
             DataRequired("O nome do banco é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O nome do banco deve ter entre 2 e 100 caracteres.",
+                message="O nome do banco deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",

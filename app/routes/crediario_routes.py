@@ -24,7 +24,9 @@ crediario_bp = Blueprint("crediario", __name__, url_prefix="/crediarios")
 def listar_crediarios():
     crediarios = (
         Crediario.query.filter_by(usuario_id=current_user.id)
+        .order_by(Crediario.ativa.desc())
         .order_by(Crediario.nome_crediario.asc())
+        .order_by(Crediario.tipo_crediario.asc())
         .all()
     )
     return render_template("crediarios/list.html", crediarios=crediarios)

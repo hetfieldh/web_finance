@@ -16,9 +16,9 @@ class CadastroContaTransacaoForm(FlaskForm):
         validators=[
             DataRequired("O tipo de transação é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O tipo de transação deve ter entre 2 e 100 caracteres.",
+                message="O tipo de transação deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
@@ -64,9 +64,9 @@ class EditarContaTransacaoForm(FlaskForm):
         validators=[
             DataRequired("O tipo de transação é obrigatório."),
             Length(
-                min=2,
+                min=3,
                 max=100,
-                message="O tipo de transação deve ter entre 2 e 100 caracteres.",
+                message="O tipo de transação deve ter entre 3 e 100 caracteres.",
             ),
             Regexp(
                 r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",

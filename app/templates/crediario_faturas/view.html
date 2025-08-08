@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Visualizar Fatura Crediário{% endblock %}
+{% block title %}Web Finance - Fatura Crediário{% endblock %}
 {% block page_title %}Detalhes da Fatura{% endblock %}
 
 {% block content %}
@@ -34,8 +34,11 @@
                             fatura.mes_referencia }}</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Valor Total:</strong> R$ {{
-                            "%.2f"|format(fatura.valor_total_fatura) }}</p>
+                        <p><strong>Valor Total:</strong> <span
+                                class="fw-bold {% if fatura.valor_total_fatura < 0 %}text-danger{% endif %}">R$
+                                {{
+                                "%.2f"|format(fatura.valor_total_fatura)
+                                }}</span></p>
                     </div>
                     <div class="col-md-3">
                         <p><strong>Status:</strong>
@@ -72,7 +75,7 @@
                                 <th>Descrição Compra</th>
                                 <th>Parcela</th>
                                 <th>Vencimento</th>
-                                <th>Valor Parcela</th>
+                                <th class="text-end">Valor Parcela</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,8 +89,11 @@
                                 <td>{{
                                     parcela.data_vencimento.strftime('%m/%Y')
                                     }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.valor_parcela)
-                                    }}</td>
+                                <td
+                                    class="text-end {% if parcela.valor_parcela < 0 %}text-danger fw-bold{% endif %}">
+                                    R$ {{ "%.2f"|format(parcela.valor_parcela)
+                                    }}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

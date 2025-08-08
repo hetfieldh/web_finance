@@ -2,15 +2,15 @@
 
 {% extends "base.html" %}
 
-{% block title %}Web Finance - Contas Bancárias{% endblock %}
-{% block page_title %}Adicionar Movimentação Bancária{% endblock %}
+{% block title %}eb Finance - Lançamentos{% endblock %}
+{% block page_title %}Adicionar Lançamento Bancário{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Formulário de Registro de Movimentação</h5>
+                <h5 class="mb-0">Formulário de Registro de Lançamento</h5>
             </div>
             <div class="card-body">
                 <form method="POST"
@@ -97,7 +97,9 @@
 
                     <div class="mb-3">
                     </div>
-                    {{ form.submit(class="btn btn-success btn-add") }}
+                    <button type="submit" class="btn btn-success btn-add">
+                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                    </button>
                     <a
                         href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
                         class="btn btn-secondary btn-add">Cancelar</a>
@@ -106,4 +108,4 @@
         </div>
     </div>
 </div>
-{% endblock %}  
+{% endblock %}

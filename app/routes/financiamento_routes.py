@@ -48,7 +48,9 @@ def adicionar_financiamento():
     form = CadastroFinanciamentoForm()
 
     if form.validate_on_submit():
-        nome_financiamento = form.nome_financiamento.data.strip()
+        nome_financiamento = (
+            form.nome_financiamento.data.strip().upper()
+        )  # CORRIGIDO AQUI
         conta_id = form.conta_id.data
         valor_total_financiado = form.valor_total_financiado.data
         taxa_juros_anual = form.taxa_juros_anual.data
@@ -110,7 +112,8 @@ def editar_financiamento(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    if any(p.pago for p in financiamento.parcelas):
+    # --- LÓGICA DE VERIFICAÇÃO CORRIGIDA ---
+    if any(p.status == "Paga" for p in financiamento.parcelas):
         flash(
             "Não é possível editar um financiamento que já possui parcelas pagas.",
             "danger",
@@ -154,7 +157,8 @@ def excluir_financiamento(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    if any(p.pago for p in financiamento.parcelas):
+    # --- LÓGICA DE VERIFICAÇÃO CORRIGIDA ---
+    if any(p.status == "Paga" for p in financiamento.parcelas):
         flash(
             "Não é possível excluir um financiamento que já possui parcelas pagas.",
             "danger",
@@ -308,7 +312,6 @@ def visualizar_parcelas(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    # Consulta atualizada para buscar a parcela e o valor do movimento relacionado
     parcelas_data = (
         db.session.query(FinanciamentoParcela, ContaMovimento.valor)
         .outerjoin(

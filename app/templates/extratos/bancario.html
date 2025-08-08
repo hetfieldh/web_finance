@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Web Finance - Extratos{% endblock %}
+{% block title %}Web Finance - Extrato Bancário{% endblock %}
 {% block page_title %}Extrato Bancário{% endblock %}
 
 {% block content %}
@@ -38,9 +38,9 @@
                             {% endif %}
                         </div>
                         <div class="col-md-2 d-flex align-items-end mb-1">
-                            {{
-                            form.submit(class="btn btn-primary btn-add w-100")
-                            }}
+                            <button type="submit" class="btn btn-success btn-add">
+                                <i class="fas fa-cogs"></i> {{ form.submit.label.text }}
+                            </button>
                         </div>
                     </div>
                 </form>

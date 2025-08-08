@@ -2,15 +2,15 @@
 
 {% extends "base.html" %}
 
-{% block title %}Editar Movimento Crediário{% endblock %}
-{% block page_title %}Editar Movimento de Crediário{% endblock %}
+{% block title %}Web Finance - Lançamentos{% endblock %}
+{% block page_title %}Editar Lançamento de Crediário{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Editar Movimento Crediário ID: {{ movimento.id
+                <h5 class="mb-0">Editar Lançamento Crediário ID: {{ movimento.id
                     }}</h5>
             </div>
             <div class="card-body">
@@ -89,7 +89,9 @@
                     </div>
                     <div class="mb-3">
                     </div>
-                    {{ form.submit(class="btn btn-primary btn-add") }}
+                    <button type="submit" class="btn btn-info btn-add">
+                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                    </button>
                     <a
                         href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
                         class="btn btn-secondary btn-add">Cancelar</a>

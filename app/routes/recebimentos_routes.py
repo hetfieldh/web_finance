@@ -127,12 +127,12 @@ def registrar_recebimento():
 
             tipo_transacao_credito = ContaTransacao.query.filter_by(
                 usuario_id=current_user.id,
-                transacao_tipo="RECEBIMENTOS",
+                transacao_tipo="RECEBIMENTO",
                 tipo="Crédito",
             ).first()
             if not tipo_transacao_credito:
                 flash(
-                    'Tipo de transação "RECEBIMENTOS" (Crédito) não encontrado. Por favor, cadastre-o primeiro.',
+                    'Tipo de transação "RECEBIMENTO" (Crédito) não encontrado. Por favor, cadastre-o primeiro.',
                     "danger",
                 )
                 return redirect(url_for("recebimentos.painel"))
