@@ -2,15 +2,16 @@
 
 {% extends "base.html" %}
 
-{% block title %}Web Finance - Recebimentos{% endblock %}
-{% block page_title %}Gerenciar Recebimentos Mensal{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-2">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtros</h5>
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtrar por
+                    Mês</h5>
             </div>
             <div class="card-body">
                 <form method="POST"
@@ -30,6 +31,32 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-2">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 text-secondary"><i
+                        class="fas fa-chart-pie me-2"></i>Resumo do Mês</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h6>Total Previsto a Receber</h6>
+                        <p class="h5 text-primary">R$ {{
+                            "%.2f"|format(totais.previsto) }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Total já Recebido</h6>
+                        <p class="h5 text-success">R$ {{
+                            "%.2f"|format(totais.recebido) }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Saldo Pendente</h6>
+                        <p class="h5 fw-bold text-warning text-dark">R$ {{
+                            "%.2f"|format(totais.pendente) }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -77,7 +104,8 @@
                                     {% if conta.status not in ['Recebido',
                                     'Pago'] %}
                                     <button type="button"
-                                        class="btn btn-success btn-sm"
+                                        class="btn btn-link text-success p-0"
+                                        title="Registrar Recebimento"
                                         data-bs-toggle="modal"
                                         data-bs-target="#recebimentoModal"
                                         data-item-id="{{ conta.id_original }}"
@@ -85,7 +113,8 @@
                                         data-item-valor="{{ '%.2f'|format(conta.valor) }}"
                                         data-item-descricao="{{ conta.origem }}"
                                         data-item-data="{{ conta.vencimento.strftime('%Y-%m-%d') }}">
-                                        Registrar
+                                        <i
+                                            class="fas fa-check-double fa-xs"></i>
                                     </button>
                                     {% else %}
                                     <form method="POST"
@@ -99,9 +128,10 @@
                                         <input type="hidden" name="mes_ano"
                                             value="{{ form.mes_ano.data }}">
                                         <button type="submit"
-                                            class="btn btn-danger btn-sm"
+                                            class="btn btn-link text-danger p-0"
                                             title="Estornar Recebimento">
-                                            <i class="fas fa-undo"></i> Estornar
+                                            <i
+                                                class="fas fa-times-circle fa-xs"></i>
                                         </button>
                                     </form>
                                     {% endif %}

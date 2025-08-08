@@ -36,6 +36,11 @@ def painel():
 
     mes_ano_str = form.mes_ano.data
     contas_a_receber = []
+    totais = {
+        "previsto": Decimal("0.00"),
+        "recebido": Decimal("0.00"),
+        "pendente": Decimal("0.00"),
+    }
 
     if mes_ano_str:
         ano, mes = map(int, mes_ano_str.split("-"))
@@ -81,6 +86,9 @@ def painel():
                     "id_original": movimento.id,
                 }
             )
+            totais["previsto"] += salario_liquido
+            if movimento.movimento_bancario_id:
+                totais["recebido"] += salario_liquido
 
         outras_receitas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
@@ -94,24 +102,30 @@ def painel():
         )
 
         for receita in outras_receitas:
+            valor_previsto = receita.valor_previsto
+            valor_recebido = receita.valor_realizado or Decimal("0.00")
             contas_a_receber.append(
                 {
                     "vencimento": receita.data_vencimento,
                     "origem": receita.despesa_receita.nome,
-                    "valor": receita.valor_previsto,
+                    "valor": valor_previsto,
                     "status": receita.status,
                     "tipo": "Receita",
                     "id_original": receita.id,
                 }
             )
+            totais["previsto"] += valor_previsto
+            totais["recebido"] += valor_recebido
 
         contas_a_receber.sort(key=lambda x: x["vencimento"])
+        totais["pendente"] = totais["previsto"] - totais["recebido"]
 
     return render_template(
         "recebimentos/painel.html",
         form=form,
         recebimento_form=recebimento_form,
         contas=contas_a_receber,
+        totais=totais,
         title="Painel de Recebimentos",
     )
 
