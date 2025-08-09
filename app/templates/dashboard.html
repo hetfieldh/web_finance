@@ -8,13 +8,16 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="mt-0">Bem-vindo(a), {{ current_user.nome or
-            current_user.login }}!</h2>
-        <p id="data-atual"></p>
+        <h4
+            class="text-secondary mb-0">Bem-vindo(a), <span class="text-danger">{{ current_user.nome or current_user.login }}!
+        </h4>
+        <h7>
+            <p id="data-atual"></p>
+        </h7>
     </div>
 </div>
 
-<div class="row g-1 mt-0">
+<div class="row g-2">
     <!--- Bloco de contas bancárias -->
     <div class="col-12">
         <div class="card card-borders shadow-sm mb-0">

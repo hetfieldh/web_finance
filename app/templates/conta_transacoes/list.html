@@ -11,14 +11,14 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Tipos de Transação Cadastradas</h4>
             <div>
-                <a href="{{ url_for('conta.listar_contas') }}"
-                    class="btn btn-secondary btn-add me-2">
-                    <i class="fas fa-arrow-left"></i> Voltar
-                </a>
                 <a
                     href="{{ url_for('conta_transacao.adicionar_tipo_transacao') }}"
-                    class="btn btn-success btn-add">
+                    class="btn btn-success btn-add me-1">
                     <i class="fas fa-plus"></i> Tipo Transação
+                </a>
+                <a href="{{ url_for('conta.listar_contas') }}"
+                    class="btn btn-secondary btn-add">
+                    <i class="fas fa-arrow-left"></i> Voltar
                 </a>
             </div>
         </div>

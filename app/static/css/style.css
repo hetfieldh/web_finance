@@ -48,6 +48,10 @@ h6,
     font-size: 0.95rem;
 }
 
+h7,
+.h7 {
+    font-size: 0.8rem
+}
 
 /* ==========================================================================
    2. LAYOUT PRINCIPAL (SIDEBAR E CONTEÚDO)
@@ -67,6 +71,10 @@ h6,
     width: 14rem;
     display: flex;
     flex-direction: column;
+}
+
+#sidebar-wrapper .list-group-item {
+    border-color: #4a4a4a;
 }
 
 /* Área principal do conteúdo da página (container da rolagem) */
@@ -195,6 +203,7 @@ h6,
 
 .list-group-item {
     font-size: 0.85rem;
+    color: #c8c8c8
 }
 
 .collapse.list-group-flush .list-group-item {
@@ -202,12 +211,12 @@ h6,
 }
 
 .collapse.list-group-flush .list-group-item i {
-    color: #007bff !important;
+    color: #d1c118 !important;
 }
 
 .logged-in-user-info {
     font-size: 0.7rem;
-    color: #555;
+    color: #7b7b7b;
 }
 
 /* --- Outros Componentes --- */

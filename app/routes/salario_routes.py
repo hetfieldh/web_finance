@@ -30,9 +30,10 @@ salario_bp = Blueprint("salario", __name__, url_prefix="/salario")
 @salario_bp.route("/itens")
 @login_required
 def listar_itens():
+    """Lista todas as verbas de salário cadastradas pelo usuário."""
     itens = (
         SalarioItem.query.filter_by(usuario_id=current_user.id)
-        .order_by(SalarioItem.ativo.desc(), SalarioItem.nome.asc())
+        .order_by(SalarioItem.tipo.asc(), SalarioItem.nome.asc())
         .all()
     )
     return render_template(
@@ -43,12 +44,13 @@ def listar_itens():
 @salario_bp.route("/itens/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_item():
+    """Adiciona uma nova verba de salário."""
     form = CadastroSalarioItemForm()
     if form.validate_on_submit():
         try:
             novo_item = SalarioItem(
                 usuario_id=current_user.id,
-                nome=form.nome.data.strip().upper(),
+                nome=form.nome.data.strip(),
                 tipo=form.tipo.data,
                 descricao=form.descricao.data.strip() if form.descricao.data else None,
                 ativo=form.ativo.data,
@@ -75,6 +77,7 @@ def adicionar_item():
 @salario_bp.route("/itens/editar/<int:id>", methods=["GET", "POST"])
 @login_required
 def editar_item(id):
+    """Edita uma verba de salário existente."""
     item = SalarioItem.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
     form = EditarSalarioItemForm(obj=item)
 
@@ -105,6 +108,7 @@ def editar_item(id):
 @salario_bp.route("/itens/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_item(id):
+    """Exclui uma verba de salário."""
     item = SalarioItem.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
 
     if SalarioMovimentoItem.query.filter_by(salario_item_id=id).first():
@@ -134,6 +138,7 @@ def excluir_item(id):
 @salario_bp.route("/lancamentos")
 @login_required
 def listar_movimentos():
+    """Lista todas as folhas de pagamento lançadas pelo usuário."""
     movimentos = (
         SalarioMovimento.query.filter_by(usuario_id=current_user.id)
         .order_by(SalarioMovimento.mes_referencia.desc())
@@ -149,6 +154,7 @@ def listar_movimentos():
 @salario_bp.route("/lancamento/novo", methods=["GET", "POST"])
 @login_required
 def novo_lancamento_folha():
+    """Cria o cabeçalho de uma nova folha de pagamento."""
     form = CabecalhoFolhaForm()
     if form.validate_on_submit():
         movimento_existente = SalarioMovimento.query.filter_by(
@@ -190,12 +196,21 @@ def novo_lancamento_folha():
 @salario_bp.route("/lancamento/<int:id>/gerenciar", methods=["GET", "POST"])
 @login_required
 def gerenciar_itens_folha(id):
+    """Página para adicionar e remover verbas de uma folha de pagamento."""
     movimento = SalarioMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
     form = AdicionarItemFolhaForm()
+    is_locked = movimento.movimento_bancario_id is not None
 
     if form.validate_on_submit():
+        if is_locked:
+            flash(
+                "Não é possível adicionar verbas a uma folha de pagamento já recebida.",
+                "warning",
+            )
+            return redirect(url_for("salario.gerenciar_itens_folha", id=id))
+
         try:
             novo_item = SalarioMovimentoItem(
                 salario_movimento_id=movimento.id,
@@ -246,6 +261,7 @@ def gerenciar_itens_folha(id):
         movimento=movimento,
         form=form,
         totais=totais,
+        is_locked=is_locked,
         title=f"Gerenciar Folha de {movimento.mes_referencia}",
     )
 
@@ -253,11 +269,19 @@ def gerenciar_itens_folha(id):
 @salario_bp.route("/lancamento/item/excluir/<int:item_id>", methods=["POST"])
 @login_required
 def excluir_item_folha(item_id):
+    """Exclui uma única verba de uma folha de pagamento."""
     item = SalarioMovimentoItem.query.get_or_404(item_id)
     movimento_id = item.salario_movimento_id
     movimento = SalarioMovimento.query.filter_by(
         id=movimento_id, usuario_id=current_user.id
     ).first_or_404()
+
+    if movimento.movimento_bancario_id:
+        flash(
+            "Não é possível remover verbas de uma folha de pagamento já recebida.",
+            "warning",
+        )
+        return redirect(url_for("salario.gerenciar_itens_folha", id=movimento_id))
 
     try:
         db.session.delete(item)
@@ -276,6 +300,7 @@ def excluir_item_folha(item_id):
 @salario_bp.route("/lancamento/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_movimento(id):
+    """Exclui uma folha de pagamento inteira e seus itens."""
     movimento = SalarioMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()

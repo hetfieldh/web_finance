@@ -35,6 +35,10 @@ class CrediarioFatura(db.Model):
     )
     data_pagamento = db.Column(db.Date, nullable=True)
 
+    movimento_bancario_id = db.Column(
+        db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
+    )
+
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )

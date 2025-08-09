@@ -9,18 +9,14 @@
 <div class="row">
     <div class="col-12">
         <div class="card shadow-sm mb-2">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtrar por
-                    Mês</h5>
-            </div>
             <div class="card-body">
                 <form method="POST"
                     action="{{ url_for('recebimentos.painel') }}">
                     {{ form.csrf_token }}
                     <div class="row align-items-end">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select") }}
+                            {{ form.mes_ano(class="form-select form-select-sm") }}
                         </div>
                         <div class="col-md-3">
                             <button type="submit"
@@ -35,25 +31,21 @@
         </div>
 
         <div class="card shadow-sm mb-2">
-            <div class="card-header bg-light">
-                <h5 class="mb-0 text-secondary"><i
-                        class="fas fa-chart-pie me-2"></i>Resumo do Mês</h5>
-            </div>
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-md-4">
-                        <h6>Total Previsto a Receber</h6>
-                        <p class="h5 text-primary">R$ {{
+                        <h7>Total Previsto a Receber</h7>
+                        <p class="h5 text-primary mb-0">R$ {{
                             "%.2f"|format(totais.previsto) }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h6>Total já Recebido</h6>
-                        <p class="h5 text-success">R$ {{
+                        <h7>Total já Recebido</h7>
+                        <p class="h5 text-success mb-0">R$ {{
                             "%.2f"|format(totais.recebido) }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h6>Saldo Pendente</h6>
-                        <p class="h5 fw-bold text-warning text-dark">R$ {{
+                        <h7>Saldo Pendente</h7>
+                        <p class="h5 fw-bold text-warning text-dark mb-0">R$ {{
                             "%.2f"|format(totais.pendente) }}</p>
                     </div>
                 </div>
@@ -130,8 +122,7 @@
                                         <button type="submit"
                                             class="btn btn-link text-danger p-0"
                                             title="Estornar Recebimento">
-                                            <i
-                                                class="fas fa-times-circle fa-xs"></i>
+                                            <i class="fas fa-history fa-xs"></i>
                                         </button>
                                     </form>
                                     {% endif %}

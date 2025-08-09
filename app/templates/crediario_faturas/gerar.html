@@ -8,22 +8,13 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="d-flex justify-content-end">
-            <a href="{{ url_for('crediario_fatura.listar_faturas') }}"
-                class="btn btn-secondary btn-add me-2 mb-3">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
-        </div>
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Gerar/Visualizar Fatura</h5>
-            </div>
             <div class="card-body">
                 <form method="POST"
                     action="{{ url_for('crediario_fatura.gerar_fatura') }}">
                     {{ form.csrf_token }}
                     <div class="row">
-                        <div class="col-md-6 mb-1">
+                        <div class="col-md-4 mb-1">
                             {{ form.crediario_id.label(class="form-label") }}
                             {{ form.crediario_id(class="form-select") }}
                             {% if form.crediario_id.errors %}
@@ -33,7 +24,7 @@
                             </div>
                             {% endif %}
                         </div>
-                        <div class="col-md-4 mb-1">
+                        <div class="col-md-2 mb-1">
                             {{ form.mes_ano.label(class="form-label") }}
                             {{ form.mes_ano(class="form-select") }}
                             {% if form.mes_ano.errors %}
@@ -43,12 +34,17 @@
                             </div>
                             {% endif %}
                         </div>
-                        <div class="col-md-2 d-flex align-items-end mb-1">
+                        <div class="col-md-3 d-flex align-items-end mb-2">
                             <button type="submit"
-                                class="btn btn-success btn-add">
+                                class="btn btn-success btn-add me-2">
                                 <i class="fas fa-cogs"></i> {{
                                 form.submit.label.text }}
                             </button>
+                            <a
+                                href="{{ url_for('crediario_fatura.listar_faturas') }}"
+                                class="btn btn-light btn-sm">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
                         </div>
                     </div>
                 </form>

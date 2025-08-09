@@ -13,7 +13,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-from sqlalchemy import extract
+from sqlalchemy import func
 
 from app import db
 from app.forms.pagamentos_forms import PagamentoForm, PainelPagamentosForm
@@ -21,6 +21,8 @@ from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_movimento_model import CrediarioMovimento
+from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 
@@ -59,16 +61,36 @@ def painel():
             CrediarioFatura.data_vencimento_fatura <= data_fim_mes,
         ).all()
         for fatura in faturas:
+            soma_real_parcelas = (
+                db.session.query(
+                    func.coalesce(
+                        func.sum(CrediarioParcela.valor_parcela), Decimal("0.00")
+                    )
+                )
+                .join(CrediarioMovimento)
+                .filter(
+                    CrediarioMovimento.id == CrediarioParcela.crediario_movimento_id,
+                    CrediarioMovimento.crediario_id == fatura.crediario_id,
+                    CrediarioMovimento.usuario_id == current_user.id,
+                    CrediarioParcela.data_vencimento >= data_inicio_mes,
+                    CrediarioParcela.data_vencimento <= data_fim_mes,
+                )
+                .scalar()
+            )
+            desatualizada = fatura.valor_total_fatura != soma_real_parcelas
+
             valor_original = fatura.valor_total_fatura
             valor_pago = fatura.valor_pago_fatura
             contas_a_pagar.append(
                 {
                     "vencimento": fatura.data_vencimento_fatura,
                     "origem": f"Fatura {fatura.crediario.nome_crediario}",
-                    "valor": valor_original - valor_pago,
+                    "valor_display": valor_original,
+                    "valor_pendente": valor_original - valor_pago,
                     "status": fatura.status,
                     "tipo": "Crediário",
                     "id_original": fatura.id,
+                    "desatualizada": desatualizada,
                 }
             )
             totais["previsto"] += valor_original
@@ -95,10 +117,12 @@ def painel():
                 {
                     "vencimento": parcela.data_vencimento,
                     "origem": f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})",
-                    "valor": valor_original - valor_pago,
+                    "valor_display": valor_original,
+                    "valor_pendente": valor_original - valor_pago,
                     "status": parcela.status,
                     "tipo": "Financiamento",
                     "id_original": parcela.id,
+                    "desatualizada": False,
                 }
             )
             totais["previsto"] += valor_original
@@ -122,10 +146,12 @@ def painel():
                 {
                     "vencimento": despesa.data_vencimento,
                     "origem": despesa.despesa_receita.nome,
-                    "valor": valor_original - valor_pago,
+                    "valor_display": valor_original,
+                    "valor_pendente": valor_original - valor_pago,
                     "status": despesa.status,
                     "tipo": "Despesa",
                     "id_original": despesa.id,
+                    "desatualizada": False,
                 }
             )
             totais["previsto"] += valor_original
@@ -153,7 +179,6 @@ def pagar_conta():
             conta_debito = Conta.query.get(form.conta_id.data)
             valor_pago = form.valor_pago.data
 
-            # --- LÓGICA DE VALIDAÇÃO DE SALDO ADICIONADA ---
             saldo_disponivel = conta_debito.saldo_atual
             if conta_debito.tipo in ["Corrente", "Digital"] and conta_debito.limite:
                 saldo_disponivel += conta_debito.limite
@@ -166,7 +191,6 @@ def pagar_conta():
                 return redirect(
                     url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano"))
                 )
-            # --- FIM DA LÓGICA DE VALIDAÇÃO ---
 
             tipo_transacao_debito = ContaTransacao.query.filter_by(
                 usuario_id=current_user.id, transacao_tipo="PAGAMENTO", tipo="Débito"
@@ -208,6 +232,7 @@ def pagar_conta():
                 item = CrediarioFatura.query.get(item_id)
                 item.valor_pago_fatura += valor_pago
                 item.data_pagamento = form.data_pagamento.data
+                item.movimento_bancario_id = novo_movimento.id
                 if item.valor_pago_fatura >= item.valor_total_fatura:
                     item.status = "Paga"
                 else:
@@ -226,43 +251,44 @@ def pagar_conta():
 @pagamentos_bp.route("/estornar", methods=["POST"])
 @login_required
 def estornar_pagamento():
-    """Estorna um pagamento, revertendo a movimentação e o status do item."""
     item_id = request.form.get("item_id")
     item_tipo = request.form.get("item_tipo")
 
     try:
         movimento_bancario_id = None
-        valor_estornado = Decimal("0.00")
+        item_a_atualizar = None
 
         if item_tipo == "Despesa":
-            item = DespRecMovimento.query.get(item_id)
-            movimento_bancario_id = item.movimento_bancario_id
-            valor_estornado = item.valor_realizado
-            item.status = "Pendente"
-            item.valor_realizado = None
-            item.data_pagamento = None
-            item.movimento_bancario_id = None
+            item_a_atualizar = DespRecMovimento.query.get(item_id)
+            if item_a_atualizar:
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
+                item_a_atualizar.status = "Pendente"
+                item_a_atualizar.valor_realizado = None
+                item_a_atualizar.data_pagamento = None
+                item_a_atualizar.movimento_bancario_id = None
 
         elif item_tipo == "Financiamento":
-            item = FinanciamentoParcela.query.get(item_id)
-            movimento_bancario_id = item.movimento_bancario_id
-            valor_estornado = item.valor_total_previsto
-            item.status = "A Pagar"
-            item.data_pagamento = None
-            item.movimento_bancario_id = None
+            item_a_atualizar = FinanciamentoParcela.query.get(item_id)
+            if item_a_atualizar:
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
+                item_a_atualizar.status = "A Pagar"
+                item_a_atualizar.data_pagamento = None
+                item_a_atualizar.movimento_bancario_id = None
 
         elif item_tipo == "Crediário":
-            item = CrediarioFatura.query.get(item_id)
-            valor_estornado = item.valor_pago_fatura
-            item.valor_pago_fatura = Decimal("0.00")
-            item.status = "Aberta"
-            item.data_pagamento = None
+            item_a_atualizar = CrediarioFatura.query.get(item_id)
+            if item_a_atualizar:
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
+                item_a_atualizar.valor_pago_fatura = Decimal("0.00")
+                item_a_atualizar.status = "Aberta"
+                item_a_atualizar.data_pagamento = None
+                item_a_atualizar.movimento_bancario_id = None
 
         if movimento_bancario_id:
             movimento_bancario = ContaMovimento.query.get(movimento_bancario_id)
             if movimento_bancario:
                 conta_bancaria = Conta.query.get(movimento_bancario.conta_id)
-                conta_bancaria.saldo_atual += valor_estornado
+                conta_bancaria.saldo_atual += movimento_bancario.valor
                 db.session.delete(movimento_bancario)
 
         db.session.commit()

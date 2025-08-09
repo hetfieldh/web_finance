@@ -16,6 +16,8 @@ from sqlalchemy.exc import IntegrityError
 
 getcontext().prec = 10
 
+from datetime import datetime
+
 from app import db
 from app.forms.conta_movimento_forms import (
     CadastroContaMovimentoForm,
@@ -24,6 +26,9 @@ from app.forms.conta_movimento_forms import (
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
+from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.models.salario_movimento_model import SalarioMovimento
 
 conta_movimento_bp = Blueprint("conta_movimento", __name__, url_prefix="/movimentacoes")
 
@@ -133,8 +138,6 @@ def adicionar_movimentacao():
                 conta_origem.saldo_atual = saldo_origem_atualizado - valor_decimal
             elif tipo_transacao.tipo == "Crédito":
                 conta_origem.saldo_atual = saldo_origem_atualizado + valor_decimal
-            else:
-                pass
 
             if is_transferencia:
                 db.session.refresh(conta_destino)
@@ -161,6 +164,7 @@ def adicionar_movimentacao():
             current_app.logger.info(
                 f"Movimentação {tipo_transacao.tipo} de R$ {valor:.2f} registrada por {current_user.login}."
             )
+
             return redirect(url_for("conta_movimento.listar_movimentacoes"))
 
         except IntegrityError as e:
@@ -224,6 +228,19 @@ def excluir_movimentacao(id):
     if ultima_movimentacao and ultima_movimentacao.id != movimento.id:
         flash(
             "Não é possível excluir esta movimentação. Apenas o último registro (mais atual) da conta pode ser excluído.",
+            "danger",
+        )
+        return redirect(url_for("conta_movimento.listar_movimentacoes"))
+
+    is_linked = (
+        DespRecMovimento.query.filter_by(movimento_bancario_id=id).first()
+        or FinanciamentoParcela.query.filter_by(movimento_bancario_id=id).first()
+        or SalarioMovimento.query.filter_by(movimento_bancario_id=id).first()
+    )
+    if is_linked:
+        flash(
+            "Esta movimentação não pode ser excluída diretamente, pois está vinculada a um pagamento ou recebimento. "
+            "Por favor, realize o estorno a partir do painel de origem.",
             "danger",
         )
         return redirect(url_for("conta_movimento.listar_movimentacoes"))
