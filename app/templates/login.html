@@ -12,6 +12,10 @@
             xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
             crossorigin="anonymous">
         <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            xintegrity="sha512-1ycn6IcaQQ40ZefMdN/FUoLiLZBxdqbuGwFwvcNF/FfLwZcZk+YA+f+g9sZ/Tj/s6tFLjWfN+s0fD/XzFwB3A=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet"
             href="{{ url_for('static', filename='css/style.css') }}">
     </head>
     <body class="login-body">
@@ -50,8 +54,11 @@
                     <input type="password" class="form-control" id="senha"
                         name="senha" required>
                 </div>
-                <button type="submit"
-                    class="btn btn-primary w-100">Entrar</button>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-key me-2"></i>Acessar
+                    </button>
+                </div>
             </form>
         </div>
 

@@ -1,7 +1,32 @@
 /* app/static/css/style.css */
 
 /* ==========================================================================
-   1. ESTILOS DE BASE E TIPOGRAFIA
+   1. CORES
+   ========================================================================== */
+
+:root {
+    --wf-white: #ffffff;
+    --wf-grey: #444444;
+    --wf-ultra-light: #eceff1;
+    --wf-light: #bebebe;
+    --wf-sidebar-bg: #1B4F72;
+    --wf-border: #6e6e6e;
+    --wf-text-light: #BDC3C7;
+    --wf-info: #0753c4;
+    --wf-warning: #c79c19;
+    --wf-danger: #dc3545;
+    --wf-primary: #0b6dff;
+    --wf-secondary: #6c757d;
+    --wf-box-positivo: #d4edda;
+    --wf-borda-positivo: #28a745;
+    --wf-box-negativo: #f8d7da;
+    --wf-borda-negativo: #dc3545;
+    --wf-shadow: rgba(0, 0, 0, 0.1);
+}
+
+
+/* ==========================================================================
+   2. ESTILOS DE BASE E TIPOGRAFIA
    ========================================================================== */
 
 /* Configuração base para layout de rolagem controlada */
@@ -48,19 +73,19 @@ h6,
     font-size: 0.95rem;
 }
 
-h7,
-.h7 {
-    font-size: 0.8rem
-}
-
 /* ==========================================================================
-   2. LAYOUT PRINCIPAL (SIDEBAR E CONTEÚDO)
+   3. LAYOUT PRINCIPAL (SIDEBAR E CONTEÚDO)
    ========================================================================== */
 
 /* Wrapper principal: ocupa toda a altura da tela */
 #wrapper {
     overflow-x: hidden;
     height: 100vh;
+}
+
+/* Cor de fundo principal da sidebar */
+#sidebar-wrapper.bg-modified {
+    background-color: var(--wf-sidebar-bg) !important;
 }
 
 /* Sidebar lateral */
@@ -74,7 +99,12 @@ h7,
 }
 
 #sidebar-wrapper .list-group-item {
-    border-color: #4a4a4a;
+    border-color: var(--wf-border);
+    color: var(--wf-text-light)
+}
+
+#sidebar-wrapper .list-group-item-action:hover {
+    color: var(--wf-warning);
 }
 
 /* Área principal do conteúdo da página (container da rolagem) */
@@ -98,8 +128,25 @@ h7,
 
 
 /* ==========================================================================
-   3. ESTILOS DE COMPONENTES
+   4. ESTILOS DE COMPONENTES
    ========================================================================== */
+
+/* Estilo da barra de navegação superior */
+.navbar.bg-dark {
+    background-color: var(--wf-grey) !important;
+    border-bottom-color: var(--wf-border) !important;
+}
+
+/* Cor do link "Home" na navbar */
+.navbar .nav-link {
+    color: var(--wf-text-light);
+    transition: color 0.2s ease-in-out;
+}
+
+/* Cor do link "Home" ao passar o mouse */
+.navbar .nav-link:hover {
+    color: var(--wf-white);
+}
 
 /* --- Tabelas --- */
 .table {
@@ -147,23 +194,23 @@ h7,
 }
 
 .table-actions .btn.btn-info i {
-    color: #0753c4;
+    color: var(--wf-info);
 }
 
 .table-actions .btn.btn-warning i {
-    color: #c79c19;
+    color: var(--wf-warning);
 }
 
 .table-actions .btn.btn-danger i {
-    color: #dc3545;
+    color: var(--wf-danger);
 }
 
 .table-actions .btn.btn-primary i {
-    color: #0b6dff;
+    color: var(--wf-primary);
 }
 
 .table-actions .btn.btn-secondary i {
-    color: #6c757d;
+    color: var(--wf-secondary);
 }
 
 .table-actions .btn:hover i {
@@ -188,7 +235,7 @@ h7,
 }
 
 .card-borders {
-    border: 1px solid #6b737a36;
+    border: 1px solid var(--wf-border);
     border-radius: 0rem;
 }
 
@@ -203,7 +250,7 @@ h7,
 
 .list-group-item {
     font-size: 0.85rem;
-    color: #c8c8c8
+    color: var(--wf-text-light)
 }
 
 .collapse.list-group-flush .list-group-item {
@@ -211,12 +258,12 @@ h7,
 }
 
 .collapse.list-group-flush .list-group-item i {
-    color: #d1c118 !important;
+    color: var(--wf-warning) !important;
 }
 
 .logged-in-user-info {
     font-size: 0.7rem;
-    color: #7b7b7b;
+    color: var(--wf-secondary);
 }
 
 /* --- Outros Componentes --- */
@@ -226,16 +273,16 @@ h7,
 }
 
 .saldo-positivo-box {
-    background-color: #d4edda;
-    border: 1px solid #28a745;
+    background-color: var(--wf-box-positivo);
+    border: 1px solid var(--wf-borda-positivo);
     padding: 0.5rem;
     border-radius: 0.25rem;
     font-weight: bold;
 }
 
 .saldo-negativo-box {
-    background-color: #f8d7da;
-    border: 1px solid #dc3545;
+    background-color: var(--wf-box-negativo);
+    border: 1px solid var(--wf-borda-negativo);
     padding: 0.5rem;
     border-radius: 0.25rem;
     font-weight: bold;
@@ -256,7 +303,7 @@ h7,
 
 
 /* ==========================================================================
-   4. CLASSES UTILITÁRIAS
+   5. CLASSES UTILITÁRIAS
    ========================================================================== */
 
 .extra-small {
@@ -278,7 +325,7 @@ h7,
 
 
 /* ==========================================================================
-   5. ESTILOS DE PÁGINAS ESPECÍFICAS
+   6. ESTILOS DE PÁGINAS ESPECÍFICAS
    ========================================================================== */
 
 /* --- Página de Login --- */
@@ -287,7 +334,7 @@ body.login-body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #323232;
+    background-color: var(--wf-sidebar-bg);
     overflow: auto;
 }
 
@@ -295,10 +342,10 @@ body.login-body {
     max-width: 400px;
     min-width: 300px;
     padding: 20px;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--wf-sidebar-bg);
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
+    box-shadow: 0 4px 8px var(--wf-shadow);
+    background-color: var(--wf-white);
 }
 
 .logo-login {
@@ -308,7 +355,7 @@ body.login-body {
 
 /* --- Páginas de Erro --- */
 .error-container {
-    background: #e9ecef;
+    background: var(--wf-white);
     padding: 3rem;
     border-radius: 1rem;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -318,7 +365,7 @@ body.login-body {
 
 
 /* ==========================================================================
-   6. RESPONSIVIDADE (MEDIA QUERIES)
+   7. RESPONSIVIDADE (MEDIA QUERIES)
    ========================================================================== */
 
 @media (min-width: 768px) {
