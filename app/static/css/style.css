@@ -29,20 +29,17 @@
    2. ESTILOS DE BASE E TIPOGRAFIA
    ========================================================================== */
 
-/* Configuração base para layout de rolagem controlada */
 body,
 html {
     overflow: hidden;
     height: 100%;
 }
 
-/* Fonte base do corpo */
 body {
     font-size: 0.9rem;
     line-height: 1.5;
 }
 
-/* Tamanhos dos cabeçalhos */
 h1,
 .h1 {
     font-size: 2.2rem;
@@ -70,25 +67,22 @@ h5,
 
 h6,
 .h6 {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 /* ==========================================================================
    3. LAYOUT PRINCIPAL (SIDEBAR E CONTEÚDO)
    ========================================================================== */
 
-/* Wrapper principal: ocupa toda a altura da tela */
 #wrapper {
     overflow-x: hidden;
     height: 100vh;
 }
 
-/* Cor de fundo principal da sidebar */
 #sidebar-wrapper.bg-modified {
     background-color: var(--wf-sidebar-bg) !important;
 }
 
-/* Sidebar lateral */
 #sidebar-wrapper {
     min-height: 100vh;
     margin-left: -15rem;
@@ -107,21 +101,18 @@ h6,
     color: var(--wf-warning);
 }
 
-/* Área principal do conteúdo da página (container da rolagem) */
 #page-content-wrapper {
     min-width: 100vw;
     overflow-y: auto;
     height: 100vh;
 }
 
-/* Barra de navegação superior: "pegajosa" (sticky) no topo */
 #page-content-wrapper>.navbar {
     position: sticky;
     top: 0;
     z-index: 1020;
 }
 
-/* Comportamento do Toggled para mostrar/esconder a sidebar */
 #wrapper.toggled #sidebar-wrapper {
     margin-left: 0;
 }
@@ -131,19 +122,16 @@ h6,
    4. ESTILOS DE COMPONENTES
    ========================================================================== */
 
-/* Estilo da barra de navegação superior */
 .navbar.bg-dark {
     background-color: var(--wf-grey) !important;
     border-bottom-color: var(--wf-border) !important;
 }
 
-/* Cor do link "Home" na navbar */
 .navbar .nav-link {
     color: var(--wf-text-light);
     transition: color 0.2s ease-in-out;
 }
 
-/* Cor do link "Home" ao passar o mouse */
 .navbar .nav-link:hover {
     color: var(--wf-white);
 }
@@ -157,7 +145,31 @@ h6,
 .table th {
     padding: 0.1rem 0.2rem;
     height: 15px;
+    line-height: 1.2rem;
     vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table .badge {
+    padding: 0 0.25em;
+    line-height: 1rem;
+    font-size: 0.65rem;
+}
+
+.table i {
+    font-size: 0.7rem;
+    line-height: 1rem;
+}
+
+.table .btn {
+    padding: 0 !important;
+    line-height: 1rem;
+    height: auto;
+}
+
+.table form {
+    margin: 0;
+    padding: 0;
 }
 
 .table-responsive {
@@ -167,7 +179,6 @@ h6,
     padding: 0 15px;
 }
 
-/* --- Estilos dos botões de ação --- */
 .table-actions {
     white-space: nowrap;
 }
@@ -178,7 +189,6 @@ h6,
     vertical-align: middle;
 }
 
-/* Estilo base para botões de ícone: fundo transparente, sem borda */
 .table-actions .btn {
     width: 15px;
     height: 15px;
@@ -216,7 +226,6 @@ h6,
 .table-actions .btn:hover i {
     opacity: 0.5;
 }
-
 
 /* --- Formulários --- */
 .form-control,
@@ -328,7 +337,6 @@ h6,
    6. ESTILOS DE PÁGINAS ESPECÍFICAS
    ========================================================================== */
 
-/* --- Página de Login --- */
 body.login-body {
     display: flex;
     justify-content: center;
@@ -353,7 +361,6 @@ body.login-body {
     width: auto;
 }
 
-/* --- Páginas de Erro --- */
 .error-container {
     background: var(--wf-white);
     padding: 3rem;
@@ -362,7 +369,6 @@ body.login-body {
     max-width: 800px;
     width: 90%;
 }
-
 
 /* ==========================================================================
    7. RESPONSIVIDADE (MEDIA QUERIES)

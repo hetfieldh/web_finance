@@ -2,55 +2,39 @@
 
 {% extends "base.html" %}
 
-{% block title %}Web Finance - Recebimento{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}Web Finance - Recebimentos{% endblock %}
+{% block page_title %}Valores a Receber{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- Card de Filtros -->
+        <!-- Card de Filtro e Resumo -->
         <div class="card shadow-sm mb-2">
-            <div class="card-body">
+            <div
+                class="card-body p-2 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <!-- Lado Esquerdo: Filtros -->
                 <form method="POST"
-                    action="{{ url_for('recebimentos.painel') }}">
+                    action="{{ url_for('recebimentos.painel') }}"
+                    class="d-flex align-items-center gap-2">
                     {{ form.csrf_token }}
-                    <div class="row align-items-end">
-                        <div class="col-md-2">
-                            {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select form-select-sm")
-                            }}
-                        </div>
-                        <div class="col-md-3">
-                            <button type="submit"
-                                class="btn btn-success btn-add">
-                                <i class="fas fa-search me-1"></i> {{
-                                form.submit.label.text }}
-                            </button>
-                        </div>
-                    </div>
+                    {{ form.mes_ano(class="form-select form-select-sm") }}
+                    <button type="submit" class="btn btn-success btn-sm"
+                        title="Filtrar">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </form>
-            </div>
-        </div>
 
-        <!-- Card de Resumo de Totais -->
-        <div class="card shadow-sm mb-2">
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-4">
-                        <h6>Total Previsto a Receber</h6>
-                        <p class="h5 text-primary">R$ {{
-                            "%.2f"|format(totais.previsto) }}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h6>Total já Recebido</h6>
-                        <p class="h5 text-success">R$ {{
-                            "%.2f"|format(totais.recebido) }}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h6>Saldo Pendente</h6>
-                        <p class="h5 fw-bold text-warning text-dark">R$ {{
-                            "%.2f"|format(totais.pendente) }}</p>
-                    </div>
+                <!-- Lado Direito: Resumo -->
+                <div
+                    class="d-flex align-items-center text-muted small gap-3 flex-wrap justify-content-center">
+                    <span>Total Previsto: <strong class="text-primary">R$ {{
+                            "%.2f"|format(totais.previsto) }}</strong></span>
+                    <span class="d-none d-md-inline">|</span>
+                    <span>Total Recebido: <strong class="text-success">R$ {{
+                            "%.2f"|format(totais.recebido) }}</strong></span>
+                    <span class="d-none d-md-inline">|</span>
+                    <span>Pendente: <strong class="text-warning text-dark">R$ {{
+                            "%.2f"|format(totais.pendente) }}</strong></span>
                 </div>
             </div>
         </div>
@@ -59,7 +43,7 @@
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">
                 <h5 class="mb-0"><i
-                        class="fas fa-hand-holding-usd me-2"></i>Contas a
+                        class="fas fa-hand-holding-usd me-2"></i>Valores a
                     Receber</h5>
             </div>
             <div class="card-body">
@@ -114,7 +98,7 @@
                                         data-item-descricao="{{ conta.origem }}"
                                         data-item-data="{{ conta.vencimento.strftime('%Y-%m-%d') }}">
                                         <i
-                                            class="fas fa-check-double fa-xs"></i>
+                                            class="fas fa-check-double fa-sm"></i>
                                     </button>
                                     {% else %}
                                     <form method="POST"
@@ -130,7 +114,7 @@
                                         <button type="submit"
                                             class="btn btn-link text-danger p-0"
                                             title="Estornar Recebimento">
-                                            <i class="fas fa-history fa-xs"></i>
+                                            <i class="fas fa-history fa-sm"></i>
                                         </button>
                                     </form>
                                     {% endif %}
@@ -200,29 +184,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var recebimentoModal = document.getElementById('recebimentoModal');
-    if (recebimentoModal) {
-        recebimentoModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var itemId = button.getAttribute('data-item-id');
-            var itemTipo = button.getAttribute('data-item-tipo');
-            var itemValor = button.getAttribute('data-item-valor');
-            var itemDescricao = button.getAttribute('data-item-descricao');
-            var itemData = button.getAttribute('data-item-data');
-
-            var modal = this;
-            modal.querySelector('#item_id').value = itemId;
-            modal.querySelector('#item_tipo').value = itemTipo;
-            modal.querySelector('#valor_recebido').value = itemValor;
-            modal.querySelector('#item_descricao').value = itemDescricao;
-            modal.querySelector('#data_recebimento').value = itemData;
-        });
-    }
-});
-</script>
 {% endblock %}

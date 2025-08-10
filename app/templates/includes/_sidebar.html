@@ -102,14 +102,18 @@
                 class="list-group-item list-group-item-action bg-transparent ps-4">
                 <i class="fas fa-university me-2"></i>Extrato Bancário
             </a>
-            <a href="{{ url_for('crediario_fatura.listar_faturas') }}"
-                class="list-group-item list-group-item-action bg-transparent ps-4">
-                <i class="fas fa-receipt me-2"></i>Faturas de Crediário
-            </a>
             <a
                 href="{{ url_for('extrato_desp_rec.extrato_despesas_receitas') }}"
                 class="list-group-item list-group-item-action bg-transparent ps-4">
                 <i class="fas fa-chart-bar me-2"></i>Extrato de Desp/Rec
+            </a>
+            <a href="{{ url_for('crediario_fatura.listar_faturas') }}"
+                class="list-group-item list-group-item-action bg-transparent ps-4">
+                <i class="fas fa-receipt me-2"></i>Faturas de Crediário
+            </a>
+            <a href="{{ url_for('fluxo_caixa.painel')}}"
+                class="list-group-item list-group-item-action bg-transparent ps-4">
+                <i class="fas fa-file-invoice-dollar me-2"></i></i>Fluxo de Caixa
             </a>
         </div>
 

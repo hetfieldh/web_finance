@@ -1,6 +1,6 @@
 // app/static/js/script.js
 
-// Exibe mensagem no console
+// Exibe uma mensagem no console para confirmar que o script foi carregado
 console.log("script.js carregado com sucesso!");
 
 // Adiciona um listener para quando o DOM estiver completamente carregado
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const contaOrigemSelect = document.getElementById("conta_id");
   const contaDestinoSelect = document.getElementById("conta_destino_id");
 
+  // Lógica de visibilidade dos campos de transferência
   if (
     contaTransacaoSelect &&
     isTransferenciaCheckboxContainer &&
@@ -66,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTransferenciaFieldsVisibility();
   }
 
+  // Lógica para desabilitar a conta de origem na lista de destino
   if (contaOrigemSelect && contaDestinoSelect) {
     function atualizarContaDestino() {
       const selectedOrigemId = contaOrigemSelect.value;
@@ -83,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     contaOrigemSelect.addEventListener("change", atualizarContaDestino);
-    atualizarContaDestino();
+    atualizarContaDestino(); // Define o estado inicial
   }
 
   // --- 3. Script para inicializar tooltips do Bootstrap ---
@@ -140,7 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (formLancamento) {
     const itensContainer = document.getElementById("itens-container");
     const addItemBtn = document.getElementById("add-item-btn");
-    const itemTemplate = document.getElementById("item-template");
+    const itemTemplateHtml =
+      document.getElementById("item-template")?.innerHTML;
 
     const reindexRows = () => {
       const itemRows = itensContainer.querySelectorAll(".item-row");
@@ -161,47 +164,71 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
 
-    // Adiciona uma nova linha de item
-    if (addItemBtn && itemTemplate) {
+    if (addItemBtn && itemTemplateHtml) {
       addItemBtn.addEventListener("click", () => {
-        // Clona o template
-        const newRow = itemTemplate.content.cloneNode(true);
-
-        // Pega o índice para a nova linha
         const currentIndex =
           itensContainer.querySelectorAll(".item-row").length;
+        const newRowHtml = itemTemplateHtml.replace(
+          /__prefix__/g,
+          currentIndex
+        );
 
-        // Atualiza os atributos 'name' e 'id' dos campos no novo clone
-        const fields = newRow.querySelectorAll("select, input");
-        fields.forEach((field) => {
-          for (const attr of ["name", "id"]) {
-            const attrValue = field.getAttribute(attr);
-            if (attrValue) {
-              field.setAttribute(
-                attr,
-                attrValue.replace("__prefix__", currentIndex)
-              );
-            }
-          }
-        });
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = newRowHtml;
 
-        // Adiciona a nova linha ao container
-        itensContainer.appendChild(newRow);
+        itensContainer.appendChild(tempDiv.firstElementChild);
       });
     }
 
-    // Delegação de evento para o botão de remover
     itensContainer.addEventListener("click", (event) => {
       const removeBtn = event.target.closest(".remove-item-btn");
       if (removeBtn) {
         const itemRow = removeBtn.closest(".item-row");
         if (itensContainer.querySelectorAll(".item-row").length > 1) {
           itemRow.remove();
-          reindexRows(); // Re-indexa as linhas restantes
+          reindexRows();
         } else {
           alert("É necessário pelo menos uma verba na folha de pagamento.");
         }
       }
+    });
+  }
+
+  // --- 7. Script para Modal de Pagamento ---
+  const pagamentoModal = document.getElementById("pagamentoModal");
+  if (pagamentoModal) {
+    pagamentoModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+      const itemId = button.getAttribute("data-item-id");
+      const itemTipo = button.getAttribute("data-item-tipo");
+      const itemValor = button.getAttribute("data-item-valor");
+      const itemDescricao = button.getAttribute("data-item-descricao");
+
+      const modal = this;
+      modal.querySelector("#item_id").value = itemId;
+      modal.querySelector("#item_tipo").value = itemTipo;
+      modal.querySelector("#valor_pago").value = itemValor;
+      modal.querySelector("#item_descricao").value = itemDescricao;
+    });
+  }
+
+  // --- 8. Script para Modal de Recebimento ---
+  const recebimentoModal = document.getElementById("recebimentoModal");
+  if (recebimentoModal) {
+    recebimentoModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+      const itemId = button.getAttribute("data-item-id");
+      const itemTipo = button.getAttribute("data-item-tipo");
+      const itemValor = button.getAttribute("data-item-valor");
+      const itemDescricao = button.getAttribute("data-item-descricao");
+      const itemData = button.getAttribute("data-item-data");
+
+      const modal = this;
+      modal.querySelector("#item_id").value = itemId;
+      modal.querySelector("#item_tipo").value = itemTipo;
+      modal.querySelector("#valor_recebido").value = itemValor;
+      modal.querySelector("#item_descricao").value = itemDescricao;
+      modal.querySelector("#data_recebimento").value = itemData;
     });
   }
 });

@@ -68,6 +68,23 @@ def adicionar_movimento_crediario():
         data_primeira_parcela_obj = form.data_primeira_parcela.data
         numero_parcelas = form.numero_parcelas.data
 
+        mes_ano_referencia = data_primeira_parcela_obj.strftime("%Y-%m")
+        fatura_existente = CrediarioFatura.query.filter_by(
+            usuario_id=current_user.id,
+            crediario_id=crediario_id,
+            mes_referencia=mes_ano_referencia,
+        ).first()
+
+        if fatura_existente and fatura_existente.status in [
+            "Paga",
+            "Parcialmente Paga",
+        ]:
+            flash(
+                f"Não é possível adicionar uma compra cuja primeira parcela vence em {mes_ano_referencia.split('-')[1]}/{mes_ano_referencia.split('-')[0]}, pois a fatura para este período já foi paga.",
+                "danger",
+            )
+            return render_template("crediario_movimentos/add.html", form=form)
+
         valor_final_compra = valor_total_compra
         if crediario_grupo_id:
             grupo = CrediarioGrupo.query.get(crediario_grupo_id)
@@ -96,7 +113,6 @@ def adicionar_movimento_crediario():
 
             for i in range(numero_parcelas):
                 data_vencimento = data_primeira_parcela_obj + relativedelta(months=i)
-
                 nova_parcela = CrediarioParcela(
                     crediario_movimento_id=novo_movimento.id,
                     numero_parcela=i + 1,
@@ -111,27 +127,10 @@ def adicionar_movimento_crediario():
                 "Compra no crediário registrada e parcelas geradas com sucesso!",
                 "success",
             )
-            current_app.logger.info(
-                f"Movimento de crediário (ID: {novo_movimento.id}) de R$ {valor_final_compra} em {numero_parcelas}x registrado por {current_user.login}."
-            )
             return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
 
-        except IntegrityError as e:
-            db.session.rollback()
-            current_app.logger.error(
-                f"Erro de integridade ao adicionar movimento de crediário: {e}",
-                exc_info=True,
-            )
-            flash(
-                "Erro ao registrar movimento de crediário. Verifique os dados e tente novamente.",
-                "danger",
-            )
         except Exception as e:
             db.session.rollback()
-            current_app.logger.error(
-                f"Erro inesperado ao adicionar movimento de crediário: {e}",
-                exc_info=True,
-            )
             flash("Ocorreu um erro inesperado. Tente novamente.", "danger")
 
     return render_template("crediario_movimentos/add.html", form=form)
@@ -143,10 +142,31 @@ def editar_movimento_crediario(id):
     movimento = CrediarioMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-
     form = EditarCrediarioMovimentoForm(obj=movimento)
 
     if form.validate_on_submit():
+        nova_data_primeira_parcela = form.data_primeira_parcela.data
+        mes_ano_referencia = nova_data_primeira_parcela.strftime("%Y-%m")
+
+        if nova_data_primeira_parcela != movimento.data_primeira_parcela:
+            fatura_existente = CrediarioFatura.query.filter_by(
+                usuario_id=current_user.id,
+                crediario_id=movimento.crediario_id,
+                mes_referencia=mes_ano_referencia,
+            ).first()
+
+            if fatura_existente and fatura_existente.status in [
+                "Paga",
+                "Parcialmente Paga",
+            ]:
+                flash(
+                    f"Não é possível mover a primeira parcela para {mes_ano_referencia.split('-')[1]}/{mes_ano_referencia.split('-')[0]}, pois a fatura para este período já foi paga.",
+                    "danger",
+                )
+                return render_template(
+                    "crediario_movimentos/edit.html", form=form, movimento=movimento
+                )
+
         valor_total_compra = form.valor_total_compra.data
         if (
             movimento.crediario_grupo
@@ -190,16 +210,9 @@ def editar_movimento_crediario(id):
         try:
             db.session.commit()
             flash("Movimento de crediário atualizado com sucesso!", "success")
-            current_app.logger.info(
-                f"Movimento de crediário (ID: {movimento.id}) atualizado por {current_user.login}."
-            )
             return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
         except Exception as e:
             db.session.rollback()
-            current_app.logger.error(
-                f"Erro ao salvar atualização de movimento de crediário: {e}",
-                exc_info=True,
-            )
             flash("Ocorreu um erro ao atualizar a compra. Tente novamente.", "danger")
             return render_template(
                 "crediario_movimentos/edit.html", form=form, movimento=movimento
