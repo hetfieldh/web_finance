@@ -2,12 +2,13 @@
 
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Web Finance - Recebimento{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
+        <!-- Card de Filtros -->
         <div class="card shadow-sm mb-2">
             <div class="card-body">
                 <form method="POST"
@@ -16,7 +17,8 @@
                     <div class="row align-items-end">
                         <div class="col-md-2">
                             {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select form-select-sm") }}
+                            {{ form.mes_ano(class="form-select form-select-sm")
+                            }}
                         </div>
                         <div class="col-md-3">
                             <button type="submit"
@@ -30,28 +32,30 @@
             </div>
         </div>
 
+        <!-- Card de Resumo de Totais -->
         <div class="card shadow-sm mb-2">
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-md-4">
-                        <h7>Total Previsto a Receber</h7>
-                        <p class="h5 text-primary mb-0">R$ {{
+                        <h6>Total Previsto a Receber</h6>
+                        <p class="h5 text-primary">R$ {{
                             "%.2f"|format(totais.previsto) }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h7>Total já Recebido</h7>
-                        <p class="h5 text-success mb-0">R$ {{
+                        <h6>Total já Recebido</h6>
+                        <p class="h5 text-success">R$ {{
                             "%.2f"|format(totais.recebido) }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h7>Saldo Pendente</h7>
-                        <p class="h5 fw-bold text-warning text-dark mb-0">R$ {{
+                        <h6>Saldo Pendente</h6>
+                        <p class="h5 fw-bold text-warning text-dark">R$ {{
                             "%.2f"|format(totais.pendente) }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Card da Tabela de Recebimentos -->
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">
                 <h5 class="mb-0"><i
@@ -68,6 +72,7 @@
                                 <th>Origem</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Valor Previsto</th>
+                                <th class="text-center">Data Recebimento</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Ações</th>
                             </tr>
@@ -82,6 +87,9 @@
                                         }}</span></td>
                                 <td class="text-end fw-bold text-success">R$ {{
                                     "%.2f"|format(conta.valor) }}</td>
+                                <td class="text-center">{{
+                                    conta.data_pagamento.strftime('%d/%m/%Y') if
+                                    conta.data_pagamento else '-' }}</td>
                                 <td class="text-center">
                                     {% if conta.status in ['Recebido', 'Pago']
                                     %}
@@ -141,6 +149,7 @@
     </div>
 </div>
 
+<!-- Modal de Recebimento -->
 <div class="modal fade" id="recebimentoModal" tabindex="-1"
     aria-labelledby="recebimentoModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -50,6 +50,7 @@ def painel():
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
+        # 1. Buscar Salário Líquido pela DATA DE RECEBIMENTO
         salario_movimentos = SalarioMovimento.query.filter(
             SalarioMovimento.usuario_id == current_user.id,
             SalarioMovimento.data_recebimento >= data_inicio_mes,
@@ -74,6 +75,12 @@ def painel():
             )
             salario_liquido = proventos - (impostos + descontos)
 
+            data_pagamento = None
+            if movimento.movimento_bancario_id:
+                mov_bancario = ContaMovimento.query.get(movimento.movimento_bancario_id)
+                if mov_bancario:
+                    data_pagamento = mov_bancario.data_movimento
+
             contas_a_receber.append(
                 {
                     "vencimento": movimento.data_recebimento,
@@ -82,6 +89,7 @@ def painel():
                     "status": (
                         "Recebido" if movimento.movimento_bancario_id else "Pendente"
                     ),
+                    "data_pagamento": data_pagamento,
                     "tipo": "Salário",
                     "id_original": movimento.id,
                 }
@@ -90,6 +98,7 @@ def painel():
             if movimento.movimento_bancario_id:
                 totais["recebido"] += salario_liquido
 
+        # 2. Buscar Outras Receitas
         outras_receitas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
             .filter(
@@ -110,6 +119,7 @@ def painel():
                     "origem": receita.despesa_receita.nome,
                     "valor": valor_previsto,
                     "status": receita.status,
+                    "data_pagamento": receita.data_pagamento,
                     "tipo": "Receita",
                     "id_original": receita.id,
                 }
@@ -196,28 +206,28 @@ def estornar_recebimento():
 
     try:
         movimento_bancario_id = None
-        valor_estornado = Decimal("0.00")
+        item_a_atualizar = None
 
         if item_tipo == "Receita":
-            item = DespRecMovimento.query.get(item_id)
-            movimento_bancario_id = item.movimento_bancario_id
-            valor_estornado = item.valor_realizado
-            item.status = "Pendente"
-            item.valor_realizado = None
-            item.data_pagamento = None
-            item.movimento_bancario_id = None
+            item_a_atualizar = DespRecMovimento.query.get(item_id)
+            if item_a_atualizar:
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
+                item_a_atualizar.status = "Pendente"
+                item_a_atualizar.valor_realizado = None
+                item_a_atualizar.data_pagamento = None
+                item_a_atualizar.movimento_bancario_id = None
 
         elif item_tipo == "Salário":
-            item = SalarioMovimento.query.get(item_id)
-            movimento_bancario_id = item.movimento_bancario_id
-            item.movimento_bancario_id = None
+            item_a_atualizar = SalarioMovimento.query.get(item_id)
+            if item_a_atualizar:
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
+                item_a_atualizar.movimento_bancario_id = None
 
         if movimento_bancario_id:
             movimento_bancario = ContaMovimento.query.get(movimento_bancario_id)
             if movimento_bancario:
-                valor_estornado = movimento_bancario.valor
                 conta_bancaria = Conta.query.get(movimento_bancario.conta_id)
-                conta_bancaria.saldo_atual -= valor_estornado
+                conta_bancaria.saldo_atual -= movimento_bancario.valor
                 db.session.delete(movimento_bancario)
 
         db.session.commit()

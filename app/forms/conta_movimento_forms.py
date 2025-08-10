@@ -79,7 +79,7 @@ class CadastroContaMovimentoForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.conta_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_banco} - {c.conta} ({c.tipo})")
+            (str(c.id), f"{c.nome_banco} - {c.tipo} ({c.saldo_atual})")
             for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Conta.nome_banco.asc())
             .all()
@@ -92,7 +92,7 @@ class CadastroContaMovimentoForm(FlaskForm):
         ]
 
         self.conta_destino_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_banco} - {c.conta} ({c.tipo})")
+            (str(c.id), f"{c.nome_banco} - {c.tipo} ({c.saldo_atual})")
             for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Conta.nome_banco.asc())
             .all()

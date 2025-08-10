@@ -121,7 +121,7 @@
     </div>
     {% if current_user.is_authenticated %}
     <div
-        class="list-group-item bg-dark text-secondary mt-auto py-2 px-2 text-left logged-in-user-info">
+        class="list-group-item bg-transparent text-warning mt-auto py-2 px-2 text-left logged-in-user-info">
         Usuário: <strong>{{ current_user.login }}</strong>
     </div>
     {% endif %}

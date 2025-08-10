@@ -12,6 +12,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 getcontext().prec = 10
@@ -54,7 +55,7 @@ def adicionar_movimentacao():
         tipo_transacao_id = form.conta_transacao_id.data
         data_movimento = form.data_movimento.data
         valor = form.valor.data
-        descricao = form.descricao.data.strip() if form.descricao.data else None
+        descricao_manual = form.descricao.data.strip() if form.descricao.data else None
         is_transferencia = form.is_transferencia.data
         conta_destino_id = form.conta_destino_id.data if is_transferencia else None
 
@@ -120,13 +121,30 @@ def adicionar_movimentacao():
                 return render_template("conta_movimentos/add.html", form=form)
 
         try:
+            descricao_origem = descricao_manual
+            descricao_destino = ""
+
+            if is_transferencia:
+                transacao_nome = tipo_transacao.transacao_tipo
+                nome_conta_origem = f"{conta_origem.nome_banco} - {conta_origem.conta}"
+                nome_conta_destino = (
+                    f"{conta_destino.nome_banco} - {conta_destino.conta}"
+                )
+
+                descricao_origem = f"{transacao_nome} para {nome_conta_destino}"
+                descricao_destino = f"{transacao_nome} recebida de {nome_conta_origem}"
+
+                if descricao_manual:
+                    descricao_origem += f" ({descricao_manual})"
+                    descricao_destino += f" ({descricao_manual})"
+
             movimento_origem = ContaMovimento(
                 usuario_id=current_user.id,
                 conta_id=conta_origem_id,
                 conta_transacao_id=tipo_transacao_id,
                 data_movimento=data_movimento,
                 valor=valor,
-                descricao=descricao,
+                descricao=descricao_origem,
             )
             db.session.add(movimento_origem)
             db.session.flush()
@@ -149,7 +167,7 @@ def adicionar_movimentacao():
                     conta_transacao_id=tipo_transacao_credito.id,
                     data_movimento=data_movimento,
                     valor=valor,
-                    descricao=f"Transferência recebida de {conta_origem.nome_banco} - {conta_origem.conta}",
+                    descricao=descricao_destino,
                 )
                 db.session.add(movimento_destino)
                 db.session.flush()
@@ -217,21 +235,6 @@ def excluir_movimentacao(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    ultima_movimentacao = (
-        ContaMovimento.query.filter_by(
-            conta_id=movimento.conta_id, usuario_id=current_user.id
-        )
-        .order_by(ContaMovimento.data_movimento.desc(), ContaMovimento.id.desc())
-        .first()
-    )
-
-    if ultima_movimentacao and ultima_movimentacao.id != movimento.id:
-        flash(
-            "Não é possível excluir esta movimentação. Apenas o último registro (mais atual) da conta pode ser excluído.",
-            "danger",
-        )
-        return redirect(url_for("conta_movimento.listar_movimentacoes"))
-
     is_linked = (
         DespRecMovimento.query.filter_by(movimento_bancario_id=id).first()
         or FinanciamentoParcela.query.filter_by(movimento_bancario_id=id).first()
@@ -241,6 +244,25 @@ def excluir_movimentacao(id):
         flash(
             "Esta movimentação não pode ser excluída diretamente, pois está vinculada a um pagamento ou recebimento. "
             "Por favor, realize o estorno a partir do painel de origem.",
+            "danger",
+        )
+        return redirect(url_for("conta_movimento.listar_movimentacoes"))
+
+    movimentos_posteriores = ContaMovimento.query.filter(
+        ContaMovimento.usuario_id == current_user.id,
+        or_(
+            ContaMovimento.data_movimento > movimento.data_movimento,
+            db.and_(
+                ContaMovimento.data_movimento == movimento.data_movimento,
+                ContaMovimento.id > movimento.id,
+            ),
+        ),
+    ).count()
+
+    if movimentos_posteriores > 0:
+        flash(
+            "Não é possível excluir esta movimentação, pois existem lançamentos posteriores em suas contas. "
+            "Exclua as movimentações da mais recente para a mais antiga para manter a integridade dos saldos.",
             "danger",
         )
         return redirect(url_for("conta_movimento.listar_movimentacoes"))

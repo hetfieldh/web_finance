@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Wef Finance - Pagamento{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
@@ -16,7 +16,8 @@
                     <div class="row align-items-end">
                         <div class="col-md-2">
                             {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select form-select-sm") }}
+                            {{ form.mes_ano(class="form-select form-select-sm")
+                            }}
                         </div>
                         <div class="col-md-3">
                             <button type="submit"
@@ -35,18 +36,18 @@
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-md-4">
-                        <h7>Total Previsto a Pagar</h7>
-                        <p class="h5 text-primary mb-0">R$ {{
+                        <h6>Total Previsto a Pagar</h6>
+                        <p class="h5 text-primary">R$ {{
                             "%.2f"|format(totais.previsto) }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h7>Total já Pago</h7>
-                        <p class="h5 text-success mb-0">R$ {{
+                        <h6>Total já Pago</h6>
+                        <p class="h5 text-success">R$ {{
                             "%.2f"|format(totais.pago) }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h7>Saldo Pendente</h7>
-                        <p class="h5 fw-bold text-danger mb-0">R$ {{
+                        <h6>Saldo Pendente</h6>
+                        <p class="h5 fw-bold text-danger">R$ {{
                             "%.2f"|format(totais.pendente) }}</p>
                     </div>
                 </div>
@@ -69,6 +70,7 @@
                                 <th>Origem</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Valor</th>
+                                <th class="text-center">Data Pagamento</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Ações</th>
                             </tr>
@@ -83,6 +85,9 @@
                                         conta.tipo }}</span></td>
                                 <td class="text-end fw-bold">R$ {{
                                     "%.2f"|format(conta.valor_display) }}</td>
+                                <td class="text-center">{{
+                                    conta.data_pagamento.strftime('%d/%m/%Y') if
+                                    conta.data_pagamento else '-' }}</td>
                                 <td class="text-center">
                                     {% if conta.status in ['Paga', 'Pago'] %}
                                     <span class="badge bg-success">{{
@@ -99,7 +104,7 @@
                                     {% if conta.desatualizada %}
                                     <a
                                         href="{{ url_for('crediario_fatura.listar_faturas') }}"
-                                        class="btn btn-link text-danger p-0"
+                                        class="btn btn-link text-warning p-0"
                                         title="O valor da fatura mudou. Clique para atualizar.">
                                         <i class="fas fa-retweet fa-xs"></i>
                                     </a>
