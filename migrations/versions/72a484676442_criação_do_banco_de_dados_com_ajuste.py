@@ -1,8 +1,8 @@
-"""Criação do Banco de Dados ajustada
+"""Criação do Banco de Dados com Ajuste
 
-Revision ID: f99e1ba456ac
+Revision ID: 72a484676442
 Revises: 
-Create Date: 2025-08-08 16:11:23.235472
+Create Date: 2025-08-11 17:51:07.059718
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f99e1ba456ac'
+revision = '72a484676442'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -123,23 +123,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('crediario_fatura',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('usuario_id', sa.Integer(), nullable=False),
-    sa.Column('crediario_id', sa.Integer(), nullable=False),
-    sa.Column('mes_referencia', sa.String(length=7), nullable=False),
-    sa.Column('valor_total_fatura', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('valor_pago_fatura', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('data_fechamento', sa.Date(), nullable=True),
-    sa.Column('data_vencimento_fatura', sa.Date(), nullable=False),
-    sa.Column('status', sa.Enum('Aberta', 'Fechada', 'Paga', 'Atrasada', 'Parcialmente Paga', name='status_fatura_enum'), nullable=False),
-    sa.Column('data_pagamento', sa.Date(), nullable=True),
-    sa.Column('data_criacao', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['crediario_id'], ['crediario.id'], ),
-    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('usuario_id', 'crediario_id', 'mes_referencia', name='_usuario_crediario_fatura_uc')
-    )
     op.create_table('crediario_movimento',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
@@ -173,6 +156,25 @@ def upgrade():
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('usuario_id', 'nome_financiamento', name='_usuario_financiamento_uc')
+    )
+    op.create_table('crediario_fatura',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=False),
+    sa.Column('crediario_id', sa.Integer(), nullable=False),
+    sa.Column('mes_referencia', sa.String(length=7), nullable=False),
+    sa.Column('valor_total_fatura', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('valor_pago_fatura', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('data_fechamento', sa.Date(), nullable=True),
+    sa.Column('data_vencimento_fatura', sa.Date(), nullable=False),
+    sa.Column('status', sa.Enum('Aberta', 'Fechada', 'Paga', 'Atrasada', 'Parcialmente Paga', name='status_fatura_enum'), nullable=False),
+    sa.Column('data_pagamento', sa.Date(), nullable=True),
+    sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
+    sa.Column('data_criacao', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['crediario_id'], ['crediario.id'], ),
+    sa.ForeignKeyConstraint(['movimento_bancario_id'], ['conta_movimento.id'], ),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('usuario_id', 'crediario_id', 'mes_referencia', name='_usuario_crediario_fatura_uc')
     )
     op.create_table('crediario_parcela',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -237,10 +239,12 @@ def upgrade():
     sa.Column('mes_referencia', sa.String(length=7), nullable=False),
     sa.Column('data_recebimento', sa.Date(), nullable=False),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
+    sa.Column('status', sa.Enum('Pendente', 'Recebido', name='status_salario_enum'), server_default='Pendente', nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['movimento_bancario_id'], ['conta_movimento.id'], ),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('movimento_bancario_id'),
     sa.UniqueConstraint('usuario_id', 'mes_referencia', name='_usuario_mes_referencia_uc')
     )
     op.create_table('salario_movimento_item',
@@ -262,9 +266,9 @@ def downgrade():
     op.drop_table('financiamento_parcela')
     op.drop_table('desp_rec_movimento')
     op.drop_table('crediario_parcela')
+    op.drop_table('crediario_fatura')
     op.drop_table('financiamento')
     op.drop_table('crediario_movimento')
-    op.drop_table('crediario_fatura')
     op.drop_table('conta_movimento')
     op.drop_table('salario_item')
     op.drop_table('desp_rec')

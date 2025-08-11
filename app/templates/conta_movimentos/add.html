@@ -24,7 +24,9 @@
                             {% for subfield in form.tipo_operacao %}
                             <div class="form-check">
                                 {{ subfield(class="form-check-input") }}
-                                {{ subfield.label(class="form-check-label fw-bold") }}
+                                {{
+                                subfield.label(class="form-check-label fw-bold")
+                                }}
                             </div>
                             {% endfor %}
                         </div>
@@ -93,13 +95,9 @@
                             <div class="col-md-4 mb-3">
                                 {{ form.data_movimento.label(class="form-label")
                                 }}
-                                {# O campo de data será movido para cá pelo JS
-                                #}
                             </div>
                             <div class="col-md-4 mb-3">
                                 {{ form.valor.label(class="form-label") }}
-                                {# O campo de valor será movido para cá pelo JS
-                                #}
                             </div>
                         </div>
                     </div>

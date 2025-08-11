@@ -80,7 +80,7 @@ def adicionar_movimentacao():
 
                 if tipo_transacao.tipo == "Débito":
                     conta_origem.saldo_atual -= valor
-                else:
+                else:  # Crédito
                     conta_origem.saldo_atual += valor
 
             elif tipo_operacao == "transferencia":
@@ -233,18 +233,19 @@ def excluir_movimentacao(id):
         )
         if movimento_relacionado:
             conta_destino = Conta.query.get(movimento_relacionado.conta_id)
-            tipo_destino = ContaTransacao.query.get(
-                movimento_relacionado.conta_transacao_id
-            )
-            if conta_destino and tipo_destino:
-                valor_rel = Decimal(str(movimento_relacionado.valor))
-                if tipo_destino.tipo == "Crédito":
-                    conta_destino.saldo_atual -= valor_rel
-                else:
-                    conta_destino.saldo_atual += valor_rel
+            if conta_destino:
+                conta_destino.saldo_atual -= movimento_relacionado.valor
+
+            movimento_relacionado.id_movimento_relacionado = None
+            movimento.id_movimento_relacionado = None
+            db.session.flush()
+
             db.session.delete(movimento_relacionado)
 
     db.session.delete(movimento)
     db.session.commit()
     flash("Movimentação excluída com sucesso!", "success")
+    current_app.logger.info(
+        f"Movimentação {movimento.id} excluída por {current_user.login}."
+    )
     return redirect(url_for("conta_movimento.listar_movimentacoes"))

@@ -27,7 +27,7 @@
                                 <th>Data Previsão</th>
                                 <th>Salário Líquido</th>
                                 <th>Benefícios</th>
-                                <th>Recebido?</th>
+                                <th class="text-center">Status</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -61,13 +61,13 @@
                                     "%.2f"|format(salario_liquido) }}</td>
                                 <td class="text-info">R$ {{
                                     "%.2f"|format(totais.beneficios) }}</td>
-                                <td>
-                                    {% if movimento.movimento_bancario_id %}
-                                    <i class="fas fa-check-circle text-success"
-                                        title="Sim"></i>
+                                <td class="text-center">
+                                    {% if movimento.status == 'Recebido' %}
+                                    <span class="badge bg-success">{{
+                                        movimento.status }}</span>
                                     {% else %}
-                                    <i class="fas fa-times-circle text-danger"
-                                        title="Não"></i>
+                                    <span class="badge bg-warning text-dark">{{
+                                        movimento.status }}</span>
                                     {% endif %}
                                 </td>
                                 <td class="table-actions">

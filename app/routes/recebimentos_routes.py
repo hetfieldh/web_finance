@@ -50,7 +50,6 @@ def painel():
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
-        # 1. Buscar Salário Líquido pela DATA DE RECEBIMENTO
         salario_movimentos = SalarioMovimento.query.filter(
             SalarioMovimento.usuario_id == current_user.id,
             SalarioMovimento.data_recebimento >= data_inicio_mes,
@@ -86,19 +85,16 @@ def painel():
                     "vencimento": movimento.data_recebimento,
                     "origem": f"Salário Líquido (Ref: {movimento.mes_referencia})",
                     "valor": salario_liquido,
-                    "status": (
-                        "Recebido" if movimento.movimento_bancario_id else "Pendente"
-                    ),
+                    "status": movimento.status,
                     "data_pagamento": data_pagamento,
                     "tipo": "Salário",
                     "id_original": movimento.id,
                 }
             )
             totais["previsto"] += salario_liquido
-            if movimento.movimento_bancario_id:
+            if movimento.status == "Recebido":
                 totais["recebido"] += salario_liquido
 
-        # 2. Buscar Outras Receitas
         outras_receitas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
             .filter(
@@ -185,6 +181,7 @@ def registrar_recebimento():
             elif item_tipo == "Salário":
                 item = SalarioMovimento.query.get(item_id)
                 item.movimento_bancario_id = novo_movimento.id
+                item.status = "Recebido"
 
             db.session.commit()
             flash("Recebimento registrado com sucesso!", "success")
@@ -222,6 +219,7 @@ def estornar_recebimento():
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_id
                 item_a_atualizar.movimento_bancario_id = None
+                item_a_atualizar.status = "Pendente"
 
         if movimento_bancario_id:
             movimento_bancario = ContaMovimento.query.get(movimento_bancario_id)

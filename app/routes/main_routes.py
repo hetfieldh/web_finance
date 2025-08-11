@@ -52,7 +52,7 @@ def dashboard():
     salario_recebido = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == current_user.id,
         SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
-        SalarioMovimento.movimento_bancario_id.isnot(None),
+        SalarioMovimento.status == "Recebido",
     ).first()
     if salario_recebido:
         receitas_realizadas += sum(
@@ -123,7 +123,6 @@ def dashboard():
         .filter(
             DespRecMovimento.usuario_id == current_user.id,
             DespRecMovimento.status == "Pendente",
-            DespRecMovimento.data_vencimento >= hoje,
         )
         .all()
     )
@@ -143,7 +142,6 @@ def dashboard():
     faturas_pendentes = CrediarioFatura.query.filter(
         CrediarioFatura.usuario_id == current_user.id,
         CrediarioFatura.status.in_(["Aberta", "Fechada"]),
-        CrediarioFatura.data_vencimento_fatura >= hoje,
     ).all()
     for fatura in faturas_pendentes:
         proximos_movimentos.append(
@@ -160,7 +158,6 @@ def dashboard():
         FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
         .filter(
             FinanciamentoParcela.status == "A Pagar",
-            FinanciamentoParcela.data_vencimento >= hoje,
             FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
         )
         .all()
@@ -178,8 +175,7 @@ def dashboard():
     # Salários e Benefícios Pendentes de Recebimento
     salarios_pendentes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == current_user.id,
-        SalarioMovimento.movimento_bancario_id.is_(None),
-        SalarioMovimento.data_recebimento >= hoje,
+        SalarioMovimento.status == "Pendente",
     ).all()
     for salario in salarios_pendentes:
         salario_liquido = sum(
