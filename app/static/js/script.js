@@ -210,4 +210,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     toggleMovimentoFields();
   }
+
+  // --- 9. Lógica para o formulário de transferência ---
+  const contaOrigemSelect = document.querySelector("#conta_id");
+  const contaDestinoSelect = document.querySelector("#conta_destino_id");
+
+  if (contaOrigemSelect && contaDestinoSelect) {
+    const atualizarContaDestino = () => {
+      const selectedOrigemId = contaOrigemSelect.value;
+
+      for (const option of contaDestinoSelect.options) {
+        if (option.value === selectedOrigemId && option.value !== "") {
+          option.style.display = "none";
+        } else {
+          option.style.display = "block";
+        }
+      }
+
+      if (contaDestinoSelect.value === selectedOrigemId) {
+        contaDestinoSelect.value = "";
+      }
+    };
+
+    contaOrigemSelect.addEventListener("change", atualizarContaDestino);
+
+    atualizarContaDestino();
+  }
 });
