@@ -20,7 +20,7 @@
                     action="{{ url_for('salario.novo_lancamento_folha') }}">
                     {{ form.csrf_token }}
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             {{ form.mes_referencia.label(class="form-label") }}
                             {{ form.mes_referencia(class="form-select") }}
                             {% if form.mes_referencia.errors %}
@@ -29,7 +29,7 @@
                                     }}</small></div>
                             {% endif %}
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             {{ form.data_recebimento.label(class="form-label")
                             }}
                             {{ form.data_recebimento(class="form-control",

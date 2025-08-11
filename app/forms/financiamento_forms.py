@@ -28,7 +28,12 @@ from app import db
 from app.models.conta_model import Conta
 from app.models.financiamento_model import Financiamento
 
-TIPOS_AMORTIZACAO = [("SAC", "SAC"), ("PRICE", "PRICE"), ("Outro", "Outro")]
+TIPOS_AMORTIZACAO = [
+    ("", "Selecione..."),   
+    ("SAC", "SAC"),
+    ("PRICE", "PRICE"),
+    ("Outro", "Outro"),
+]
 
 
 class CadastroFinanciamentoForm(FlaskForm):
@@ -50,7 +55,7 @@ class CadastroFinanciamentoForm(FlaskForm):
     )
 
     valor_total_financiado = DecimalField(
-        "Valor Total Financiado",
+        "Valor Total",
         validators=[
             InputRequired("O valor total financiado é obrigatório."),
             NumberRange(min=0.01, message="O valor deve ser maior que zero."),
@@ -59,7 +64,7 @@ class CadastroFinanciamentoForm(FlaskForm):
     )
 
     taxa_juros_anual = DecimalField(
-        "Taxa de Juros Anual (%)",
+        "% Juros Anual",
         validators=[
             InputRequired("A taxa de juros é obrigatória."),
             NumberRange(
@@ -87,7 +92,7 @@ class CadastroFinanciamentoForm(FlaskForm):
     )
 
     tipo_amortizacao = SelectField(
-        "Tipo de Amortização",
+        "Amortização",
         choices=TIPOS_AMORTIZACAO,
         validators=[DataRequired("O tipo de amortização é obrigatório.")],
     )

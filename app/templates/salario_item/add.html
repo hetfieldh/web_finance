@@ -17,22 +17,24 @@
                     action="{{ url_for('salario.adicionar_item') }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-3">
-                        {{ form.nome.label(class="form-label") }}
-                        {{ form.nome(class="form-control") }}
-                        {% if form.nome.errors %}
-                        <div class="text-danger mt-1"><small>{{
-                                form.nome.errors[0] }}</small></div>
-                        {% endif %}
-                    </div>
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            {{ form.nome.label(class="form-label") }}
+                            {{ form.nome(class="form-control") }}
+                            {% if form.nome.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.nome.errors[0] }}</small></div>
+                            {% endif %}
+                        </div>
 
-                    <div class="mb-3">
-                        {{ form.tipo.label(class="form-label") }}
-                        {{ form.tipo(class="form-select") }}
-                        {% if form.tipo.errors %}
-                        <div class="text-danger mt-1"><small>{{
-                                form.tipo.errors[0] }}</small></div>
-                        {% endif %}
+                        <div class="col-md-3 mb-3">
+                            {{ form.tipo.label(class="form-label") }}
+                            {{ form.tipo(class="form-select") }}
+                            {% if form.tipo.errors %}
+                            <div class="text-danger mt-1"><small>{{
+                                    form.tipo.errors[0] }}</small></div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="mb-3">

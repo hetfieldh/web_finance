@@ -51,115 +51,80 @@ def adicionar_movimentacao():
     form = CadastroContaMovimentoForm()
 
     if form.validate_on_submit():
+        tipo_operacao = form.tipo_operacao.data
         conta_origem_id = form.conta_id.data
-        tipo_transacao_id = form.conta_transacao_id.data
         data_movimento = form.data_movimento.data
         valor = form.valor.data
         descricao_manual = form.descricao.data.strip() if form.descricao.data else None
-        is_transferencia = form.is_transferencia.data
-        conta_destino_id = form.conta_destino_id.data if is_transferencia else None
 
         conta_origem = db.session.query(Conta).get(conta_origem_id)
-        tipo_transacao = ContaTransacao.query.get(tipo_transacao_id)
-        conta_destino = Conta.query.get(conta_destino_id) if is_transferencia else None
-
-        if not conta_origem or not tipo_transacao:
-            flash("Erro: Conta ou Tipo de Transação inválidos.", "danger")
-            return render_template("conta_movimentos/add.html", form=form)
 
         if valor <= 0:
             flash("O valor da movimentação deve ser maior que zero.", "danger")
             return render_template("conta_movimentos/add.html", form=form)
 
-        valor_decimal = Decimal(str(valor))
-        saldo_origem_decimal = Decimal(str(conta_origem.saldo_atual))
+        try:
+            if tipo_operacao == "simples":
+                tipo_transacao_id = form.conta_transacao_id.data
+                tipo_transacao = ContaTransacao.query.get(tipo_transacao_id)
 
-        if tipo_transacao.tipo == "Débito":
-            tipos_com_limite = ["Corrente", "Digital"]
-            if saldo_origem_decimal < valor_decimal:
-                if conta_origem.tipo in tipos_com_limite and conta_origem.limite:
-                    limite_decimal = Decimal(str(conta_origem.limite))
-                    if (saldo_origem_decimal + limite_decimal) < valor_decimal:
-                        flash("Saldo e limite insuficientes.", "danger")
-                        return render_template("conta_movimentos/add.html", form=form)
-                    else:
-                        flash(
-                            f"Atenção: será utilizado R$ {(valor_decimal - saldo_origem_decimal):.2f} do seu limite.",
-                            "warning",
-                        )
+                movimento = ContaMovimento(
+                    usuario_id=current_user.id,
+                    conta_id=conta_origem_id,
+                    conta_transacao_id=tipo_transacao_id,
+                    data_movimento=data_movimento,
+                    valor=valor,
+                    descricao=descricao_manual,
+                )
+                db.session.add(movimento)
+
+                if tipo_transacao.tipo == "Débito":
+                    conta_origem.saldo_atual -= valor
                 else:
-                    flash("Saldo insuficiente para a movimentação.", "danger")
+                    conta_origem.saldo_atual += valor
+
+            elif tipo_operacao == "transferencia":
+                conta_destino_id = form.conta_destino_id.data
+                transferencia_tipo_id = form.transferencia_tipo_id.data
+
+                conta_destino = Conta.query.get(conta_destino_id)
+                tipo_transacao_debito = ContaTransacao.query.get(transferencia_tipo_id)
+                tipo_transacao_credito = ContaTransacao.query.filter_by(
+                    usuario_id=current_user.id,
+                    transacao_tipo=tipo_transacao_debito.transacao_tipo,
+                    tipo="Crédito",
+                ).first()
+
+                if not tipo_transacao_credito:
+                    flash(
+                        f'Tipo de transação de Crédito correspondente a "{tipo_transacao_debito.transacao_tipo}" não encontrado.',
+                        "danger",
+                    )
                     return render_template("conta_movimentos/add.html", form=form)
 
-        if is_transferencia:
-            if not conta_destino:
-                flash("Conta de destino inválida.", "danger")
-                return render_template("conta_movimentos/add.html", form=form)
-
-            if conta_origem.id == conta_destino.id:
-                flash("A conta de origem e destino devem ser diferentes.", "danger")
-                return render_template("conta_movimentos/add.html", form=form)
-
-            if tipo_transacao.tipo != "Débito":
-                flash(
-                    'Em transferências, a transação de origem deve ser do tipo "Débito".',
-                    "danger",
+                nome_origem = f"{conta_origem.nome_banco} - {conta_origem.conta}"
+                nome_destino = f"{conta_destino.nome_banco} - {conta_destino.conta}"
+                desc_origem = (
+                    f"{tipo_transacao_debito.transacao_tipo} para {nome_destino}"
                 )
-                return render_template("conta_movimentos/add.html", form=form)
-
-            tipo_transacao_credito = ContaTransacao.query.filter_by(
-                usuario_id=current_user.id,
-                transacao_tipo=tipo_transacao.transacao_tipo,
-                tipo="Crédito",
-            ).first()
-
-            if not tipo_transacao_credito:
-                flash(
-                    f'Não foi encontrado o tipo de transação "{tipo_transacao.transacao_tipo}" do tipo "Crédito" na conta de destino.',
-                    "danger",
+                desc_destino = (
+                    f"{tipo_transacao_debito.transacao_tipo} de {nome_origem}"
                 )
-                return render_template("conta_movimentos/add.html", form=form)
-
-        try:
-            descricao_origem = descricao_manual
-            descricao_destino = ""
-
-            if is_transferencia:
-                transacao_nome = tipo_transacao.transacao_tipo
-                nome_conta_origem = f"{conta_origem.nome_banco} - {conta_origem.conta}"
-                nome_conta_destino = (
-                    f"{conta_destino.nome_banco} - {conta_destino.conta}"
-                )
-
-                descricao_origem = f"{transacao_nome} para {nome_conta_destino}"
-                descricao_destino = f"{transacao_nome} recebida de {nome_conta_origem}"
-
                 if descricao_manual:
-                    descricao_origem += f" ({descricao_manual})"
-                    descricao_destino += f" ({descricao_manual})"
+                    desc_origem += f" ({descricao_manual})"
+                    desc_destino += f" ({descricao_manual})"
 
-            movimento_origem = ContaMovimento(
-                usuario_id=current_user.id,
-                conta_id=conta_origem_id,
-                conta_transacao_id=tipo_transacao_id,
-                data_movimento=data_movimento,
-                valor=valor,
-                descricao=descricao_origem,
-            )
-            db.session.add(movimento_origem)
-            db.session.flush()
-
-            db.session.refresh(conta_origem)
-            saldo_origem_atualizado = Decimal(str(conta_origem.saldo_atual))
-
-            if tipo_transacao.tipo == "Débito":
-                conta_origem.saldo_atual = saldo_origem_atualizado - valor_decimal
-            elif tipo_transacao.tipo == "Crédito":
-                conta_origem.saldo_atual = saldo_origem_atualizado + valor_decimal
-
-            if is_transferencia:
-                db.session.refresh(conta_destino)
-                saldo_destino_atualizado = Decimal(str(conta_destino.saldo_atual))
+                movimento_origem = ContaMovimento(
+                    usuario_id=current_user.id,
+                    conta_id=conta_origem_id,
+                    conta_transacao_id=tipo_transacao_debito.id,
+                    data_movimento=data_movimento,
+                    valor=valor,
+                    descricao=desc_origem,
+                )
+                db.session.add(movimento_origem)
+                conta_origem.saldo_atual -= valor
+                db.session.flush()
 
                 movimento_destino = ContaMovimento(
                     usuario_id=current_user.id,
@@ -167,32 +132,25 @@ def adicionar_movimentacao():
                     conta_transacao_id=tipo_transacao_credito.id,
                     data_movimento=data_movimento,
                     valor=valor,
-                    descricao=descricao_destino,
+                    descricao=desc_destino,
                 )
                 db.session.add(movimento_destino)
+                conta_destino.saldo_atual += valor
                 db.session.flush()
-
-                conta_destino.saldo_atual = saldo_destino_atualizado + valor_decimal
 
                 movimento_origem.id_movimento_relacionado = movimento_destino.id
                 movimento_destino.id_movimento_relacionado = movimento_origem.id
 
             db.session.commit()
             flash("Movimentação registrada com sucesso!", "success")
-            current_app.logger.info(
-                f"Movimentação {tipo_transacao.tipo} de R$ {valor:.2f} registrada por {current_user.login}."
-            )
-
             return redirect(url_for("conta_movimento.listar_movimentacoes"))
 
-        except IntegrityError as e:
-            db.session.rollback()
-            current_app.logger.error(f"Erro de integridade: {e}", exc_info=True)
-            flash("Erro ao registrar movimentação. Verifique os dados.", "danger")
         except Exception as e:
             db.session.rollback()
-            current_app.logger.error(f"Erro inesperado: {e}", exc_info=True)
-            flash("Erro inesperado. Tente novamente.", "danger")
+            flash("Ocorreu um erro inesperado. Tente novamente.", "danger")
+            current_app.logger.error(
+                f"Erro ao adicionar movimentação: {e}", exc_info=True
+            )
 
     return render_template("conta_movimentos/add.html", form=form)
 
@@ -203,28 +161,20 @@ def editar_movimentacao(id):
     movimento = ContaMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-
     form = EditarContaMovimentoForm()
-
     if form.validate_on_submit():
         movimento.descricao = (
             form.descricao.data.strip() if form.descricao.data else None
         )
-
         db.session.commit()
         flash("Movimentação atualizada com sucesso!", "success")
-        current_app.logger.info(
-            f"Movimentação {movimento.id} editada por {current_user.login}."
-        )
         return redirect(url_for("conta_movimento.listar_movimentacoes"))
-
     elif request.method == "GET":
         form.conta_id.data = movimento.conta_id
         form.conta_transacao_id.data = movimento.conta_transacao_id
         form.data_movimento.data = movimento.data_movimento
         form.valor.data = movimento.valor
         form.descricao.data = movimento.descricao
-
     return render_template("conta_movimentos/edit.html", form=form, movimento=movimento)
 
 
@@ -271,9 +221,7 @@ def excluir_movimentacao(id):
     tipo_transacao = ContaTransacao.query.get(movimento.conta_transacao_id)
 
     if conta_afetada and tipo_transacao:
-        conta_afetada.saldo_atual = Decimal(str(conta_afetada.saldo_atual))
         valor_decimal = Decimal(str(movimento.valor))
-
         if tipo_transacao.tipo == "Débito":
             conta_afetada.saldo_atual += valor_decimal
         else:
@@ -288,28 +236,15 @@ def excluir_movimentacao(id):
             tipo_destino = ContaTransacao.query.get(
                 movimento_relacionado.conta_transacao_id
             )
-
             if conta_destino and tipo_destino:
-                conta_destino.saldo_atual = Decimal(str(conta_destino.saldo_atual))
                 valor_rel = Decimal(str(movimento_relacionado.valor))
-
                 if tipo_destino.tipo == "Crédito":
                     conta_destino.saldo_atual -= valor_rel
                 else:
                     conta_destino.saldo_atual += valor_rel
-
-            movimento.id_movimento_relacionado = None
-            movimento_relacionado.id_movimento_relacionado = None
-            db.session.add(movimento)
-            db.session.add(movimento_relacionado)
-            db.session.flush()
-
             db.session.delete(movimento_relacionado)
 
     db.session.delete(movimento)
     db.session.commit()
     flash("Movimentação excluída com sucesso!", "success")
-    current_app.logger.info(
-        f"Movimentação {movimento.id} excluída por {current_user.login}."
-    )
     return redirect(url_for("conta_movimento.listar_movimentacoes"))

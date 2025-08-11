@@ -18,25 +18,27 @@
                     action="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_transacao.id) }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
-                        {{ form.transacao_tipo.label(class="form-label") }}
-                        {{ form.transacao_tipo(class="form-control") }}
-                        {% if form.transacao_tipo.errors %}
-                        <div class="text-danger">
-                            {% for error in form.transacao_tipo.errors %}{{
-                            error }}{% endfor %}
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            {{ form.transacao_tipo.label(class="form-label") }}
+                            {{ form.transacao_tipo(class="form-control") }}
+                            {% if form.transacao_tipo.errors %}
+                            <div class="text-danger">
+                                {% for error in form.transacao_tipo.errors %}{{
+                                error }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.tipo.label(class="form-label") }}
-                        {{ form.tipo(class="form-select") }}
-                        {% if form.tipo.errors %}
-                        <div class="text-danger">
-                            {% for error in form.tipo.errors %}{{ error }}{%
-                            endfor %}
+                        <div class="col-md-5 mb-3">
+                            {{ form.tipo.label(class="form-label") }}
+                            {{ form.tipo(class="form-select") }}
+                            {% if form.tipo.errors %}
+                            <div class="text-danger">
+                                {% for error in form.tipo.errors %}{{ error }}{%
+                                endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
                     </div>
                     <div class="mb-3">
                     </div>

@@ -30,7 +30,7 @@ class ExtratoDespRecForm(FlaskForm):
     )
     data_fim = DateField("Data de Fim", format="%Y-%m-%d", validators=[Optional()])
 
-    submit = SubmitField("Filtrar")
+    submit = SubmitField("")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

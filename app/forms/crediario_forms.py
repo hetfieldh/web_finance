@@ -17,6 +17,7 @@ from app import db
 from app.models.crediario_model import Crediario
 
 TIPOS_CREDIARIO = [
+    ("", "Selecione..."),
     ("Cartão Físico", "Cartão Físico"),
     ("Cartão VR", "Cartão VR"),
     ("Cartão VT", "Cartão VT"),

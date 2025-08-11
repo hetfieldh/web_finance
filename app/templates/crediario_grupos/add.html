@@ -18,36 +18,41 @@
                     action="{{ url_for('crediario_grupo.adicionar_grupo_crediario') }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
-                        {{ form.grupo_crediario.label(class="form-label") }}
-                        {{ form.grupo_crediario(class="form-control") }}
-                        {% if form.grupo_crediario.errors %}
-                        <div class="text-danger">
-                            {% for error in form.grupo_crediario.errors %}{{
-                            error }}{% endfor %}
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            {{ form.grupo_crediario.label(class="form-label") }}
+                            {{ form.grupo_crediario(class="form-control") }}
+                            {% if form.grupo_crediario.errors %}
+                            <div class="text-danger">
+                                {% for error in form.grupo_crediario.errors %}{{
+                                error }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
+                        <div class="col-md-5 mb-3">
+                            {{
+                            form.tipo_grupo_crediario.label(class="form-label")
+                            }}
+                            {{ form.tipo_grupo_crediario(class="form-select") }}
+                            {% if form.tipo_grupo_crediario.errors %}
+                            <div class="text-danger">
+                                {% for error in form.tipo_grupo_crediario.errors
+                                %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="mb-1">
-                        {{ form.tipo_grupo_crediario.label(class="form-label")
-                        }}
-                        {{ form.tipo_grupo_crediario(class="form-select") }}
-                        {% if form.tipo_grupo_crediario.errors %}
-                        <div class="text-danger">
-                            {% for error in form.tipo_grupo_crediario.errors
-                            %}{{ error }}{% endfor %}
+                    <div class="row">
+                        <div class="mb-3">
+                            {{ form.descricao.label(class="form-label") }}
+                            {{ form.descricao(class="form-control", rows="3") }}
+                            {% if form.descricao.errors %}
+                            <div class="text-danger">
+                                {% for error in form.descricao.errors %}{{ error
+                                }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.descricao.label(class="form-label") }}
-                        {{ form.descricao(class="form-control", rows="3") }}
-                        {% if form.descricao.errors %}
-                        <div class="text-danger">
-                            {% for error in form.descricao.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
                     <div class="mb-3">
                     </div>

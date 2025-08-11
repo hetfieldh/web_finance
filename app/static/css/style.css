@@ -117,6 +117,10 @@ h6,
     margin-left: 0;
 }
 
+.button-menu {
+    background-color: var(--wf-sidebar-bg);
+    color: var(--wf-text-light)
+}
 
 /* ==========================================================================
    4. ESTILOS DE COMPONENTES

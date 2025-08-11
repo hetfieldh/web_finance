@@ -18,7 +18,7 @@ class ExtratoBancarioForm(FlaskForm):
         "Mês/Ano", validators=[DataRequired("O mês e ano são obrigatórios.")]
     )
 
-    submit = SubmitField("Gerar Extrato")
+    submit = SubmitField("")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

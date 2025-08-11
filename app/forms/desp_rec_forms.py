@@ -31,7 +31,7 @@ from app.models.desp_rec_model import DespRec
 
 class CadastroDespRecForm(FlaskForm):
     nome = StringField(
-        "Nome da Despesa/Receita",
+        "Nome da Despesa ou Receita",
         validators=[
             DataRequired("O nome é obrigatório."),
             Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
@@ -52,7 +52,7 @@ class CadastroDespRecForm(FlaskForm):
         validators=[DataRequired("O tipo é obrigatório.")],
     )
     dia_vencimento = IntegerField(
-        "Dia Padrão de Vencimento (1-31)",
+        "Vencimento Padrão (1-31)",
         validators=[
             Optional(),
             NumberRange(min=1, max=31, message="O dia deve ser entre 1 e 31."),
@@ -85,7 +85,7 @@ class CadastroDespRecForm(FlaskForm):
 
 class EditarDespRecForm(FlaskForm):
     nome = StringField(
-        "Nome da Despesa/Receita",
+        "Nome da Despesa ou Receita",
         render_kw={"readonly": True, "class": "form-control-plaintext"},
     )
     tipo = SelectField(
@@ -99,7 +99,7 @@ class EditarDespRecForm(FlaskForm):
         render_kw={"disabled": True, "class": "form-select"},
     )
     dia_vencimento = IntegerField(
-        "Dia Padrão de Vencimento (1-31)",
+        "Vencimento Padrão (1-31)",
         validators=[
             Optional(),
             NumberRange(min=1, max=31, message="O dia deve ser entre 1 e 31."),
@@ -151,7 +151,7 @@ class GerarPrevisaoForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.desp_rec_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome} ({c.natureza} {c.tipo})")
+            (c.id, f"{c.nome}")
             for c in DespRec.query.filter_by(
                 usuario_id=current_user.id, tipo="Fixa", ativo=True
             )
@@ -216,7 +216,7 @@ class LancamentoUnicoForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.desp_rec_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome} ({c.natureza} {c.tipo})")
+            (c.id, f"{c.nome}")
             for c in DespRec.query.filter_by(
                 usuario_id=current_user.id, ativo=True, tipo="Variável"
             )

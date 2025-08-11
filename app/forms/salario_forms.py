@@ -29,7 +29,7 @@ from wtforms.validators import (
 from app.models.salario_item_model import SalarioItem
 
 TIPOS_SALARIO_ITEM = [
-    ("", "Selecione o Tipo..."),
+    ("", "Selecione..."),
     ("Provento", "Provento"),
     ("Benefício", "Benefício"),
     ("Imposto", "Imposto"),
@@ -39,7 +39,7 @@ TIPOS_SALARIO_ITEM = [
 
 class CadastroSalarioItemForm(FlaskForm):
     nome = StringField(
-        "Nome da Verba",
+        "Verba",
         validators=[
             DataRequired("O nome é obrigatório."),
             Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
@@ -75,7 +75,7 @@ class CadastroSalarioItemForm(FlaskForm):
 
 
 class EditarSalarioItemForm(FlaskForm):
-    nome = StringField("Nome da Verba", render_kw={"readonly": True})
+    nome = StringField("Verba", render_kw={"readonly": True})
     tipo = SelectField("Tipo", choices=TIPOS_SALARIO_ITEM, render_kw={"disabled": True})
 
     descricao = TextAreaField(
@@ -150,7 +150,7 @@ class AdicionarItemFolhaForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.salario_item_id.choices = [("", "Selecione a Verba...")] + [
+        self.salario_item_id.choices = [("", "Selecione...")] + [
             (item.id, f"{item.nome} ({item.tipo})")
             for item in SalarioItem.query.filter_by(
                 usuario_id=current_user.id, ativo=True

@@ -17,6 +17,7 @@ from flask_login import current_user
 from app import db
 
 TIPOS_CONTA = [
+    ("", "Selecione..."),
     ("Corrente", "Corrente"),
     ("Poupança", "Poupança"),
     ("Digital", "Digital"),

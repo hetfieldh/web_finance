@@ -18,7 +18,9 @@
                     action="{{ url_for('conta_transacao.adicionar_tipo_transacao') }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
+
+                <div class="row">
+                    <div class="col-md-7 mb-3">
                         {{ form.transacao_tipo.label(class="form-label") }}
                         {{ form.transacao_tipo(class="form-control") }}
                         {% if form.transacao_tipo.errors %}
@@ -28,7 +30,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                    <div class="col-md-5 mb-3">
                         {{ form.tipo.label(class="form-label") }}
                         {{ form.tipo(class="form-select") }}
                         {% if form.tipo.errors %}
@@ -38,6 +40,7 @@
                         </div>
                         {% endif %}
                     </div>
+                </div>
                     <div class="mb-3">
                     </div>
                     <button type="submit" class="btn btn-success btn-add">

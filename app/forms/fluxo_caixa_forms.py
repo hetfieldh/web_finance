@@ -9,13 +9,11 @@ from wtforms.validators import DataRequired
 
 
 class FluxoCaixaForm(FlaskForm):
-    """Formulário para filtrar o Fluxo de Caixa por Mês/Ano."""
-
     mes_ano = SelectField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
     )
-    submit = SubmitField("Filtrar")
+    submit = SubmitField("")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,7 +35,6 @@ class FluxoCaixaForm(FlaskForm):
             12: "Dezembro",
         }
 
-        # Gera 12 meses passados, o atual, e 12 futuros
         for i in range(-12, 13):
             data_ref = hoje + relativedelta(months=i)
             value = data_ref.strftime("%Y-%m")

@@ -18,58 +18,66 @@
                     action="{{ url_for('financiamento.editar_financiamento', id=financiamento.id) }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
-                        {{ form.nome_financiamento.label(class="form-label") }}
-                        {{ form.nome_financiamento(class="form-control") }}
-                        {% if form.nome_financiamento.errors %}
-                        <div class="text-danger">
-                            {% for error in form.nome_financiamento.errors %}{{
-                            error }}{% endfor %}
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            {{ form.nome_financiamento.label(class="form-label")
+                            }}
+                            {{ form.nome_financiamento(class="form-control") }}
+                            {% if form.nome_financiamento.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nome_financiamento.errors
+                                %}{{
+                                error }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">Conta Bancária</label>
+                            <input type="text" class="form-control"
+                                value="{{ financiamento.conta.nome_banco }} ({{ financiamento.conta.conta }})"
+                                readonly>
+                        </div>
                     </div>
-                    <div class="mb-1">
-                        <label class="form-label">Conta Bancária:</label>
-                        <input type="text" class="form-control"
-                            value="{{ financiamento.conta.nome_banco }} ({{ financiamento.conta.conta }})"
-                            readonly>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Valor Total</label>
+                            <input type="text" class="form-control"
+                                value="R$ {{ '%.2f'|format(financiamento.valor_total_financiado) }}"
+                                readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Saldo Devedor
+                                Atual</label>
+                            <input type="text" class="form-control"
+                                value="R$ {{ '%.2f'|format(financiamento.saldo_devedor_atual) }}"
+                                readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">% Juros Anual</label>
+                            <input type="text" class="form-control"
+                                value="{{ '%.4f'|format(financiamento.taxa_juros_anual) }}%"
+                                readonly>
+                        </div>
                     </div>
-                    <div class="mb-1">
-                        <label class="form-label">Valor Total
-                            Financiado:</label>
-                        <input type="text" class="form-control"
-                            value="R$ {{ '%.2f'|format(financiamento.valor_total_financiado) }}"
-                            readonly>
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label">Saldo Devedor Atual:</label>
-                        <input type="text" class="form-control"
-                            value="R$ {{ '%.2f'|format(financiamento.saldo_devedor_atual) }}"
-                            readonly>
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label">Taxa de Juros Anual
-                            (%):</label>
-                        <input type="text" class="form-control"
-                            value="{{ '%.4f'|format(financiamento.taxa_juros_anual) }}%"
-                            readonly>
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label">Data de Início:</label>
-                        <input type="text" class="form-control"
-                            value="{{ financiamento.data_inicio.strftime('%d/%m/%Y') }}"
-                            readonly>
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label">Prazo (em meses):</label>
-                        <input type="text" class="form-control"
-                            value="{{ financiamento.prazo_meses }}" readonly>
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label">Tipo de Amortização:</label>
-                        <input type="text" class="form-control"
-                            value="{{ financiamento.tipo_amortizacao }}"
-                            readonly>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Data de Início</label>
+                            <input type="text" class="form-control"
+                                value="{{ financiamento.data_inicio.strftime('%d/%m/%Y') }}"
+                                readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Prazo (em meses)</label>
+                            <input type="text" class="form-control"
+                                value="{{ financiamento.prazo_meses }}"
+                                readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Amortização</label>
+                            <input type="text" class="form-control"
+                                value="{{ financiamento.tipo_amortizacao }}"
+                                readonly>
+                        </div>
                     </div>
                     <div class="mb-1">
                         {{ form.descricao.label(class="form-label") }}

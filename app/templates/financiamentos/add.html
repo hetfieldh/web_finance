@@ -17,7 +17,8 @@
                     action="{{ url_for('financiamento.adicionar_financiamento') }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
+                <div class="row">
+                    <div class="col-md-7 mb-3">
                         {{ form.nome_financiamento.label(class="form-label") }}
                         {{ form.nome_financiamento(class="form-control") }}
                         {% if form.nome_financiamento.errors %}
@@ -27,7 +28,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                    <div class="col-md-5 mb-3">
                         {{ form.conta_id.label(class="form-label") }}
                         {{ form.conta_id(class="form-select") }}
                         {% if form.conta_id.errors %}
@@ -37,7 +38,9 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
                         {{ form.valor_total_financiado.label(class="form-label")
                         }}
                         {{ form.valor_total_financiado(class="form-control",
@@ -49,7 +52,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                    <div class="col-md-2 mb-3">
                         {{ form.taxa_juros_anual.label(class="form-label") }}
                         {{ form.taxa_juros_anual(class="form-control",
                         type="number", step="0.0001") }}
@@ -60,7 +63,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                    <div class="col-md-3 mb-3">
                         {{ form.data_inicio.label(class="form-label") }}
                         {{ form.data_inicio(class="form-control", type="date")
                         }}
@@ -71,7 +74,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                    <div class="col-md-2 mb-3">
                         {{ form.prazo_meses.label(class="form-label") }}
                         {{ form.prazo_meses(class="form-control", type="number",
                         min="1") }}
@@ -82,7 +85,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-1">
+                    <div class="col-md-2 mb-3">
                         {{ form.tipo_amortizacao.label(class="form-label") }}
                         {{ form.tipo_amortizacao(class="form-select") }}
                         {% if form.tipo_amortizacao.errors %}
@@ -92,6 +95,7 @@
                         </div>
                         {% endif %}
                     </div>
+                </div>
                     <div class="mb-1">
                         {{ form.descricao.label(class="form-label") }}
                         {{ form.descricao(class="form-control", rows="3") }}

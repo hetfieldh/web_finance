@@ -8,7 +8,8 @@ from wtforms import (
     BooleanField,
     DateField,
     DecimalField,
-    IntegerField,
+    HiddenField,
+    RadioField,
     SelectField,
     StringField,
     SubmitField,
@@ -30,25 +31,27 @@ from app.models.conta_transacao_model import ContaTransacao
 
 
 class CadastroContaMovimentoForm(FlaskForm):
+    tipo_operacao = RadioField(
+        "Tipo de Operação",
+        choices=[
+            ("simples", "Tradicional"),
+            ("transferencia", "Transferência Inter Contas"),
+        ],
+        default="simples",
+        validators=[DataRequired()],
+    )
+
     conta_id = SelectField(
-        "Conta Bancária (Origem)",
-        validators=[DataRequired("A conta bancária é obrigatória.")],
+        "Conta Bancária",
+        validators=[DataRequired("A conta é obrigatória.")],
         coerce=lambda x: int(x) if x else None,
     )
-
-    conta_transacao_id = SelectField(
-        "Tipo de Transação",
-        validators=[DataRequired("O tipo de transação é obrigatória.")],
-        coerce=lambda x: int(x) if x else None,
-    )
-
     data_movimento = DateField(
-        "Data da Movimentação",
+        "Data",
         format="%Y-%m-%d",
-        validators=[DataRequired("A data da movimentação é obrigatória.")],
+        validators=[DataRequired("A data é obrigatória.")],
         default=date.today(),
     )
-
     valor = DecimalField(
         "Valor",
         validators=[
@@ -57,7 +60,6 @@ class CadastroContaMovimentoForm(FlaskForm):
         ],
         places=2,
     )
-
     descricao = TextAreaField(
         "Descrição (opcional)",
         validators=[
@@ -66,10 +68,19 @@ class CadastroContaMovimentoForm(FlaskForm):
         ],
     )
 
-    is_transferencia = BooleanField("Transferência entre contas?")
+    conta_transacao_id = SelectField(
+        "Tipo de Transação",
+        validators=[Optional()],
+        coerce=lambda x: int(x) if x else None,
+    )
 
     conta_destino_id = SelectField(
-        "Conta de Destino",
+        "Conta Destino",
+        validators=[Optional()],
+        coerce=lambda x: int(x) if x else None,
+    )
+    transferencia_tipo_id = SelectField(
+        "Tipo de Transferência",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
     )
@@ -78,48 +89,61 @@ class CadastroContaMovimentoForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.conta_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_banco} - {c.tipo} ({c.saldo_atual})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+        contas_ativas = (
+            Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Conta.nome_banco.asc())
             .all()
+        )
+
+        self.conta_id.choices = [("", "Selecione...")] + [
+            (c.id, f"{c.nome_banco} - {c.conta} ({c.tipo})") for c in contas_ativas
         ]
+        self.conta_destino_id.choices = self.conta_id.choices
+
         self.conta_transacao_id.choices = [("", "Selecione...")] + [
-            (str(ct.id), f"{ct.transacao_tipo} ({ct.tipo})")
+            (ct.id, f"{ct.transacao_tipo} ({ct.tipo})")
             for ct in ContaTransacao.query.filter_by(usuario_id=current_user.id)
             .order_by(ContaTransacao.transacao_tipo.asc())
             .all()
         ]
 
-        self.conta_destino_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_banco} - {c.tipo} ({c.saldo_atual})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Conta.nome_banco.asc())
+        self.transferencia_tipo_id.choices = [("", "Selecione...")] + [
+            (ct.id, f"{ct.transacao_tipo}")
+            for ct in ContaTransacao.query.filter_by(
+                usuario_id=current_user.id, tipo="Débito"
+            )
+            .order_by(ContaTransacao.transacao_tipo.asc())
             .all()
         ]
 
-    def validate_is_transferencia(self, field):
-        if field.data:
+    def validate(self, extra_validators=None):
+        initial_validation = super().validate(extra_validators)
+        if not initial_validation:
+            return False
+
+        if self.tipo_operacao.data == "simples":
+            if not self.conta_transacao_id.data:
+                self.conta_transacao_id.errors.append(
+                    "O tipo de transação é obrigatório."
+                )
+                return False
+
+        elif self.tipo_operacao.data == "transferencia":
             if not self.conta_destino_id.data:
-                raise ValidationError(
-                    "A conta de destino é obrigatória para transferências."
+                self.conta_destino_id.errors.append("A conta de destino é obrigatória.")
+                return False
+            if not self.transferencia_tipo_id.data:
+                self.transferencia_tipo_id.errors.append(
+                    "O tipo de transferência é obrigatório."
                 )
-
+                return False
             if self.conta_id.data == self.conta_destino_id.data:
-                raise ValidationError(
-                    "A conta de origem e a conta de destino não podem ser a mesma."
+                self.conta_destino_id.errors.append(
+                    "A conta de destino não pode ser a mesma que a de origem."
                 )
+                return False
 
-            tipo_transacao_selecionado = ContaTransacao.query.get(
-                self.conta_transacao_id.data
-            )
-            if (
-                tipo_transacao_selecionado
-                and tipo_transacao_selecionado.tipo != "Débito"
-            ):
-                raise ValidationError(
-                    'Para transferências, o tipo de movimento da transação deve ser "Débito".'
-                )
+        return True
 
 
 class EditarContaMovimentoForm(FlaskForm):
@@ -129,28 +153,24 @@ class EditarContaMovimentoForm(FlaskForm):
         coerce=lambda x: int(x) if x else None,
         render_kw={"disabled": True},
     )
-
     conta_transacao_id = SelectField(
         "Tipo de Transação",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
         render_kw={"disabled": True},
     )
-
     data_movimento = DateField(
-        "Data da Movimentação",
+        "Data",
         format="%Y-%m-%d",
         validators=[Optional()],
         render_kw={"readonly": True},
     )
-
     valor = DecimalField(
         "Valor",
         validators=[Optional()],
         places=2,
         render_kw={"readonly": True},
     )
-
     descricao = TextAreaField(
         "Descrição",
         validators=[
@@ -158,7 +178,6 @@ class EditarContaMovimentoForm(FlaskForm):
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
         ],
     )
-
     submit = SubmitField("Atualizar")
 
     def __init__(self, *args, **kwargs):

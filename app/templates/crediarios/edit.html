@@ -18,54 +18,63 @@
                     action="{{ url_for('crediario.editar_crediario', id=crediario.id) }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
-                        {{ form.nome_crediario.label(class="form-label") }}
-                        {{ form.nome_crediario(class="form-control") }}
-                        {% if form.nome_crediario.errors %}
-                        <div class="text-danger">
-                            {% for error in form.nome_crediario.errors %}{{
-                            error }}{% endfor %}
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            {{ form.nome_crediario.label(class="form-label") }}
+                            {{ form.nome_crediario(class="form-control") }}
+                            {% if form.nome_crediario.errors %}
+                            <div class="text-danger">
+                                {% for error in form.nome_crediario.errors %}{{
+                                error }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
+                        <div class="col-md-5 mb-3">
+                            {{ form.tipo_crediario.label(class="form-label") }}
+                            {{ form.tipo_crediario(class="form-select") }}
+                            {% if form.tipo_crediario.errors %}
+                            <div class="text-danger">
+                                {% for error in form.tipo_crediario.errors %}{{
+                                error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="mb-1">
-                        {{ form.tipo_crediario.label(class="form-label") }}
-                        {{ form.tipo_crediario(class="form-select") }}
-                        {% if form.tipo_crediario.errors %}
-                        <div class="text-danger">
-                            {% for error in form.tipo_crediario.errors %}{{
-                            error }}{% endfor %}
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            {{
+                            form.identificador_final.label(class="form-label")
+                            }}
+                            {{ form.identificador_final(class="form-control",
+                            placeholder="Opcional") }}
+                            {% if form.identificador_final.errors %}
+                            <div class="text-danger">
+                                {% for error in form.identificador_final.errors
+                                %}{{
+                                error }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.identificador_final.label(class="form-label") }}
-                        {{ form.identificador_final(class="form-control",
-                        placeholder="Opcional") }}
-                        {% if form.identificador_final.errors %}
-                        <div class="text-danger">
-                            {% for error in form.identificador_final.errors %}{{
-                            error }}{% endfor %}
+                        <div class="col-md-3 mb-3">
+                            {{ form.limite_total.label(class="form-label") }}
+                            {{ form.limite_total(class="form-control",
+                            type="number", step="0.01") }}
+                            {% if form.limite_total.errors %}
+                            <div class="text-danger">
+                                {% for error in form.limite_total.errors %}{{
+                                error
+                                }}{% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.limite_total.label(class="form-label") }}
-                        {{ form.limite_total(class="form-control",
-                        type="number", step="0.01") }}
-                        {% if form.limite_total.errors %}
-                        <div class="text-danger">
-                            {% for error in form.limite_total.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
                     <div class="mb-1 form-check">
                         {{ form.ativa.label(class="form-label") }}
                         {{ form.ativa(class="form-check-input") }}
                         {% if form.ativa.errors %}
                         <div class="text-danger">
-                            {% for error in form.ativa.errors %}{{ error }}{%
+                            {% for error in form.ativa.errors %}{{ error
+                            }}{%
                             endfor %}
                         </div>
                         {% endif %}

@@ -9,6 +9,7 @@ from app import db
 from app.models.crediario_grupo_model import CrediarioGrupo
 
 TIPOS_GRUPO_CREDIARIO = [
+    ("", "Selecione..."),
     ("Compra", "Compra"),
     ("Estorno", "Estorno"),
     ("Ajuste", "Ajuste"),

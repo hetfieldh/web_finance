@@ -2,7 +2,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}eb Finance - Lançamentos{% endblock %}
+{% block title %}Web Finance - Lançamentos{% endblock %}
 {% block page_title %}Adicionar Lançamento Bancário{% endblock %}
 
 {% block content %}
@@ -17,92 +17,102 @@
                     action="{{ url_for('conta_movimento.adicionar_movimentacao') }}">
                     {{ form.csrf_token }}
 
-                    <div class="mb-1">
-                        {{ form.conta_id.label(class="form-label") }}
-                        {{ form.conta_id(class="form-select") }}
-                        {% if form.conta_id.errors %}
-                        <div class="text-danger">
-                            {% for error in form.conta_id.errors %}{{ error }}{%
-                            endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.conta_transacao_id.label(class="form-label") }}
-                        {{ form.conta_transacao_id(class="form-select") }}
-                        {% if form.conta_transacao_id.errors %}
-                        <div class="text-danger">
-                            {% for error in form.conta_transacao_id.errors %}{{
-                            error }}{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.data_movimento.label(class="form-label") }}
-                        {{ form.data_movimento(class="form-control",
-                        type="date") }}
-                        {% if form.data_movimento.errors %}
-                        <div class="text-danger">
-                            {% for error in form.data_movimento.errors %}{{
-                            error }}{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.valor.label(class="form-label") }}
-                        {{ form.valor(class="form-control", type="number",
-                        step="0.01") }}
-                        {% if form.valor.errors %}
-                        <div class="text-danger">
-                            {% for error in form.valor.errors %}{{ error }}{%
-                            endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-1">
-                        {{ form.descricao.label(class="form-label") }}
-                        {{ form.descricao(class="form-control", rows="3") }}
-                        {% if form.descricao.errors %}
-                        <div class="text-danger">
-                            {% for error in form.descricao.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-1 form-check"
-                        id="is_transferencia_field_container"
-                        style="display: none;">
-                        {{ form.is_transferencia.label(class="form-label") }}
-                        {{ form.is_transferencia(class="form-check-input") }}
-                        {% if form.is_transferencia.errors %}
-                        <div class="text-danger">
-                            {% for error in form.is_transferencia.errors %}{{
-                            error }}{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-1" id="conta_destino_field"
-                        style="display: none;">
-                        {{ form.conta_destino_id.label(class="form-label") }}
-                        {{ form.conta_destino_id(class="form-select") }}
-                        {% if form.conta_destino_id.errors %}
-                        <div class="text-danger">
-                            {% for error in form.conta_destino_id.errors %}{{
-                            error }}{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
                     <div class="mb-3">
+                        <label class="form-label">{{ form.tipo_operacao.label
+                            }}</label>
+                        <div class="d-flex gap-3">
+                            {% for subfield in form.tipo_operacao %}
+                            <div class="form-check">
+                                {{ subfield(class="form-check-input") }}
+                                {{ subfield.label(class="form-check-label fw-bold") }}
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-success btn-add">
-                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
-                    </button>
-                    <a
-                        href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
-                        class="btn btn-secondary btn-add">Cancelar</a>
+
+                    <hr>
+
+                    <!-- Bloco para Movimentação Simples -->
+                    <div id="movimentacao_simples_fields">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.conta_id.label(class="form-label",
+                                text="Conta Bancária") }}
+                                {{ form.conta_id(class="form-select") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{
+                                form.conta_transacao_id.label(class="form-label")
+                                }}
+                                {{ form.conta_transacao_id(class="form-select")
+                                }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.data_movimento.label(class="form-label")
+                                }}
+                                {{ form.data_movimento(class="form-control",
+                                type="date") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.valor.label(class="form-label") }}
+                                {{ form.valor(class="form-control",
+                                type="number", step="0.01") }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.descricao.label(class="form-label") }}
+                            {{ form.descricao(class="form-control", rows="3") }}
+                        </div>
+                    </div>
+
+                    <!-- Bloco para Transferência entre Contas -->
+                    <div id="transferencia_fields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.conta_id.label(class="form-label",
+                                text="Conta Origem") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{
+                                form.conta_destino_id.label(class="form-label")
+                                }}
+                                {{ form.conta_destino_id(class="form-select") }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{
+                                form.transferencia_tipo_id.label(class="form-label")
+                                }}
+                                {{
+                                form.transferencia_tipo_id(class="form-select")
+                                }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.data_movimento.label(class="form-label")
+                                }}
+                                {# O campo de data será movido para cá pelo JS
+                                #}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.valor.label(class="form-label") }}
+                                {# O campo de valor será movido para cá pelo JS
+                                #}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a
+                            href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

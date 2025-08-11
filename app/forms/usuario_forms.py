@@ -67,7 +67,7 @@ class CadastroUsuarioForm(FlaskForm):
         ],
     )
     login = StringField(
-        "Login (Nome de Usuário)",
+        "Login/Usuário",
         validators=[
             DataRequired("O campo login é obrigatório."),
             Length(min=4, max=20, message="O login deve ter entre 4 e 20 caracteres."),
@@ -142,7 +142,7 @@ class EditarUsuarioForm(FlaskForm):
         ],
     )
     login = StringField(
-        "Login (Nome de Usuário)",
+        "Login/Usuário",
         validators=[
             DataRequired("O campo login é obrigatório."),
             Length(min=4, max=20, message="O login deve ter entre 4 e 20 caracteres."),

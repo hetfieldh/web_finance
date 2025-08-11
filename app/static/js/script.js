@@ -13,82 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 2. Scripts para formulário de movimentação de conta ---
-  const contaTransacaoSelect = document.getElementById("conta_transacao_id");
-  const isTransferenciaCheckboxContainer = document.getElementById(
-    "is_transferencia_field_container"
-  );
-  const isTransferenciaCheckbox = document.getElementById("is_transferencia");
-  const contaDestinoField = document.getElementById("conta_destino_field");
-  const contaOrigemSelect = document.getElementById("conta_id");
-  const contaDestinoSelect = document.getElementById("conta_destino_id");
-
-  // Lógica de visibilidade dos campos de transferência
-  if (
-    contaTransacaoSelect &&
-    isTransferenciaCheckboxContainer &&
-    isTransferenciaCheckbox &&
-    contaDestinoField
-  ) {
-    const tipoMovimentoMap = {};
-    Array.from(contaTransacaoSelect.options).forEach((option) => {
-      const match = option.textContent.match(/\((Crédito|Débito)\)/);
-      if (match) {
-        tipoMovimentoMap[option.value] = match[1];
-      }
-    });
-
-    function updateTransferenciaFieldsVisibility() {
-      const selectedTransacaoId = contaTransacaoSelect.value;
-      const tipoMovimento = tipoMovimentoMap[selectedTransacaoId];
-
-      if (tipoMovimento === "Débito") {
-        isTransferenciaCheckboxContainer.style.display = "block";
-        if (isTransferenciaCheckbox.checked) {
-          contaDestinoField.style.display = "block";
-        } else {
-          contaDestinoField.style.display = "none";
-        }
-      } else {
-        isTransferenciaCheckboxContainer.style.display = "none";
-        contaDestinoField.style.display = "none";
-        isTransferenciaCheckbox.checked = false;
-      }
-    }
-
-    contaTransacaoSelect.addEventListener(
-      "change",
-      updateTransferenciaFieldsVisibility
-    );
-    isTransferenciaCheckbox.addEventListener(
-      "change",
-      updateTransferenciaFieldsVisibility
-    );
-    updateTransferenciaFieldsVisibility();
-  }
-
-  // Lógica para desabilitar a conta de origem na lista de destino
-  if (contaOrigemSelect && contaDestinoSelect) {
-    function atualizarContaDestino() {
-      const selectedOrigemId = contaOrigemSelect.value;
-
-      for (const option of contaDestinoSelect.options) {
-        if (option.value === selectedOrigemId && option.value !== "") {
-          option.style.display = "none";
-          if (contaDestinoSelect.value === selectedOrigemId) {
-            contaDestinoSelect.value = "";
-          }
-        } else {
-          option.style.display = "";
-        }
-      }
-    }
-
-    contaOrigemSelect.addEventListener("change", atualizarContaDestino);
-    atualizarContaDestino(); // Define o estado inicial
-  }
-
-  // --- 3. Script para inicializar tooltips do Bootstrap ---
+  // --- 2. Script para inicializar tooltips do Bootstrap ---
   var tooltipTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="tooltip"]')
   );
@@ -96,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 
-  // --- 4. Script para exibir a data atual no Dashboard ---
+  // --- 3. Script para exibir a data atual no Dashboard ---
   const dataAtual = new Date();
   const opcoes = {
     weekday: "long",
@@ -108,17 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
     dataAtual
   );
   const elementoDataAtual = document.getElementById("data-atual");
-
   if (elementoDataAtual) {
     const frase =
       formatoElegante.charAt(0).toUpperCase() + formatoElegante.slice(1);
     elementoDataAtual.innerText = frase;
   }
 
-  // --- 5. Lógica para o Botão "Voltar ao Topo" ---
+  // --- 4. Lógica para o Botão "Voltar ao Topo" ---
   const backToTopButton = document.getElementById("back-to-top-btn");
   const scrollContainer = document.getElementById("page-content-wrapper");
-
   if (backToTopButton && scrollContainer) {
     scrollContainer.addEventListener("scroll", () => {
       if (scrollContainer.scrollTop > 200) {
@@ -127,17 +50,13 @@ document.addEventListener("DOMContentLoaded", () => {
         backToTopButton.style.display = "none";
       }
     });
-
     backToTopButton.addEventListener("click", (e) => {
       e.preventDefault();
-      scrollContainer.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
 
-  // --- 6. Script para formulário dinâmico da Folha de Pagamento ---
+  // --- 5. Script para formulário dinâmico da Folha de Pagamento ---
   const formLancamento = document.getElementById("form-lancamento-folha");
   if (formLancamento) {
     const itensContainer = document.getElementById("itens-container");
@@ -172,10 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
           /__prefix__/g,
           currentIndex
         );
-
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = newRowHtml;
-
         itensContainer.appendChild(tempDiv.firstElementChild);
       });
     }
@@ -194,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 7. Script para Modal de Pagamento ---
+  // --- 6. Script para Modal de Pagamento ---
   const pagamentoModal = document.getElementById("pagamentoModal");
   if (pagamentoModal) {
     pagamentoModal.addEventListener("show.bs.modal", function (event) {
@@ -203,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const itemTipo = button.getAttribute("data-item-tipo");
       const itemValor = button.getAttribute("data-item-valor");
       const itemDescricao = button.getAttribute("data-item-descricao");
-
       const modal = this;
       modal.querySelector("#item_id").value = itemId;
       modal.querySelector("#item_tipo").value = itemTipo;
@@ -212,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 8. Script para Modal de Recebimento ---
+  // --- 7. Script para Modal de Recebimento ---
   const recebimentoModal = document.getElementById("recebimentoModal");
   if (recebimentoModal) {
     recebimentoModal.addEventListener("show.bs.modal", function (event) {
@@ -222,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const itemValor = button.getAttribute("data-item-valor");
       const itemDescricao = button.getAttribute("data-item-descricao");
       const itemData = button.getAttribute("data-item-data");
-
       const modal = this;
       modal.querySelector("#item_id").value = itemId;
       modal.querySelector("#item_tipo").value = itemTipo;
@@ -230,5 +145,69 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.querySelector("#item_descricao").value = itemDescricao;
       modal.querySelector("#data_recebimento").value = itemData;
     });
+  }
+
+  // --- 8. Script para seleção do tipo de movimentação bancária ---
+  const tipoOperacaoRadios = document.querySelectorAll(
+    'input[name="tipo_operacao"]'
+  );
+  const simplesFields = document.getElementById("movimentacao_simples_fields");
+  const transferenciaFields = document.getElementById("transferencia_fields");
+  const descricaoFieldContainer = document.getElementById(
+    "descricao_field_container"
+  );
+
+  const contaIdField = document.querySelector(
+    'label[for="conta_id"]'
+  ).nextElementSibling;
+  const dataMovimentoField = document.querySelector(
+    'label[for="data_movimento"]'
+  ).nextElementSibling;
+  const valorField =
+    document.querySelector('label[for="valor"]').nextElementSibling;
+
+  function toggleMovimentoFields() {
+    const selectedValue = document.querySelector(
+      'input[name="tipo_operacao"]:checked'
+    ).value;
+
+    if (selectedValue === "simples") {
+      if (simplesFields) simplesFields.style.display = "block";
+      if (transferenciaFields) transferenciaFields.style.display = "none";
+      if (descricaoFieldContainer)
+        descricaoFieldContainer.style.display = "block";
+
+      simplesFields
+        .querySelector(".row:nth-of-type(1) .col-md-6:nth-of-type(1)")
+        .appendChild(contaIdField);
+      simplesFields
+        .querySelector(".row:nth-of-type(2) .col-md-6:nth-of-type(1)")
+        .appendChild(dataMovimentoField);
+      simplesFields
+        .querySelector(".row:nth-of-type(2) .col-md-6:nth-of-type(2)")
+        .appendChild(valorField);
+    } else {
+      if (simplesFields) simplesFields.style.display = "none";
+      if (transferenciaFields) transferenciaFields.style.display = "block";
+      if (descricaoFieldContainer)
+        descricaoFieldContainer.style.display = "none";
+
+      transferenciaFields
+        .querySelector(".row:nth-of-type(1) .col-md-6:nth-of-type(1)")
+        .appendChild(contaIdField);
+      transferenciaFields
+        .querySelector(".row:nth-of-type(2) .col-md-4:nth-of-type(2)")
+        .appendChild(dataMovimentoField);
+      transferenciaFields
+        .querySelector(".row:nth-of-type(2) .col-md-4:nth-of-type(3)")
+        .appendChild(valorField);
+    }
+  }
+
+  if (tipoOperacaoRadios.length > 0) {
+    tipoOperacaoRadios.forEach((radio) => {
+      radio.addEventListener("change", toggleMovimentoFields);
+    });
+    toggleMovimentoFields();
   }
 });
