@@ -1,6 +1,7 @@
 <!-- app/templates/extratos/desp_rec.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Extrato Desp/Rec{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
@@ -8,7 +9,6 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- Card de Filtros -->
         <div class="card shadow-sm mb-2">
             <div class="card-body">
                 <form method="POST"
@@ -16,41 +16,27 @@
                     {{ form.csrf_token }}
                     <div class="row align-items-end">
                         <div class="col-md-2">
-                            {{ form.tipo_relatorio.label(class="form-label") }}
-                            {{
-                            form.tipo_relatorio(class="form-select form-select-sm",
-                            id="tipo_relatorio") }}
+                            {{ render_field(form.tipo_relatorio, attrs={'id':
+                            'tipo_relatorio'}) }}
                         </div>
 
-                        <!-- Filtros para Visão Mensal -->
                         <div class="col-md-2" id="filtro_mensal">
-                            {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select form-select-sm")
-                            }}
+                            {{ render_field(form.mes_ano) }}
                         </div>
 
-                        <!-- Filtros para Análise por Período -->
                         <div class="col-md-2" id="filtro_conta"
                             style="display: none;">
-                            {{ form.desp_rec_id.label(class="form-label") }}
-                            {{
-                            form.desp_rec_id(class="form-select form-select-sm")
-                            }}
+                            {{ render_field(form.desp_rec_id) }}
                         </div>
                         <div class="col-md-2" id="filtro_data_inicio"
                             style="display: none;">
-                            {{ form.data_inicio.label(class="form-label") }}
-                            {{
-                            form.data_inicio(class="form-control form-control-sm",
-                            type="date") }}
+                            {{ render_field(form.data_inicio, attrs={'type':
+                            'date'}) }}
                         </div>
                         <div class="col-md-2" id="filtro_data_fim"
                             style="display: none;">
-                            {{ form.data_fim.label(class="form-label") }}
-                            {{
-                            form.data_fim(class="form-control form-control-sm",
-                            type="date")
-                            }}
+                            {{ render_field(form.data_fim, attrs={'type':
+                            'date'}) }}
                         </div>
 
                         <div class="col-md-2">
@@ -65,7 +51,6 @@
             </div>
         </div>
 
-        <!-- Card da Tabela de Resultados -->
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">
                 <h6 class="mb-0"><i class="fas fa-list-ul me-2"></i>Lançamentos

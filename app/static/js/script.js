@@ -147,73 +147,93 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 8. Script para seleção do tipo de movimentação bancária ---
-  const tipoOperacaoRadios = document.querySelectorAll(
-    'input[name="tipo_operacao"]'
-  );
-  const simplesFields = document.getElementById("movimentacao_simples_fields");
-  const transferenciaFields = document.getElementById("transferencia_fields");
-  const descricaoFieldContainer = document.getElementById(
-    "descricao_field_container"
-  );
+  // --- 8. Lógica para formulário dinâmico de Lançamento Bancário ---
+  const formMovimentacao = document.getElementById("form-movimentacao");
+  if (formMovimentacao) {
+    // Campos que serão movidos
+    const contaId = document.getElementById("container-conta_id");
+    const dataMovimento = document.getElementById("container-data_movimento");
+    const valor = document.getElementById("container-valor");
+    const descricao = document.getElementById("container-descricao");
 
-  const contaIdField = document.querySelector(
-    'label[for="conta_id"]'
-  ).nextElementSibling;
-  const dataMovimentoField = document.querySelector(
-    'label[for="data_movimento"]'
-  ).nextElementSibling;
-  const valorField =
-    document.querySelector('label[for="valor"]').nextElementSibling;
+    // Containers (placeholders) de destino
+    const simplesFields = document.getElementById(
+      "movimentacao_simples_fields"
+    );
+    const transferenciaFields = document.getElementById("transferencia_fields");
 
-  function toggleMovimentoFields() {
-    const selectedValue = document.querySelector(
-      'input[name="tipo_operacao"]:checked'
-    ).value;
+    // Placeholders
+    const placeholders = {
+      simples: {
+        conta_id: document.getElementById("placeholder-simples-conta_id"),
+        data_movimento: document.getElementById(
+          "placeholder-simples-data_movimento"
+        ),
+        valor: document.getElementById("placeholder-simples-valor"),
+        descricao: document.getElementById("placeholder-simples-descricao"),
+      },
+      transferencia: {
+        conta_id: document.getElementById("placeholder-transf-conta_origem"),
+        data_movimento: document.getElementById(
+          "placeholder-transf-data_movimento"
+        ),
+        valor: document.getElementById("placeholder-transf-valor"),
+        descricao: document.getElementById("placeholder-transf-descricao"),
+      },
+    };
 
-    if (selectedValue === "simples") {
-      if (simplesFields) simplesFields.style.display = "block";
-      if (transferenciaFields) transferenciaFields.style.display = "none";
-      if (descricaoFieldContainer)
-        descricaoFieldContainer.style.display = "block";
+    function moverCampos() {
+      const tipoSelecionado = formMovimentacao.querySelector(
+        'input[name="tipo_operacao"]:checked'
+      ).value;
 
-      simplesFields
-        .querySelector(".row:nth-of-type(1) .col-md-6:nth-of-type(1)")
-        .appendChild(contaIdField);
-      simplesFields
-        .querySelector(".row:nth-of-type(2) .col-md-6:nth-of-type(1)")
-        .appendChild(dataMovimentoField);
-      simplesFields
-        .querySelector(".row:nth-of-type(2) .col-md-6:nth-of-type(2)")
-        .appendChild(valorField);
-    } else {
-      if (simplesFields) simplesFields.style.display = "none";
-      if (transferenciaFields) transferenciaFields.style.display = "block";
-      if (descricaoFieldContainer)
-        descricaoFieldContainer.style.display = "none";
+      if (tipoSelecionado === "simples") {
+        simplesFields.style.display = "block";
+        transferenciaFields.style.display = "none";
 
-      transferenciaFields
-        .querySelector(".row:nth-of-type(1) .col-md-6:nth-of-type(1)")
-        .appendChild(contaIdField);
-      transferenciaFields
-        .querySelector(".row:nth-of-type(2) .col-md-4:nth-of-type(2)")
-        .appendChild(dataMovimentoField);
-      transferenciaFields
-        .querySelector(".row:nth-of-type(2) .col-md-4:nth-of-type(3)")
-        .appendChild(valorField);
+        // Move os campos para a seção "Simples"
+        placeholders.simples.conta_id.appendChild(contaId);
+        placeholders.simples.data_movimento.appendChild(dataMovimento);
+        placeholders.simples.valor.appendChild(valor);
+        placeholders.simples.descricao.appendChild(descricao);
+
+        // Renomeia a label da conta para o contexto correto
+        contaId.querySelector("label").textContent = "Conta Bancária";
+        descricao.querySelector("label").textContent = "Descrição (opcional)";
+      } else {
+        // Transferência
+        simplesFields.style.display = "none";
+        transferenciaFields.style.display = "block";
+
+        // Move os campos para a seção "Transferência"
+        placeholders.transferencia.conta_id.appendChild(contaId);
+        placeholders.transferencia.data_movimento.appendChild(dataMovimento);
+        placeholders.transferencia.valor.appendChild(valor);
+        placeholders.transferencia.descricao.appendChild(descricao);
+
+        // Renomeia a label da conta para o contexto correto
+        contaId.querySelector("label").textContent = "Conta Origem";
+        descricao.querySelector("label").textContent =
+          "Descrição da Transferência (opcional)";
+      }
     }
+
+    // Adiciona o listener para os botões de rádio
+    formMovimentacao
+      .querySelectorAll('input[name="tipo_operacao"]')
+      .forEach((radio) => {
+        radio.addEventListener("change", moverCampos);
+      });
+
+    // Executa a função uma vez no carregamento da página
+    moverCampos();
   }
 
-  if (tipoOperacaoRadios.length > 0) {
-    tipoOperacaoRadios.forEach((radio) => {
-      radio.addEventListener("change", toggleMovimentoFields);
-    });
-    toggleMovimentoFields();
-  }
-
-  // --- 9. Lógica para o formulário de transferência ---
-  const contaOrigemSelect = document.querySelector("#conta_id");
-  const contaDestinoSelect = document.querySelector("#conta_destino_id");
+  // --- 9. Lógica para o formulário de transferência (evitar conta de destino igual à origem) ---
+  const contaOrigemSelect = document.querySelector("#conta_id select");
+  const contaDestinoSelect = document.querySelector(
+    "#transferencia_fields select[name='conta_destino_id']"
+  );
 
   if (contaOrigemSelect && contaDestinoSelect) {
     const atualizarContaDestino = () => {

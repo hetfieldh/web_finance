@@ -124,13 +124,13 @@ class GerarPrevisaoForm(FlaskForm):
         places=2,
     )
     data_inicio = DateField(
-        "Mês/Ano da Primeira Parcela",
+        "1º Vencimento",
         format="%Y-%m-%d",
         validators=[DataRequired("A data de início é obrigatória.")],
         default=date.today,
     )
     numero_meses = IntegerField(
-        "Gerar por Quantos Meses?",
+        "Quant. Meses?",
         validators=[
             InputRequired("O número de meses é obrigatório."),
             NumberRange(

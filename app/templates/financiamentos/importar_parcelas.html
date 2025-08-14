@@ -1,6 +1,7 @@
 <!-- app/templates/financiamentos/importar_parcelas.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Financiamentos{% endblock %}
 {% block page_title %}Importar Parcelas do Financiamento{% endblock %}
@@ -80,15 +81,7 @@
                     {{ form.csrf_token }}
 
                     <div class="mb-3">
-                        {{ form.csv_file.label(class="form-label fw-bold") }}
-                        {{ form.csv_file(class="form-control") }}
-                        {% if form.csv_file.errors %}
-                        <div class="text-danger mt-1">
-                            {% for error in form.csv_file.errors %}
-                            <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                        {{ render_field(form.csv_file) }}
                     </div>
 
                     <div class="mt-4">

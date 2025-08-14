@@ -1,6 +1,7 @@
 <!--- app/templates/crediario_faturas/gerar.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Fatura Crediário{% endblock %}
 {% block page_title %}Gerar/Visualizar Fatura de Crediário{% endblock %}
@@ -13,26 +14,12 @@
                 <form method="POST"
                     action="{{ url_for('crediario_fatura.gerar_fatura') }}">
                     {{ form.csrf_token }}
-                    <div class="row">
-                        <div class="col-md-4 mb-1">
-                            {{ form.crediario_id.label(class="form-label") }}
-                            {{ form.crediario_id(class="form-select") }}
-                            {% if form.crediario_id.errors %}
-                            <div class="text-danger">
-                                {% for error in form.crediario_id.errors %}{{
-                                error }}{% endfor %}
-                            </div>
-                            {% endif %}
+                    <div class="row align-items-end">
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            {{ render_field(form.crediario_id) }}
                         </div>
-                        <div class="col-md-2 mb-1">
-                            {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select") }}
-                            {% if form.mes_ano.errors %}
-                            <div class="text-danger">
-                                {% for error in form.mes_ano.errors %}{{ error
-                                }}{% endfor %}
-                            </div>
-                            {% endif %}
+                        <div class="col-md-2 mb-2 mb-md-0">
+                            {{ render_field(form.mes_ano) }}
                         </div>
                         <div class="col-md-3 d-flex align-items-end mb-2">
                             <button type="submit"
@@ -68,9 +55,9 @@
                         {% if fatura_existente %}
                         <p class="mb-0 text-info">Esta fatura já existe no
                             sistema. <a
-                                href="{{ url_for('crediario_fatura.editar_fatura', id=fatura_existente.id) }}">Clique
-                                aqui para editar.</a></p>
-                        {% else %}
+                                href="{{ url_for('crediario_fatura.visualizar_fatura', id=fatura_existente.id) }}">Clique
+                                aqui para visualizar.</a></p>
+                        {% elif valor_total_calculado > 0 %}
                         <p class="mb-0 text-success">Fatura pronta para ser
                             gerada.</p>
                         {% endif %}
@@ -120,7 +107,6 @@
                 {% endif %}
             </div>
         </div>
-        {% elif form.is_submitted() and not crediario_selecionado %}
         {% endif %}
     </div>
 </div>

@@ -1,6 +1,7 @@
 <!--- app\templates\salario_movimento\add.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Lançamentos{% endblock %}
 {% block page_title %}Adicionar Salário{% endblock %}
@@ -19,26 +20,13 @@
                 <form method="POST"
                     action="{{ url_for('salario.novo_lancamento_folha') }}">
                     {{ form.csrf_token }}
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            {{ form.mes_referencia.label(class="form-label") }}
-                            {{ form.mes_referencia(class="form-select") }}
-                            {% if form.mes_referencia.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.mes_referencia.errors[0]
-                                    }}</small></div>
-                            {% endif %}
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-4">
+                            {{ render_field(form.mes_referencia) }}
                         </div>
-                        <div class="col-md-3">
-                            {{ form.data_recebimento.label(class="form-label")
-                            }}
-                            {{ form.data_recebimento(class="form-control",
-                            type="date") }}
-                            {% if form.data_recebimento.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.data_recebimento.errors[0]
-                                    }}</small></div>
-                            {% endif %}
+                        <div class="col-md-4">
+                            {{ render_field(form.data_recebimento,
+                            attrs={'type': 'date'}) }}
                         </div>
                     </div>
                     <div class="mt-4">

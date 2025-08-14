@@ -1,6 +1,7 @@
 <!--- app/templates/conta_movimentos/edit.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Editar Movimentação{% endblock %}
 {% block page_title %}Editar Movimentação{% endblock %}
@@ -19,42 +20,26 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form.conta_id.label(class="form-label") }}
-                            <input type="text" class="form-control"
-                                value="{{ movimento.conta.nome_banco }} - {{ movimento.conta.conta }}"
-                                readonly>
+                            {{ render_field(form.conta_id) }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form.conta_transacao_id.label(class="form-label")
-                            }}
-                            <input type="text" class="form-control"
-                                value="{{ movimento.tipo_transacao.transacao_tipo }} ({{ movimento.tipo_transacao.tipo }})"
-                                readonly>
+                            {{ render_field(form.conta_transacao_id) }}
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form.data_movimento.label(class="form-label") }}
-                            {{ form.data_movimento(class="form-control",
-                            readonly=True) }}
+                            {{ render_field(form.data_movimento,
+                            attrs={'readonly': True}) }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form.valor.label(class="form-label") }}
-                            {{ form.valor(class="form-control", readonly=True)
-                            }}
+                            {{ render_field(form.valor, attrs={'readonly':
+                            True}) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        {{ form.descricao.label(class="form-label") }}
-                        {{ form.descricao(class="form-control", rows="3") }}
-                        {% if form.descricao.errors %}
-                        <div class="text-danger">
-                            {% for error in form.descricao.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
+                        {{ render_field(form.descricao) }}
                     </div>
 
                     <div class="mt-4">

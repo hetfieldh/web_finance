@@ -1,0 +1,36 @@
+<!--- app/templates/includes/_macros.html -->
+
+{% macro render_field(field, attrs={}) %}
+{{ field.label(class="form-label") }}
+
+{% set default_class = 'form-select' if field.type == 'SelectField' else
+'form-control' %}
+
+{{ field(class=default_class, **attrs) }}
+
+{% if field.errors %}
+<div class="text-danger mt-1">
+    <small>
+        {% for error in field.errors %}
+        {{ error }}<br>
+        {% endfor %}
+    </small>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro render_checkbox(field, attrs={}) %}
+<div class="form-check">
+    {{ field(class="form-check-input", **attrs) }}
+    {{ field.label(class="form-check-label") }}
+</div>
+{% if field.errors %}
+<div class="text-danger mt-1">
+    <small>
+        {% for error in field.errors %}
+        {{ error }}<br>
+        {% endfor %}
+    </small>
+</div>
+{% endif %}
+{% endmacro %}

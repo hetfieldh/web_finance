@@ -1,6 +1,7 @@
 <!--- app/templates/crediario_grupos/add.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Grupos de Crediário{% endblock %}
 {% block page_title %}Adicionar Grupo de Crediário{% endblock %}
@@ -20,48 +21,26 @@
 
                     <div class="row">
                         <div class="col-md-7 mb-3">
-                            {{ form.grupo_crediario.label(class="form-label") }}
-                            {{ form.grupo_crediario(class="form-control") }}
-                            {% if form.grupo_crediario.errors %}
-                            <div class="text-danger">
-                                {% for error in form.grupo_crediario.errors %}{{
-                                error }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.grupo_crediario) }}
                         </div>
                         <div class="col-md-5 mb-3">
-                            {{
-                            form.tipo_grupo_crediario.label(class="form-label")
-                            }}
-                            {{ form.tipo_grupo_crediario(class="form-select") }}
-                            {% if form.tipo_grupo_crediario.errors %}
-                            <div class="text-danger">
-                                {% for error in form.tipo_grupo_crediario.errors
-                                %}{{ error }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.tipo_grupo_crediario) }}
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="mb-3">
-                            {{ form.descricao.label(class="form-label") }}
-                            {{ form.descricao(class="form-control", rows="3") }}
-                            {% if form.descricao.errors %}
-                            <div class="text-danger">
-                                {% for error in form.descricao.errors %}{{ error
-                                }}{% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+
                     <div class="mb-3">
+                        {{ render_field(form.descricao) }}
                     </div>
-                    <button type="submit" class="btn btn-success btn-add">
-                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
-                    </button>
-                    <a
-                        href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
-                        class="btn btn-secondary btn-add">Cancelar</a>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a
+                            href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

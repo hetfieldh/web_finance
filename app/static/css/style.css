@@ -374,6 +374,11 @@ body.login-body {
     width: 90%;
 }
 
+/* Estilo do logotipo */
+.error-container .error-icon {
+    max-width: 150px;
+}
+
 /* ==========================================================================
    7. RESPONSIVIDADE (MEDIA QUERIES)
    ========================================================================== */

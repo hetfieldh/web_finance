@@ -1,6 +1,7 @@
 <!--- app\templates\fluxo_caixa\painel.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}{{ title }}{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
@@ -14,16 +15,14 @@
                     action="{{ url_for('fluxo_caixa.painel') }}">
                     {{ form.csrf_token }}
                     <div class="row align-items-end">
-                        <div class="col-md-2">
-                            {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select form-select-sm")
-                            }}
+                        <div class="col-md-3">
+                            {{ render_field(form.mes_ano) }}
                         </div>
                         <div class="col-md-3">
                             <button type="submit"
                                 class="btn btn-success btn-add">
                                 <i class="fas fa-search me-1"></i> {{
-                                form.submit.label.text }}
+                                form.submit.label.text or 'Filtrar' }}
                             </button>
                         </div>
                     </div>
@@ -98,9 +97,8 @@
                                     endif %} R$ {{
                                     "%.2f"|format(mov.valor_realizado) }}
                                 </td>
-                                <td class="text-end fw-bold
-                                    {% if mov.tipo == 'entrada' and mov.diferenca < 0 %}text-success{% elif mov.tipo == 'entrada' and mov.diferenca > 0 %}text-danger
-                                    {% elif mov.tipo == 'saida' and mov.diferenca > 0 %}text-success{% elif mov.tipo == 'saida' and mov.diferenca < 0 %}text-danger{% endif %}">
+                                <td
+                                    class="text-end fw-bold {% if mov.tipo == 'entrada' and mov.diferenca < 0 %}text-success{% elif mov.tipo == 'entrada' and mov.diferenca > 0 %}text-danger {% elif mov.tipo == 'saida' and mov.diferenca > 0 %}text-success{% elif mov.tipo == 'saida' and mov.diferenca < 0 %}text-danger{% endif %}">
                                     {{ "%.2f"|format(mov.diferenca) }}
                                 </td>
                                 <td class="text-center">

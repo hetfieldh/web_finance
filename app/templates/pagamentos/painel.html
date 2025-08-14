@@ -1,6 +1,7 @@
 <!--- app\templates\pagamentos\painel.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Pagamentos{% endblock %}
 {% block page_title %}Contas a Pagar{% endblock %}
@@ -8,22 +9,21 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- Card de Filtro e Resumo -->
         <div class="card shadow-sm mb-2">
             <div
                 class="card-body p-2 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <!-- Lado Esquerdo: Filtros -->
                 <form method="POST" action="{{ url_for('pagamentos.painel') }}"
-                    class="d-flex align-items-center gap-2">
+                    class="d-flex align-items-end gap-2">
                     {{ form.csrf_token }}
-                    {{ form.mes_ano(class="form-select form-select-sm") }}
+                    <div class="mb-0">
+                        {{ render_field(form.mes_ano) }}
+                    </div>
                     <button type="submit" class="btn btn-success btn-sm"
                         title="Filtrar">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
 
-                <!-- Lado Direito: Resumo -->
                 <div
                     class="d-flex align-items-center text-muted small gap-3 flex-wrap justify-content-center">
                     <span>Total Previsto: <strong class="text-primary">R$ {{
@@ -38,7 +38,6 @@
             </div>
         </div>
 
-        <!-- Card da Tabela de Pagamentos -->
         <div class="card shadow-sm">
             <div class="card-header bg-secondary text-white">
                 <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Contas a
@@ -139,7 +138,6 @@
     </div>
 </div>
 
-<!-- Modal de Pagamento -->
 <div class="modal fade" id="pagamentoModal" tabindex="-1"
     aria-labelledby="pagamentoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -160,22 +158,11 @@
                     <input type="hidden" name="mes_ano"
                         value="{{ form.mes_ano.data }}">
 
-                    <div class="mb-3">
-                        {{ pagamento_form.conta_id.label(class="form-label") }}
-                        {{ pagamento_form.conta_id(class="form-select") }}
-                    </div>
-                    <div class="mb-3">
-                        {{
-                        pagamento_form.data_pagamento.label(class="form-label")
-                        }}
-                        {{ pagamento_form.data_pagamento(class="form-control")
-                        }}
-                    </div>
-                    <div class="mb-3">
-                        {{ pagamento_form.valor_pago.label(class="form-label")
-                        }}
-                        {{ pagamento_form.valor_pago(class="form-control") }}
-                    </div>
+                    {{ render_field(pagamento_form.conta_id) }}
+                    {{ render_field(pagamento_form.data_pagamento,
+                    attrs={'type': 'date'}) }}
+                    {{ render_field(pagamento_form.valor_pago, attrs={'type':
+                    'number', 'step': '0.01'}) }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary"

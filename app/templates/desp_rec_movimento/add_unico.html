@@ -1,6 +1,7 @@
 <!-- app/templates/desp_rec_movimento/add_unico.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Lançamentos{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
@@ -18,47 +19,20 @@
                     {{ form.csrf_token }}
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            {{ form.desp_rec_id.label(class="form-label") }}
-                            {{ form.desp_rec_id(class="form-select") }}
-                            {% if form.desp_rec_id.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.desp_rec_id.errors[0] }}</small></div>
-                            {% endif %}
+                        <div class="col-md-6 mb-3">
+                            {{ render_field(form.desp_rec_id) }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{
-                            form.data_vencimento.label(class="form-label")
-                            }}
-                            {{ form.data_vencimento(class="form-control",
-                            type="date") }}
-                            {% if form.data_vencimento.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.data_vencimento.errors[0]
-                                    }}</small></div>
-                            {% endif %}
+                            {{ render_field(form.data_vencimento, attrs={'type':
+                            'date'}) }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            {{ form.valor_previsto.label(class="form-label")
-                            }}
-                            {{ form.valor_previsto(class="form-control",
-                            type="number", step="0.01") }}
-                            {% if form.valor_previsto.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.valor_previsto.errors[0]
-                                    }}</small></div>
-                            {% endif %}
+                            {{ render_field(form.valor_previsto, attrs={'type':
+                            'number', 'step': '0.01'}) }}
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="mb-3">
-                            {{ form.descricao.label(class="form-label") }}
-                            {{ form.descricao(class="form-control", rows="3") }}
-                            {% if form.descricao.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.descricao.errors[0] }}</small></div>
-                            {% endif %}
-                        </div>
+                    <div class="mb-3">
+                        {{ render_field(form.descricao) }}
                     </div>
 
                     <div class="mt-3">

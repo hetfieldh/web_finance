@@ -1,6 +1,7 @@
 <!--- app/templates/financiamentos/add.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Financiamentos{% endblock %}
 {% block page_title %}Adicionar Financiamento{% endblock %}
@@ -17,103 +18,48 @@
                     action="{{ url_for('financiamento.adicionar_financiamento') }}">
                     {{ form.csrf_token }}
 
-                <div class="row">
-                    <div class="col-md-7 mb-3">
-                        {{ form.nome_financiamento.label(class="form-label") }}
-                        {{ form.nome_financiamento(class="form-control") }}
-                        {% if form.nome_financiamento.errors %}
-                        <div class="text-danger">
-                            {% for error in form.nome_financiamento.errors %}{{
-                            error }}{% endfor %}
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            {{ render_field(form.nome_financiamento) }}
                         </div>
-                        {% endif %}
+                        <div class="col-md-5 mb-3">
+                            {{ render_field(form.conta_id) }}
+                        </div>
                     </div>
-                    <div class="col-md-5 mb-3">
-                        {{ form.conta_id.label(class="form-label") }}
-                        {{ form.conta_id(class="form-select") }}
-                        {% if form.conta_id.errors %}
-                        <div class="text-danger">
-                            {% for error in form.conta_id.errors %}{{ error }}{%
-                            endfor %}
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            {{ render_field(form.valor_total_financiado,
+                            attrs={'type': 'number', 'step': '0.01'}) }}
                         </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        {{ form.valor_total_financiado.label(class="form-label")
-                        }}
-                        {{ form.valor_total_financiado(class="form-control",
-                        type="number", step="0.01") }}
-                        {% if form.valor_total_financiado.errors %}
-                        <div class="text-danger">
-                            {% for error in form.valor_total_financiado.errors
-                            %}{{ error }}{% endfor %}
+                        <div class="col-md-2 mb-3">
+                            {{ render_field(form.taxa_juros_anual,
+                            attrs={'type': 'number', 'step': '0.0001'}) }}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        {{ form.taxa_juros_anual.label(class="form-label") }}
-                        {{ form.taxa_juros_anual(class="form-control",
-                        type="number", step="0.0001") }}
-                        {% if form.taxa_juros_anual.errors %}
-                        <div class="text-danger">
-                            {% for error in form.taxa_juros_anual.errors %}{{
-                            error }}{% endfor %}
+                        <div class="col-md-3 mb-3">
+                            {{ render_field(form.data_inicio, attrs={'type':
+                            'date'}) }}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        {{ form.data_inicio.label(class="form-label") }}
-                        {{ form.data_inicio(class="form-control", type="date")
-                        }}
-                        {% if form.data_inicio.errors %}
-                        <div class="text-danger">
-                            {% for error in form.data_inicio.errors %}{{ error
-                            }}{% endfor %}
+                        <div class="col-md-2 mb-3">
+                            {{ render_field(form.prazo_meses, attrs={'type':
+                            'number', 'min': '1'}) }}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        {{ form.prazo_meses.label(class="form-label") }}
-                        {{ form.prazo_meses(class="form-control", type="number",
-                        min="1") }}
-                        {% if form.prazo_meses.errors %}
-                        <div class="text-danger">
-                            {% for error in form.prazo_meses.errors %}{{ error
-                            }}{% endfor %}
+                        <div class="col-md-2 mb-3">
+                            {{ render_field(form.tipo_amortizacao) }}
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        {{ form.tipo_amortizacao.label(class="form-label") }}
-                        {{ form.tipo_amortizacao(class="form-select") }}
-                        {% if form.tipo_amortizacao.errors %}
-                        <div class="text-danger">
-                            {% for error in form.tipo_amortizacao.errors %}{{
-                            error }}{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                    <div class="mb-1">
-                        {{ form.descricao.label(class="form-label") }}
-                        {{ form.descricao(class="form-control", rows="3") }}
-                        {% if form.descricao.errors %}
-                        <div class="text-danger">
-                            {% for error in form.descricao.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
                     <div class="mb-3">
+                        {{ render_field(form.descricao) }}
                     </div>
-                    <button type="submit" class="btn btn-success btn-add">
-                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
-                    </button>
-                    <a
-                        href="{{ url_for('financiamento.listar_financiamentos') }}"
-                        class="btn btn-secondary btn-add">Cancelar</a>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a
+                            href="{{ url_for('financiamento.listar_financiamentos') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

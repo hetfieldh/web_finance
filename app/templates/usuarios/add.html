@@ -1,6 +1,7 @@
 <!--- app/templates/usuarios/add.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field, render_checkbox %}
 
 {% block title %}Web Finance - Usuários{% endblock %}
 {% block page_title %}Adicionar Usuário{% endblock %}
@@ -19,95 +20,46 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form.nome.label(class="form-label") }}
-                            {{ form.nome(class="form-control") }}
-                            {% if form.nome.errors %}
-                            <div class="text-danger">
-                                {% for error in form.nome.errors %}{{ error }}{%
-                                endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.nome) }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form.sobrenome.label(class="form-label") }}
-                            {{ form.sobrenome(class="form-control") }}
-                            {% if form.sobrenome.errors %}
-                            <div class="text-danger">
-                                {% for error in form.sobrenome.errors %}{{ error
-                                }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.sobrenome) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-7 mb-3">
-                            {{ form.email.label(class="form-label") }}
-                            {{ form.email(class="form-control") }}
-                            {% if form.email.errors %}
-                            <div class="text-danger">
-                                {% for error in form.email.errors %}{{ error
-                                }}{%
-                                endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.email) }}
                         </div>
                         <div class="col-md-5 mb-3">
-                            {{ form.login.label(class="form-label") }}
-                            {{ form.login(class="form-control") }}
-                            {% if form.login.errors %}
-                            <div class="text-danger">
-                                {% for error in form.login.errors %}{{ error
-                                }}{%
-                                endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.login) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            {{ form.senha.label(class="form-label") }}
-                            {{ form.senha(class="form-control") }}
+                            {{ render_field(form.senha, attrs={'type':
+                            'password'}) }}
                             <small class="form-text text-muted">Mínimo 8
-                                caracteres,
-                                com pelo menos uma letra maiúscula e um
-                                caractere
-                                especial.</small>
-                            {% if form.senha.errors %}
-                            <div class="text-danger">
-                                {% for error in form.senha.errors %}{{ error
-                                }}{%
-                                endfor %}
-                            </div>
-                            {% endif %}
+                                caracteres, com pelo menos uma letra maiúscula e
+                                um caractere especial.</small>
                         </div>
                         <div class="col-md-6 mb-3">
-                            {{ form.confirmar_senha.label(class="form-label") }}
-                            {{ form.confirmar_senha(class="form-control") }}
-                            {% if form.confirmar_senha.errors %}
-                            <div class="text-danger">
-                                {% for error in form.confirmar_senha.errors %}{{
-                                error }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.confirmar_senha, attrs={'type':
+                            'password'}) }}
                         </div>
                     </div>
-                    <div class="mb-1 form-check">
-                        {{ form.is_admin(class="form-check-input") }}
-                        {{ form.is_admin.label(class="form-check-label") }}
-                        {% if form.is_admin.errors %}
-                        <div class="text-danger">
-                            {% for error in form.is_admin.errors %}{{ error }}{%
-                            endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
+
                     <div class="mb-3">
+                        {{ render_checkbox(form.is_admin) }}
                     </div>
-                    <button type="submit" class="btn btn-success btn-add">
-                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
-                    </button>
-                    <a href="{{ url_for('usuario.listar_usuarios') }}"
-                        class="btn btn-secondary btn-add">Cancelar</a>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a href="{{ url_for('usuario.listar_usuarios') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

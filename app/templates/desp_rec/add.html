@@ -1,6 +1,7 @@
 <!-- app/templates/desp_rec/add.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field, render_checkbox %}
 
 {% block title %}Web Finance - Despesas e Receitas{% endblock %}
 {% block page_title %}Adicionar Despesa / Receita{% endblock %}
@@ -17,48 +18,26 @@
                     action="{{ url_for('desp_rec.adicionar_cadastro') }}">
                     {{ form.csrf_token }}
 
-                    <div classs="row">
+                    <div class="row">
                         <div class="col-md-12 mb-3">
-                            {{ form.nome.label(class="form-label") }}
-                            {{ form.nome(class="form-control") }}
-                            {% if form.nome.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.nome.errors[0] }}</small></div>
-                            {% endif %}
+                            {{ render_field(form.nome) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            {{ form.natureza.label(class="form-label") }}
-                            {{ form.natureza(class="form-select") }}
-                            {% if form.natureza.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.natureza.errors[0] }}</small></div>
-                            {% endif %}
+                            {{ render_field(form.natureza) }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            {{ form.tipo.label(class="form-label") }}
-                            {{ form.tipo(class="form-select") }}
-                            {% if form.tipo.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.tipo.errors[0] }}</small></div>
-                            {% endif %}
+                            {{ render_field(form.tipo) }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            {{ form.dia_vencimento.label(class="form-label") }}
-                            {{ form.dia_vencimento(class="form-control",
-                            type="number", min="1", max="31") }}
-                            {% if form.dia_vencimento.errors %}
-                            <div class="text-danger mt-1"><small>{{
-                                    form.dia_vencimento.errors[0]
-                                    }}</small></div>
-                            {% endif %}
+                            {{ render_field(form.dia_vencimento, attrs={'type':
+                            'number', 'min': '1', 'max': '31'}) }}
                         </div>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        {{ form.ativo(class="form-check-input") }}
-                        {{ form.ativo.label(class="form-check-label") }}
+                    <div class="mb-3">
+                        {{ render_checkbox(form.ativo) }}
                     </div>
 
                     <div class="mt-4">

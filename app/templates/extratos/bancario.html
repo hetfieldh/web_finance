@@ -1,6 +1,7 @@
 <!--- app/templates/extratos/bancario.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Extratos{% endblock %}
 {% block page_title %}Extrato Bancário{% endblock %}
@@ -15,26 +16,10 @@
                     {{ form.csrf_token }}
                     <div class="row align-items-end">
                         <div class="col-md-4 mb-2 mb-md-0">
-                            {{ form.conta_id.label(class="form-label") }}
-                            {{ form.conta_id(class="form-select form-select-sm")
-                            }}
-                            {% if form.conta_id.errors %}
-                            <div class="text-danger">
-                                {% for error in form.conta_id.errors %}{{ error
-                                }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.conta_id) }}
                         </div>
                         <div class="col-md-2 mb-2 mb-md-0">
-                            {{ form.mes_ano.label(class="form-label") }}
-                            {{ form.mes_ano(class="form-select form-select-sm")
-                            }}
-                            {% if form.mes_ano.errors %}
-                            <div class="text-danger">
-                                {% for error in form.mes_ano.errors %}{{ error
-                                }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.mes_ano) }}
                         </div>
                         <div class="col-md-2">
                             <button type="submit"
@@ -50,7 +35,6 @@
 
         {% if movimentacoes or (form.is_submitted() and conta_selecionada) %}
 
-        <!-- Card de Resumo do Mês -->
         <div class="card shadow-sm mb-2">
             <div class="card-body">
                 <div class="row g-0 text-center align-items-center">
@@ -147,9 +131,6 @@
                 {% endif %}
             </div>
         </div>
-        {% elif form.is_submitted() and not movimentacoes and not
-        conta_selecionada %}
-
         {% endif %}
     </div>
 </div>

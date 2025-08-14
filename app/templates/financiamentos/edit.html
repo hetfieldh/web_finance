@@ -1,6 +1,7 @@
 <!--- app/templates/financiamentos/edit.html -->
 
 {% extends "base.html" %}
+{% from "includes/_macros.html" import render_field %}
 
 {% block title %}Web Finance - Financiamentos{% endblock %}
 {% block page_title %}Editar Financiamento{% endblock %}
@@ -20,30 +21,15 @@
 
                     <div class="row">
                         <div class="col-md-7 mb-3">
-                            {{ form.nome_financiamento.label(class="form-label")
-                            }}
-                            {{ form.nome_financiamento(class="form-control") }}
-                            {% if form.nome_financiamento.errors %}
-                            <div class="text-danger">
-                                {% for error in form.nome_financiamento.errors
-                                %}{{
-                                error }}{% endfor %}
-                            </div>
-                            {% endif %}
+                            {{ render_field(form.nome_financiamento) }}
                         </div>
                         <div class="col-md-5 mb-3">
-                            <label class="form-label">Conta Bancária</label>
-                            <input type="text" class="form-control"
-                                value="{{ financiamento.conta.nome_banco }} ({{ financiamento.conta.conta }})"
-                                readonly>
+                            {{ render_field(form.conta_id) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">Valor Total</label>
-                            <input type="text" class="form-control"
-                                value="R$ {{ '%.2f'|format(financiamento.valor_total_financiado) }}"
-                                readonly>
+                            {{ render_field(form.valor_total_financiado) }}
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Saldo Devedor
@@ -53,50 +39,33 @@
                                 readonly>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">% Juros Anual</label>
-                            <input type="text" class="form-control"
-                                value="{{ '%.4f'|format(financiamento.taxa_juros_anual) }}%"
-                                readonly>
+                            {{ render_field(form.taxa_juros_anual) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">Data de Início</label>
-                            <input type="text" class="form-control"
-                                value="{{ financiamento.data_inicio.strftime('%d/%m/%Y') }}"
-                                readonly>
+                            {{ render_field(form.data_inicio) }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">Prazo (em meses)</label>
-                            <input type="text" class="form-control"
-                                value="{{ financiamento.prazo_meses }}"
-                                readonly>
+                            {{ render_field(form.prazo_meses) }}
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">Amortização</label>
-                            <input type="text" class="form-control"
-                                value="{{ financiamento.tipo_amortizacao }}"
-                                readonly>
+                            {{ render_field(form.tipo_amortizacao) }}
                         </div>
-                    </div>
-                    <div class="mb-1">
-                        {{ form.descricao.label(class="form-label") }}
-                        {{ form.descricao(class="form-control", rows="3") }}
-                        {% if form.descricao.errors %}
-                        <div class="text-danger">
-                            {% for error in form.descricao.errors %}{{ error
-                            }}{% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
                     <div class="mb-3">
+                        {{ render_field(form.descricao) }}
                     </div>
-                    <button type="submit" class="btn btn-info btn-add">
-                        <i class="fas fa-save"></i> {{ form.submit.label.text }}
-                    </button>
-                    <a
-                        href="{{ url_for('financiamento.listar_financiamentos') }}"
-                        class="btn btn-secondary btn-add">Cancelar</a>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-info btn-add">
+                            <i class="fas fa-save"></i> {{
+                            form.submit.label.text }}
+                        </button>
+                        <a
+                            href="{{ url_for('financiamento.listar_financiamentos') }}"
+                            class="btn btn-secondary btn-add">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

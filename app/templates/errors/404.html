@@ -10,11 +10,12 @@
     <div class="error-container text-center p-5 shadow-md rounded-3">
         <div class="mb-4">
             <img src="{{ url_for('static', filename='images/error-icon.png') }}"
-                alt="Ícone de Erro" class="img-fluid" style="max-width: 150px;">
+                alt="Ícone de Erro" class="img-fluid error-icon">
         </div>
         <h1 class="display-1 text-danger fw-bold mb-3">404</h1>
         <p class="lead text-dark mb-2">Ops! Esta página não existe.</p>
-        <p class="text-muted mb-4">Verifique o endereço digitado e tente novamente.</p>
+        <p class="text-muted mb-4">Verifique o endereço digitado e tente
+            novamente.</p>
         <a href="{{ url_for('main.dashboard') }}"
             class="btn btn-secondary btn-add mt-3">
             <i class="fas fa-home me-2"></i>Ir para o Dashboard
