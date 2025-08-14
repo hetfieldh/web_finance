@@ -24,7 +24,7 @@ class ExtratoBancarioForm(FlaskForm):
         super().__init__(*args, **kwargs)
 
         self.conta_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome_banco} - {c.conta} ({c.tipo})")
+            (c.id, f"{c.nome_banco} - {c.tipo} ({c.conta})")
             for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Conta.nome_banco)
             .all()

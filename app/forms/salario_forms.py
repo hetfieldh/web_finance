@@ -146,7 +146,7 @@ class AdicionarItemFolhaForm(FlaskForm):
         ],
         places=2,
     )
-    submit = SubmitField("Adicionar")
+    submit = SubmitField("")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

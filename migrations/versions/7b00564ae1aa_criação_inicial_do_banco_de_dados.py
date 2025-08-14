@@ -1,8 +1,8 @@
-"""Criação do Banco de Dados com Ajuste
+"""Criação inicial do Banco de Dados
 
-Revision ID: 72a484676442
+Revision ID: 7b00564ae1aa
 Revises: 
-Create Date: 2025-08-11 17:51:07.059718
+Create Date: 2025-08-12 21:45:44.871470
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '72a484676442'
+revision = '7b00564ae1aa'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -238,13 +238,16 @@ def upgrade():
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('mes_referencia', sa.String(length=7), nullable=False),
     sa.Column('data_recebimento', sa.Date(), nullable=False),
-    sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
-    sa.Column('status', sa.Enum('Pendente', 'Recebido', name='status_salario_enum'), server_default='Pendente', nullable=False),
+    sa.Column('movimento_bancario_salario_id', sa.Integer(), nullable=True),
+    sa.Column('movimento_bancario_beneficio_id', sa.Integer(), nullable=True),
+    sa.Column('status', sa.Enum('Pendente', 'Parcialmente Recebido', 'Recebido', name='status_salario_enum'), server_default='Pendente', nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['movimento_bancario_id'], ['conta_movimento.id'], ),
+    sa.ForeignKeyConstraint(['movimento_bancario_beneficio_id'], ['conta_movimento.id'], ),
+    sa.ForeignKeyConstraint(['movimento_bancario_salario_id'], ['conta_movimento.id'], ),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('movimento_bancario_id'),
+    sa.UniqueConstraint('movimento_bancario_beneficio_id'),
+    sa.UniqueConstraint('movimento_bancario_salario_id'),
     sa.UniqueConstraint('usuario_id', 'mes_referencia', name='_usuario_mes_referencia_uc')
     )
     op.create_table('salario_movimento_item',

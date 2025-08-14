@@ -123,7 +123,7 @@ def excluir_item(id):
         )
     except Exception as e:
         db.session.rollback()
-        flash("Erro ao excluir o item. Tente novamente.", "danger")
+        flash("Erro ao excluir o item.", "danger")
         current_app.logger.error(
             f"Erro ao excluir SalarioItem ID {id}: {e}", exc_info=True
         )
@@ -194,7 +194,11 @@ def gerenciar_itens_folha(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
     form = AdicionarItemFolhaForm()
-    is_locked = movimento.movimento_bancario_id is not None
+
+    is_locked = (
+        movimento.movimento_bancario_salario_id is not None
+        or movimento.movimento_bancario_beneficio_id is not None
+    )
 
     if form.validate_on_submit():
         if is_locked:
@@ -268,7 +272,10 @@ def excluir_item_folha(item_id):
         id=movimento_id, usuario_id=current_user.id
     ).first_or_404()
 
-    if movimento.movimento_bancario_id:
+    if (
+        movimento.movimento_bancario_salario_id
+        or movimento.movimento_bancario_beneficio_id
+    ):
         flash(
             "Não é possível remover verbas de uma folha de pagamento já recebida.",
             "warning",
@@ -296,7 +303,10 @@ def excluir_movimento(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    if movimento.movimento_bancario_id:
+    if (
+        movimento.movimento_bancario_salario_id
+        or movimento.movimento_bancario_beneficio_id
+    ):
         flash(
             "Não é possível excluir uma folha de pagamento que já foi conciliada com uma movimentação bancária.",
             "danger",

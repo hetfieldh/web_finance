@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from flask import Blueprint, render_template, request
 from flask_login import current_user, login_required
+from sqlalchemy import func, or_
 
 from app.forms.fluxo_caixa_forms import FluxoCaixaForm
 from app.models.crediario_fatura_model import CrediarioFatura
@@ -40,33 +41,57 @@ def painel():
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
+        # --- Coleta de Receitas ---
         salario_movimentos = SalarioMovimento.query.filter(
             SalarioMovimento.usuario_id == current_user.id,
             SalarioMovimento.data_recebimento >= data_inicio_mes,
             SalarioMovimento.data_recebimento <= data_fim_mes,
-            SalarioMovimento.movimento_bancario_id != None,
+            or_(
+                SalarioMovimento.movimento_bancario_salario_id.isnot(None),
+                SalarioMovimento.movimento_bancario_beneficio_id.isnot(None),
+            ),
         ).all()
+
         for mov in salario_movimentos:
-            salario_liquido = sum(
-                i.valor for i in mov.itens if i.salario_item.tipo == "Provento"
-            ) - sum(
-                i.valor
-                for i in mov.itens
-                if i.salario_item.tipo in ["Imposto", "Desconto"]
-            )
-            movimentacoes_consolidadas.append(
-                {
-                    "data": mov.data_recebimento,
-                    "descricao": f"Salário (Ref: {mov.mes_referencia})",
-                    "categoria": "Salário",
-                    "valor": salario_liquido,
-                    "tipo": "entrada",
-                    "status": "Recebido",
-                    "valor_realizado": salario_liquido,
-                    "diferenca": Decimal("0.00"),
-                }
-            )
-            kpis["receitas"] += salario_liquido
+            if mov.movimento_bancario_salario_id:
+                salario_liquido = sum(
+                    i.valor for i in mov.itens if i.salario_item.tipo == "Provento"
+                ) - sum(
+                    i.valor
+                    for i in mov.itens
+                    if i.salario_item.tipo in ["Imposto", "Desconto"]
+                )
+                movimentacoes_consolidadas.append(
+                    {
+                        "data": mov.movimento_bancario_salario.data_movimento,
+                        "descricao": f"Salário (Ref: {mov.mes_referencia})",
+                        "categoria": "Salário",
+                        "valor": salario_liquido,
+                        "tipo": "entrada",
+                        "status": "Recebido",
+                        "valor_realizado": salario_liquido,
+                        "diferenca": Decimal("0.00"),
+                    }
+                )
+                kpis["receitas"] += salario_liquido
+
+            if mov.movimento_bancario_beneficio_id:
+                total_beneficios = sum(
+                    i.valor for i in mov.itens if i.salario_item.tipo == "Benefício"
+                )
+                movimentacoes_consolidadas.append(
+                    {
+                        "data": mov.movimento_bancario_beneficio.data_movimento,
+                        "descricao": f"Benefícios (Ref: {mov.mes_referencia})",
+                        "categoria": "Benefício",
+                        "valor": total_beneficios,
+                        "tipo": "entrada",
+                        "status": "Recebido",
+                        "valor_realizado": total_beneficios,
+                        "diferenca": Decimal("0.00"),
+                    }
+                )
+                kpis["receitas"] += total_beneficios
 
         outras_receitas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
@@ -96,6 +121,7 @@ def painel():
             )
             kpis["receitas"] += valor_realizado
 
+        # --- Coleta de Despesas ---
         faturas_pagas = CrediarioFatura.query.filter(
             CrediarioFatura.usuario_id == current_user.id,
             CrediarioFatura.status.in_(["Paga", "Parcialmente Paga"]),

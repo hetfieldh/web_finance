@@ -12,8 +12,6 @@ from app.models.conta_model import Conta
 
 
 class PainelPagamentosForm(FlaskForm):
-    """Formulário para filtrar o Painel de Pagamentos por Mês/Ano."""
-
     mes_ano = SelectField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
@@ -51,8 +49,6 @@ class PainelPagamentosForm(FlaskForm):
 
 
 class PagamentoForm(FlaskForm):
-    """Formulário para processar o pagamento de uma conta."""
-
     conta_id = SelectField(
         "Pagar com a Conta",
         coerce=lambda x: int(x) if x else None,
@@ -72,7 +68,6 @@ class PagamentoForm(FlaskForm):
             NumberRange(min=0.01, message="O valor pago deve ser maior que zero."),
         ],
     )
-    # Campos ocultos para passar informações da conta a ser paga
     item_id = HiddenField()
     item_tipo = HiddenField()
     item_descricao = HiddenField()

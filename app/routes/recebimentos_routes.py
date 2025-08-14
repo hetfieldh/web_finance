@@ -50,6 +50,7 @@ def painel():
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
+        # 1. Buscar Salário Líquido e Benefícios
         salario_movimentos = SalarioMovimento.query.filter(
             SalarioMovimento.usuario_id == current_user.id,
             SalarioMovimento.data_recebimento >= data_inicio_mes,
@@ -57,44 +58,70 @@ def painel():
         ).all()
 
         for movimento in salario_movimentos:
-            proventos = sum(
-                item.valor
-                for item in movimento.itens
-                if item.salario_item.tipo == "Provento"
+            salario_liquido = sum(
+                i.valor for i in movimento.itens if i.salario_item.tipo == "Provento"
+            ) - sum(
+                i.valor
+                for i in movimento.itens
+                if i.salario_item.tipo in ["Imposto", "Desconto"]
             )
-            impostos = sum(
-                item.valor
-                for item in movimento.itens
-                if item.salario_item.tipo == "Imposto"
+            total_beneficios = sum(
+                i.valor for i in movimento.itens if i.salario_item.tipo == "Benefício"
             )
-            descontos = sum(
-                item.valor
-                for item in movimento.itens
-                if item.salario_item.tipo == "Desconto"
-            )
-            salario_liquido = proventos - (impostos + descontos)
 
-            data_pagamento = None
-            if movimento.movimento_bancario_id:
-                mov_bancario = ContaMovimento.query.get(movimento.movimento_bancario_id)
-                if mov_bancario:
-                    data_pagamento = mov_bancario.data_movimento
+            if salario_liquido > 0:
+                status_salario = (
+                    "Recebido"
+                    if movimento.movimento_bancario_salario_id
+                    else "Pendente"
+                )
+                data_pag_salario = (
+                    movimento.movimento_bancario_salario.data_movimento
+                    if movimento.movimento_bancario_salario
+                    else None
+                )
+                contas_a_receber.append(
+                    {
+                        "vencimento": movimento.data_recebimento,
+                        "origem": f"Salário Líquido (Ref: {movimento.mes_referencia})",
+                        "valor": salario_liquido,
+                        "status": status_salario,
+                        "data_pagamento": data_pag_salario,
+                        "tipo": "Salário",
+                        "id_original": movimento.id,
+                    }
+                )
+                totais["previsto"] += salario_liquido
+                if status_salario == "Recebido":
+                    totais["recebido"] += salario_liquido
 
-            contas_a_receber.append(
-                {
-                    "vencimento": movimento.data_recebimento,
-                    "origem": f"Salário Líquido (Ref: {movimento.mes_referencia})",
-                    "valor": salario_liquido,
-                    "status": movimento.status,
-                    "data_pagamento": data_pagamento,
-                    "tipo": "Salário",
-                    "id_original": movimento.id,
-                }
-            )
-            totais["previsto"] += salario_liquido
-            if movimento.status == "Recebido":
-                totais["recebido"] += salario_liquido
+            if total_beneficios > 0:
+                status_beneficio = (
+                    "Recebido"
+                    if movimento.movimento_bancario_beneficio_id
+                    else "Pendente"
+                )
+                data_pag_beneficio = (
+                    movimento.movimento_bancario_beneficio.data_movimento
+                    if movimento.movimento_bancario_beneficio
+                    else None
+                )
+                contas_a_receber.append(
+                    {
+                        "vencimento": movimento.data_recebimento,
+                        "origem": f"Benefícios (Ref: {movimento.mes_referencia})",
+                        "valor": total_beneficios,
+                        "status": status_beneficio,
+                        "data_pagamento": data_pag_beneficio,
+                        "tipo": "Benefício",
+                        "id_original": movimento.id,
+                    }
+                )
+                totais["previsto"] += total_beneficios
+                if status_beneficio == "Recebido":
+                    totais["recebido"] += total_beneficios
 
+        # 2. Buscar Outras Receitas
         outras_receitas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
             .filter(
@@ -105,7 +132,6 @@ def painel():
             )
             .all()
         )
-
         for receita in outras_receitas:
             valor_previsto = receita.valor_previsto
             valor_recebido = receita.valor_realizado or Decimal("0.00")
@@ -144,6 +170,8 @@ def registrar_recebimento():
         try:
             conta_credito = Conta.query.get(form.conta_id.data)
             valor_recebido = form.valor_recebido.data
+            item_id = form.item_id.data
+            item_tipo = form.item_tipo.data
 
             tipo_transacao_credito = ContaTransacao.query.filter_by(
                 usuario_id=current_user.id,
@@ -169,19 +197,30 @@ def registrar_recebimento():
             conta_credito.saldo_atual += valor_recebido
             db.session.flush()
 
-            item_id = form.item_id.data
-            item_tipo = form.item_tipo.data
-
             if item_tipo == "Receita":
                 item = DespRecMovimento.query.get(item_id)
                 item.status = "Pago"
                 item.valor_realizado = valor_recebido
                 item.data_pagamento = form.data_recebimento.data
                 item.movimento_bancario_id = novo_movimento.id
-            elif item_tipo == "Salário":
+            elif item_tipo in ["Salário", "Benefício"]:
                 item = SalarioMovimento.query.get(item_id)
-                item.movimento_bancario_id = novo_movimento.id
-                item.status = "Recebido"
+
+                has_beneficios = any(
+                    i.salario_item.tipo == "Benefício" for i in item.itens
+                )
+
+                if item_tipo == "Salário":
+                    item.movimento_bancario_salario_id = novo_movimento.id
+                else:
+                    item.movimento_bancario_beneficio_id = novo_movimento.id
+
+                if item.movimento_bancario_salario_id and (
+                    not has_beneficios or item.movimento_bancario_beneficio_id
+                ):
+                    item.status = "Recebido"
+                else:
+                    item.status = "Parcialmente Recebido"
 
             db.session.commit()
             flash("Recebimento registrado com sucesso!", "success")
@@ -214,12 +253,27 @@ def estornar_recebimento():
                 item_a_atualizar.data_pagamento = None
                 item_a_atualizar.movimento_bancario_id = None
 
-        elif item_tipo == "Salário":
+        elif item_tipo in ["Salário", "Benefício"]:
             item_a_atualizar = SalarioMovimento.query.get(item_id)
             if item_a_atualizar:
-                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-                item_a_atualizar.movimento_bancario_id = None
-                item_a_atualizar.status = "Pendente"
+                if item_tipo == "Salário":
+                    movimento_bancario_id = (
+                        item_a_atualizar.movimento_bancario_salario_id
+                    )
+                    item_a_atualizar.movimento_bancario_salario_id = None
+                else:
+                    movimento_bancario_id = (
+                        item_a_atualizar.movimento_bancario_beneficio_id
+                    )
+                    item_a_atualizar.movimento_bancario_beneficio_id = None
+
+                if (
+                    item_a_atualizar.movimento_bancario_salario_id
+                    or item_a_atualizar.movimento_bancario_beneficio_id
+                ):
+                    item_a_atualizar.status = "Parcialmente Recebido"
+                else:
+                    item_a_atualizar.status = "Pendente"
 
         if movimento_bancario_id:
             movimento_bancario = ContaMovimento.query.get(movimento_bancario_id)

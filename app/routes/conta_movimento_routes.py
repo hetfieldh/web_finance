@@ -63,6 +63,32 @@ def adicionar_movimentacao():
             flash("O valor da movimentação deve ser maior que zero.", "danger")
             return render_template("conta_movimentos/add.html", form=form)
 
+        is_debit_operation = False
+        if tipo_operacao == "simples":
+            tipo_transacao = ContaTransacao.query.get(form.conta_transacao_id.data)
+            if tipo_transacao and tipo_transacao.tipo == "Débito":
+                is_debit_operation = True
+        elif tipo_operacao == "transferencia":
+            is_debit_operation = True
+
+        if is_debit_operation:
+            saldo_disponivel = conta_origem.saldo_atual
+            if conta_origem.tipo in ["Corrente", "Digital"] and conta_origem.limite:
+                saldo_disponivel += conta_origem.limite
+
+            if valor > saldo_disponivel:
+                flash(
+                    f"Saldo e limite insuficientes na conta {conta_origem.nome_banco}. Saldo disponível: R$ {saldo_disponivel:.2f}",
+                    "danger",
+                )
+                return render_template("conta_movimentos/add.html", form=form)
+
+            if valor > conta_origem.saldo_atual:
+                flash(
+                    f"Atenção: será utilizado R$ {(valor - conta_origem.saldo_atual):.2f} do seu limite.",
+                    "warning",
+                )
+
         try:
             if tipo_operacao == "simples":
                 tipo_transacao_id = form.conta_transacao_id.data
@@ -80,7 +106,7 @@ def adicionar_movimentacao():
 
                 if tipo_transacao.tipo == "Débito":
                     conta_origem.saldo_atual -= valor
-                else:  # Crédito
+                else:
                     conta_origem.saldo_atual += valor
 
             elif tipo_operacao == "transferencia":
@@ -188,7 +214,12 @@ def excluir_movimentacao(id):
     is_linked = (
         DespRecMovimento.query.filter_by(movimento_bancario_id=id).first()
         or FinanciamentoParcela.query.filter_by(movimento_bancario_id=id).first()
-        or SalarioMovimento.query.filter_by(movimento_bancario_id=id).first()
+        or SalarioMovimento.query.filter(
+            or_(
+                SalarioMovimento.movimento_bancario_salario_id == id,
+                SalarioMovimento.movimento_bancario_beneficio_id == id,
+            )
+        ).first()
     )
     if is_linked:
         flash(
@@ -217,35 +248,47 @@ def excluir_movimentacao(id):
         )
         return redirect(url_for("conta_movimento.listar_movimentacoes"))
 
-    conta_afetada = Conta.query.get(movimento.conta_id)
-    tipo_transacao = ContaTransacao.query.get(movimento.conta_transacao_id)
+    try:
+        conta_afetada = Conta.query.get(movimento.conta_id)
+        if conta_afetada:
+            if movimento.tipo_transacao.tipo == "Débito":
+                conta_afetada.saldo_atual += movimento.valor
+            else:
+                conta_afetada.saldo_atual -= movimento.valor
 
-    if conta_afetada and tipo_transacao:
-        valor_decimal = Decimal(str(movimento.valor))
-        if tipo_transacao.tipo == "Débito":
-            conta_afetada.saldo_atual += valor_decimal
-        else:
-            conta_afetada.saldo_atual -= valor_decimal
+        if movimento.id_movimento_relacionado:
+            movimento_relacionado = ContaMovimento.query.get(
+                movimento.id_movimento_relacionado
+            )
+            if movimento_relacionado:
+                conta_destino = Conta.query.get(movimento_relacionado.conta_id)
+                if conta_destino:
+                    if movimento_relacionado.tipo_transacao.tipo == "Débito":
+                        conta_destino.saldo_atual += movimento_relacionado.valor
+                    else:
+                        conta_destino.saldo_atual -= movimento_relacionado.valor
 
-    if movimento.id_movimento_relacionado:
-        movimento_relacionado = ContaMovimento.query.get(
-            movimento.id_movimento_relacionado
+                movimento_relacionado.id_movimento_relacionado = None
+                movimento.id_movimento_relacionado = None
+                db.session.flush()
+
+                db.session.delete(movimento_relacionado)
+
+        db.session.delete(movimento)
+        db.session.commit()
+        flash("Movimentação excluída com sucesso!", "success")
+        current_app.logger.info(
+            f"Movimentação {movimento.id} excluída por {current_user.login}."
         )
-        if movimento_relacionado:
-            conta_destino = Conta.query.get(movimento_relacionado.conta_id)
-            if conta_destino:
-                conta_destino.saldo_atual -= movimento_relacionado.valor
 
-            movimento_relacionado.id_movimento_relacionado = None
-            movimento.id_movimento_relacionado = None
-            db.session.flush()
+    except Exception as e:
+        db.session.rollback()
+        flash(
+            "Esta movimentação não pode ser excluída diretamente, pois está vinculada a um pagamento ou recebimento. Por favor, realize o estorno a partir do painel de origem.",
+            "danger",
+        )
+        current_app.logger.error(
+            f"Erro ao excluir movimentação ID {id}: {e}", exc_info=True
+        )
 
-            db.session.delete(movimento_relacionado)
-
-    db.session.delete(movimento)
-    db.session.commit()
-    flash("Movimentação excluída com sucesso!", "success")
-    current_app.logger.info(
-        f"Movimentação {movimento.id} excluída por {current_user.login}."
-    )
     return redirect(url_for("conta_movimento.listar_movimentacoes"))
