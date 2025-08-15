@@ -1,4 +1,4 @@
-# app/routes/conta_movimento_routes.py
+# app\routes\conta_movimento_routes.py
 
 from decimal import Decimal, getcontext
 
@@ -14,6 +14,7 @@ from flask import (
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 getcontext().prec = 10
 
@@ -39,6 +40,9 @@ conta_movimento_bp = Blueprint("conta_movimento", __name__, url_prefix="/movimen
 def listar_movimentacoes():
     movimentacoes = (
         ContaMovimento.query.filter_by(usuario_id=current_user.id)
+        .options(
+            joinedload(ContaMovimento.conta), joinedload(ContaMovimento.tipo_transacao)
+        )
         .order_by(ContaMovimento.data_movimento.desc(), ContaMovimento.id.desc())
         .all()
     )

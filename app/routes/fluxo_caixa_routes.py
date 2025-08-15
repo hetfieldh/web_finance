@@ -6,11 +6,13 @@ from decimal import Decimal
 from flask import Blueprint, render_template, request
 from flask_login import current_user, login_required
 from sqlalchemy import func, or_
+from sqlalchemy.orm import joinedload, subqueryload
 
 from app.forms.fluxo_caixa_forms import FluxoCaixaForm
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 
 fluxo_caixa_bp = Blueprint("fluxo_caixa", __name__, url_prefix="/fluxo_caixa")
@@ -41,16 +43,25 @@ def painel():
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
-        # --- Coleta de Receitas ---
-        salario_movimentos = SalarioMovimento.query.filter(
-            SalarioMovimento.usuario_id == current_user.id,
-            SalarioMovimento.data_recebimento >= data_inicio_mes,
-            SalarioMovimento.data_recebimento <= data_fim_mes,
-            or_(
-                SalarioMovimento.movimento_bancario_salario_id.isnot(None),
-                SalarioMovimento.movimento_bancario_beneficio_id.isnot(None),
-            ),
-        ).all()
+        salario_movimentos = (
+            SalarioMovimento.query.filter(
+                SalarioMovimento.usuario_id == current_user.id,
+                SalarioMovimento.data_recebimento >= data_inicio_mes,
+                SalarioMovimento.data_recebimento <= data_fim_mes,
+                or_(
+                    SalarioMovimento.movimento_bancario_salario_id.isnot(None),
+                    SalarioMovimento.movimento_bancario_beneficio_id.isnot(None),
+                ),
+            )
+            .options(
+                subqueryload(SalarioMovimento.itens).joinedload(
+                    SalarioMovimentoItem.salario_item
+                ),
+                joinedload(SalarioMovimento.movimento_bancario_salario),
+                joinedload(SalarioMovimento.movimento_bancario_beneficio),
+            )
+            .all()
+        )
 
         for mov in salario_movimentos:
             if mov.movimento_bancario_salario_id:
@@ -102,6 +113,7 @@ def painel():
                 DespRecMovimento.data_pagamento <= data_fim_mes,
                 DespRecMovimento.despesa_receita.has(natureza="Receita"),
             )
+            .options(joinedload(DespRecMovimento.despesa_receita))
             .all()
         )
         for receita in outras_receitas:
@@ -121,13 +133,16 @@ def painel():
             )
             kpis["receitas"] += valor_realizado
 
-        # --- Coleta de Despesas ---
-        faturas_pagas = CrediarioFatura.query.filter(
-            CrediarioFatura.usuario_id == current_user.id,
-            CrediarioFatura.status.in_(["Paga", "Parcialmente Paga"]),
-            CrediarioFatura.data_pagamento >= data_inicio_mes,
-            CrediarioFatura.data_pagamento <= data_fim_mes,
-        ).all()
+        faturas_pagas = (
+            CrediarioFatura.query.filter(
+                CrediarioFatura.usuario_id == current_user.id,
+                CrediarioFatura.status.in_(["Paga", "Parcialmente Paga"]),
+                CrediarioFatura.data_pagamento >= data_inicio_mes,
+                CrediarioFatura.data_pagamento <= data_fim_mes,
+            )
+            .options(joinedload(CrediarioFatura.crediario))
+            .all()
+        )
         for fatura in faturas_pagas:
             valor_previsto = fatura.valor_total_fatura
             valor_pago = fatura.valor_pago_fatura
@@ -153,6 +168,7 @@ def painel():
                 FinanciamentoParcela.data_pagamento <= data_fim_mes,
                 FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
             )
+            .options(joinedload(FinanciamentoParcela.financiamento))
             .all()
         )
         for parcela in parcelas_pagas:
@@ -180,6 +196,7 @@ def painel():
                 DespRecMovimento.data_pagamento <= data_fim_mes,
                 DespRecMovimento.despesa_receita.has(natureza="Despesa"),
             )
+            .options(joinedload(DespRecMovimento.despesa_receita))
             .all()
         )
         for despesa in outras_despesas:

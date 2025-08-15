@@ -16,6 +16,7 @@ from flask import (
 from flask_login import current_user, login_required
 from sqlalchemy import extract
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.forms.desp_rec_forms import (
@@ -36,6 +37,7 @@ desp_rec_movimento_bp = Blueprint(
 def listar_movimentos():
     movimentos = (
         DespRecMovimento.query.filter_by(usuario_id=current_user.id)
+        .options(joinedload(DespRecMovimento.despesa_receita))
         .order_by(DespRecMovimento.data_vencimento.desc())
         .all()
     )

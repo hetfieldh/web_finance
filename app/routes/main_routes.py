@@ -6,12 +6,14 @@ from decimal import Decimal
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload, subqueryload
 
 from app import db
 from app.models.conta_model import Conta
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 
 main_bp = Blueprint("main", __name__)
@@ -20,14 +22,12 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
-    # --- DADOS BÁSICOS ---
     contas_do_usuario = (
         Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
         .order_by(Conta.nome_banco.asc())
         .all()
     )
 
-    # --- CÁLCULO DOS KPIs ---
     hoje = date.today()
     data_inicio_mes = hoje.replace(day=1)
     if hoje.month == 12:
@@ -37,7 +37,6 @@ def dashboard():
     else:
         data_fim_mes = hoje.replace(month=hoje.month + 1, day=1) - timedelta(days=1)
 
-    # 1. Saldos Separados
     saldo_operacional = Decimal("0.00")
     saldo_investimentos = Decimal("0.00")
     tipos_operacionais = ["Corrente", "Digital", "Dinheiro"]
@@ -47,7 +46,6 @@ def dashboard():
         else:
             saldo_investimentos += conta.saldo_atual
 
-    # 2. Receitas Realizadas no Mês
     receitas_realizadas = Decimal("0.00")
     salario_recebido = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == current_user.id,
@@ -75,7 +73,6 @@ def dashboard():
     )
     receitas_realizadas += outras_receitas
 
-    # 3. Despesas Realizadas no Mês
     despesas_realizadas = Decimal("0.00")
     faturas_pagas = db.session.query(
         func.sum(CrediarioFatura.valor_pago_fatura)
@@ -111,19 +108,17 @@ def dashboard():
     )
     despesas_realizadas += outras_despesas
 
-    # 4. Balanço do Mês
     balanco_mes = receitas_realizadas - despesas_realizadas
 
-    # --- PRÓXIMOS MOVIMENTOS (ENTRADAS E SAÍDAS) ---
     proximos_movimentos = []
 
-    # Despesas e Receitas Pendentes
     desp_rec_pendentes = (
         DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
         .filter(
             DespRecMovimento.usuario_id == current_user.id,
             DespRecMovimento.status == "Pendente",
         )
+        .options(joinedload(DespRecMovimento.despesa_receita))
         .all()
     )
     for item in desp_rec_pendentes:
@@ -138,11 +133,14 @@ def dashboard():
             }
         )
 
-    # Faturas de Crediário Abertas/Fechadas
-    faturas_pendentes = CrediarioFatura.query.filter(
-        CrediarioFatura.usuario_id == current_user.id,
-        CrediarioFatura.status.in_(["Aberta", "Fechada"]),
-    ).all()
+    faturas_pendentes = (
+        CrediarioFatura.query.filter(
+            CrediarioFatura.usuario_id == current_user.id,
+            CrediarioFatura.status.in_(["Aberta", "Fechada"]),
+        )
+        .options(joinedload(CrediarioFatura.crediario))
+        .all()
+    )
     for fatura in faturas_pendentes:
         proximos_movimentos.append(
             {
@@ -153,13 +151,13 @@ def dashboard():
             }
         )
 
-    # Parcelas de Financiamento a Pagar
     parcelas_pendentes = (
         FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
         .filter(
             FinanciamentoParcela.status == "A Pagar",
             FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
         )
+        .options(joinedload(FinanciamentoParcela.financiamento))
         .all()
     )
     for parcela in parcelas_pendentes:
@@ -172,11 +170,18 @@ def dashboard():
             }
         )
 
-    # Salários e Benefícios Pendentes de Recebimento
-    salarios_pendentes = SalarioMovimento.query.filter(
-        SalarioMovimento.usuario_id == current_user.id,
-        SalarioMovimento.status == "Pendente",
-    ).all()
+    salarios_pendentes = (
+        SalarioMovimento.query.filter(
+            SalarioMovimento.usuario_id == current_user.id,
+            SalarioMovimento.status == "Pendente",
+        )
+        .options(
+            subqueryload(SalarioMovimento.itens).joinedload(
+                SalarioMovimentoItem.salario_item
+            )
+        )
+        .all()
+    )
     for salario in salarios_pendentes:
         salario_liquido = sum(
             i.valor for i in salario.itens if i.salario_item.tipo == "Provento"
@@ -209,7 +214,6 @@ def dashboard():
                 }
             )
 
-    # Ordena a lista final por data e pega os 10 primeiros
     proximos_movimentos.sort(key=lambda x: x["data"])
 
     kpis = {

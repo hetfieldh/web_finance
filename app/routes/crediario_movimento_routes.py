@@ -13,6 +13,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 getcontext().prec = 10
 
@@ -41,6 +42,10 @@ crediario_movimento_bp = Blueprint(
 def listar_movimentos_crediario():
     movimentos_crediario = (
         CrediarioMovimento.query.filter_by(usuario_id=current_user.id)
+        .options(
+            joinedload(CrediarioMovimento.crediario),
+            joinedload(CrediarioMovimento.crediario_grupo),
+        )
         .order_by(
             CrediarioMovimento.data_compra.desc(),
             CrediarioMovimento.data_criacao.desc(),

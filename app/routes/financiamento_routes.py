@@ -16,6 +16,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.forms.financiamento_forms import (
@@ -36,6 +37,7 @@ financiamento_bp = Blueprint("financiamento", __name__, url_prefix="/financiamen
 def listar_financiamentos():
     financiamentos = (
         Financiamento.query.filter_by(usuario_id=current_user.id)
+        .options(joinedload(Financiamento.conta))
         .order_by(Financiamento.data_inicio.desc())
         .all()
     )
@@ -48,9 +50,7 @@ def adicionar_financiamento():
     form = CadastroFinanciamentoForm()
 
     if form.validate_on_submit():
-        nome_financiamento = (
-            form.nome_financiamento.data.strip().upper()
-        )  # CORRIGIDO AQUI
+        nome_financiamento = form.nome_financiamento.data.strip().upper()
         conta_id = form.conta_id.data
         valor_total_financiado = form.valor_total_financiado.data
         taxa_juros_anual = form.taxa_juros_anual.data
@@ -112,7 +112,6 @@ def editar_financiamento(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    # --- LÓGICA DE VERIFICAÇÃO CORRIGIDA ---
     if any(p.status == "Paga" for p in financiamento.parcelas):
         flash(
             "Não é possível editar um financiamento que já possui parcelas pagas.",
@@ -157,7 +156,6 @@ def excluir_financiamento(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    # --- LÓGICA DE VERIFICAÇÃO CORRIGIDA ---
     if any(p.status == "Paga" for p in financiamento.parcelas):
         flash(
             "Não é possível excluir um financiamento que já possui parcelas pagas.",
@@ -319,6 +317,7 @@ def visualizar_parcelas(id):
             FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
         )
         .filter(FinanciamentoParcela.financiamento_id == id)
+        .options(joinedload(FinanciamentoParcela.financiamento))
         .order_by(FinanciamentoParcela.numero_parcela.asc())
         .all()
     )

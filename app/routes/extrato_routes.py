@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.forms.extrato_forms import ExtratoBancarioForm
@@ -55,15 +56,18 @@ def extrato_bancario():
 
         saldo_anterior = Decimal(str(conta_selecionada.saldo_inicial))
 
-        movs_anteriores = ContaMovimento.query.filter(
-            ContaMovimento.conta_id == conta_selecionada.id,
-            ContaMovimento.data_movimento < data_inicio_mes,
-        ).all()
+        movs_anteriores = (
+            ContaMovimento.query.filter(
+                ContaMovimento.conta_id == conta_selecionada.id,
+                ContaMovimento.data_movimento < data_inicio_mes,
+            )
+            .options(joinedload(ContaMovimento.tipo_transacao))
+            .all()
+        )
 
         for mov_ant in movs_anteriores:
-            tipo_transacao_ant = ContaTransacao.query.get(mov_ant.conta_transacao_id)
-            if tipo_transacao_ant:
-                if tipo_transacao_ant.tipo == "Crédito":
+            if mov_ant.tipo_transacao:
+                if mov_ant.tipo_transacao.tipo == "Crédito":
                     saldo_anterior += mov_ant.valor
                 else:
                     saldo_anterior -= mov_ant.valor
@@ -74,6 +78,7 @@ def extrato_bancario():
                 ContaMovimento.data_movimento >= data_inicio_mes,
                 ContaMovimento.data_movimento <= data_fim_mes,
             )
+            .options(joinedload(ContaMovimento.tipo_transacao))
             .order_by(ContaMovimento.data_movimento.asc(), ContaMovimento.id.asc())
             .all()
         )
@@ -82,9 +87,8 @@ def extrato_bancario():
         movimentacoes_para_template = []
 
         for mov in movimentacoes_do_mes:
-            tipo_transacao_mov = ContaTransacao.query.get(mov.conta_transacao_id)
-            if tipo_transacao_mov:
-                if tipo_transacao_mov.tipo == "Crédito":
+            if mov.tipo_transacao:
+                if mov.tipo_transacao.tipo == "Crédito":
                     saldo_acumulado_temp += mov.valor
                     total_creditos += mov.valor
                 else:
@@ -95,8 +99,8 @@ def extrato_bancario():
                     {
                         "id": mov.id,
                         "data_movimento": mov.data_movimento,
-                        "tipo_transacao_nome": tipo_transacao_mov.transacao_tipo,
-                        "tipo_movimento": tipo_transacao_mov.tipo,
+                        "tipo_transacao_nome": mov.tipo_transacao.transacao_tipo,
+                        "tipo_movimento": mov.tipo_transacao.tipo,
                         "valor": mov.valor,
                         "descricao": mov.descricao,
                         "saldo_acumulado": saldo_acumulado_temp,

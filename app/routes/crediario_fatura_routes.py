@@ -15,6 +15,7 @@ from flask import (
 from flask_login import current_user, login_required
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.forms.crediario_fatura_forms import GerarFaturaForm
@@ -33,6 +34,7 @@ crediario_fatura_bp = Blueprint(
 def listar_faturas():
     faturas = (
         CrediarioFatura.query.filter_by(usuario_id=current_user.id)
+        .options(joinedload(CrediarioFatura.crediario))
         .order_by(CrediarioFatura.mes_referencia.desc())
         .all()
     )
@@ -224,6 +226,7 @@ def visualizar_fatura(id):
             CrediarioParcela.data_vencimento >= data_inicio_mes,
             CrediarioParcela.data_vencimento <= data_fim_mes,
         )
+        .options(joinedload(CrediarioParcela.movimento_pai))
         .order_by(
             CrediarioParcela.data_vencimento.asc(),
             CrediarioParcela.numero_parcela.asc(),
