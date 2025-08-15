@@ -2,7 +2,6 @@
 
 from flask import (
     Blueprint,
-    current_app,
     flash,
     redirect,
     render_template,
@@ -10,15 +9,19 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-from sqlalchemy.exc import IntegrityError
 
-from app import db
 from app.forms.crediario_grupo_forms import (
     CadastroCrediarioGrupoForm,
     EditarCrediarioGrupoForm,
 )
 from app.models.crediario_grupo_model import CrediarioGrupo
-from app.models.crediario_movimento_model import CrediarioMovimento
+from app.services.crediario_grupo_service import (
+    atualizar_grupo,
+    criar_grupo,
+)
+from app.services.crediario_grupo_service import (
+    excluir_grupo_por_id as excluir_grupo_service,
+)
 
 crediario_grupo_bp = Blueprint(
     "crediario_grupo", __name__, url_prefix="/grupos_crediario"
@@ -45,26 +48,13 @@ def listar_grupos_crediario():
 @login_required
 def adicionar_grupo_crediario():
     form = CadastroCrediarioGrupoForm()
-
     if form.validate_on_submit():
-        grupo_crediario = form.grupo_crediario.data.strip().upper()
-        tipo_grupo_crediario = form.tipo_grupo_crediario.data
-        descricao = form.descricao.data.strip() if form.descricao.data else None
-
-        novo_grupo = CrediarioGrupo(
-            usuario_id=current_user.id,
-            grupo_crediario=grupo_crediario,
-            tipo_grupo_crediario=tipo_grupo_crediario,
-            descricao=descricao,
-        )
-        db.session.add(novo_grupo)
-        db.session.commit()
-        flash("Grupo de crediário adicionado com sucesso!", "success")
-        current_app.logger.info(
-            f'Grupo de crediário "{grupo_crediario}" ({tipo_grupo_crediario}) adicionado por {current_user.login} (ID: {current_user.id})'
-        )
-        return redirect(url_for("crediario_grupo.listar_grupos_crediario"))
-
+        success, message = criar_grupo(form)
+        if success:
+            flash(message, "success")
+            return redirect(url_for("crediario_grupo.listar_grupos_crediario"))
+        else:
+            flash(message, "danger")
     return render_template("crediario_grupos/add.html", form=form)
 
 
@@ -74,29 +64,19 @@ def editar_grupo_crediario(id):
     grupo_crediario_obj = CrediarioGrupo.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-
     form = EditarCrediarioGrupoForm(
+        obj=grupo_crediario_obj,
         original_grupo_crediario=grupo_crediario_obj.grupo_crediario,
         original_tipo_grupo_crediario=grupo_crediario_obj.tipo_grupo_crediario,
     )
 
     if form.validate_on_submit():
-        grupo_crediario_obj.grupo_crediario = form.grupo_crediario.data.strip().upper()
-        grupo_crediario_obj.descricao = (
-            form.descricao.data.strip() if form.descricao.data else None
-        )
-
-        db.session.commit()
-        flash("Grupo de crediário atualizado com sucesso!", "success")
-        current_app.logger.info(
-            f'Grupo de crediário "{grupo_crediario_obj.grupo_crediario}" (ID: {grupo_crediario_obj.id}) atualizado por {current_user.login} (ID: {current_user.id})'
-        )
-        return redirect(url_for("crediario_grupo.listar_grupos_crediario"))
-
-    elif request.method == "GET":
-        form.grupo_crediario.data = grupo_crediario_obj.grupo_crediario
-        form.tipo_grupo_crediario.data = grupo_crediario_obj.tipo_grupo_crediario
-        form.descricao.data = grupo_crediario_obj.descricao
+        success, message = atualizar_grupo(grupo_crediario_obj, form)
+        if success:
+            flash(message, "success")
+            return redirect(url_for("crediario_grupo.listar_grupos_crediario"))
+        else:
+            flash(message, "danger")
 
     return render_template(
         "crediario_grupos/edit.html", form=form, grupo_crediario_obj=grupo_crediario_obj
@@ -106,21 +86,9 @@ def editar_grupo_crediario(id):
 @crediario_grupo_bp.route("/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_grupo_crediario(id):
-    grupo_crediario_obj = CrediarioGrupo.query.filter_by(
-        id=id, usuario_id=current_user.id
-    ).first_or_404()
-
-    if len(grupo_crediario_obj.movimentos) > 0:
-        flash(
-            "Não é possível excluir este grupo de crediário. Existem movimentos de crediário associados a ele.",
-            "danger",
-        )
-        return redirect(url_for("crediario_grupo.listar_grupos_crediario"))
-
-    db.session.delete(grupo_crediario_obj)
-    db.session.commit()
-    flash("Grupo de crediário excluído com sucesso!", "success")
-    current_app.logger.info(
-        f'Grupo de crediário "{grupo_crediario_obj.grupo_crediario}" (ID: {grupo_crediario_obj.id}) excluído por {current_user.login} (ID: {current_user.id})'
-    )
+    success, message = excluir_grupo_service(id)
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "danger")
     return redirect(url_for("crediario_grupo.listar_grupos_crediario"))

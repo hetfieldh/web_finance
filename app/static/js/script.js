@@ -256,4 +256,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     atualizarContaDestino();
   }
+
+  // --- 10. Lógica para filtros dinâmicos do Extrato Desp/Rec ---
+  const tipoRelatorioSelect = document.getElementById("tipo_relatorio");
+  if (tipoRelatorioSelect) {
+    const filtroMensal = document.getElementById("filtro_mensal");
+    const filtroConta = document.getElementById("filtro_conta");
+    const filtroDataInicio = document.getElementById("filtro_data_inicio");
+    const filtroDataFim = document.getElementById("filtro_data_fim");
+
+    function toggleFilters() {
+      if (tipoRelatorioSelect.value === "mensal") {
+        filtroMensal.style.display = "block";
+        filtroConta.style.display = "none";
+        filtroDataInicio.style.display = "none";
+        filtroDataFim.style.display = "none";
+      } else {
+        // periodo
+        filtroMensal.style.display = "none";
+        filtroConta.style.display = "block";
+        filtroDataInicio.style.display = "block";
+        filtroDataFim.style.display = "block";
+      }
+    }
+
+    tipoRelatorioSelect.addEventListener("change", toggleFilters);
+
+    // Executa a função no carregamento da página para definir o estado inicial correto
+    toggleFilters();
+  }
 });

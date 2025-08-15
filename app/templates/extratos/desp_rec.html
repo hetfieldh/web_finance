@@ -1,4 +1,4 @@
-<!-- app/templates/extratos/desp_rec.html -->
+<!--- app\templates\extratos\desp_rec.html -->
 
 {% extends "base.html" %}
 {% from "includes/_macros.html" import render_field %}
@@ -42,8 +42,7 @@
                         <div class="col-md-2">
                             <button type="submit"
                                 class="btn btn-success btn-add">
-                                <i class="fas fa-search me-1"></i> {{
-                                form.submit.label.text }}
+                                <i class="fas fa-search me-1"></i> Filtrar
                             </button>
                         </div>
                     </div>
@@ -124,36 +123,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tipoRelatorioSelect = document.getElementById('tipo_relatorio');
-
-    const filtroMensal = document.getElementById('filtro_mensal');
-    const filtroConta = document.getElementById('filtro_conta');
-    const filtroDataInicio = document.getElementById('filtro_data_inicio');
-    const filtroDataFim = document.getElementById('filtro_data_fim');
-
-    function toggleFilters() {
-        if (tipoRelatorioSelect.value === 'mensal') {
-            filtroMensal.style.display = 'block';
-            filtroConta.style.display = 'none';
-            filtroDataInicio.style.display = 'none';
-            filtroDataFim.style.display = 'none';
-        } else { // periodo
-            filtroMensal.style.display = 'none';
-            filtroConta.style.display = 'block';
-            filtroDataInicio.style.display = 'block';
-            filtroDataFim.style.display = 'block';
-        }
-    }
-
-    tipoRelatorioSelect.addEventListener('change', toggleFilters);
-
-    // Executa a função no carregamento da página para definir o estado inicial correto
-    toggleFilters();
-});
-</script>
 {% endblock %}

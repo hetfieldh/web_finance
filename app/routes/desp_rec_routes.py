@@ -2,7 +2,6 @@
 
 from flask import (
     Blueprint,
-    current_app,
     flash,
     redirect,
     render_template,
@@ -10,11 +9,13 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
-from sqlalchemy.exc import IntegrityError
 
-from app import db
 from app.forms.desp_rec_forms import CadastroDespRecForm, EditarDespRecForm
 from app.models.desp_rec_model import DespRec
+from app.services.desp_rec_service import atualizar_cadastro, criar_cadastro
+from app.services.desp_rec_service import (
+    excluir_cadastro_por_id as excluir_cadastro_service,
+)
 
 desp_rec_bp = Blueprint("desp_rec", __name__, url_prefix="/despesas_receitas")
 
@@ -35,27 +36,12 @@ def listar_cadastros():
 def adicionar_cadastro():
     form = CadastroDespRecForm()
     if form.validate_on_submit():
-        try:
-            novo_cadastro = DespRec(
-                usuario_id=current_user.id,
-                nome=form.nome.data.strip().upper(),
-                natureza=form.natureza.data,
-                tipo=form.tipo.data,
-                dia_vencimento=form.dia_vencimento.data,
-                ativo=form.ativo.data,
-            )
-            db.session.add(novo_cadastro)
-            db.session.commit()
-            flash("Cadastro adicionado com sucesso!", "success")
-            current_app.logger.info(
-                f"Cadastro de Despesa/Receita '{novo_cadastro.nome}' criado por {current_user.login}."
-            )
+        success, message = criar_cadastro(form)
+        if success:
+            flash(message, "success")
             return redirect(url_for("desp_rec.listar_cadastros"))
-        except Exception as e:
-            db.session.rollback()
-            flash("Erro ao adicionar o cadastro. Tente novamente.", "danger")
-            current_app.logger.error(f"Erro ao adicionar DespRec: {e}", exc_info=True)
-
+        else:
+            flash(message, "danger")
     return render_template("desp_rec/add.html", form=form, title="Adicionar Cadastro")
 
 
@@ -66,28 +52,12 @@ def editar_cadastro(id):
     form = EditarDespRecForm(obj=cadastro)
 
     if form.validate_on_submit():
-        try:
-            cadastro.dia_vencimento = form.dia_vencimento.data
-            cadastro.ativo = form.ativo.data
-            db.session.commit()
-            flash("Cadastro atualizado com sucesso!", "success")
-            current_app.logger.info(
-                f"Cadastro de Despesa/Receita ID {id} atualizado por {current_user.login}."
-            )
+        success, message = atualizar_cadastro(cadastro, form)
+        if success:
+            flash(message, "success")
             return redirect(url_for("desp_rec.listar_cadastros"))
-        except Exception as e:
-            db.session.rollback()
-            flash("Erro ao atualizar o cadastro. Tente novamente.", "danger")
-            current_app.logger.error(
-                f"Erro ao editar DespRec ID {id}: {e}", exc_info=True
-            )
-
-    elif request.method == "GET":
-        form.nome.data = cadastro.nome
-        form.natureza.data = cadastro.natureza
-        form.tipo.data = cadastro.tipo
-        form.dia_vencimento.data = cadastro.dia_vencimento
-        form.ativo.data = cadastro.ativo
+        else:
+            flash(message, "danger")
 
     return render_template(
         "desp_rec/edit.html", form=form, title="Editar Cadastro", cadastro=cadastro
@@ -97,25 +67,9 @@ def editar_cadastro(id):
 @desp_rec_bp.route("/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_cadastro(id):
-    cadastro = DespRec.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
-
-    if cadastro.movimentos:
-        flash(
-            "Não é possível excluir este cadastro, pois existem lançamentos associados a ele.",
-            "danger",
-        )
-        return redirect(url_for("desp_rec.listar_cadastros"))
-
-    try:
-        db.session.delete(cadastro)
-        db.session.commit()
-        flash("Cadastro excluído com sucesso!", "success")
-        current_app.logger.info(
-            f"Cadastro de Despesa/Receita ID {id} ('{cadastro.nome}') excluído por {current_user.login}."
-        )
-    except Exception as e:
-        db.session.rollback()
-        flash("Erro ao excluir o cadastro. Tente novamente.", "danger")
-        current_app.logger.error(f"Erro ao excluir DespRec ID {id}: {e}", exc_info=True)
-
+    success, message = excluir_cadastro_service(id)
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "danger")
     return redirect(url_for("desp_rec.listar_cadastros"))

@@ -1,11 +1,10 @@
 # app/routes/pagamentos_routes.py
 
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from decimal import Decimal
 
 from flask import (
     Blueprint,
-    current_app,
     flash,
     redirect,
     render_template,
@@ -14,17 +13,19 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.forms.pagamentos_forms import PagamentoForm, PainelPagamentosForm
-from app.models.conta_model import Conta
-from app.models.conta_movimento_model import ContaMovimento
-from app.models.conta_transacao_model import ContaTransacao
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.services.pagamento_service import (
+    estornar_pagamento as estornar_pagamento_service,
+)
+from app.services.pagamento_service import registrar_pagamento
 
 pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 
@@ -54,12 +55,16 @@ def painel():
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
-        # 1. Buscar Faturas de Crediário
-        faturas = CrediarioFatura.query.filter(
-            CrediarioFatura.usuario_id == current_user.id,
-            CrediarioFatura.data_vencimento_fatura >= data_inicio_mes,
-            CrediarioFatura.data_vencimento_fatura <= data_fim_mes,
-        ).all()
+        faturas = (
+            CrediarioFatura.query.filter(
+                CrediarioFatura.usuario_id == current_user.id,
+                CrediarioFatura.data_vencimento_fatura >= data_inicio_mes,
+                CrediarioFatura.data_vencimento_fatura <= data_fim_mes,
+            )
+            .options(joinedload(CrediarioFatura.crediario))
+            .all()
+        )
+
         for fatura in faturas:
             soma_real_parcelas = (
                 db.session.query(
@@ -78,7 +83,6 @@ def painel():
                 .scalar()
             )
             desatualizada = fatura.valor_total_fatura != soma_real_parcelas
-
             valor_original = fatura.valor_total_fatura
             valor_pago = fatura.valor_pago_fatura
             contas_a_pagar.append(
@@ -97,7 +101,6 @@ def painel():
             totais["previsto"] += valor_original
             totais["pago"] += valor_pago
 
-        # 2. Buscar Parcelas de Financiamento
         parcelas = (
             FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
             .filter(
@@ -105,6 +108,7 @@ def painel():
                 FinanciamentoParcela.data_vencimento <= data_fim_mes,
                 FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
             )
+            .options(joinedload(FinanciamentoParcela.financiamento))
             .all()
         )
         for parcela in parcelas:
@@ -130,7 +134,6 @@ def painel():
             totais["previsto"] += valor_original
             totais["pago"] += valor_pago
 
-        # 3. Buscar Despesas
         despesas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
             .filter(
@@ -139,6 +142,7 @@ def painel():
                 DespRecMovimento.data_vencimento <= data_fim_mes,
                 DespRecMovimento.despesa_receita.has(natureza="Despesa"),
             )
+            .options(joinedload(DespRecMovimento.despesa_receita))
             .all()
         )
         for despesa in despesas:
@@ -178,75 +182,11 @@ def painel():
 def pagar_conta():
     form = PagamentoForm()
     if form.validate_on_submit():
-        try:
-            conta_debito = Conta.query.get(form.conta_id.data)
-            valor_pago = form.valor_pago.data
-
-            saldo_disponivel = conta_debito.saldo_atual
-            if conta_debito.tipo in ["Corrente", "Digital"] and conta_debito.limite:
-                saldo_disponivel += conta_debito.limite
-
-            if valor_pago > saldo_disponivel:
-                flash(
-                    f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível (com limite): R$ {saldo_disponivel:.2f}",
-                    "danger",
-                )
-                return redirect(
-                    url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano"))
-                )
-
-            tipo_transacao_debito = ContaTransacao.query.filter_by(
-                usuario_id=current_user.id, transacao_tipo="PAGAMENTO", tipo="Débito"
-            ).first()
-            if not tipo_transacao_debito:
-                flash(
-                    'Tipo de transação "PAGAMENTO" (Débito) não encontrado. Por favor, cadastre-o primeiro.',
-                    "danger",
-                )
-                return redirect(url_for("pagamentos.painel"))
-
-            novo_movimento = ContaMovimento(
-                usuario_id=current_user.id,
-                conta_id=conta_debito.id,
-                conta_transacao_id=tipo_transacao_debito.id,
-                data_movimento=form.data_pagamento.data,
-                valor=valor_pago,
-                descricao=form.item_descricao.data,
-            )
-            db.session.add(novo_movimento)
-            conta_debito.saldo_atual -= valor_pago
-            db.session.flush()
-
-            item_id = form.item_id.data
-            item_tipo = form.item_tipo.data
-
-            if item_tipo == "Despesa":
-                item = DespRecMovimento.query.get(item_id)
-                item.status = "Pago"
-                item.valor_realizado = valor_pago
-                item.data_pagamento = form.data_pagamento.data
-                item.movimento_bancario_id = novo_movimento.id
-            elif item_tipo == "Financiamento":
-                item = FinanciamentoParcela.query.get(item_id)
-                item.status = "Paga"
-                item.data_pagamento = form.data_pagamento.data
-                item.movimento_bancario_id = novo_movimento.id
-            elif item_tipo == "Crediário":
-                item = CrediarioFatura.query.get(item_id)
-                item.valor_pago_fatura += valor_pago
-                item.data_pagamento = form.data_pagamento.data
-                item.movimento_bancario_id = novo_movimento.id
-                if item.valor_pago_fatura >= item.valor_total_fatura:
-                    item.status = "Paga"
-                else:
-                    item.status = "Parcialmente Paga"
-
-            db.session.commit()
-            flash("Pagamento registrado com sucesso!", "success")
-        except Exception as e:
-            db.session.rollback()
-            flash("Ocorreu um erro ao registrar o pagamento.", "danger")
-            current_app.logger.error(f"Erro ao pagar conta: {e}", exc_info=True)
+        success, message = registrar_pagamento(form)
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "danger")
 
     return redirect(url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano")))
 
@@ -257,48 +197,10 @@ def estornar_pagamento():
     item_id = request.form.get("item_id")
     item_tipo = request.form.get("item_tipo")
 
-    try:
-        movimento_bancario_id = None
-        item_a_atualizar = None
-
-        if item_tipo == "Despesa":
-            item_a_atualizar = DespRecMovimento.query.get(item_id)
-            if item_a_atualizar:
-                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-                item_a_atualizar.status = "Pendente"
-                item_a_atualizar.valor_realizado = None
-                item_a_atualizar.data_pagamento = None
-                item_a_atualizar.movimento_bancario_id = None
-
-        elif item_tipo == "Financiamento":
-            item_a_atualizar = FinanciamentoParcela.query.get(item_id)
-            if item_a_atualizar:
-                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-                item_a_atualizar.status = "A Pagar"
-                item_a_atualizar.data_pagamento = None
-                item_a_atualizar.movimento_bancario_id = None
-
-        elif item_tipo == "Crediário":
-            item_a_atualizar = CrediarioFatura.query.get(item_id)
-            if item_a_atualizar:
-                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-                item_a_atualizar.valor_pago_fatura = Decimal("0.00")
-                item_a_atualizar.status = "Aberta"
-                item_a_atualizar.data_pagamento = None
-                item_a_atualizar.movimento_bancario_id = None
-
-        if movimento_bancario_id:
-            movimento_bancario = ContaMovimento.query.get(movimento_bancario_id)
-            if movimento_bancario:
-                conta_bancaria = Conta.query.get(movimento_bancario.conta_id)
-                conta_bancaria.saldo_atual += movimento_bancario.valor
-                db.session.delete(movimento_bancario)
-
-        db.session.commit()
-        flash("Pagamento estornado com sucesso!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash("Ocorreu um erro ao estornar o pagamento.", "danger")
-        current_app.logger.error(f"Erro ao estornar pagamento: {e}", exc_info=True)
+    success, message = estornar_pagamento_service(item_id, item_tipo)
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "danger")
 
     return redirect(url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano")))

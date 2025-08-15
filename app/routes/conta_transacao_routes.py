@@ -2,23 +2,27 @@
 
 from flask import (
     Blueprint,
+    flash,
+    redirect,
     render_template,
     request,
-    redirect,
     url_for,
-    flash,
-    current_app,
 )
-from flask_login import login_required, current_user
-from app import db
-from app.models.conta_transacao_model import ContaTransacao
-from app.models.conta_movimento_model import ContaMovimento
+from flask_login import current_user, login_required
+from sqlalchemy import asc
+
 from app.forms.conta_transacao_forms import (
     CadastroContaTransacaoForm,
     EditarContaTransacaoForm,
 )
-from sqlalchemy import asc, desc
-
+from app.models.conta_transacao_model import ContaTransacao
+from app.services.conta_transacao_service import (
+    atualizar_tipo_transacao,
+    criar_tipo_transacao,
+)
+from app.services.conta_transacao_service import (
+    excluir_tipo_transacao_por_id as excluir_tipo_transacao_service,
+)
 
 conta_transacao_bp = Blueprint(
     "conta_transacao", __name__, url_prefix="/tipos_transacao"
@@ -42,24 +46,13 @@ def listar_tipos_transacao():
 @login_required
 def adicionar_tipo_transacao():
     form = CadastroContaTransacaoForm()
-
     if form.validate_on_submit():
-        transacao_tipo = form.transacao_tipo.data.strip().upper()
-        tipo_movimento = form.tipo.data
-
-        novo_tipo_transacao = ContaTransacao(
-            usuario_id=current_user.id,
-            transacao_tipo=transacao_tipo,
-            tipo=tipo_movimento,
-        )
-        db.session.add(novo_tipo_transacao)
-        db.session.commit()
-        flash("Tipo de transação adicionado com sucesso!", "success")
-        current_app.logger.info(
-            f'Tipo de transação "{transacao_tipo}" ({tipo_movimento}) adicionado por {current_user.login} (ID: {current_user.id})'
-        )
-        return redirect(url_for("conta_transacao.listar_tipos_transacao"))
-
+        success, message = criar_tipo_transacao(form)
+        if success:
+            flash(message, "success")
+            return redirect(url_for("conta_transacao.listar_tipos_transacao"))
+        else:
+            flash(message, "danger")
     return render_template("conta_transacoes/add.html", form=form)
 
 
@@ -69,27 +62,19 @@ def editar_tipo_transacao(id):
     tipo_transacao = ContaTransacao.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-
     form = EditarContaTransacaoForm(
+        obj=tipo_transacao,
         original_transacao_tipo=tipo_transacao.transacao_tipo,
         original_tipo=tipo_transacao.tipo,
     )
 
     if form.validate_on_submit():
-        tipo_transacao.transacao_tipo = form.transacao_tipo.data.strip().upper()
-
-        tipo_transacao.tipo = tipo_transacao.tipo
-
-        db.session.commit()
-        flash("Tipo de transação atualizado com sucesso!", "success")
-        current_app.logger.info(
-            f'Tipo de transação "{tipo_transacao.transacao_tipo}" (ID: {tipo_transacao.id}) atualizado por {current_user.login} (ID: {current_user.id})'
-        )
-        return redirect(url_for("conta_transacao.listar_tipos_transacao"))
-
-    elif request.method == "GET":
-        form.transacao_tipo.data = tipo_transacao.transacao_tipo
-        form.tipo.data = tipo_transacao.tipo
+        success, message = atualizar_tipo_transacao(tipo_transacao, form)
+        if success:
+            flash(message, "success")
+            return redirect(url_for("conta_transacao.listar_tipos_transacao"))
+        else:
+            flash(message, "danger")
 
     return render_template(
         "conta_transacoes/edit.html", form=form, tipo_transacao=tipo_transacao
@@ -99,21 +84,9 @@ def editar_tipo_transacao(id):
 @conta_transacao_bp.route("/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_tipo_transacao(id):
-    tipo_transacao = ContaTransacao.query.filter_by(
-        id=id, usuario_id=current_user.id
-    ).first_or_404()
-
-    if len(tipo_transacao.movimentos) > 0:
-        flash(
-            "Não é possível excluir este tipo de transação. Existem movimentações associadas a ele.",
-            "danger",
-        )
-        return redirect(url_for("conta_transacao.listar_tipos_transacao"))
-
-    db.session.delete(tipo_transacao)
-    db.session.commit()
-    flash("Tipo de transação excluído com sucesso!", "success")
-    current_app.logger.info(
-        f'Tipo de transação "{tipo_transacao.transacao_tipo}" (ID: {tipo_transacao.id}) excluído por {current_user.login} (ID: {current_user.id})'
-    )
+    success, message = excluir_tipo_transacao_service(id)
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "danger")
     return redirect(url_for("conta_transacao.listar_tipos_transacao"))

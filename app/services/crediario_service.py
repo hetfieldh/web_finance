@@ -1,0 +1,96 @@
+# app/services/crediario_service.py
+
+from flask import current_app
+from flask_login import current_user
+
+from app import db
+from app.models.crediario_model import Crediario
+
+
+def criar_crediario(form):
+    """
+    Processa a criação de um novo crediário.
+    A validação de duplicidade já é feita no formulário.
+    Retorna uma tupla (sucesso, mensagem).
+    """
+    try:
+        novo_crediario = Crediario(
+            usuario_id=current_user.id,
+            nome_crediario=form.nome_crediario.data.strip().upper(),
+            tipo_crediario=form.tipo_crediario.data,
+            identificador_final=(
+                form.identificador_final.data.strip().upper()
+                if form.identificador_final.data
+                else None
+            ),
+            limite_total=form.limite_total.data,
+            ativa=form.ativa.data,
+        )
+        db.session.add(novo_crediario)
+        db.session.commit()
+        current_app.logger.info(
+            f'Crediário "{novo_crediario.nome_crediario}" ({novo_crediario.tipo_crediario}) adicionado por {current_user.login}.'
+        )
+        return True, "Crediário adicionado com sucesso!"
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Erro ao criar crediário: {e}", exc_info=True)
+        return False, "Ocorreu um erro ao criar o crediário."
+
+
+def atualizar_crediario(crediario, form):
+    """
+    Processa a atualização de um crediário.
+    A validação de duplicidade já é feita no formulário.
+    Retorna uma tupla (sucesso, mensagem).
+    """
+    try:
+        crediario.nome_crediario = form.nome_crediario.data.strip().upper()
+        crediario.identificador_final = (
+            form.identificador_final.data.strip().upper()
+            if form.identificador_final.data
+            else None
+        )
+        crediario.limite_total = form.limite_total.data
+        crediario.ativa = form.ativa.data
+        db.session.commit()
+        current_app.logger.info(
+            f'Crediário "{crediario.nome_crediario}" (ID: {crediario.id}) atualizado por {current_user.login}.'
+        )
+        return True, "Crediário atualizado com sucesso!"
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(
+            f"Erro ao atualizar crediário ID {crediario.id}: {e}", exc_info=True
+        )
+        return False, "Ocorreu um erro ao atualizar o crediário."
+
+
+def excluir_crediario_por_id(crediario_id):
+    """
+    Processa a exclusão de um crediário, validando as regras de negócio.
+    Retorna uma tupla (sucesso, mensagem).
+    """
+    crediario = Crediario.query.filter_by(
+        id=crediario_id, usuario_id=current_user.id
+    ).first_or_404()
+
+    if crediario.movimentos:
+        return (
+            False,
+            "Não é possível excluir este crediário. Existem movimentos de crediário associados a ele.",
+        )
+
+    try:
+        db.session.delete(crediario)
+        db.session.commit()
+        current_app.logger.info(
+            f'Crediário "{crediario.nome_crediario}" (ID: {crediario.id}) excluído por {current_user.login}.'
+        )
+        return True, "Crediário excluído com sucesso!"
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(
+            f"Erro ao excluir crediário ID {crediario.id}: {e}", exc_info=True
+        )
+        return False, "Ocorreu um erro ao excluir o crediário."

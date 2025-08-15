@@ -1,7 +1,5 @@
 # app/routes/salario_routes.py
 
-from decimal import Decimal
-
 from flask import (
     Blueprint,
     current_app,
@@ -12,6 +10,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy.orm import joinedload, subqueryload
 
 from app import db
 from app.forms.salario_forms import (
@@ -23,6 +22,16 @@ from app.forms.salario_forms import (
 from app.models.salario_item_model import SalarioItem
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
+from app.services.salario_service import (
+    adicionar_item_folha,
+    criar_folha_pagamento,
+)
+from app.services.salario_service import (
+    excluir_folha_pagamento as excluir_folha_pagamento_service,
+)
+from app.services.salario_service import (
+    excluir_item_folha as excluir_item_folha_service,
+)
 
 salario_bp = Blueprint("salario", __name__, url_prefix="/salario")
 
@@ -136,6 +145,11 @@ def excluir_item(id):
 def listar_movimentos():
     movimentos = (
         SalarioMovimento.query.filter_by(usuario_id=current_user.id)
+        .options(
+            subqueryload(SalarioMovimento.itens).joinedload(
+                SalarioMovimentoItem.salario_item
+            )
+        )
         .order_by(SalarioMovimento.mes_referencia.desc())
         .all()
     )
@@ -151,36 +165,13 @@ def listar_movimentos():
 def novo_lancamento_folha():
     form = CabecalhoFolhaForm()
     if form.validate_on_submit():
-        movimento_existente = SalarioMovimento.query.filter_by(
-            usuario_id=current_user.id, mes_referencia=form.mes_referencia.data
-        ).first()
-        if movimento_existente:
-            flash(
-                f"Já existe uma folha de pagamento para o mês {form.mes_referencia.data}.",
-                "warning",
-            )
-            return redirect(
-                url_for("salario.gerenciar_itens_folha", id=movimento_existente.id)
-            )
+        success, message, movimento = criar_folha_pagamento(form)
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "warning")
 
-        try:
-            novo_movimento = SalarioMovimento(
-                usuario_id=current_user.id,
-                mes_referencia=form.mes_referencia.data,
-                data_recebimento=form.data_recebimento.data,
-            )
-            db.session.add(novo_movimento)
-            db.session.commit()
-            flash("Folha de pagamento criada. Agora adicione as verbas.", "success")
-            return redirect(
-                url_for("salario.gerenciar_itens_folha", id=novo_movimento.id)
-            )
-        except Exception as e:
-            db.session.rollback()
-            flash("Erro ao criar a folha de pagamento.", "danger")
-            current_app.logger.error(
-                f"Erro ao criar SalarioMovimento: {e}", exc_info=True
-            )
+        return redirect(url_for("salario.gerenciar_itens_folha", id=movimento.id))
 
     return render_template(
         "salario_movimento/add.html", form=form, title="Nova Folha de Pagamento"
@@ -201,28 +192,11 @@ def gerenciar_itens_folha(id):
     )
 
     if form.validate_on_submit():
-        if is_locked:
-            flash(
-                "Não é possível adicionar verbas a uma folha de pagamento já recebida.",
-                "warning",
-            )
-            return redirect(url_for("salario.gerenciar_itens_folha", id=id))
-
-        try:
-            novo_item = SalarioMovimentoItem(
-                salario_movimento_id=movimento.id,
-                salario_item_id=form.salario_item_id.data,
-                valor=form.valor.data,
-            )
-            db.session.add(novo_item)
-            db.session.commit()
-            flash("Verba adicionada com sucesso!", "success")
-        except Exception as e:
-            db.session.rollback()
-            flash("Erro ao adicionar verba.", "danger")
-            current_app.logger.error(
-                f"Erro ao adicionar SalarioMovimentoItem: {e}", exc_info=True
-            )
+        success, message = adicionar_item_folha(id, form)
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "warning")
         return redirect(url_for("salario.gerenciar_itens_folha", id=id))
 
     totais = {
@@ -268,30 +242,12 @@ def gerenciar_itens_folha(id):
 def excluir_item_folha(item_id):
     item = SalarioMovimentoItem.query.get_or_404(item_id)
     movimento_id = item.salario_movimento_id
-    movimento = SalarioMovimento.query.filter_by(
-        id=movimento_id, usuario_id=current_user.id
-    ).first_or_404()
 
-    if (
-        movimento.movimento_bancario_salario_id
-        or movimento.movimento_bancario_beneficio_id
-    ):
-        flash(
-            "Não é possível remover verbas de uma folha de pagamento já recebida.",
-            "warning",
-        )
-        return redirect(url_for("salario.gerenciar_itens_folha", id=movimento_id))
-
-    try:
-        db.session.delete(item)
-        db.session.commit()
-        flash("Verba removida com sucesso!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash("Erro ao remover verba.", "danger")
-        current_app.logger.error(
-            f"Erro ao excluir SalarioMovimentoItem ID {item_id}: {e}", exc_info=True
-        )
+    success, message = excluir_item_folha_service(item_id)
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "warning")
 
     return redirect(url_for("salario.gerenciar_itens_folha", id=movimento_id))
 
@@ -299,32 +255,10 @@ def excluir_item_folha(item_id):
 @salario_bp.route("/lancamento/excluir/<int:id>", methods=["POST"])
 @login_required
 def excluir_movimento(id):
-    movimento = SalarioMovimento.query.filter_by(
-        id=id, usuario_id=current_user.id
-    ).first_or_404()
-
-    if (
-        movimento.movimento_bancario_salario_id
-        or movimento.movimento_bancario_beneficio_id
-    ):
-        flash(
-            "Não é possível excluir uma folha de pagamento que já foi conciliada com uma movimentação bancária.",
-            "danger",
-        )
-        return redirect(url_for("salario.listar_movimentos"))
-
-    try:
-        db.session.delete(movimento)
-        db.session.commit()
-        flash("Folha de pagamento excluída com sucesso!", "success")
-        current_app.logger.info(
-            f"Folha de pagamento ID {id} excluída por {current_user.login}."
-        )
-    except Exception as e:
-        db.session.rollback()
-        flash("Erro ao excluir a folha de pagamento.", "danger")
-        current_app.logger.error(
-            f"Erro ao excluir folha de pagamento ID {id}: {e}", exc_info=True
-        )
+    success, message = excluir_folha_pagamento_service(id)
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "danger")
 
     return redirect(url_for("salario.listar_movimentos"))
