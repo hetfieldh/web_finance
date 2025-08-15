@@ -199,3 +199,81 @@ class EditarUsuarioForm(FlaskForm):
             usuario = Usuario.query.filter_by(login=login.data).first()
             if usuario:
                 raise ValidationError("Este login já está em uso por outro usuário.")
+
+
+class PerfilUsuarioForm(FlaskForm):
+    nome = StringField(
+        "Nome",
+        validators=[
+            DataRequired("O campo nome é obrigatório."),
+            Length(min=3, max=50, message="O nome deve ter entre 3 e 50 caracteres."),
+            Regexp(
+                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
+                message="O nome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
+            ),
+        ],
+    )
+    sobrenome = StringField(
+        "Sobrenome",
+        validators=[
+            DataRequired("O campo sobrenome é obrigatório."),
+            Length(
+                min=3, max=50, message="O sobrenome deve ter entre 3 e 50 caracteres."
+            ),
+            Regexp(
+                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
+                message="O sobrenome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
+            ),
+        ],
+    )
+    email = StringField(
+        "E-mail",
+        validators=[
+            DataRequired("O campo e-mail é obrigatório."),
+            validar_email_strict_custom,
+            Length(max=120),
+        ],
+    )
+    login = StringField("Login/Usuário", render_kw={"readonly": True})
+
+    senha_atual = PasswordField(
+        "Senha Atual",
+        validators=[
+            Optional(),
+        ],
+        description="Necessária apenas se desejar alterar a senha.",
+    )
+    nova_senha = PasswordField(
+        "Nova Senha",
+        validators=[
+            Optional(),
+            validar_senha_forte_custom,
+        ],
+    )
+    confirmar_nova_senha = PasswordField(
+        "Confirmar Nova Senha",
+        validators=[
+            EqualTo(
+                "nova_senha", message="A nova senha e a confirmação não coincidem."
+            ),
+        ],
+    )
+    submit = SubmitField("Atualizar Perfil")
+
+    def __init__(self, original_email, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.original_email = original_email
+
+    def validate_email(self, email):
+        if email.data != self.original_email:
+            usuario = Usuario.query.filter_by(email=email.data).first()
+            if usuario:
+                raise ValidationError(
+                    "Este e-mail já está cadastrado por outro usuário."
+                )
+
+    def validate_senha_atual(self, field):
+        if self.nova_senha.data and not field.data:
+            raise ValidationError(
+                "A senha atual é obrigatória para definir uma nova senha."
+            )

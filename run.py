@@ -4,9 +4,14 @@ import os
 
 from dotenv import load_dotenv
 
-from app import create_app
+# Constrói o caminho absoluto para o arquivo .env
+basedir = os.path.abspath(os.path.dirname(__file__))
+dotenv_path = os.path.join(basedir, ".env")
 
-load_dotenv()
+# Carrega o .env a partir do caminho específico
+load_dotenv(dotenv_path=dotenv_path)
+
+from app import create_app
 
 app = create_app()
 

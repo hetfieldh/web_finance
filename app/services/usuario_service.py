@@ -78,3 +78,28 @@ def excluir_usuario_por_id(usuario_id):
             f"Erro ao excluir usuário ID {usuario_id}: {e}", exc_info=True
         )
         return False, "Ocorreu um erro inesperado ao excluir o usuário."
+
+
+def atualizar_perfil_usuario(usuario, form):
+    try:
+        usuario.nome = form.nome.data.strip().upper()
+        usuario.sobrenome = form.sobrenome.data.strip().upper()
+        usuario.email = form.email.data.strip()
+
+        if form.nova_senha.data:
+            if not usuario.check_password(form.senha_atual.data):
+                return False, {"senha_atual": ["A senha atual está incorreta."]}
+
+            usuario.set_password(form.nova_senha.data)
+
+        db.session.commit()
+        current_app.logger.info(
+            f"Perfil do usuário {usuario.login} atualizado com sucesso."
+        )
+        return True, "Perfil atualizado com sucesso!"
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(
+            f"Erro ao atualizar perfil do usuário {usuario.login}: {e}", exc_info=True
+        )
+        return False, {"form": ["Ocorreu um erro inesperado ao atualizar o perfil."]}

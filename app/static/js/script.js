@@ -285,4 +285,92 @@ document.addEventListener("DOMContentLoaded", () => {
     // Executa a função no carregamento da página para definir o estado inicial correto
     toggleFilters();
   }
+
+  // --- 11. Lógica AJAX para Gerenciar Folha de Pagamento ---
+  const formAdicionarVerba = document.getElementById("form-adicionar-verba");
+  const tabelaVerbasCorpo = document.getElementById("tabela-verbas-corpo");
+
+  // Função para Adicionar Verba
+  if (formAdicionarVerba) {
+    formAdicionarVerba.addEventListener("submit", function (event) {
+      event.preventDefault(); // Impede o recarregamento da página
+
+      const formData = new FormData(this);
+      const url = this.action;
+
+      fetch(url, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Adiciona a nova linha na tabela
+            const novaLinha = document.createElement("tr");
+            novaLinha.id = `verba-${data.item.id}`;
+            novaLinha.innerHTML = `
+                        <td>${data.item.nome}</td>
+                        <td><span class="badge bg-secondary">${data.item.tipo}</span></td>
+                        <td class="text-end">R$ ${data.item.valor.toFixed(2)}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn-excluir-verba p-0 border-0 bg-transparent text-danger"
+                                    data-url="/salario/lancamento/item/excluir/${data.item.id}"
+                                    data-id="${data.item.id}" title="Excluir">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+            // Remove a mensagem de "nenhuma verba" se ela existir
+            const linhaVazia =
+              tabelaVerbasCorpo.querySelector('td[colspan="4"]');
+            if (linhaVazia) {
+              linhaVazia.parentElement.remove();
+            }
+
+            tabelaVerbasCorpo.appendChild(novaLinha);
+            formAdicionarVerba.reset(); // Limpa o formulário
+            // Nota: a atualização dos totais ainda exigiria um recarregamento ou mais JS.
+          } else {
+            alert("Erro: " + data.message);
+          }
+        })
+        .catch((error) => console.error("Erro na requisição AJAX:", error));
+    });
+  }
+
+  // Função para Excluir Verba (usando delegação de eventos)
+  if (tabelaVerbasCorpo) {
+    tabelaVerbasCorpo.addEventListener("click", function (event) {
+      const target = event.target.closest(".btn-excluir-verba");
+      if (!target) return;
+
+      if (confirm("Tem certeza que deseja remover esta verba?")) {
+        const url = target.dataset.url;
+        const itemId = target.dataset.id;
+        const csrfToken = document.querySelector(
+          'input[name="csrf_token"]'
+        ).value;
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": csrfToken,
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              document.getElementById(`verba-${data.deleted_item_id}`).remove();
+            } else {
+              alert("Erro: " + data.message);
+            }
+          })
+          .catch((error) => console.error("Erro na requisição AJAX:", error));
+      }
+    });
+  }
 });

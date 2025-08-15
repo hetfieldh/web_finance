@@ -1,0 +1,59 @@
+<!--- app\templates\usuarios\perfil.html -->
+
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block title %}Web Finance - Meu Perfil{% endblock %} {% block page_title
+%}Meu Perfil{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Editar Informações do Perfil</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('usuario.perfil') }}">
+          {{ form.csrf_token }}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">{{ render_field(form.nome) }}</div>
+            <div class="col-md-6 mb-3">{{ render_field(form.sobrenome) }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-7 mb-3">{{ render_field(form.email) }}</div>
+            <div class="col-md-5 mb-3">{{ render_field(form.login) }}</div>
+          </div>
+
+          <hr />
+          <h6 class="text-muted">Alterar Senha (opcional)</h6>
+          <p class="text-muted small">
+            Preencha os campos abaixo apenas se desejar alterar sua senha.
+          </p>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              {{ render_field(form.senha_atual, attrs={'type': 'password'}) }}
+            </div>
+            <div class="col-md-4 mb-3">
+              {{ render_field(form.nova_senha, attrs={'type': 'password'}) }}
+            </div>
+            <div class="col-md-4 mb-3">
+              {{ render_field(form.confirmar_nova_senha, attrs={'type':
+              'password'}) }}
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-success btn-add">
+              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+            </button>
+            <a
+              href="{{ url_for('main.dashboard') }}"
+              class="btn btn-secondary btn-add"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

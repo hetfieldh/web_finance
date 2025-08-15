@@ -43,11 +43,11 @@ def criar_folha_pagamento(form):
 def adicionar_item_folha(movimento_id, form):
     """
     Adiciona uma verba a uma folha de pagamento existente.
-    Retorna (sucesso, mensagem).
+    Retorna (sucesso, mensagem, dados_do_item).
     """
     movimento = db.session.get(SalarioMovimento, movimento_id)
     if not movimento or movimento.usuario_id != current_user.id:
-        return False, "Folha de pagamento não encontrada."
+        return False, "Folha de pagamento não encontrada.", None
 
     if (
         movimento.movimento_bancario_salario_id
@@ -56,6 +56,7 @@ def adicionar_item_folha(movimento_id, form):
         return (
             False,
             "Não é possível adicionar verbas a uma folha de pagamento já recebida.",
+            None,
         )
 
     try:
@@ -66,23 +67,29 @@ def adicionar_item_folha(movimento_id, form):
         )
         db.session.add(novo_item)
         db.session.commit()
-        return True, "Verba adicionada com sucesso!"
+        item_data = {
+            "id": novo_item.id,
+            "nome": novo_item.salario_item.nome,
+            "tipo": novo_item.salario_item.tipo,
+            "valor": float(novo_item.valor),
+        }
+        return True, "Verba adicionada com sucesso!", item_data
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(
             f"Erro ao adicionar SalarioMovimentoItem: {e}", exc_info=True
         )
-        return False, "Erro ao adicionar verba."
+        return False, "Erro ao adicionar verba.", None
 
 
 def excluir_item_folha(item_id):
     """
     Exclui uma verba de uma folha de pagamento.
-    Retorna (sucesso, mensagem).
+    Retorna (sucesso, mensagem, id_do_item_excluido).
     """
     item = db.session.get(SalarioMovimentoItem, item_id)
     if not item or item.movimento_pai.usuario_id != current_user.id:
-        return False, "Item não encontrado."
+        return False, "Item não encontrado.", None
 
     movimento = item.movimento_pai
     if (
@@ -92,18 +99,19 @@ def excluir_item_folha(item_id):
         return (
             False,
             "Não é possível remover verbas de uma folha de pagamento já recebida.",
+            None,
         )
 
     try:
         db.session.delete(item)
         db.session.commit()
-        return True, "Verba removida com sucesso!"
+        return True, "Verba removida com sucesso!", item_id
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(
             f"Erro ao excluir SalarioMovimentoItem ID {item_id}: {e}", exc_info=True
         )
-        return False, "Erro ao remover verba."
+        return False, "Erro ao remover verba.", None
 
 
 def excluir_folha_pagamento(movimento_id):

@@ -5,6 +5,7 @@ from datetime import date
 from app import db
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.models.usuario_model import Usuario
 
 
 def test_create_desp_rec(auth_client, app):
@@ -51,6 +52,30 @@ def test_create_duplicate_desp_rec_fails(auth_client, app):
         assert len(cadastros) == 1
 
 
+def test_list_desp_rec_is_isolated(auth_client, app):
+    with app.app_context():
+        user_b = Usuario(nome="USER", sobrenome="B", login="userb", email="b@test.com")
+        user_b.set_password("password_b")
+        db.session.add(user_b)
+        db.session.commit()
+
+        cadastro_a = DespRec(
+            usuario_id=1, nome="ALUGUEL USER A", natureza="Despesa", tipo="Fixa"
+        )
+        cadastro_b = DespRec(
+            usuario_id=2, nome="CONSULTORIA USER B", natureza="Receita", tipo="Variável"
+        )
+        db.session.add_all([cadastro_a, cadastro_b])
+        db.session.commit()
+
+    response = auth_client.get("/despesas_receitas/")
+    response_text = response.data.decode("utf-8")
+
+    assert response.status_code == 200
+    assert "ALUGUEL USER A" in response_text
+    assert "CONSULTORIA USER B" not in response_text
+
+
 def test_update_desp_rec(auth_client, app):
     with app.app_context():
         cadastro = DespRec(
@@ -65,10 +90,7 @@ def test_update_desp_rec(auth_client, app):
         db.session.commit()
         cadastro_id = cadastro.id
 
-    update_data = {
-        "dia_vencimento": 20,
-        "ativo": "y",
-    }
+    update_data = {"dia_vencimento": 20, "ativo": "y"}
     response = auth_client.post(
         f"/despesas_receitas/editar/{cadastro_id}",
         data=update_data,
@@ -77,7 +99,6 @@ def test_update_desp_rec(auth_client, app):
 
     assert response.status_code == 200
     assert "Cadastro atualizado com sucesso!" in response.data.decode("utf-8")
-
     with app.app_context():
         cadastro_atualizado = db.session.get(DespRec, cadastro_id)
         assert cadastro_atualizado.dia_vencimento == 20

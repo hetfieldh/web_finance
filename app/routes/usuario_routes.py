@@ -13,9 +13,14 @@ from flask import (
 from flask_login import current_user, login_required
 
 from app import db
-from app.forms.usuario_forms import CadastroUsuarioForm, EditarUsuarioForm
+from app.forms.usuario_forms import (
+    CadastroUsuarioForm,
+    EditarUsuarioForm,
+    PerfilUsuarioForm,
+)
 from app.models.usuario_model import Usuario
 from app.services.usuario_service import (
+    atualizar_perfil_usuario,
     criar_novo_usuario,
 )
 from app.services.usuario_service import (
@@ -105,3 +110,32 @@ def excluir_usuario(id):
         flash(message, "danger")
 
     return redirect(url_for("usuario.listar_usuarios"))
+
+
+@usuario_bp.route("/perfil", methods=["GET", "POST"])
+@login_required
+def perfil():
+    form = PerfilUsuarioForm(original_email=current_user.email)
+
+    if form.validate_on_submit():
+        success, result = atualizar_perfil_usuario(current_user, form)
+        if success:
+            flash(result, "success")
+            return redirect(url_for("usuario.perfil"))
+        else:
+            if isinstance(result, dict):
+                for field, errors in result.items():
+                    if hasattr(form, field):
+                        getattr(form, field).errors.extend(errors)
+                    else:
+                        flash(errors[0], "danger")
+            else:
+                flash(result, "danger")
+
+    elif request.method == "GET":
+        form.nome.data = current_user.nome
+        form.sobrenome.data = current_user.sobrenome
+        form.email.data = current_user.email
+        form.login.data = current_user.login
+
+    return render_template("usuarios/perfil.html", form=form)

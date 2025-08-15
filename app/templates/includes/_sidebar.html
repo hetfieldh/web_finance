@@ -124,9 +124,8 @@
         </a>
     </div>
     {% if current_user.is_authenticated %}
-    <div
-        class="list-group-item bg-transparent text-warning mt-auto py-2 px-2 text-left logged-in-user-info">
-        Usuário: <strong>{{ current_user.login }}</strong>
-    </div>
+    <a href="{{ url_for('usuario.perfil') }}" class="list-group-item bg-transparent text-warning mt-auto py-2 px-2 text-left logged-in-user-info" title="Editar Perfil">
+        <i class="fas fa-user-edit me-2"></i>Usuário: <strong>{{ current_user.login }}</strong>
+    </a>
     {% endif %}
 </div>

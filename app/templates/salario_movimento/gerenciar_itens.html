@@ -17,34 +17,7 @@
           <i class="fas fa-arrow-left"></i> Voltar
         </a>
       </div>
-      <div class="card-body py-2">
-        <div class="row text-center align-items-center">
-          <div class="col-md-3">
-            <h6 class="text-muted small mb-1">Salário Bruto</h6>
-            <p class="h6 text-primary mb-0">
-              R$ {{ "%.2f"|format(totais.salario_bruto) }}
-            </p>
-          </div>
-          <div class="col-md-3">
-            <h6 class="text-muted small mb-1">Descontos + Impostos</h6>
-            <p class="h6 text-danger mb-0">
-              R$ {{ "%.2f"|format(totais.total_descontos_impostos) }}
-            </p>
-          </div>
-          <div class="col-md-3">
-            <h6 class="text-muted small mb-1">Salário Líquido</h6>
-            <p class="h6 fw-bold text-success mb-0">
-              R$ {{ "%.2f"|format(totais.salario_liquido) }}
-            </p>
-          </div>
-          <div class="col-md-3">
-            <h6 class="text-muted small mb-1">Total de Benefícios</h6>
-            <p class="h6 text-info mb-0">
-              R$ {{ "%.2f"|format(totais.beneficios) }}
-            </p>
-          </div>
-        </div>
-      </div>
+      <div class="card-body py-2"></div>
     </div>
 
     <div class="card shadow-sm">
@@ -54,6 +27,7 @@
       <div class="card-body">
         {% if not is_locked %}
         <form
+          id="form-adicionar-verba"
           method="POST"
           action="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
           class="mb-4 p-3 border rounded bg-light"
@@ -92,9 +66,9 @@
                 <th class="text-center">Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tabela-verbas-corpo">
               {% for item in movimento.itens %}
-              <tr>
+              <tr id="verba-{{ item.id }}">
                 <td>{{ item.salario_item.nome }}</td>
                 <td>
                   {% if item.salario_item.tipo == 'Provento' %}<span
@@ -118,19 +92,15 @@
                 <td class="text-end">R$ {{ "%.2f"|format(item.valor) }}</td>
                 <td class="text-center">
                   {% if not is_locked %}
-                  <form
-                    action="{{ url_for('salario.excluir_item_folha', item_id=item.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja remover esta verba?');"
+                  <button
+                    type="button"
+                    class="btn-excluir-verba p-0 border-0 bg-transparent text-danger"
+                    data-url="{{ url_for('salario.excluir_item_folha', item_id=item.id) }}"
+                    data-id="{{ item.id }}"
+                    title="Excluir"
                   >
-                    <button
-                      type="submit"
-                      class="p-0 border-0 bg-transparent text-danger"
-                      title="Excluir"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
                   {% else %}
                   <i
                     class="fas fa-lock text-muted"

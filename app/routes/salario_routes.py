@@ -4,6 +4,7 @@ from flask import (
     Blueprint,
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -186,18 +187,25 @@ def gerenciar_itens_folha(id):
     ).first_or_404()
     form = AdicionarItemFolhaForm()
 
-    is_locked = (
-        movimento.movimento_bancario_salario_id is not None
-        or movimento.movimento_bancario_beneficio_id is not None
-    )
-
     if form.validate_on_submit():
-        success, message = adicionar_item_folha(id, form)
+        success, message, item_data = adicionar_item_folha(id, form)
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if success:
+                return jsonify({"success": True, "message": message, "item": item_data})
+            else:
+                return jsonify({"success": False, "message": message}), 400
+
         if success:
             flash(message, "success")
         else:
             flash(message, "warning")
         return redirect(url_for("salario.gerenciar_itens_folha", id=id))
+
+    is_locked = (
+        movimento.movimento_bancario_salario_id is not None
+        or movimento.movimento_bancario_beneficio_id is not None
+    )
 
     totais = {
         "proventos": sum(
@@ -240,10 +248,22 @@ def gerenciar_itens_folha(id):
 @salario_bp.route("/lancamento/item/excluir/<int:item_id>", methods=["POST"])
 @login_required
 def excluir_item_folha(item_id):
-    item = SalarioMovimentoItem.query.get_or_404(item_id)
-    movimento_id = item.salario_movimento_id
+    movimento_id = SalarioMovimentoItem.query.get_or_404(item_id).salario_movimento_id
 
-    success, message = excluir_item_folha_service(item_id)
+    success, message, deleted_item_id = excluir_item_folha_service(item_id)
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        if success:
+            return jsonify(
+                {
+                    "success": True,
+                    "message": message,
+                    "deleted_item_id": deleted_item_id,
+                }
+            )
+        else:
+            return jsonify({"success": False, "message": message}), 400
+
     if success:
         flash(message, "success")
     else:
