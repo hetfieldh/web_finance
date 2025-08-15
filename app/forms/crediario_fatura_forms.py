@@ -1,12 +1,8 @@
-# app/forms/crediario_fatura_forms.py
+# app/forms/crediario_fatura_forms.py 
 
-from datetime import date
-
-from dateutil.relativedelta import relativedelta
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField,
     DateField,
     DecimalField,
     SelectField,
@@ -16,14 +12,13 @@ from wtforms import (
 from wtforms.validators import (
     DataRequired,
     InputRequired,
-    Length,
     NumberRange,
     Optional,
     ValidationError,
 )
 
-from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_model import Crediario
+from app.utils import gerar_opcoes_mes_ano
 
 STATUS_FATURA = [
     ("Aberta", "Aberta"),
@@ -58,34 +53,7 @@ class GerarFaturaForm(FlaskForm):
             .all()
         ]
 
-        meses_anos = []
-        hoje = date.today()
-        nomes_meses_ptbr = {
-            1: "Janeiro",
-            2: "Fevereiro",
-            3: "Março",
-            4: "Abril",
-            5: "Maio",
-            6: "Junho",
-            7: "Julho",
-            8: "Agosto",
-            9: "Setembro",
-            10: "Outubro",
-            11: "Novembro",
-            12: "Dezembro",
-        }
-
-        inicio = hoje + relativedelta(months=1)
-
-        for i in range(12):
-            data_ref = inicio - relativedelta(months=i)
-            mes = data_ref.month
-            ano = data_ref.year
-            value = f"{ano}-{mes:02d}"
-            label = f"{nomes_meses_ptbr[mes]}/{ano}"
-            meses_anos.append((value, label))
-
-        self.mes_ano.choices = [("", "Selecione um período...")] + meses_anos
+        self.mes_ano.choices = gerar_opcoes_mes_ano(meses_passados=11, meses_futuros=1)
 
 
 class EditarFaturaForm(FlaskForm):
