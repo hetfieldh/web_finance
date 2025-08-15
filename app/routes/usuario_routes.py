@@ -30,7 +30,7 @@ def admin_required(f):
     @login_required
     def decorated_function(*args, **kwargs):
         if not current_user.is_admin:
-            flash("Você не tem permissão para acessar esta página.", "danger")
+            flash("Você não tem permissão para acessar esta página", "danger")
             return redirect(url_for("main.dashboard"))
         return f(*args, **kwargs)
 
