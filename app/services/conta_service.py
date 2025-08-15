@@ -12,7 +12,7 @@ from app.models.conta_model import Conta
 def criar_conta(form):
     """
     Processa a lógica de negócio para criar uma nova conta bancária.
-    Retorna uma tupla (sucesso, mensagem).
+    Retorna uma tupla (sucesso, mensagem_ou_dicionario_de_erros).
     """
     try:
         nome_banco = form.nome_banco.data.strip().upper()
@@ -29,10 +29,12 @@ def criar_conta(form):
         ).first()
 
         if existing_account:
-            return (
-                False,
-                "Você já possui uma conta com este banco, agência, número e tipo.",
-            )
+            erros = {
+                "form": [
+                    "Você já possui uma conta com este banco, agência, número e tipo de conta."
+                ]
+            }
+            return False, erros
 
         nova_conta = Conta(
             usuario_id=current_user.id,
@@ -55,7 +57,7 @@ def criar_conta(form):
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Erro ao criar conta: {e}", exc_info=True)
-        return False, "Ocorreu um erro inesperado ao criar a conta."
+        return False, {"form": ["Ocorreu um erro inesperado ao criar a conta."]}
 
 
 def atualizar_conta(conta, form):

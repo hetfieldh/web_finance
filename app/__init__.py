@@ -59,7 +59,7 @@ def create_app(config_class=Config):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return Usuario.query.get(int(user_id))
+        return db.session.get(Usuario, int(user_id))
 
     from app.routes.auth_routes import auth_bp
     from app.routes.conta_movimento_routes import conta_movimento_bp

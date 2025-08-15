@@ -1,4 +1,4 @@
-# app/routes/conta_routes.py
+# app/routes/conta_routes.py (Corrigido)
 
 from flask import (
     Blueprint,
@@ -39,12 +39,19 @@ def listar_contas():
 def adicionar_conta():
     form = CadastroContaForm()
     if form.validate_on_submit():
-        success, message = criar_conta(form)
+        success, result = criar_conta(form)
         if success:
-            flash(message, "success")
+            flash(result, "success")
             return redirect(url_for("conta.listar_contas"))
         else:
-            flash(message, "danger")
+            if isinstance(result, dict):
+                for field, errors in result.items():
+                    if field == "form" or not hasattr(form, field):
+                        flash(errors[0], "danger")
+                    else:
+                        getattr(form, field).errors.extend(errors)
+            else:
+                flash(result, "danger")
     return render_template("contas/add.html", form=form)
 
 
@@ -59,6 +66,9 @@ def editar_conta(id):
         original_conta=conta.conta,
         original_tipo=conta.tipo,
     )
+
+    if request.method == "GET":
+        form.process(obj=conta)
 
     if form.validate_on_submit():
         success, message = atualizar_conta(conta, form)

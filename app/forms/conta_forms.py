@@ -1,6 +1,5 @@
-# app/forms/conta_forms.py
+# app/forms/conta_forms.py (Completo e Corrigido)
 
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DecimalField, SelectField, StringField, SubmitField
 from wtforms.validators import (
@@ -13,9 +12,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app import db
 from app.models.conta_model import Conta
-from app.models.usuario_model import Usuario
 
 TIPOS_CONTA = [
     ("", "Selecione..."),
@@ -109,40 +106,17 @@ class CadastroContaForm(FlaskForm):
 class EditarContaForm(FlaskForm):
     nome_banco = StringField(
         "Nome do Banco",
-        validators=[
-            DataRequired("O nome do banco é obrigatório."),
-            Length(
-                min=3,
-                max=100,
-                message="O nome do banco deve ter entre 3 e 100 caracteres.",
-            ),
-            Regexp(
-                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ\s'\-]+$",
-                message="O nome do banco contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
-            ),
-        ],
+        validators=[Optional()],
         render_kw={"readonly": True},
     )
     agencia = StringField(
         "Agência",
-        validators=[
-            DataRequired("A agência é obrigatória."),
-            Length(min=4, max=4, message="A agência deve ter exatamente 4 números."),
-            Regexp(r"^[0-9]+$", message="A agência deve conter apenas números."),
-        ],
+        validators=[Optional()],
         render_kw={"readonly": True},
     )
     conta = StringField(
         "Número da Conta",
-        validators=[
-            DataRequired("O número da conta é obrigatório."),
-            Length(
-                min=6, max=50, message="O número da conta deve ter no mínimo 6 números."
-            ),
-            Regexp(
-                r"^[0-9]+$", message="O número da conta deve conter apenas números."
-            ),
-        ],
+        validators=[Optional()],
         render_kw={"readonly": True},
     )
     tipo = SelectField(
@@ -153,17 +127,11 @@ class EditarContaForm(FlaskForm):
     )
     saldo_inicial = DecimalField(
         "Saldo Inicial",
-        validators=[
-            InputRequired("O saldo inicial é obrigatório."),
-            NumberRange(
-                min=0.00,
-                max=9999999999.99,
-                message="Saldo inicial fora do limite permitido.",
-            ),
-        ],
+        validators=[Optional()],
         places=2,
         render_kw={"readonly": True},
     )
+
     limite = DecimalField(
         "Limite (opcional)",
         validators=[
@@ -194,7 +162,6 @@ class EditarContaForm(FlaskForm):
 
     def validate_limite(self, field):
         tipos_com_limite = ["Corrente", "Digital"]
-
         tipo_da_conta = self.tipo.data if self.tipo.data else self.original_tipo
 
         if tipo_da_conta not in tipos_com_limite:
