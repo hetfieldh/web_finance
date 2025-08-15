@@ -1,153 +1,164 @@
 <!--- app\templates\dashboard.html -->
 
-{% extends 'base.html' %}
-
-{% block title %}Web Finance - Dashboard{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Web Finance - Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %} {% block content %}
 <div class="row mb-2">
-    <div class="col-12">
-        <h4 class="text-secondary mb-0">Bem-vindo(a), <span
-                class="text-dark fw-semibold">{{ current_user.nome or
-                current_user.login }}!</span></h4>
-        <p id="data-atual" class="text-muted small"></p>
-    </div>
+  <div class="col-12">
+    <h4 class="text-secondary mb-0">
+      Bem-vindo(a),
+      <span class="text-dark fw-semibold"
+        >{{ current_user.nome or current_user.login }}!</span
+      >
+    </h4>
+    <p id="data-atual" class="text-muted small"></p>
+  </div>
 </div>
 
 <!-- KPIs (Indicadores Chave) -->
 <div class="row g-4 mb-3">
-    <div class="col">
-        <div class="card shadow-sm h-100 bg-light">
-            <div class="card-body text-center py-1">
-                <h6 class="card-title text-muted small">SALDO OPERACIONAL</h6>
-                <p
-                    class="card-text h5 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %}">R$
-                    {{ "%.2f"|format(kpis.saldo_operacional) }}</p>
-            </div>
-        </div>
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">SALDO OPERACIONAL</h6>
+        <p
+          class="card-text h5 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %}"
+        >
+          R$ {{ "%.2f"|format(kpis.saldo_operacional) }}
+        </p>
+      </div>
     </div>
-    <div class="col">
-        <div class="card shadow-sm h-100 bg-light">
-            <div class="card-body text-center py-1">
-                <h6 class="card-title text-muted small">INVESTIMENTOS</h6>
-                <p class="card-text h5 fw-semibold text-primary">R$ {{
-                    "%.2f"|format(kpis.saldo_investimentos) }}</p>
-            </div>
-        </div>
+  </div>
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">INVESTIMENTOS</h6>
+        <p class="card-text h5 fw-semibold text-primary">
+          R$ {{ "%.2f"|format(kpis.saldo_investimentos) }}
+        </p>
+      </div>
     </div>
-    <div class="col">
-        <div class="card shadow-sm h-100 bg-light">
-            <div class="card-body text-center py-1">
-                <h6 class="card-title text-muted small">RECEITAS DO MÊS</h6>
-                <p class="card-text h5 fw-semibold text-success">R$ {{
-                    "%.2f"|format(kpis.receitas_mes) }}</p>
-            </div>
-        </div>
+  </div>
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">RECEITAS DO MÊS</h6>
+        <p class="card-text h5 fw-semibold text-success">
+          R$ {{ "%.2f"|format(kpis.receitas_mes) }}
+        </p>
+      </div>
     </div>
-    <div class="col">
-        <div class="card shadow-sm h-100 bg-light">
-            <div class="card-body text-center py-1">
-                <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
-                <p class="card-text h5 fw-semibold text-danger">R$ {{
-                    "%.2f"|format(kpis.despesas_mes) }}</p>
-            </div>
-        </div>
+  </div>
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
+        <p class="card-text h5 fw-semibold text-danger">
+          R$ {{ "%.2f"|format(kpis.despesas_mes) }}
+        </p>
+      </div>
     </div>
-    <div class="col">
-        <div class="card shadow-sm h-100 bg-light">
-            <div class="card-body text-center py-1">
-                <h6 class="card-title text-muted small">SALDO (Receitas -
-                    Despesas)</h6>
-                <p
-                    class="card-text h5 fw-semibold {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}">R$
-                    {{ "%.2f"|format(kpis.balanco_mes) }}</p>
-            </div>
-        </div>
+  </div>
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">SALDO (Receitas - Despesas)</h6>
+        <p
+          class="card-text h5 fw-semibold {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
+        >
+          R$ {{ "%.2f"|format(kpis.balanco_mes) }}
+        </p>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="row g-3">
-    <!-- Coluna da Esquerda: Contas Bancárias -->
-    <div class="col-lg-3">
-        <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <h6 class="fw-semibold mb-0 text-secondary">Contas Bancárias
-                    Ativas</h6>
-            </div>
-            <div class="card-body p-1">
-                {% if contas_do_usuario %}
-                <div class="d-flex flex-column gap-1">
-                    {% for conta in contas_do_usuario %}
-                    <div class="card border-1">
-                        <div
-                            class="card-body p-1 d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <i
-                                    class="fas fa-wallet fa-lg text-secondary opacity-50 me-2"></i>
-                                <div>
-                                    <div class="fw-semibold small">{{
-                                        conta.nome_banco }}</div>
-                                    <div class="text-muted extra-small">{{
-                                        conta.tipo }}</div>
-                                </div>
-                            </div>
-                            <span
-                                class="fw-semibold h5 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                R$ {{ "%.2f"|format(conta.saldo_atual) }}
-                            </span>
-                        </div>
-                    </div>
-                    {% endfor %}
+  <!-- Coluna da Esquerda: Contas Bancárias -->
+  <div class="col-lg-3">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h6 class="fw-semibold mb-0 text-secondary">Contas Bancárias Ativas</h6>
+      </div>
+      <div class="card-body p-1">
+        {% if contas_do_usuario %}
+        <div class="d-flex flex-column gap-1">
+          {% for conta in contas_do_usuario %}
+          <div class="card border-1">
+            <div
+              class="card-body p-1 d-flex justify-content-between align-items-center"
+            >
+              <div class="d-flex align-items-center">
+                <i
+                  class="fas fa-wallet fa-lg text-secondary opacity-50 me-2"
+                ></i>
+                <div>
+                  <div class="fw-semibold small">{{ conta.nome_banco }}</div>
+                  <div class="text-muted extra-small">{{ conta.tipo }}</div>
                 </div>
-                {% else %}
-                <div class="text-center p-2">
-                    <p class="text-muted small mb-0">Nenhuma conta bancária
-                        cadastrada.</p>
-                </div>
-                {% endif %}
+              </div>
+              <span
+                class="fw-semibold h5 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
+              >
+                R$ {{ "%.2f"|format(conta.saldo_atual) }}
+              </span>
             </div>
+          </div>
+          {% endfor %}
         </div>
+        {% else %}
+        <div class="text-center p-2">
+          <p class="text-muted small mb-0">
+            Nenhuma conta bancária cadastrada.
+          </p>
+        </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 
-    <!-- Coluna da Direita: Próximos Movimentos -->
-    <div class="col-lg-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-light">
-                <h6 class="fw-semibold mb-0 text-secondary">Próximos
-                    Movimentos</h6>
+  <!-- Coluna da Direita: Próximos Movimentos -->
+  <div class="col-lg-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-light">
+        <h6 class="fw-semibold mb-0 text-secondary">Próximos Movimentos</h6>
+      </div>
+      <div class="card-body p-0">
+        {% if proximos_movimentos %}
+        <ul class="list-group list-group-flush">
+          {% for item in proximos_movimentos %}
+          <li
+            class="list-group-item py-0 d-flex justify-content-between align-items-center small"
+          >
+            <div>
+              <div class="fw-semibold text-dark small">
+                {{ item.descricao }}
+              </div>
+              <div class="text-muted extra-small">
+                {{ item.data.strftime('%d/%m/%Y') }}
+              </div>
             </div>
-            <div class="card-body p-0">
-                {% if proximos_movimentos %}
-                <ul class="list-group list-group-flush">
-                    {% for item in proximos_movimentos %}
-                    <li
-                        class="list-group-item py-0 d-flex justify-content-between align-items-center small">
-                        <div>
-                            <div class="fw-semibold text-dark small">{{ item.descricao
-                                }}</div>
-                            <div class="text-muted extra-small">{{
-                                item.data.strftime('%d/%m/%Y') }}</div>
-                        </div>
-                        {% if item.tipo == 'saida' %}
-                        <span class="badge bg-danger rounded-pill">R$ {{
-                            "%.2f"|format(item.valor) }}</span>
-                        {% else %}
-                        <span class="badge bg-success rounded-pill">R$ {{
-                            "%.2f"|format(item.valor) }}</span>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="text-center p-3">
-                    <i class="fas fa-check-circle fa-2x text-success mb-1"></i>
-                    <p class="text-muted small">Nenhum movimento pendente nos
-                        próximos dias.</p>
-                </div>
-                {% endif %}
-            </div>
+            {% if item.tipo == 'saida' %}
+            <span class="badge bg-danger rounded-pill"
+              >R$ {{ "%.2f"|format(item.valor) }}</span
+            >
+            {% else %}
+            <span class="badge bg-success rounded-pill"
+              >R$ {{ "%.2f"|format(item.valor) }}</span
+            >
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center p-3">
+          <i class="fas fa-check-circle fa-2x text-success mb-1"></i>
+          <p class="text-muted small">
+            Nenhum movimento pendente nos próximos dias.
+          </p>
         </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,49 +1,47 @@
 <!--- app/templates/crediario_grupos/edit.html -->
 
-{% extends "base.html" %}
-{% from "includes/_macros.html" import render_field %}
-
-{% block title %}Web Finance - Grupos de Crediário{% endblock %}
-{% block page_title %}Editar Grupo de Crediário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block title %}Web Finance - Grupos de Crediário{% endblock %} {% block
+page_title %}Editar Grupo de Crediário{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Editar Grupo de Crediário: {{
-                    grupo_crediario_obj.grupo_crediario }}</h5>
+  <div class="col-md-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">
+          Editar Grupo de Crediário: {{ grupo_crediario_obj.grupo_crediario }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo_crediario_obj.id) }}"
+        >
+          {{ form.csrf_token }}
+
+          <div class="row">
+            <div class="col-md-7 mb-3">
+              {{ render_field(form.grupo_crediario) }}
             </div>
-            <div class="card-body">
-                <form method="POST"
-                    action="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo_crediario_obj.id) }}">
-                    {{ form.csrf_token }}
-
-                    <div class="row">
-                        <div class="col-md-7 mb-3">
-                            {{ render_field(form.grupo_crediario) }}
-                        </div>
-                        <div class="col-md-5 mb-3">
-                            {{ render_field(form.tipo_grupo_crediario) }}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        {{ render_field(form.descricao) }}
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-info btn-add">
-                            <i class="fas fa-save"></i> {{
-                            form.submit.label.text }}
-                        </button>
-                        <a
-                            href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
-                            class="btn btn-secondary btn-add">Cancelar</a>
-                    </div>
-                </form>
+            <div class="col-md-5 mb-3">
+              {{ render_field(form.tipo_grupo_crediario) }}
             </div>
-        </div>
+          </div>
+
+          <div class="mb-3">{{ render_field(form.descricao) }}</div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-info btn-add">
+              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+            </button>
+            <a
+              href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
+              class="btn btn-secondary btn-add"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

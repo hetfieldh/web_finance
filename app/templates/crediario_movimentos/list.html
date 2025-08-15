@@ -1,92 +1,93 @@
 <!-- app/templates/crediario_movimentos/list.html -->
 
-{% extends "base.html" %}
-
-{% block title %}Web Finance - Lançamentos{% endblock %}
-{% block page_title %}Lançamentos de Crediário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Web Finance - Lançamentos{% endblock
+%} {% block page_title %}Lançamentos de Crediário{% endblock %} {% block content
+%}
 <div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Lançamentos de Crediário Registrados</h4>
-            <div>
-                <a
-                    href="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}"
-                    class="btn btn-success btn-add me-2">
-                    <i class="fas fa-plus"></i> Adicionar
-                </a>
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                {% if movimentos_crediario %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Crediário</th>
-                                <th>Grupo</th>
-                                <th>Data Compra</th>
-                                <th>Valor Total</th>
-                                <th>Parcelas</th>
-                                <th>1ª Parcela</th>
-                                <th>Descrição</th>
-                                <th>Criação Registro</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for mov in movimentos_crediario %}
-                            <tr>
-                                <td>{{ mov.id }}</td>
-                                <td>{{ mov.crediario.nome_crediario }} ({{
-                                    mov.crediario.tipo_crediario }})</td>
-                                <td>{{ mov.crediario_grupo.grupo_crediario if
-                                    mov.crediario_grupo else 'N/A' }}</td>
-                                <td>{{ mov.data_compra.strftime('%d/%m/%Y')
-                                    }}</td>
-                                <td>R$ {{ "%.2f"|format(mov.valor_total_compra)
-                                    }}</td>
-                                <td>{{ mov.numero_parcelas }}</td>
-                                <td>{{
-                                    mov.data_primeira_parcela.strftime('%m/%Y')
-                                    }}</td>
-                                <td>{{ mov.descricao }}</td>
-                                <td>{{
-                                    mov.data_criacao.strftime('%d/%m/%Y %H:%M')
-                                    }}</td>
-                                <td class="table-actions">
-                                    <a
-                                        href="{{ url_for('crediario_movimento.editar_movimento_crediario', id=mov.id) }}"
-                                        class="btn btn-warning me-2"
-                                        title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form
-                                        action="{{ url_for('crediario_movimento.excluir_movimento_crediario', id=mov.id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir este movimento de crediário?');">
-                                        <button type="submit"
-                                            class="btn btn-danger"
-                                            title="Excluir">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-center">Nenhum movimento de crediário registrado
-                    ainda.</p>
-                {% endif %}
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Lançamentos de Crediário Registrados</h4>
+      <div>
+        <a
+          href="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}"
+          class="btn btn-success btn-add me-2"
+        >
+          <i class="fas fa-plus"></i> Adicionar
+        </a>
+      </div>
     </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if movimentos_crediario %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Crediário</th>
+                <th>Grupo</th>
+                <th>Data Compra</th>
+                <th>Valor Total</th>
+                <th>Parcelas</th>
+                <th>1ª Parcela</th>
+                <th>Descrição</th>
+                <th>Criação Registro</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for mov in movimentos_crediario %}
+              <tr>
+                <td>{{ mov.id }}</td>
+                <td>
+                  {{ mov.crediario.nome_crediario }} ({{
+                  mov.crediario.tipo_crediario }})
+                </td>
+                <td>
+                  {{ mov.crediario_grupo.grupo_crediario if mov.crediario_grupo
+                  else 'N/A' }}
+                </td>
+                <td>{{ mov.data_compra.strftime('%d/%m/%Y') }}</td>
+                <td>R$ {{ "%.2f"|format(mov.valor_total_compra) }}</td>
+                <td>{{ mov.numero_parcelas }}</td>
+                <td>{{ mov.data_primeira_parcela.strftime('%m/%Y') }}</td>
+                <td>{{ mov.descricao }}</td>
+                <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td class="table-actions">
+                  <a
+                    href="{{ url_for('crediario_movimento.editar_movimento_crediario', id=mov.id) }}"
+                    class="btn btn-warning me-2"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form
+                    action="{{ url_for('crediario_movimento.excluir_movimento_crediario', id=mov.id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este movimento de crediário?');"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-danger"
+                      title="Excluir"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-center">
+          Nenhum movimento de crediário registrado ainda.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

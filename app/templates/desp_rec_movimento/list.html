@@ -1,110 +1,106 @@
 <!-- app/templates/desp_rec_movimento/list.html -->
 
-{% extends "base.html" %}
-
-{% block title %}Web Finance - Lançamentos{% endblock %}
-{% block page_title %}Lançamento de Despesas e Receitas{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Web Finance - Lançamentos{% endblock
+%} {% block page_title %}Lançamento de Despesas e Receitas{% endblock %} {%
+block content %}
 <div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Lançamentos Registrados</h4>
-            <div>
-                <a
-                    href="{{ url_for('desp_rec_movimento.adicionar_lancamento_unico') }}"
-                    class="btn btn-success btn-add me-2">
-                    <i class="fas fa-plus-circle"></i> Eventuais
-                </a>
-                <a href="{{ url_for('desp_rec_movimento.gerar_previsao') }}"
-                    class="btn btn-info btn-add me-2">
-                    <i class="fas fa-plus-circle"></i> Contas Fixas
-                </a>
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                {% if movimentos %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Vencimento</th>
-                                <th>Nome</th>
-                                <th>Natureza</th>
-                                <th>Valor Previsto</th>
-                                <th>Valor Realizado</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for movimento in movimentos %}
-                            <tr>
-                                <td>{{
-                                    movimento.data_vencimento.strftime('%d/%m/%Y')
-                                    }}</td>
-                                <td>{{ movimento.despesa_receita.nome }}</td>
-                                <td>
-                                    {% if movimento.despesa_receita.natureza ==
-                                    'Receita' %}
-                                    <span class="badge bg-success">{{
-                                        movimento.despesa_receita.natureza
-                                        }}</span>
-                                    {% else %}
-                                    <span class="badge bg-danger">{{
-                                        movimento.despesa_receita.natureza
-                                        }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>R$ {{
-                                    "%.2f"|format(movimento.valor_previsto)
-                                    }}</td>
-                                <td>R$ {{
-                                    "%.2f"|format(movimento.valor_realizado) if
-                                    movimento.valor_realizado is not none else
-                                    'N/A' }}</td>
-                                <td>
-                                    {% if movimento.status == 'Pago' %}
-                                    <span class="badge bg-success">{{
-                                        movimento.status }}</span>
-                                    {% elif movimento.status == 'Atrasado' %}
-                                    <span class="badge bg-danger">{{
-                                        movimento.status }}</span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">{{
-                                        movimento.status }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="table-actions">
-                                    <a
-                                        href="{{ url_for('desp_rec_movimento.editar_movimento', id=movimento.id) }}"
-                                        class="btn btn-warning me-2"
-                                        title="Editar/Pagar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form
-                                        action="{{ url_for('desp_rec_movimento.excluir_movimento', id=movimento.id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir este lançamento?');">
-                                        <button type="submit"
-                                            class="btn btn-danger"
-                                            title="Excluir">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-center">Nenhum lançamento encontrado.</p>
-                {% endif %}
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Lançamentos Registrados</h4>
+      <div>
+        <a
+          href="{{ url_for('desp_rec_movimento.adicionar_lancamento_unico') }}"
+          class="btn btn-success btn-add me-2"
+        >
+          <i class="fas fa-plus-circle"></i> Eventuais
+        </a>
+        <a
+          href="{{ url_for('desp_rec_movimento.gerar_previsao') }}"
+          class="btn btn-info btn-add me-2"
+        >
+          <i class="fas fa-plus-circle"></i> Contas Fixas
+        </a>
+      </div>
     </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if movimentos %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Vencimento</th>
+                <th>Nome</th>
+                <th>Natureza</th>
+                <th>Valor Previsto</th>
+                <th>Valor Realizado</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for movimento in movimentos %}
+              <tr>
+                <td>{{ movimento.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                <td>{{ movimento.despesa_receita.nome }}</td>
+                <td>
+                  {% if movimento.despesa_receita.natureza == 'Receita' %}
+                  <span class="badge bg-success"
+                    >{{ movimento.despesa_receita.natureza }}</span
+                  >
+                  {% else %}
+                  <span class="badge bg-danger"
+                    >{{ movimento.despesa_receita.natureza }}</span
+                  >
+                  {% endif %}
+                </td>
+                <td>R$ {{ "%.2f"|format(movimento.valor_previsto) }}</td>
+                <td>
+                  R$ {{ "%.2f"|format(movimento.valor_realizado) if
+                  movimento.valor_realizado is not none else 'N/A' }}
+                </td>
+                <td>
+                  {% if movimento.status == 'Pago' %}
+                  <span class="badge bg-success">{{ movimento.status }}</span>
+                  {% elif movimento.status == 'Atrasado' %}
+                  <span class="badge bg-danger">{{ movimento.status }}</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ movimento.status }}</span>
+                  {% endif %}
+                </td>
+                <td class="table-actions">
+                  <a
+                    href="{{ url_for('desp_rec_movimento.editar_movimento', id=movimento.id) }}"
+                    class="btn btn-warning me-2"
+                    title="Editar/Pagar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form
+                    action="{{ url_for('desp_rec_movimento.excluir_movimento', id=movimento.id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este lançamento?');"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-danger"
+                      title="Excluir"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-center">Nenhum lançamento encontrado.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

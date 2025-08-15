@@ -1,99 +1,97 @@
 <!-- app/templates/crediario_grupos/list.html -->
 
-{% extends "base.html" %}
-
-{% block title %}Web Finance - Grupos de Crediário{% endblock %}
-{% block page_title %}Grupos de Crediário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Web Finance - Grupos de Crediário{%
+endblock %} {% block page_title %}Grupos de Crediário{% endblock %} {% block
+content %}
 <div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Grupos de Crediário Cadastrados</h4>
-            <div>
-                <a
-                    href="{{ url_for('crediario_grupo.adicionar_grupo_crediario') }}"
-                    class="btn btn-success btn-add me-1">
-                    <i class="fas fa-plus"></i> Grupo
-                </a>
-                <a href="{{ url_for('crediario.listar_crediarios') }}"
-                    class="btn btn-secondary btn-add">
-                    <i class="fas fa-arrow-left"></i> Voltar
-                </a>
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                {% if grupos_crediario %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Grupo</th>
-                                <th>Tipo</th>
-                                <th>Descrição</th>
-                                <th>Criação</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for grupo in grupos_crediario %}
-                            <tr>
-                                <td>{{ grupo.id }}</td>
-                                <td>{{ grupo.grupo_crediario }}</td>
-                                <td>
-                                    {% if grupo.tipo_grupo_crediario == 'Compra'
-                                    %}
-                                    <span class="badge bg-primary">{{
-                                        grupo.tipo_grupo_crediario }}</span>
-                                    {% elif grupo.tipo_grupo_crediario ==
-                                    'Estorno' %}
-                                    <span class="badge bg-warning">{{
-                                        grupo.tipo_grupo_crediario }}</span>
-                                    {% elif grupo.tipo_grupo_crediario ==
-                                    'Ajuste' %}
-                                    <span class="badge bg-info">{{
-                                        grupo.tipo_grupo_crediario }}</span>
-                                    {% else %}
-                                    {{ grupo.tipo_grupo_crediario }}
-                                    {% endif %}
-                                </td>
-                                <td>{{ grupo.descricao if grupo.descricao else
-                                    'N/A' }}</td>
-                                <td>{{
-                                    grupo.data_criacao.strftime('%d/%m/%Y %H:%M')
-                                    }}</td>
-                                <td class="table-actions">
-                                    <a
-                                        href="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo.id) }}"
-                                        class="btn btn-warning me-2"
-                                        title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form
-                                        action="{{ url_for('crediario_grupo.excluir_grupo_crediario', id=grupo.id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir este grupo?');">
-                                        <button type="submit"
-                                            class="btn btn-danger"
-                                            title="Excluir">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-center">Nenhum grupo de crediário cadastrado
-                    ainda.</p>
-                {% endif %}
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Grupos de Crediário Cadastrados</h4>
+      <div>
+        <a
+          href="{{ url_for('crediario_grupo.adicionar_grupo_crediario') }}"
+          class="btn btn-success btn-add me-1"
+        >
+          <i class="fas fa-plus"></i> Grupo
+        </a>
+        <a
+          href="{{ url_for('crediario.listar_crediarios') }}"
+          class="btn btn-secondary btn-add"
+        >
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+      </div>
     </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if grupos_crediario %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Grupo</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grupo in grupos_crediario %}
+              <tr>
+                <td>{{ grupo.id }}</td>
+                <td>{{ grupo.grupo_crediario }}</td>
+                <td>
+                  {% if grupo.tipo_grupo_crediario == 'Compra' %}
+                  <span class="badge bg-primary"
+                    >{{ grupo.tipo_grupo_crediario }}</span
+                  >
+                  {% elif grupo.tipo_grupo_crediario == 'Estorno' %}
+                  <span class="badge bg-warning"
+                    >{{ grupo.tipo_grupo_crediario }}</span
+                  >
+                  {% elif grupo.tipo_grupo_crediario == 'Ajuste' %}
+                  <span class="badge bg-info"
+                    >{{ grupo.tipo_grupo_crediario }}</span
+                  >
+                  {% else %} {{ grupo.tipo_grupo_crediario }} {% endif %}
+                </td>
+                <td>{{ grupo.descricao if grupo.descricao else 'N/A' }}</td>
+                <td>{{ grupo.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td class="table-actions">
+                  <a
+                    href="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo.id) }}"
+                    class="btn btn-warning me-2"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form
+                    action="{{ url_for('crediario_grupo.excluir_grupo_crediario', id=grupo.id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este grupo?');"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-danger"
+                      title="Excluir"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-center">Nenhum grupo de crediário cadastrado ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

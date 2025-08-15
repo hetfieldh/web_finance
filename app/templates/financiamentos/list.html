@@ -1,100 +1,96 @@
 <!-- app/templates/financiamentos/list.html -->
 
-{% extends "base.html" %}
-
-{% block title %}Web Finance - Financiamentos{% endblock %}
-{% block page_title %}Financiamentos{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Web Finance - Financiamentos{%
+endblock %} {% block page_title %}Financiamentos{% endblock %} {% block content
+%}
 <div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Financiamentos Cadastrados</h4>
-            <div>
-                <a href="{{ url_for('financiamento.adicionar_financiamento') }}"
-                    class="btn btn-success btn-add">
-                    <i class="fas fa-plus"></i> Adicionar
-                </a>
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                {% if financiamentos %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Conta</th>
-                                <th>Valor Total</th>
-                                <th>Saldo Devedor</th>
-                                <th>Juros Anual</th>
-                                <th>Prazo (meses)</th>
-                                <th>Tipo Amortização</th>
-                                <th>Início</th>
-                                <th>Criação</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for financ in financiamentos %}
-                            <tr>
-                                <td>{{ financ.id }}</td>
-                                <td>{{ financ.nome_financiamento }}</td>
-                                <td>{{ financ.conta.nome_banco }} ({{
-                                    financ.conta.conta }})</td>
-                                <td>R$ {{
-                                    "%.2f"|format(financ.valor_total_financiado)
-                                    }}</td>
-                                <td>R$ {{
-                                    "%.2f"|format(financ.saldo_devedor_atual)
-                                    }}</td>
-                                <td>{{ "%.2f"|format(financ.taxa_juros_anual)
-                                    }}%</td>
-                                <td>{{ financ.prazo_meses }}</td>
-                                <td>{{ financ.tipo_amortizacao }}</td>
-                                <td>{{ financ.data_inicio.strftime('%d/%m/%Y')
-                                    }}</td>
-                                <td>{{
-                                    financ.data_criacao.strftime('%d/%m/%Y %H:%M')
-                                    }}</td>
-                                <td class="table-actions">
-                                    <a
-                                        href="{{ url_for('financiamento.visualizar_parcelas', id=financ.id) }}"
-                                        class="btn btn-info me-2"
-                                        title="Visualizar Parcelas">
-                                        <i class="fas fa-list-ol"></i>
-                                    </a>
-                                    <a
-                                        href="{{ url_for('financiamento.editar_financiamento', id=financ.id) }}"
-                                        class="btn btn-warning me-2"
-                                        title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form
-                                        action="{{ url_for('financiamento.excluir_financiamento', id=financ.id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir este financiamento?');">
-                                        <button type="submit"
-                                            class="btn btn-danger"
-                                            title="Excluir">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-center">Nenhum financiamento cadastrado
-                    ainda.</p>
-                {% endif %}
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Financiamentos Cadastrados</h4>
+      <div>
+        <a
+          href="{{ url_for('financiamento.adicionar_financiamento') }}"
+          class="btn btn-success btn-add"
+        >
+          <i class="fas fa-plus"></i> Adicionar
+        </a>
+      </div>
     </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if financiamentos %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Conta</th>
+                <th>Valor Total</th>
+                <th>Saldo Devedor</th>
+                <th>Juros Anual</th>
+                <th>Prazo (meses)</th>
+                <th>Tipo Amortização</th>
+                <th>Início</th>
+                <th>Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for financ in financiamentos %}
+              <tr>
+                <td>{{ financ.id }}</td>
+                <td>{{ financ.nome_financiamento }}</td>
+                <td>
+                  {{ financ.conta.nome_banco }} ({{ financ.conta.conta }})
+                </td>
+                <td>R$ {{ "%.2f"|format(financ.valor_total_financiado) }}</td>
+                <td>R$ {{ "%.2f"|format(financ.saldo_devedor_atual) }}</td>
+                <td>{{ "%.2f"|format(financ.taxa_juros_anual) }}%</td>
+                <td>{{ financ.prazo_meses }}</td>
+                <td>{{ financ.tipo_amortizacao }}</td>
+                <td>{{ financ.data_inicio.strftime('%d/%m/%Y') }}</td>
+                <td>{{ financ.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td class="table-actions">
+                  <a
+                    href="{{ url_for('financiamento.visualizar_parcelas', id=financ.id) }}"
+                    class="btn btn-info me-2"
+                    title="Visualizar Parcelas"
+                  >
+                    <i class="fas fa-list-ol"></i>
+                  </a>
+                  <a
+                    href="{{ url_for('financiamento.editar_financiamento', id=financ.id) }}"
+                    class="btn btn-warning me-2"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form
+                    action="{{ url_for('financiamento.excluir_financiamento', id=financ.id) }}"
+                    method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este financiamento?');"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-danger"
+                      title="Excluir"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-center">Nenhum financiamento cadastrado ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

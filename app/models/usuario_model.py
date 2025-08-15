@@ -1,9 +1,11 @@
 # app/models/usuario_model.py
 
-from app import db
 from datetime import datetime, timezone
-from werkzeug.security import generate_password_hash, check_password_hash
+
 from flask_login import UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from app import db
 
 
 class Usuario(db.Model, UserMixin):

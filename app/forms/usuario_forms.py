@@ -1,19 +1,22 @@
 # app/forms/usuario_forms.py
 
+import re
+
+from email_validator import EmailNotValidError
+from email_validator import validate_email as validate_email_strict
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import (
     DataRequired,
     Email,
-    Length,
     EqualTo,
+    Length,
+    Optional,
     Regexp,
     ValidationError,
-    Optional,
 )
+
 from app.models.usuario_model import Usuario
-import re
-from email_validator import validate_email as validate_email_strict, EmailNotValidError
 
 
 def validar_senha_forte_custom(form, field):

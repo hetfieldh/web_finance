@@ -1,101 +1,104 @@
 <!--- app/templates/conta_movimentos/add.html -->
 
-{% extends "base.html" %}
-{% from "includes/_macros.html" import render_field %}
-
-{% block title %}Web Finance - Lançamentos{% endblock %}
-{% block page_title %}Adicionar Lançamento Bancário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block title %}Web Finance - Lançamentos{% endblock %} {% block page_title
+%}Adicionar Lançamento Bancário{% endblock %} {% block content %}
 <div id="campos-moviveis" class="d-none">
-    <div id="container-conta_id">{{ render_field(form.conta_id, attrs={'id':
-        'conta_id'}) }}</div>
-    <div id="container-data_movimento">{{ render_field(form.data_movimento,
-        attrs={'type': 'date'}) }}</div>
-    <div id="container-valor">{{ render_field(form.valor, attrs={'type':
-        'number', 'step': '0.01'}) }}</div>
-    <div id="container-descricao">{{ render_field(form.descricao) }}</div>
+  <div id="container-conta_id">
+    {{ render_field(form.conta_id, attrs={'id': 'conta_id'}) }}
+  </div>
+  <div id="container-data_movimento">
+    {{ render_field(form.data_movimento, attrs={'type': 'date'}) }}
+  </div>
+  <div id="container-valor">
+    {{ render_field(form.valor, attrs={'type': 'number', 'step': '0.01'}) }}
+  </div>
+  <div id="container-descricao">{{ render_field(form.descricao) }}</div>
 </div>
 
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Formulário de Registro de Lançamento</h5>
+  <div class="col-md-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Formulário de Registro de Lançamento</h5>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('conta_movimento.adicionar_movimentacao') }}"
+          id="form-movimentacao"
+        >
+          {{ form.csrf_token }}
+
+          <div class="mb-3">
+            <label class="form-label">{{ form.tipo_operacao.label }}</label>
+            <div class="d-flex gap-3">
+              {% for subfield in form.tipo_operacao %}
+              <div class="form-check">
+                {{ subfield(class="form-check-input") }} {{
+                subfield.label(class="form-check-label fw-bold") }}
+              </div>
+              {% endfor %}
             </div>
-            <div class="card-body">
-                <form method="POST"
-                    action="{{ url_for('conta_movimento.adicionar_movimentacao') }}"
-                    id="form-movimentacao">
-                    {{ form.csrf_token }}
+          </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.tipo_operacao.label
-                            }}</label>
-                        <div class="d-flex gap-3">
-                            {% for subfield in form.tipo_operacao %}
-                            <div class="form-check">
-                                {{ subfield(class="form-check-input") }}
-                                {{
-                                subfield.label(class="form-check-label fw-bold")
-                                }}
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+          <hr />
 
-                    <hr>
-
-                    <div id="movimentacao_simples_fields">
-                        <div class="row">
-                            <div class="col-md-6 mb-3"
-                                id="placeholder-simples-conta_id"></div>
-                            <div class="col-md-6 mb-3">
-                                {{ render_field(form.conta_transacao_id) }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3"
-                                id="placeholder-simples-data_movimento"></div>
-                            <div class="col-md-6 mb-3"
-                                id="placeholder-simples-valor"></div>
-                        </div>
-                        <div class="mb-3"
-                            id="placeholder-simples-descricao"></div>
-                    </div>
-
-                    <div id="transferencia_fields" style="display: none;">
-                        <div class="row">
-                            <div class="col-md-6 mb-3"
-                                id="placeholder-transf-conta_origem"></div>
-                            <div class="col-md-6 mb-3">
-                                {{ render_field(form.conta_destino_id) }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                {{ render_field(form.transferencia_tipo_id) }}
-                            </div>
-                            <div class="col-md-4 mb-3"
-                                id="placeholder-transf-data_movimento"></div>
-                            <div class="col-md-4 mb-3"
-                                id="placeholder-transf-valor"></div>
-                        </div>
-                        
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-success btn-add">
-                            <i class="fas fa-save"></i> {{
-                            form.submit.label.text }}
-                        </button>
-                        <a
-                            href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
-                            class="btn btn-secondary btn-add">Cancelar</a>
-                    </div>
-                </form>
+          <div id="movimentacao_simples_fields">
+            <div class="row">
+              <div
+                class="col-md-6 mb-3"
+                id="placeholder-simples-conta_id"
+              ></div>
+              <div class="col-md-6 mb-3">
+                {{ render_field(form.conta_transacao_id) }}
+              </div>
             </div>
-        </div>
+            <div class="row">
+              <div
+                class="col-md-6 mb-3"
+                id="placeholder-simples-data_movimento"
+              ></div>
+              <div class="col-md-6 mb-3" id="placeholder-simples-valor"></div>
+            </div>
+            <div class="mb-3" id="placeholder-simples-descricao"></div>
+          </div>
+
+          <div id="transferencia_fields" style="display: none">
+            <div class="row">
+              <div
+                class="col-md-6 mb-3"
+                id="placeholder-transf-conta_origem"
+              ></div>
+              <div class="col-md-6 mb-3">
+                {{ render_field(form.conta_destino_id) }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                {{ render_field(form.transferencia_tipo_id) }}
+              </div>
+              <div
+                class="col-md-4 mb-3"
+                id="placeholder-transf-data_movimento"
+              ></div>
+              <div class="col-md-4 mb-3" id="placeholder-transf-valor"></div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-success btn-add">
+              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+            </button>
+            <a
+              href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
+              class="btn btn-secondary btn-add"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

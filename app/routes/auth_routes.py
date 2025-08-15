@@ -6,14 +6,15 @@ from flask import (
     current_app,
     flash,
     redirect,
-    url_for,
-    request,
     render_template,
+    request,
+    url_for,
 )
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_sqlalchemy import (
     SQLAlchemy,
 )
-from flask_login import login_user, logout_user, login_required, current_user
+
 from app import db
 from app.models.usuario_model import Usuario
 

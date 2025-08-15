@@ -1,74 +1,61 @@
 <!--- app/templates/usuarios/edit.html -->
 
-{% extends "base.html" %}
-{% from "includes/_macros.html" import render_field, render_checkbox %}
-
-{% block title %}Web Finance - Usuários{% endblock %}
-{% block page_title %}Editar Usuário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field,
+render_checkbox %} {% block title %}Web Finance - Usuários{% endblock %} {%
+block page_title %}Editar Usuário{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Editar Usuário: {{ usuario.nome }} {{
-                    usuario.sobrenome }}</h5>
+  <div class="col-md-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">
+          Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}"
+        >
+          {{ form.csrf_token }}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">{{ render_field(form.nome) }}</div>
+            <div class="col-md-6 mb-3">{{ render_field(form.sobrenome) }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-7 mb-3">{{ render_field(form.email) }}</div>
+            <div class="col-md-5 mb-3">{{ render_field(form.login) }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.senha, attrs={'type': 'password',
+              'placeholder': 'Deixe em branco para manter a senha atual'}) }}
+              <small class="form-text text-muted"
+                >Mínimo 8 caracteres, com maiúscula e caractere especial.</small
+              >
             </div>
-            <div class="card-body">
-                <form method="POST"
-                    action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
-                    {{ form.csrf_token }}
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ render_field(form.nome) }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ render_field(form.sobrenome) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-7 mb-3">
-                            {{ render_field(form.email) }}
-                        </div>
-                        <div class="col-md-5 mb-3">
-                            {{ render_field(form.login) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ render_field(form.senha, attrs={'type':
-                            'password', 'placeholder':
-                            'Deixe em branco para manter a senha atual'}) }}
-                            <small class="form-text text-muted">Mínimo 8
-                                caracteres, com maiúscula e caractere
-                                especial.</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ render_field(form.confirmar_senha, attrs={'type':
-                            'password', 'placeholder': 'Repita a nova senha'})
-                            }}
-                        </div>
-                    </div>
-
-                    <div class="mb-1">
-                        {{ render_checkbox(form.is_active) }}
-                    </div>
-                    <div class="mb-3">
-                        {{ render_checkbox(form.is_admin) }}
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-info btn-add">
-                            <i class="fas fa-save"></i> {{
-                            form.submit.label.text }}
-                        </button>
-                        <a href="{{ url_for('usuario.listar_usuarios') }}"
-                            class="btn btn-secondary btn-add">Cancelar</a>
-                    </div>
-                </form>
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.confirmar_senha, attrs={'type': 'password',
+              'placeholder': 'Repita a nova senha'}) }}
             </div>
-        </div>
+          </div>
+
+          <div class="mb-1">{{ render_checkbox(form.is_active) }}</div>
+          <div class="mb-3">{{ render_checkbox(form.is_admin) }}</div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-info btn-add">
+              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+            </button>
+            <a
+              href="{{ url_for('usuario.listar_usuarios') }}"
+              class="btn btn-secondary btn-add"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

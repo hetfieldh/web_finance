@@ -1,42 +1,41 @@
 <!--- app\templates\salario_movimento\add.html -->
 
-{% extends "base.html" %}
-{% from "includes/_macros.html" import render_field %}
-
-{% block title %}Web Finance - Lançamentos{% endblock %}
-{% block page_title %}Adicionar Salário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block title %}Web Finance - Lançamentos{% endblock %} {% block page_title
+%}Adicionar Salário{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Adicionar Salário Mensal</h5>
+  <div class="col-md-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Adicionar Salário Mensal</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          Primeiro, informe o mês de referência e a data de recebimento. Depois,
+          você será direcionado para adicionar as verbas.
+        </p>
+        <form
+          method="POST"
+          action="{{ url_for('salario.novo_lancamento_folha') }}"
+        >
+          {{ form.csrf_token }}
+          <div class="row mb-3 align-items-end">
+            <div class="col-md-4">{{ render_field(form.mes_referencia) }}</div>
+            <div class="col-md-4">
+              {{ render_field(form.data_recebimento, attrs={'type': 'date'}) }}
             </div>
-            <div class="card-body">
-                <p class="card-text">Primeiro, informe o mês de referência e a
-                    data de recebimento. Depois, você será direcionado para
-                    adicionar as verbas.</p>
-                <form method="POST"
-                    action="{{ url_for('salario.novo_lancamento_folha') }}">
-                    {{ form.csrf_token }}
-                    <div class="row mb-3 align-items-end">
-                        <div class="col-md-4">
-                            {{ render_field(form.mes_referencia) }}
-                        </div>
-                        <div class="col-md-4">
-                            {{ render_field(form.data_recebimento,
-                            attrs={'type': 'date'}) }}
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        {{ form.submit(class="btn btn-success btn-add") }}
-                        <a href="{{ url_for('salario.listar_movimentos') }}"
-                            class="btn btn-secondary btn-add">Cancelar</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+          </div>
+          <div class="mt-4">
+            {{ form.submit(class="btn btn-success btn-add") }}
+            <a
+              href="{{ url_for('salario.listar_movimentos') }}"
+              class="btn btn-secondary btn-add"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

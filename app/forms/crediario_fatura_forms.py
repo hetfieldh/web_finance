@@ -1,4 +1,4 @@
-# app/forms/crediario_fatura_forms.py 
+# app/forms/crediario_fatura_forms.py
 
 from flask_login import current_user
 from flask_wtf import FlaskForm

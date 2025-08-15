@@ -29,7 +29,7 @@ from app.models.conta_model import Conta
 from app.models.financiamento_model import Financiamento
 
 TIPOS_AMORTIZACAO = [
-    ("", "Selecione..."),   
+    ("", "Selecione..."),
     ("SAC", "SAC"),
     ("PRICE", "PRICE"),
     ("Outro", "Outro"),

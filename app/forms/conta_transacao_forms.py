@@ -1,11 +1,12 @@
 # app/forms/conta_transacao_forms.py
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SubmitField, ValidationError
-from wtforms.validators import DataRequired, Length, Regexp, Optional
-from app.models.conta_transacao_model import ContaTransacao
 from flask_login import current_user
+from flask_wtf import FlaskForm
+from wtforms import SelectField, StringField, SubmitField, ValidationError
+from wtforms.validators import DataRequired, Length, Optional, Regexp
+
 from app import db
+from app.models.conta_transacao_model import ContaTransacao
 
 TIPOS_MOVIMENTO = [("Crédito", "Crédito"), ("Débito", "Débito")]
 

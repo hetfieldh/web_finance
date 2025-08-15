@@ -1,114 +1,113 @@
 <!-- app/templates/financiamentos/parcelas.html -->
 
-{% extends "base.html" %}
-
-{% block title %}Web Finance - Financiamentos{% endblock
-%}
-{% block page_title %}Parcelas de {{ financiamento.nome_financiamento }}{%
-endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Web Finance - Financiamentos{%
+endblock %} {% block page_title %}Parcelas de {{
+financiamento.nome_financiamento }}{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-end mb-3">
-            <a href="{{ url_for('financiamento.listar_financiamentos') }}"
-                class="btn btn-secondary btn-add">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Tabela de Amortização</h5>
-            </div>
-            <div class="card-body">
-                {% if parcelas_data %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Vencimento</th>
-                                <th>Amortização</th>
-                                <th>Juros</th>
-                                <th>Seguros</th>
-                                <th>Taxas</th>
-                                <th>Multa</th>
-                                <th>Mora</th>
-                                <th>Ajustes</th>
-                                <th>Total Previsto</th>
-                                <th>Valor Pago</th>
-                                <th>Saldo Devedor</th>
-                                <th>Status</th>
-                                <th>Data Pagamento</th>
-                                <th>Obs.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for parcela, valor_pago in parcelas_data %}
-                            <tr>
-                                <td>{{ parcela.numero_parcela }}</td>
-                                <td>{{
-                                    parcela.data_vencimento.strftime('%d/%m/%Y')
-                                    }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.valor_principal)
-                                    }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.valor_juros)
-                                    }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.valor_seguro +
-                                    parcela.valor_seguro_2 +
-                                    parcela.valor_seguro_3) }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.valor_taxas)
-                                    }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.multa) }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.mora) }}</td>
-                                <td>R$ {{ "%.2f"|format(parcela.ajustes) }}</td>
-                                <td class="fw-bold">R$ {{
-                                    "%.2f"|format(parcela.valor_total_previsto)
-                                    }}</td>
-                                <td class="fw-bold text-success">
-                                    {% if valor_pago %}
-                                    R$ {{ "%.2f"|format(valor_pago) }}
-                                    {% else %}
-                                    R$ 0.00
-                                    {% endif %}
-                                </td>
-                                <td class="fw-bold text-danger">R$ {{
-                                    "%.2f"|format(parcela.saldo_devedor) }}</td>
-                                <td>
-                                    {% if parcela.status == 'Paga' %}<span
-                                        class="badge bg-success">{{
-                                        parcela.status }}</span>
-                                    {% elif parcela.status == 'Atrasada' %}<span
-                                        class="badge bg-danger">{{
-                                        parcela.status }}</span>
-                                    {% elif parcela.status == 'Amortizada'
-                                    %}<span class="badge bg-primary">{{
-                                        parcela.status }}</span>
-                                    {% else %}<span
-                                        class="badge bg-secondary">{{
-                                        parcela.status }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{
-                                    parcela.data_pagamento.strftime('%d/%m/%Y')
-                                    if parcela.data_pagamento else 'N/A' }}</td>
-                                <td>{{ parcela.observacoes if
-                                    parcela.observacoes else '' }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="alert alert-warning text-center">
-                    Nenhuma parcela encontrada. <a
-                        href="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}"
-                        class="alert-link">Clique aqui para importá-las</a>.
-                </div>
-                {% endif %}
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="d-flex justify-content-end mb-3">
+      <a
+        href="{{ url_for('financiamento.listar_financiamentos') }}"
+        class="btn btn-secondary btn-add"
+      >
+        <i class="fas fa-arrow-left"></i> Voltar
+      </a>
     </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Tabela de Amortização</h5>
+      </div>
+      <div class="card-body">
+        {% if parcelas_data %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vencimento</th>
+                <th>Amortização</th>
+                <th>Juros</th>
+                <th>Seguros</th>
+                <th>Taxas</th>
+                <th>Multa</th>
+                <th>Mora</th>
+                <th>Ajustes</th>
+                <th>Total Previsto</th>
+                <th>Valor Pago</th>
+                <th>Saldo Devedor</th>
+                <th>Status</th>
+                <th>Data Pagamento</th>
+                <th>Obs.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for parcela, valor_pago in parcelas_data %}
+              <tr>
+                <td>{{ parcela.numero_parcela }}</td>
+                <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                <td>R$ {{ "%.2f"|format(parcela.valor_principal) }}</td>
+                <td>R$ {{ "%.2f"|format(parcela.valor_juros) }}</td>
+                <td>
+                  R$ {{ "%.2f"|format(parcela.valor_seguro +
+                  parcela.valor_seguro_2 + parcela.valor_seguro_3) }}
+                </td>
+                <td>R$ {{ "%.2f"|format(parcela.valor_taxas) }}</td>
+                <td>R$ {{ "%.2f"|format(parcela.multa) }}</td>
+                <td>R$ {{ "%.2f"|format(parcela.mora) }}</td>
+                <td>R$ {{ "%.2f"|format(parcela.ajustes) }}</td>
+                <td class="fw-bold">
+                  R$ {{ "%.2f"|format(parcela.valor_total_previsto) }}
+                </td>
+                <td class="fw-bold text-success">
+                  {% if valor_pago %} R$ {{ "%.2f"|format(valor_pago) }} {% else
+                  %} R$ 0.00 {% endif %}
+                </td>
+                <td class="fw-bold text-danger">
+                  R$ {{ "%.2f"|format(parcela.saldo_devedor) }}
+                </td>
+                <td>
+                  {% if parcela.status == 'Paga' %}<span
+                    class="badge bg-success"
+                    >{{ parcela.status }}</span
+                  >
+                  {% elif parcela.status == 'Atrasada' %}<span
+                    class="badge bg-danger"
+                    >{{ parcela.status }}</span
+                  >
+                  {% elif parcela.status == 'Amortizada' %}<span
+                    class="badge bg-primary"
+                    >{{ parcela.status }}</span
+                  >
+                  {% else %}<span class="badge bg-secondary"
+                    >{{ parcela.status }}</span
+                  >
+                  {% endif %}
+                </td>
+                <td>
+                  {{ parcela.data_pagamento.strftime('%d/%m/%Y') if
+                  parcela.data_pagamento else 'N/A' }}
+                </td>
+                <td>
+                  {{ parcela.observacoes if parcela.observacoes else '' }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning text-center">
+          Nenhuma parcela encontrada.
+          <a
+            href="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}"
+            class="alert-link"
+            >Clique aqui para importá-las</a
+          >.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

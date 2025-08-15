@@ -140,9 +140,7 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
 
             meses_anos.append((value, label))
 
-        self.data_primeira_parcela.choices = [
-            ("", "Selecione...")
-        ] + meses_anos
+        self.data_primeira_parcela.choices = [("", "Selecione...")] + meses_anos
 
 
 class EditarCrediarioMovimentoForm(FlaskForm):
@@ -244,6 +242,4 @@ class EditarCrediarioMovimentoForm(FlaskForm):
 
             meses_anos.append((value, label))
 
-        self.data_primeira_parcela.choices = [
-            ("", "Selecione...")
-        ] + meses_anos
+        self.data_primeira_parcela.choices = [("", "Selecione...")] + meses_anos

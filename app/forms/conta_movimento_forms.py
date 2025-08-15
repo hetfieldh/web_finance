@@ -96,7 +96,8 @@ class CadastroContaMovimentoForm(FlaskForm):
         )
 
         self.conta_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: {c.saldo_atual})") for c in contas_ativas
+            (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: {c.saldo_atual})")
+            for c in contas_ativas
         ]
         self.conta_destino_id.choices = self.conta_id.choices
 

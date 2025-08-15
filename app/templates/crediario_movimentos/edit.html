@@ -1,74 +1,74 @@
 <!--- app/templates/crediario_movimentos/edit.html -->
 
-{% extends "base.html" %}
-{% from "includes/_macros.html" import render_field %}
-
-{% block title %}Web Finance - Lançamentos{% endblock %}
-{% block page_title %}Editar Lançamento de Crediário{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block title %}Web Finance - Lançamentos{% endblock %} {% block page_title
+%}Editar Lançamento de Crediário{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Editar Lançamento Crediário ID: {{ movimento.id
-                    }}</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST"
-                    action="{{ url_for('crediario_movimento.editar_movimento_crediario', id=movimento.id) }}">
-                    {{ form.csrf_token }}
+  <div class="col-md-8 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Editar Lançamento Crediário ID: {{ movimento.id }}</h5>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('crediario_movimento.editar_movimento_crediario', id=movimento.id) }}"
+        >
+          {{ form.csrf_token }}
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Crediário:</label>
-                            <input type="text" class="form-control"
-                                value="{{ movimento.crediario.nome_crediario }} ({{ movimento.crediario.tipo_crediario }})"
-                                readonly>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Grupo de
-                                Crediário:</label>
-                            <input type="text" class="form-control"
-                                value="{{ movimento.crediario_grupo.grupo_crediario if movimento.crediario_grupo else 'N/A' }}"
-                                readonly>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            {{ render_field(form.data_compra, attrs={'type':
-                            'date'}) }}
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            {{ render_field(form.valor_total_compra,
-                            attrs={'type': 'number', 'step': '0.01'}) }}
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            {{ render_field(form.data_primeira_parcela) }}
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            {{ render_field(form.numero_parcelas, attrs={'type':
-                            'number', 'min': '1'}) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="mb-3">
-                            {{ render_field(form.descricao) }}
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-info btn-add">
-                            <i class="fas fa-save"></i> {{
-                            form.submit.label.text }}
-                        </button>
-                        <a
-                            href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
-                            class="btn btn-secondary btn-add">Cancelar</a>
-                    </div>
-                </form>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Crediário:</label>
+              <input
+                type="text"
+                class="form-control"
+                value="{{ movimento.crediario.nome_crediario }} ({{ movimento.crediario.tipo_crediario }})"
+                readonly
+              />
             </div>
-        </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Grupo de Crediário:</label>
+              <input
+                type="text"
+                class="form-control"
+                value="{{ movimento.crediario_grupo.grupo_crediario if movimento.crediario_grupo else 'N/A' }}"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              {{ render_field(form.data_compra, attrs={'type': 'date'}) }}
+            </div>
+            <div class="col-md-3 mb-3">
+              {{ render_field(form.valor_total_compra, attrs={'type': 'number',
+              'step': '0.01'}) }}
+            </div>
+            <div class="col-md-3 mb-3">
+              {{ render_field(form.data_primeira_parcela) }}
+            </div>
+            <div class="col-md-3 mb-3">
+              {{ render_field(form.numero_parcelas, attrs={'type': 'number',
+              'min': '1'}) }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3">{{ render_field(form.descricao) }}</div>
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-info btn-add">
+              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+            </button>
+            <a
+              href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
+              class="btn btn-secondary btn-add"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

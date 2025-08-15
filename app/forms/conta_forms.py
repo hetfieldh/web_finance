@@ -1,20 +1,21 @@
 # app/forms/conta_forms.py
 
+from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, BooleanField, SubmitField, SelectField
+from wtforms import BooleanField, DecimalField, SelectField, StringField, SubmitField
 from wtforms.validators import (
     DataRequired,
+    InputRequired,
     Length,
     NumberRange,
-    ValidationError,
     Optional,
-    InputRequired,
     Regexp,
+    ValidationError,
 )
+
+from app import db
 from app.models.conta_model import Conta
 from app.models.usuario_model import Usuario
-from flask_login import current_user
-from app import db
 
 TIPOS_CONTA = [
     ("", "Selecione..."),

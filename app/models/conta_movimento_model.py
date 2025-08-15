@@ -1,8 +1,10 @@
 # app/models/conta_movimento_model.py
 
-from app import db
 from datetime import datetime, timezone
+
 from sqlalchemy import Numeric
+
+from app import db
 
 
 class ContaMovimento(db.Model):

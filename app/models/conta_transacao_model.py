@@ -1,8 +1,10 @@
 # app/models/conta_transacao_model.py
 
-from app import db
 from datetime import datetime, timezone
+
 from sqlalchemy import Enum, UniqueConstraint
+
+from app import db
 
 
 class ContaTransacao(db.Model):

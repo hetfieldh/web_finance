@@ -10,16 +10,18 @@ from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
+from config import Config
+
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 
 
-def create_app():
+def create_app(config_class=Config):
     from config import Config
 
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
 
     try:
         locale.setlocale(locale.LC_TIME, "pt_BR.UTF-8")

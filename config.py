@@ -18,3 +18,9 @@ class Config:
 
     LOG_MAX_BYTES = 1024 * 1024 * 5
     LOG_BACKUP_COUNT = 5
+
+
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    WTF_CSRF_ENABLED = False
