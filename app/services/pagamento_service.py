@@ -107,7 +107,7 @@ def estornar_pagamento(item_id, item_tipo):
             item_a_atualizar = FinanciamentoParcela.query.get(item_id)
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-                item_a_atualizar.status = "A Pagar"
+                item_a_atualizar.status = "Pendente"
                 item_a_atualizar.data_pagamento = None
                 item_a_atualizar.movimento_bancario_id = None
         elif item_tipo == "Crediário":
@@ -115,7 +115,7 @@ def estornar_pagamento(item_id, item_tipo):
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_id
                 item_a_atualizar.valor_pago_fatura = Decimal("0.00")
-                item_a_atualizar.status = "Aberta"
+                item_a_atualizar.status = "Pendente"
                 item_a_atualizar.data_pagamento = None
                 item_a_atualizar.movimento_bancario_id = None
 

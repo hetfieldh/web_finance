@@ -1,15 +1,11 @@
-# app/forms/desp_rec_forms.py
-
 from datetime import date
 
-import dateutil.relativedelta
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
     DateField,
     DecimalField,
-    Form,
     IntegerField,
     SelectField,
     StringField,
@@ -124,13 +120,13 @@ class GerarPrevisaoForm(FlaskForm):
         places=2,
     )
     data_inicio = DateField(
-        "1º Vencimento",
+        "Mês/Ano da Primeira Parcela",
         format="%Y-%m-%d",
         validators=[DataRequired("A data de início é obrigatória.")],
         default=date.today,
     )
     numero_meses = IntegerField(
-        "Quant. Meses?",
+        "Gerar por Quantos Meses?",
         validators=[
             InputRequired("O número de meses é obrigatório."),
             NumberRange(

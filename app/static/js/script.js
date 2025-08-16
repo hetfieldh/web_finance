@@ -56,61 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 5. Script para formulário dinâmico da Folha de Pagamento ---
-  const formLancamento = document.getElementById("form-lancamento-folha");
-  if (formLancamento) {
-    const itensContainer = document.getElementById("itens-container");
-    const addItemBtn = document.getElementById("add-item-btn");
-    const itemTemplateHtml =
-      document.getElementById("item-template")?.innerHTML;
-
-    const reindexRows = () => {
-      const itemRows = itensContainer.querySelectorAll(".item-row");
-      itemRows.forEach((row, index) => {
-        const fields = row.querySelectorAll("select, input");
-        fields.forEach((field) => {
-          for (const attr of ["name", "id"]) {
-            const attrValue = field.getAttribute(attr);
-            if (attrValue) {
-              const newAttrValue = attrValue.replace(
-                /itens-\d+-/,
-                `itens-${index}-`
-              );
-              field.setAttribute(attr, newAttrValue);
-            }
-          }
-        });
-      });
-    };
-
-    if (addItemBtn && itemTemplateHtml) {
-      addItemBtn.addEventListener("click", () => {
-        const currentIndex =
-          itensContainer.querySelectorAll(".item-row").length;
-        const newRowHtml = itemTemplateHtml.replace(
-          /__prefix__/g,
-          currentIndex
-        );
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = newRowHtml;
-        itensContainer.appendChild(tempDiv.firstElementChild);
-      });
-    }
-
-    itensContainer.addEventListener("click", (event) => {
-      const removeBtn = event.target.closest(".remove-item-btn");
-      if (removeBtn) {
-        const itemRow = removeBtn.closest(".item-row");
-        if (itensContainer.querySelectorAll(".item-row").length > 1) {
-          itemRow.remove();
-          reindexRows();
-        } else {
-          alert("É necessário pelo menos uma verba na folha de pagamento.");
-        }
-      }
-    });
-  }
-
   // --- 6. Script para Modal de Pagamento ---
   const pagamentoModal = document.getElementById("pagamentoModal");
   if (pagamentoModal) {
@@ -150,19 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 8. Lógica para formulário dinâmico de Lançamento Bancário ---
   const formMovimentacao = document.getElementById("form-movimentacao");
   if (formMovimentacao) {
-    // Campos que serão movidos
     const contaId = document.getElementById("container-conta_id");
     const dataMovimento = document.getElementById("container-data_movimento");
     const valor = document.getElementById("container-valor");
     const descricao = document.getElementById("container-descricao");
-
-    // Containers (placeholders) de destino
     const simplesFields = document.getElementById(
       "movimentacao_simples_fields"
     );
     const transferenciaFields = document.getElementById("transferencia_fields");
-
-    // Placeholders
     const placeholders = {
       simples: {
         conta_id: document.getElementById("placeholder-simples-conta_id"),
@@ -186,74 +126,54 @@ document.addEventListener("DOMContentLoaded", () => {
       const tipoSelecionado = formMovimentacao.querySelector(
         'input[name="tipo_operacao"]:checked'
       ).value;
-
       if (tipoSelecionado === "simples") {
         simplesFields.style.display = "block";
         transferenciaFields.style.display = "none";
-
-        // Move os campos para a seção "Simples"
         placeholders.simples.conta_id.appendChild(contaId);
         placeholders.simples.data_movimento.appendChild(dataMovimento);
         placeholders.simples.valor.appendChild(valor);
         placeholders.simples.descricao.appendChild(descricao);
-
-        // Renomeia a label da conta para o contexto correto
         contaId.querySelector("label").textContent = "Conta Bancária";
         descricao.querySelector("label").textContent = "Descrição (opcional)";
       } else {
-        // Transferência
         simplesFields.style.display = "none";
         transferenciaFields.style.display = "block";
-
-        // Move os campos para a seção "Transferência"
         placeholders.transferencia.conta_id.appendChild(contaId);
         placeholders.transferencia.data_movimento.appendChild(dataMovimento);
         placeholders.transferencia.valor.appendChild(valor);
         placeholders.transferencia.descricao.appendChild(descricao);
-
-        // Renomeia a label da conta para o contexto correto
         contaId.querySelector("label").textContent = "Conta Origem";
         descricao.querySelector("label").textContent =
           "Descrição da Transferência (opcional)";
       }
     }
-
-    // Adiciona o listener para os botões de rádio
     formMovimentacao
       .querySelectorAll('input[name="tipo_operacao"]')
       .forEach((radio) => {
         radio.addEventListener("change", moverCampos);
       });
-
-    // Executa a função uma vez no carregamento da página
     moverCampos();
   }
 
-  // --- 9. Lógica para o formulário de transferência (evitar conta de destino igual à origem) ---
+  // --- 9. Lógica para o formulário de transferência ---
   const contaOrigemSelect = document.querySelector("#conta_id select");
   const contaDestinoSelect = document.querySelector(
     "#transferencia_fields select[name='conta_destino_id']"
   );
-
   if (contaOrigemSelect && contaDestinoSelect) {
     const atualizarContaDestino = () => {
       const selectedOrigemId = contaOrigemSelect.value;
-
       for (const option of contaDestinoSelect.options) {
-        if (option.value === selectedOrigemId && option.value !== "") {
-          option.style.display = "none";
-        } else {
-          option.style.display = "block";
-        }
+        option.style.display =
+          option.value === selectedOrigemId && option.value !== ""
+            ? "none"
+            : "block";
       }
-
       if (contaDestinoSelect.value === selectedOrigemId) {
         contaDestinoSelect.value = "";
       }
     };
-
     contaOrigemSelect.addEventListener("change", atualizarContaDestino);
-
     atualizarContaDestino();
   }
 
@@ -264,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const filtroConta = document.getElementById("filtro_conta");
     const filtroDataInicio = document.getElementById("filtro_data_inicio");
     const filtroDataFim = document.getElementById("filtro_data_fim");
-
     function toggleFilters() {
       if (tipoRelatorioSelect.value === "mensal") {
         filtroMensal.style.display = "block";
@@ -272,67 +191,41 @@ document.addEventListener("DOMContentLoaded", () => {
         filtroDataInicio.style.display = "none";
         filtroDataFim.style.display = "none";
       } else {
-        // periodo
         filtroMensal.style.display = "none";
         filtroConta.style.display = "block";
         filtroDataInicio.style.display = "block";
         filtroDataFim.style.display = "block";
       }
     }
-
     tipoRelatorioSelect.addEventListener("change", toggleFilters);
-
-    // Executa a função no carregamento da página para definir o estado inicial correto
     toggleFilters();
   }
 
   // --- 11. Lógica AJAX para Gerenciar Folha de Pagamento ---
   const formAdicionarVerba = document.getElementById("form-adicionar-verba");
   const tabelaVerbasCorpo = document.getElementById("tabela-verbas-corpo");
-
-  // Função para Adicionar Verba
   if (formAdicionarVerba) {
     formAdicionarVerba.addEventListener("submit", function (event) {
-      event.preventDefault(); // Impede o recarregamento da página
-
+      event.preventDefault();
       const formData = new FormData(this);
-      const url = this.action;
-
-      fetch(url, {
+      fetch(this.action, {
         method: "POST",
         body: formData,
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
+        headers: { "X-Requested-With": "XMLHttpRequest" },
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            // Adiciona a nova linha na tabela
             const novaLinha = document.createElement("tr");
             novaLinha.id = `verba-${data.item.id}`;
-            novaLinha.innerHTML = `
-                        <td>${data.item.nome}</td>
-                        <td><span class="badge bg-secondary">${data.item.tipo}</span></td>
-                        <td class="text-end">R$ ${data.item.valor.toFixed(2)}</td>
-                        <td class="text-center">
-                            <button type="button" class="btn-excluir-verba p-0 border-0 bg-transparent text-danger"
-                                    data-url="/salario/lancamento/item/excluir/${data.item.id}"
-                                    data-id="${data.item.id}" title="Excluir">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    `;
-            // Remove a mensagem de "nenhuma verba" se ela existir
+            novaLinha.innerHTML = `<td>${data.item.nome}</td><td><span class="badge bg-secondary">${data.item.tipo}</span></td><td class="text-end">R$ ${data.item.valor.toFixed(2)}</td><td class="text-center"><button type="button" class="btn-excluir-verba p-0 border-0 bg-transparent text-danger" data-url="/salario/lancamento/item/excluir/${data.item.id}" data-id="${data.item.id}" title="Excluir"><i class="fas fa-trash-alt"></i></button></td>`;
             const linhaVazia =
               tabelaVerbasCorpo.querySelector('td[colspan="4"]');
             if (linhaVazia) {
               linhaVazia.parentElement.remove();
             }
-
             tabelaVerbasCorpo.appendChild(novaLinha);
-            formAdicionarVerba.reset(); // Limpa o formulário
-            // Nota: a atualização dos totais ainda exigiria um recarregamento ou mais JS.
+            formAdicionarVerba.reset();
           } else {
             alert("Erro: " + data.message);
           }
@@ -340,21 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => console.error("Erro na requisição AJAX:", error));
     });
   }
-
-  // Função para Excluir Verba (usando delegação de eventos)
   if (tabelaVerbasCorpo) {
     tabelaVerbasCorpo.addEventListener("click", function (event) {
       const target = event.target.closest(".btn-excluir-verba");
       if (!target) return;
-
       if (confirm("Tem certeza que deseja remover esta verba?")) {
-        const url = target.dataset.url;
-        const itemId = target.dataset.id;
         const csrfToken = document.querySelector(
           'input[name="csrf_token"]'
         ).value;
-
-        fetch(url, {
+        fetch(target.dataset.url, {
           method: "POST",
           headers: {
             "X-Requested-With": "XMLHttpRequest",
@@ -372,5 +259,81 @@ document.addEventListener("DOMContentLoaded", () => {
           .catch((error) => console.error("Erro na requisição AJAX:", error));
       }
     });
+  }
+
+  // --- 12. Lógica para preenchimento automático da data de vencimento no Lançamento Único ---
+  const formLancamentoUnico = document.getElementById("form-lancamento-unico");
+  if (formLancamentoUnico) {
+    const vencimentosDataElement = document.getElementById("vencimentos-data");
+    if (!vencimentosDataElement) {
+      console.error("Contêiner de dados #vencimentos-data não encontrado!");
+      return;
+    }
+    const vencimentosMap = JSON.parse(
+      vencimentosDataElement.textContent || "{}"
+    );
+    const despRecSelect = document.getElementById("desp_rec_id");
+    const dataVencimentoInput = document.getElementById("data_vencimento");
+
+    if (despRecSelect && dataVencimentoInput) {
+      despRecSelect.addEventListener("change", function () {
+        const selectedId = this.value;
+        const diaVencimento = vencimentosMap[selectedId];
+
+        if (diaVencimento) {
+          const hoje = new Date();
+          const dataAtualNoCampo = dataVencimentoInput.value
+            ? new Date(dataVencimentoInput.value + "T00:00:00")
+            : hoje;
+          let ano = dataAtualNoCampo.getFullYear();
+          let mes = dataAtualNoCampo.getMonth() + 1;
+          let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
+          let diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
+          const mesFormatado = String(mes).padStart(2, "0");
+          const diaFormatado = String(diaFinal).padStart(2, "0");
+          dataVencimentoInput.value = `${ano}-${mesFormatado}-${diaFormatado}`;
+        }
+      });
+    }
+  }
+
+  // --- 13. Lógica para preenchimento automático da data na Geração de Previsão ---
+  const formGerarPrevisao = document.getElementById("form-gerar-previsao");
+  if (formGerarPrevisao) {
+    const vencimentosDataElement = document.getElementById(
+      "vencimentos-previsao-data"
+    );
+    if (!vencimentosDataElement) {
+      console.error(
+        "Contêiner de dados #vencimentos-previsao-data não encontrado!"
+      );
+      return;
+    }
+    const vencimentosMap = JSON.parse(
+      vencimentosDataElement.textContent || "{}"
+    );
+    const despRecSelect = document.getElementById("desp_rec_id_previsao");
+    const dataInicioInput = document.getElementById("data_inicio_previsao");
+
+    if (despRecSelect && dataInicioInput) {
+      despRecSelect.addEventListener("change", function () {
+        const selectedId = this.value;
+        const diaVencimento = vencimentosMap[selectedId];
+
+        if (diaVencimento) {
+          const hoje = new Date();
+          const dataAtualNoCampo = dataInicioInput.value
+            ? new Date(dataInicioInput.value + "T00:00:00")
+            : hoje;
+          let ano = dataAtualNoCampo.getFullYear();
+          let mes = dataAtualNoCampo.getMonth() + 1;
+          let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
+          let diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
+          const mesFormatado = String(mes).padStart(2, "0");
+          const diaFormatado = String(diaFinal).padStart(2, "0");
+          dataInicioInput.value = `${ano}-${mesFormatado}-${diaFormatado}`;
+        }
+      });
+    }
   }
 });

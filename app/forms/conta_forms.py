@@ -22,6 +22,7 @@ TIPOS_CONTA = [
     ("Investimento", "Investimento"),
     ("Caixinha", "Caixinha"),
     ("Dinheiro", "Dinheiro"),
+    ("Benefício", "Benefício"),
 ]
 
 

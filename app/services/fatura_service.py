@@ -62,7 +62,7 @@ def gerar_fatura(crediario_id, mes_ano_str):
             valor_total_fatura=valor_total_calculado,
             data_fechamento=date.today(),
             data_vencimento_fatura=data_fim_mes,
-            status="Aberta",
+            status="Pendente",
         )
         db.session.add(nova_fatura)
         db.session.commit()

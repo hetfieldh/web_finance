@@ -12,10 +12,10 @@
         <form
           method="POST"
           action="{{ url_for('pagamentos.painel') }}"
-          class="d-flex align-items-end gap-2"
+          class="d-flex align-items-center gap-2"
         >
-          {{ form.csrf_token }}
-          <div class="mb-0">{{ render_field(form.mes_ano) }}</div>
+          {{ form.csrf_token }} {{ form.mes_ano(class="form-select
+          form-select-sm") }}
           <button type="submit" class="btn btn-success btn-sm" title="Filtrar">
             <i class="fas fa-search"></i>
           </button>
@@ -83,15 +83,17 @@
                   conta.data_pagamento else '-' }}
                 </td>
                 <td class="text-center">
-                  {% if conta.status in ['Paga', 'Pago'] %}
-                  <span class="badge bg-success">{{ conta.status }}</span>
-                  {% elif conta.status in ['Atrasada'] %}
-                  <span class="badge bg-danger">{{ conta.status }}</span>
-                  {% else %}
-                  <span class="badge bg-warning text-dark"
-                    >{{ conta.status }}</span
+                  {% set status_text = conta.status %} {% set status_class =
+                  'bg-warning text-dark' %} {% if conta.status in ['Aberta',
+                  'Fechada', 'A Pagar'] %} {% set status_text = 'Pendente' %} {%
+                  elif conta.status in ['Paga', 'Pago'] %} {% set status_text =
+                  'Pago' %} {% set status_class = 'bg-success' %} {% elif
+                  conta.status == 'Atrasada' %} {% set status_class =
+                  'bg-danger' %} {% elif conta.status == 'Parcialmente Paga' %}
+                  {% set status_class = 'bg-info' %} {% endif %}
+                  <span class="badge {{ status_class }}"
+                    >{{ status_text }}</span
                   >
-                  {% endif %}
                 </td>
                 <td class="text-center">
                   {% if conta.desatualizada %}

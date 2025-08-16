@@ -21,7 +21,7 @@ class DespRecMovimento(db.Model):
     valor_realizado = db.Column(db.Numeric(12, 2), nullable=True)
 
     status = db.Column(
-        Enum("Pendente", "Pago", "Atrasado", name="status_lancamento_enum"),
+        Enum("Pendente", "Pago", "Recebido", "Atrasado", name="status_lancamento_enum"),
         nullable=False,
         default="Pendente",
     )

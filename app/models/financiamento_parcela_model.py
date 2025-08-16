@@ -35,9 +35,9 @@ class FinanciamentoParcela(db.Model):
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
     )
     status = db.Column(
-        Enum("A Pagar", "Paga", "Atrasada", "Amortizada", name="status_parcela_enum"),
+        Enum("Pendente", "Paga", "Atrasada", "Amortizada", name="status_parcela_enum"),
         nullable=False,
-        default="A Pagar",
+        default="Pendente",
     )
 
     observacoes = db.Column(db.String(255), nullable=True)

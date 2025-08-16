@@ -1,5 +1,8 @@
-# app/routes/desp_rec_movimento_routes.py
+import json
+from datetime import date
+from decimal import Decimal
 
+from dateutil.relativedelta import relativedelta
 from flask import (
     Blueprint,
     current_app,
@@ -10,6 +13,8 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import extract
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -43,6 +48,18 @@ def listar_movimentos():
 @login_required
 def gerar_previsao():
     form = GerarPrevisaoForm()
+
+    # Prepara os dados para o JavaScript
+    desp_rec_items_fixos = DespRec.query.filter_by(
+        usuario_id=current_user.id, ativo=True, tipo="Fixa"
+    ).all()
+
+    vencimentos_map = {
+        item.id: item.dia_vencimento
+        for item in desp_rec_items_fixos
+        if item.dia_vencimento is not None
+    }
+
     if form.validate_on_submit():
         success, message = gerar_previsoes(form)
         if success:
@@ -56,6 +73,7 @@ def gerar_previsao():
         "desp_rec_movimento/gerar_previsao.html",
         form=form,
         title="Gerar Previsão de Lançamentos",
+        vencimentos_map=json.dumps(vencimentos_map),
     )
 
 
@@ -63,6 +81,17 @@ def gerar_previsao():
 @login_required
 def adicionar_lancamento_unico():
     form = LancamentoUnicoForm()
+
+    desp_rec_items = DespRec.query.filter_by(
+        usuario_id=current_user.id, ativo=True, tipo="Variável"
+    ).all()
+
+    vencimentos_map = {
+        item.id: item.dia_vencimento
+        for item in desp_rec_items
+        if item.dia_vencimento is not None
+    }
+
     if form.validate_on_submit():
         try:
             desp_rec_id = form.desp_rec_id.data
@@ -71,9 +100,9 @@ def adicionar_lancamento_unico():
             conflito = DespRecMovimento.query.filter(
                 DespRecMovimento.usuario_id == current_user.id,
                 DespRecMovimento.desp_rec_id == desp_rec_id,
-                db.extract("year", DespRecMovimento.data_vencimento)
+                extract("year", DespRecMovimento.data_vencimento)
                 == data_vencimento.year,
-                db.extract("month", DespRecMovimento.data_vencimento)
+                extract("month", DespRecMovimento.data_vencimento)
                 == data_vencimento.month,
             ).first()
 
@@ -87,6 +116,7 @@ def adicionar_lancamento_unico():
                     "desp_rec_movimento/add_unico.html",
                     form=form,
                     title="Adicionar Lançamento Único",
+                    vencimentos_map=json.dumps(vencimentos_map),
                 )
 
             novo_movimento = DespRecMovimento(
@@ -112,6 +142,7 @@ def adicionar_lancamento_unico():
         "desp_rec_movimento/add_unico.html",
         form=form,
         title="Adicionar Lançamento Único",
+        vencimentos_map=json.dumps(vencimentos_map),
     )
 
 
@@ -135,9 +166,9 @@ def editar_movimento(id):
                     DespRecMovimento.id != id,
                     DespRecMovimento.usuario_id == current_user.id,
                     DespRecMovimento.desp_rec_id == movimento.desp_rec_id,
-                    db.extract("year", DespRecMovimento.data_vencimento)
+                    extract("year", DespRecMovimento.data_vencimento)
                     == nova_data_vencimento.year,
-                    db.extract("month", DespRecMovimento.data_vencimento)
+                    extract("month", DespRecMovimento.data_vencimento)
                     == nova_data_vencimento.month,
                 ).first()
                 if conflito:

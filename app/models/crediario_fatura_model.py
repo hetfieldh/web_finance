@@ -23,8 +23,7 @@ class CrediarioFatura(db.Model):
 
     status = db.Column(
         Enum(
-            "Aberta",
-            "Fechada",
+            "Pendente",
             "Paga",
             "Atrasada",
             "Parcialmente Paga",

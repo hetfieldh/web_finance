@@ -24,6 +24,7 @@ class Conta(db.Model):
             "Investimento",
             "Caixinha",
             "Dinheiro",
+            "Benefício",
             name="tipo_conta_enum",
         ),
         nullable=False,

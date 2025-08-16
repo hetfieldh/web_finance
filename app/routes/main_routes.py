@@ -136,7 +136,7 @@ def dashboard():
     faturas_pendentes = (
         CrediarioFatura.query.filter(
             CrediarioFatura.usuario_id == current_user.id,
-            CrediarioFatura.status.in_(["Aberta", "Fechada"]),
+            CrediarioFatura.status == "Pendente",
         )
         .options(joinedload(CrediarioFatura.crediario))
         .all()
@@ -154,7 +154,7 @@ def dashboard():
     parcelas_pendentes = (
         FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
         .filter(
-            FinanciamentoParcela.status == "A Pagar",
+            FinanciamentoParcela.status == "Pendente",
             FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
         )
         .options(joinedload(FinanciamentoParcela.financiamento))

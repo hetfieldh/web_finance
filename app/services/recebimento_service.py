@@ -47,7 +47,7 @@ def registrar_recebimento(form):
 
         if item_tipo == "Receita":
             item = DespRecMovimento.query.get(item_id)
-            item.status = "Pago"
+            item.status = "Recebido"
             item.valor_realizado = valor_recebido
             item.data_pagamento = form.data_recebimento.data
             item.movimento_bancario_id = novo_movimento.id

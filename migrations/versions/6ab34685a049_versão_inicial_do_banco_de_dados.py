@@ -1,8 +1,8 @@
-"""Criação inicial do Banco de Dados
+"""Versão inicial do banco de dados
 
-Revision ID: 7b00564ae1aa
+Revision ID: 6ab34685a049
 Revises: 
-Create Date: 2025-08-12 21:45:44.871470
+Create Date: 2025-08-16 16:30:06.366286
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7b00564ae1aa'
+revision = '6ab34685a049'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,7 +38,7 @@ def upgrade():
     sa.Column('nome_banco', sa.String(length=100), nullable=False),
     sa.Column('agencia', sa.String(length=20), nullable=False),
     sa.Column('conta', sa.String(length=50), nullable=False),
-    sa.Column('tipo', sa.Enum('Corrente', 'Poupança', 'Digital', 'Investimento', 'Caixinha', 'Dinheiro', name='tipo_conta_enum'), nullable=False),
+    sa.Column('tipo', sa.Enum('Corrente', 'Poupança', 'Digital', 'Investimento', 'Caixinha', 'Dinheiro', 'Benefício', name='tipo_conta_enum'), nullable=False),
     sa.Column('saldo_inicial', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('saldo_atual', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('limite', sa.Numeric(precision=12, scale=2), nullable=True),
@@ -166,7 +166,7 @@ def upgrade():
     sa.Column('valor_pago_fatura', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('data_fechamento', sa.Date(), nullable=True),
     sa.Column('data_vencimento_fatura', sa.Date(), nullable=False),
-    sa.Column('status', sa.Enum('Aberta', 'Fechada', 'Paga', 'Atrasada', 'Parcialmente Paga', name='status_fatura_enum'), nullable=False),
+    sa.Column('status', sa.Enum('Pendente', 'Paga', 'Atrasada', 'Parcialmente Paga', name='status_fatura_enum'), nullable=False),
     sa.Column('data_pagamento', sa.Date(), nullable=True),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
@@ -197,7 +197,7 @@ def upgrade():
     sa.Column('valor_previsto', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('data_pagamento', sa.Date(), nullable=True),
     sa.Column('valor_realizado', sa.Numeric(precision=12, scale=2), nullable=True),
-    sa.Column('status', sa.Enum('Pendente', 'Pago', 'Atrasado', name='status_lancamento_enum'), nullable=False),
+    sa.Column('status', sa.Enum('Pendente', 'Pago', 'Recebido', 'Atrasado', name='status_lancamento_enum'), nullable=False),
     sa.Column('descricao', sa.String(length=255), nullable=True),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
@@ -225,7 +225,7 @@ def upgrade():
     sa.Column('pago', sa.Boolean(), nullable=False),
     sa.Column('data_pagamento', sa.Date(), nullable=True),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
-    sa.Column('status', sa.Enum('A Pagar', 'Paga', 'Atrasada', 'Amortizada', name='status_parcela_enum'), nullable=False),
+    sa.Column('status', sa.Enum('Pendente', 'Paga', 'Atrasada', 'Amortizada', name='status_parcela_enum'), nullable=False),
     sa.Column('observacoes', sa.String(length=255), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['financiamento_id'], ['financiamento.id'], ),
