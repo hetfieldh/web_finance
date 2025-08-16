@@ -31,7 +31,8 @@ def view_graphics():
         dados_graficos={
             **dados_mensais,
             "evolucao_anual": dados_anuais,
-            "progresso_financiamento": dados_financiamento,  # <-- ALTERAÇÃO: Adiciona ao dicionário
+            "progresso_financiamento": dados_financiamento,
         },
-        mes_referencia=hoje.strftime("%B/%Y").capitalize(),
+        mes_referencia=hoje.strftime("%B/%y").capitalize(),
+        ano_atual=hoje.year,
     )

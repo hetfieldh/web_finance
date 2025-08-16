@@ -1,14 +1,14 @@
 <!-- app/templates/graphics.html -->
 
 {% extends 'base.html' %} {% block title %}Web Finance - Gráficos{% endblock %}
-{% block page_title %}Análises Gráficas{% endblock %} {% block content %}
+{% block page_title %}Gráficos{% endblock %} {% block content %}
 <!-- Linha 1: Gráfico Anual em Destaque -->
-<div class="row g-3 mb-3">
+<div class="row g-2 mb-2">
   <div class="col-6">
     <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">
-          Evolução Anual (Receitas vs. Despesas)
+          Receitas x Despesas ({{ ano_atual}})
         </h6>
       </div>
       <div class="card-body" style="height: 280px">
@@ -32,7 +32,7 @@
 </div>
 
 <!-- Linha 2: Gráficos Mensais Lado a Lado -->
-<div class="row g-3 mb-3">
+<div class="row g-2 mb-2">
   <div class="col-lg-4">
     <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
@@ -52,7 +52,7 @@
     <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">
-          Saídas de {{ mes_referencia }}
+          Saídas em {{ mes_referencia }}
         </h6>
       </div>
       <div class="card-body" style="height: 280px">
@@ -64,7 +64,7 @@
     <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">
-          Entradas de {{ mes_referencia }}
+          Entradas em {{ mes_referencia }}
         </h6>
       </div>
       <div class="card-body" style="height: 280px">
