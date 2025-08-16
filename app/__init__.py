@@ -75,6 +75,7 @@ def create_app(config_class=Config):
     from app.routes.extrato_routes import extrato_bp
     from app.routes.financiamento_routes import financiamento_bp
     from app.routes.fluxo_caixa_routes import fluxo_caixa_bp
+    from app.routes.graphics_routes import graphics_bp
     from app.routes.main_routes import main_bp
     from app.routes.pagamentos_routes import pagamentos_bp
     from app.routes.recebimentos_routes import recebimentos_bp
@@ -100,6 +101,7 @@ def create_app(config_class=Config):
     app.register_blueprint(pagamentos_bp)
     app.register_blueprint(recebimentos_bp)
     app.register_blueprint(fluxo_caixa_bp)
+    app.register_blueprint(graphics_bp)
 
     @app.route("/")
     def index():
