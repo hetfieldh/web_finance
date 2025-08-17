@@ -486,4 +486,16 @@ document.addEventListener("DOMContentLoaded", () => {
       debounce(() => checkAvailability(emailInput, emailFeedback), 500)
     );
   }
+
+  // --- 16. Lógica para Modal de Rejeição de Solicitação ---
+  const rejeicaoModal = document.getElementById("rejeicaoModal");
+  if (rejeicaoModal) {
+    rejeicaoModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+      const solicitacaoId = button.getAttribute("data-solicitacao-id");
+      const form = rejeicaoModal.querySelector("#form-rejeicao");
+      const solicitacaoIdInput = form.querySelector("#solicitacao_id");
+      solicitacaoIdInput.value = solicitacaoId;
+    });
+  }
 });

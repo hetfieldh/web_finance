@@ -1,18 +1,16 @@
-# tests/test_usuario_crud.py
+# tests\test_usuario_crud.py
 
 from app import db
 from app.models.usuario_model import Usuario
 
 
 def test_admin_can_list_users(admin_auth_client):
-    """Testa se um admin pode ver a lista de usuários."""
     response = admin_auth_client.get("/usuarios/")
     assert response.status_code == 200
     assert b"Gerenciamento de Usu\xc3\xa1rios" in response.data
 
 
 def test_non_admin_is_redirected(auth_client):
-    """Testa se um usuário não-admin é redirecionado da lista de usuários."""
     response = auth_client.get("/usuarios/", follow_redirects=True)
     assert response.status_code == 200
     assert "Dashboard" in response.data.decode("utf-8")
@@ -22,7 +20,6 @@ def test_non_admin_is_redirected(auth_client):
 
 
 def test_admin_can_create_user(admin_auth_client, app):
-    """Testa se um admin pode criar um novo usuário."""
     form_data = {
         "nome": "Novo",
         "sobrenome": "Usuario",

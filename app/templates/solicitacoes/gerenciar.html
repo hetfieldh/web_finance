@@ -21,7 +21,7 @@ content %}
           {% for s in solicitacoes %}
           <tr>
             <td>{{ s.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</td>
-            <td>{{ s.nome_completo }}</td>
+            <td>{{ s.nome }} {{ s.sobrenome }}</td>
             <td>{{ s.email }}</td>
             <td>{{ s.justificativa or 'N/A' }}</td>
             <td class="text-center">
@@ -40,6 +40,7 @@ content %}
                 method="POST"
                 class="d-inline"
               >
+                {{ rejeicao_form.csrf_token }}
                 <button
                   type="submit"
                   class="btn btn-link text-success p-0 me-2"
@@ -48,19 +49,16 @@ content %}
                   <i class="fas fa-check"></i>
                 </button>
               </form>
-              <form
-                action="{{ url_for('solicitacao.rejeitar_solicitacao', id=s.id) }}"
-                method="POST"
-                class="d-inline"
+              <button
+                type="button"
+                class="btn btn-link text-danger p-0"
+                title="Rejeitar"
+                data-bs-toggle="modal"
+                data-bs-target="#rejeicaoModal"
+                data-solicitacao-id="{{ s.id }}"
               >
-                <button
-                  type="submit"
-                  class="btn btn-link text-danger p-0"
-                  title="Rejeitar"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
-              </form>
+                <i class="fas fa-times"></i>
+              </button>
               {% else %}
               <small class="text-muted"
                 >Decidido por {{ s.admin.login }} em {{
@@ -81,4 +79,59 @@ content %}
     </div>
   </div>
 </div>
-{% endblock %}
+
+<!-- Modal de Rejeição -->
+<div
+  class="modal fade"
+  id="rejeicaoModal"
+  tabindex="-1"
+  aria-labelledby="rejeicaoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejeicaoModalLabel">
+          Rejeitar Solicitação
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        id="form-rejeicao"
+        method="POST"
+        action="{{ url_for('solicitacao.rejeitar_solicitacao') }}"
+      >
+        {{ rejeicao_form.csrf_token }} {{ rejeicao_form.solicitacao_id }}
+        <div class="modal-body">
+          <p>
+            Por favor, informe o motivo da rejeição. Esta mensagem será visível
+            para o usuário.
+          </p>
+          <div class="mb-3">
+            {{ rejeicao_form.motivo.label(class="form-label") }} {{
+            rejeicao_form.motivo(class="form-control") }} {% for error in
+            rejeicao_form.motivo.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          {{ rejeicao_form.submit(class="btn btn-danger") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %} {% endblock %}

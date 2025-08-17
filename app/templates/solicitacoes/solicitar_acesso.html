@@ -12,6 +12,10 @@
     />
     <link
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
   </head>
@@ -57,11 +61,13 @@
           <div class="text-danger small mt-1">{{ error }}</div>
           {% endfor %}
         </div>
-        <div class="d-grid gap-2">
-          {{ form.submit(class="btn btn-primary") }}
-          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary"
-            >Voltar para o Login</a
-          >
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary me-2">
+            <i class="fas fa-paper-plane me-1"></i> {{ form.submit.label.text }}
+          </button>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar
+          </a>
         </div>
       </form>
     </div>

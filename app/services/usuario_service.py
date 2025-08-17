@@ -9,10 +9,6 @@ from app.models.usuario_model import Usuario
 
 
 def criar_novo_usuario(form):
-    """
-    Processa a lógica de negócio para criar um novo usuário.
-    Retorna uma tupla (sucesso, mensagem, objeto_usuario_ou_none).
-    """
     try:
         novo_usuario = Usuario(
             nome=form.nome.data.strip().upper(),
@@ -21,7 +17,11 @@ def criar_novo_usuario(form):
             login=form.login.data.strip().lower(),
             is_admin=form.is_admin.data,
         )
-        novo_usuario.set_password(form.senha.data)
+
+        if form.senha.data:
+            novo_usuario.set_password(form.senha.data)
+        else:
+            novo_usuario.set_password("BemVindo@987")
 
         db.session.add(novo_usuario)
         db.session.commit()

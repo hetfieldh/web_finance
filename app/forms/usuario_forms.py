@@ -21,6 +21,8 @@ from app.models.usuario_model import Usuario
 
 def validar_senha_forte_custom(form, field):
     senha = field.data
+    if not senha:
+        return
     if len(senha) < 8:
         raise ValidationError("A senha deve ter pelo menos 8 caracteres.")
     if not re.search(r"[A-Z]", senha):
@@ -83,14 +85,13 @@ class CadastroUsuarioForm(FlaskForm):
     senha = PasswordField(
         "Senha",
         validators=[
-            DataRequired("O campo senha é obrigatório."),
+            Optional(),
             validar_senha_forte_custom,
         ],
     )
     confirmar_senha = PasswordField(
         "Confirmar Senha",
         validators=[
-            DataRequired("Confirmação de senha é obrigatória."),
             EqualTo("senha", message="A senha e a confirmação de senha não coincidem."),
         ],
     )

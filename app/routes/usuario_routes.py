@@ -1,3 +1,5 @@
+# app\routes\usuario_routes.py
+
 import functools
 import re
 
@@ -22,6 +24,7 @@ from app.forms.usuario_forms import (
     EditarUsuarioForm,
     PerfilUsuarioForm,
 )
+from app.models.solicitacao_acesso_model import SolicitacaoAcesso
 from app.models.usuario_model import Usuario
 from app.services.usuario_service import atualizar_perfil_usuario, criar_novo_usuario
 from app.services.usuario_service import (
@@ -36,7 +39,7 @@ def admin_required(f):
     @login_required
     def decorated_function(*args, **kwargs):
         if not current_user.is_admin:
-            flash("Você не tem permissão para acessar esta página", "danger")
+            flash("Você não tem permissão para acessar esta página", "danger")
             return redirect(url_for("main.dashboard"))
         return f(*args, **kwargs)
 
@@ -58,13 +61,46 @@ def adicionar_usuario():
     form = CadastroUsuarioForm(
         request.form if request.method == "POST" else request.args
     )
+
+    if (
+        request.method == "GET"
+        and form.nome.data
+        and form.sobrenome.data
+        and not form.login.data
+    ):
+        from app.routes.solicitacao_routes import sanitizar_login
+
+        nome_sugerido = sanitizar_login(form.nome.data.split(" ")[0])
+        sobrenome_sugerido = sanitizar_login(form.sobrenome.data.split(" ")[0])
+        form.login.data = f"{nome_sugerido}.{sobrenome_sugerido}"
+
     if form.validate_on_submit():
         success, message, new_user = criar_novo_usuario(form)
         if success:
+            solicitacao_original = SolicitacaoAcesso.query.filter_by(
+                email=new_user.email
+            ).first()
+            if solicitacao_original and solicitacao_original.status == "Aprovada":
+                solicitacao_original.login_criado = new_user.login
+
+                mensagem_padrao = (
+                    f"Seja bem-vindo(a)! Seu acesso foi aprovado. Você pode entrar no sistema usando seu e-mail ou o login '{new_user.login}'. "
+                    "Sua senha provisória é 'BemVindo@987'. Recomendamos que você a altere no primeiro acesso através do seu perfil."
+                )
+                solicitacao_original.motivo_decisao = mensagem_padrao
+                db.session.commit()
+
             flash(message, "success")
             return redirect(url_for("usuario.listar_usuarios"))
         else:
-            flash(message, "danger")
+            if isinstance(message, dict):
+                for field, errors in message.items():
+                    if hasattr(form, field):
+                        getattr(form, field).errors.extend(errors)
+                    else:
+                        flash(errors[0], "danger")
+            else:
+                flash(message, "danger")
 
     return render_template("usuarios/add.html", form=form)
 
@@ -97,12 +133,7 @@ def editar_usuario(id):
         return redirect(url_for("usuario.listar_usuarios"))
 
     elif request.method == "GET":
-        form.nome.data = usuario.nome
-        form.sobrenome.data = usuario.sobrenome
-        form.email.data = usuario.email
-        form.login.data = usuario.login
-        form.is_active.data = usuario.is_active
-        form.is_admin.data = usuario.is_admin
+        form.process(obj=usuario)
 
     return render_template(
         "usuarios/edit.html",
@@ -145,10 +176,7 @@ def perfil():
                 flash(result, "danger")
 
     elif request.method == "GET":
-        form.nome.data = current_user.nome
-        form.sobrenome.data = current_user.sobrenome
-        form.email.data = current_user.email
-        form.login.data = current_user.login
+        form.process(obj=current_user)
 
     return render_template("usuarios/perfil.html", form=form)
 

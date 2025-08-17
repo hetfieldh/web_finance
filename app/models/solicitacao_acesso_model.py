@@ -1,8 +1,11 @@
 # app\models\solicitacao_acesso_model.py
 
 from datetime import datetime, timezone
+
 from sqlalchemy import Enum
+
 from app import db
+
 
 class SolicitacaoAcesso(db.Model):
     __tablename__ = "solicitacao_acesso"
@@ -22,7 +25,8 @@ class SolicitacaoAcesso(db.Model):
     )
     admin_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=True)
     data_decisao = db.Column(db.DateTime, nullable=True)
-
+    motivo_decisao = db.Column(db.Text, nullable=True)
+    login_criado = db.Column(db.String(80), nullable=True)
     admin = db.relationship("Usuario")
 
     def __repr__(self):

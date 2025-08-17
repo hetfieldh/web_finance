@@ -327,6 +327,10 @@ h6,
     font-size: 0.6rem !important;
 }
 
+.extra-small-3 {
+    font-size: 0.5rem !important;
+}
+
 .btn-add {
     font-size: 0.9rem !important;
     padding: 0.2rem 1rem !important;

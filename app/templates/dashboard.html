@@ -105,8 +105,8 @@
 
 <div class="row g-2">
   <!-- Coluna da Esquerda: Contas Bancárias -->
-  <div class="col-lg-6">
-    <div class="card shadow-sm h-100">
+  <div class="col-lg-3">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Contas Bancárias Ativas</h6>
       </div>
@@ -123,12 +123,12 @@
                   class="fas fa-wallet fa-lg text-secondary opacity-50 me-2"
                 ></i>
                 <div>
-                  <div class="fw-semibold small">{{ conta.nome_banco }}</div>
+                  <div class="fw-semibold extra-small">{{ conta.nome_banco }}</div>
                   <div class="text-muted extra-small">{{ conta.tipo }}</div>
                 </div>
               </div>
               <span
-                class="fw-semibold h5 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
+                class="fw-semibold h6 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
               >
                 R$ {{ "%.2f"|format(conta.saldo_atual) }}
               </span>
@@ -148,7 +148,7 @@
   </div>
 
   <!-- Coluna da Direita: Próximos Movimentos -->
-  <div class="col-lg-6">
+  <div class="col-lg-3">
     <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Próximos Movimentos</h6>
@@ -158,22 +158,22 @@
         <ul class="list-group list-group-flush">
           {% for item in proximos_movimentos %}
           <li
-            class="list-group-item py-0 d-flex justify-content-between align-items-center small"
+            class="list-group-item py-1 d-flex justify-content-between align-items-center small"
           >
             <div>
-              <div class="fw-semibold text-dark small">
+              <div class="fw-semibold text-dark extra-small-2">
                 {{ item.descricao }}
               </div>
-              <div class="text-muted extra-small">
+              <div class="text-muted extra-small-3">
                 {{ item.data.strftime('%d/%m/%Y') }}
               </div>
             </div>
             {% if item.tipo == 'saida' %}
-            <span class="badge bg-danger rounded-pill"
+            <span class="badge bg-danger"
               >R$ {{ "%.2f"|format(item.valor) }}</span
             >
             {% else %}
-            <span class="badge bg-success rounded-pill"
+            <span class="badge bg-success"
               >R$ {{ "%.2f"|format(item.valor) }}</span
             >
             {% endif %}

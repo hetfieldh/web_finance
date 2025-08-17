@@ -1,7 +1,7 @@
 # app\forms\solicitacao_forms.py
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError
 
 from app.models.solicitacao_acesso_model import SolicitacaoAcesso
@@ -43,12 +43,45 @@ class SolicitacaoAcessoForm(FlaskForm):
     submit = SubmitField("Enviar Solicitação")
 
     def validate_email(self, email):
-        if Usuario.query.filter_by(email=email.data).first():
+        email_limpo = email.data.strip()
+        if Usuario.query.filter_by(email=email_limpo).first():
             raise ValidationError("Este e-mail já está cadastrado no sistema.")
 
-        if SolicitacaoAcesso.query.filter_by(
-            email=email.data, status="Pendente"
-        ).first():
+        if SolicitacaoAcesso.query.filter_by(email=email_limpo).first():
             raise ValidationError(
-                "Já existe uma solicitação de acesso pendente para este e-mail."
+                "Já existe uma solicitação de acesso (aprovada ou rejeitada) para este e-mail."
             )
+
+
+class VerificarStatusForm(FlaskForm):
+    email = StringField(
+        "Seu E-mail de Solicitação",
+        validators=[
+            DataRequired("O e-mail é obrigatório."),
+            Email("Formato de e-mail inválido."),
+        ],
+    )
+    submit = SubmitField("Verificar Status")
+
+
+class RejeicaoForm(FlaskForm):
+    motivo = TextAreaField(
+        "Motivo da Rejeição",
+        validators=[DataRequired("O motivo é obrigatório."), Length(min=10, max=500)],
+        render_kw={"rows": 4},
+    )
+    solicitacao_id = HiddenField()
+    submit = SubmitField("Confirmar Rejeição")
+
+
+class AprovacaoForm(FlaskForm):
+    motivo = TextAreaField(
+        "Mensagem Adicional (Opcional)",
+        validators=[Length(max=500)],
+        render_kw={
+            "rows": 4,
+            "placeholder": "Ex: O login criado foi 'douglas.f'. A senha inicial é 'mudar123'.",
+        },
+    )
+    solicitacao_id = HiddenField()
+    submit = SubmitField("Confirmar Aprovação e Criar Usuário")

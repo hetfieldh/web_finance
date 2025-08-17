@@ -87,7 +87,14 @@
           <small class="text-muted"
             >Não tem uma conta?
             <a href="{{ url_for('solicitacao.solicitar_acesso') }}"
-              >Solicite seu acesso aqui</a
+              >Solicite aqui</a
+            >
+          </small>
+          <br />
+          <small class="text-muted"
+            >Já solicitou?
+            <a href="{{ url_for('solicitacao.verificar_status') }}"
+              >Verifique o status</a
             >
           </small>
         </div>
