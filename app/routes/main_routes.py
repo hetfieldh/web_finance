@@ -1,9 +1,10 @@
 # app/routes/main_routes.py
 
+import os
 from datetime import date, timedelta
 from decimal import Decimal
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, send_from_directory
 from flask_login import current_user, login_required
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload, subqueryload
@@ -15,6 +16,9 @@ from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
+from app.models.solicitacao_acesso_model import (
+    SolicitacaoAcesso,
+)
 
 main_bp = Blueprint("main", __name__)
 
@@ -224,9 +228,25 @@ def dashboard():
         "balanco_mes": balanco_mes,
     }
 
+    pending_requests_count = 0
+    if current_user.is_admin:
+        pending_requests_count = SolicitacaoAcesso.query.filter_by(
+            status="Pendente"
+        ).count()
+
     return render_template(
         "dashboard.html",
         contas_do_usuario=contas_do_usuario,
         kpis=kpis,
         proximos_movimentos=proximos_movimentos[:10],
+        pending_requests=pending_requests_count,
+    )
+
+
+@main_bp.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        os.path.join(main_bp.root_path, "..", "static", "images"),
+        "favicon.png",
+        mimetype="image/png",
     )

@@ -7,12 +7,21 @@
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Usuários Cadastrados</h4>
-      <a
-        href="{{ url_for('usuario.adicionar_usuario') }}"
-        class="btn btn-success btn-add"
-      >
-        <i class="fas fa-plus"></i> Usuário
-      </a>
+
+      <div class="d-flex gap-2">
+        <a
+          href="{{ url_for('usuario.adicionar_usuario') }}"
+          class="btn btn-success btn-add"
+        >
+          <i class="fas fa-plus"></i> Usuário
+        </a>
+        <a
+          href="{{ url_for('solicitacao.gerenciar_solicitacoes') }}"
+          class="btn btn-warning btn-add"
+        >
+          <i class="fas fa-user-plus"></i> Solicitações
+        </a>
+      </div>
     </div>
 
     <div class="card shadow-sm">

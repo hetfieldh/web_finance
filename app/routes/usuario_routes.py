@@ -1,16 +1,20 @@
-# app/routes/usuario_routes.py
-
 import functools
+import re
 
 from flask import (
     Blueprint,
+    abort,
+    current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import asc, desc
+from werkzeug.security import generate_password_hash
 
 from app import db
 from app.forms.usuario_forms import (
@@ -19,10 +23,7 @@ from app.forms.usuario_forms import (
     PerfilUsuarioForm,
 )
 from app.models.usuario_model import Usuario
-from app.services.usuario_service import (
-    atualizar_perfil_usuario,
-    criar_novo_usuario,
-)
+from app.services.usuario_service import atualizar_perfil_usuario, criar_novo_usuario
 from app.services.usuario_service import (
     excluir_usuario_por_id as excluir_usuario_service,
 )
@@ -35,7 +36,7 @@ def admin_required(f):
     @login_required
     def decorated_function(*args, **kwargs):
         if not current_user.is_admin:
-            flash("Você não tem permissão para acessar esta página", "danger")
+            flash("Você не tem permissão para acessar esta página", "danger")
             return redirect(url_for("main.dashboard"))
         return f(*args, **kwargs)
 
@@ -54,7 +55,9 @@ def listar_usuarios():
 @usuario_bp.route("/adicionar", methods=["GET", "POST"])
 @admin_required
 def adicionar_usuario():
-    form = CadastroUsuarioForm()
+    form = CadastroUsuarioForm(
+        request.form if request.method == "POST" else request.args
+    )
     if form.validate_on_submit():
         success, message, new_user = criar_novo_usuario(form)
         if success:
@@ -81,12 +84,16 @@ def editar_usuario(id):
         if form.senha.data:
             usuario.set_password(form.senha.data)
 
-        usuario.is_active = form.is_active.data
-        if current_user.is_admin:
-            usuario.is_admin = form.is_admin.data
+        if current_user.id != usuario.id:
+            usuario.is_active = form.is_active.data
+            if current_user.is_admin:
+                usuario.is_admin = form.is_admin.data
 
         db.session.commit()
         flash("Usuário atualizado com sucesso!", "success")
+        current_app.logger.info(
+            f"Usuário {usuario.login} (ID: {usuario.id}) atualizado por {current_user.login} (ID: {current_user.id}, IP: {request.remote_addr})"
+        )
         return redirect(url_for("usuario.listar_usuarios"))
 
     elif request.method == "GET":
@@ -97,7 +104,12 @@ def editar_usuario(id):
         form.is_active.data = usuario.is_active
         form.is_admin.data = usuario.is_admin
 
-    return render_template("usuarios/edit.html", form=form, usuario=usuario)
+    return render_template(
+        "usuarios/edit.html",
+        form=form,
+        usuario=usuario,
+        is_self_edit=(current_user.id == usuario.id),
+    )
 
 
 @usuario_bp.route("/excluir/<int:id>", methods=["POST"])
@@ -139,3 +151,42 @@ def perfil():
         form.login.data = current_user.login
 
     return render_template("usuarios/perfil.html", form=form)
+
+
+@usuario_bp.route("/check-field")
+@login_required
+def check_field():
+    field_name = request.args.get("field_name")
+    value = request.args.get("value")
+    user_id_to_exclude = request.args.get("user_id", type=int)
+
+    if not field_name or not value:
+        return jsonify({"available": False, "message": "Requisição inválida"}), 400
+
+    query = Usuario.query
+    if field_name == "login":
+        query = query.filter_by(login=value.strip().lower())
+    elif field_name == "email":
+        query = query.filter_by(email=value.strip())
+    else:
+        return jsonify({"available": False, "message": "Campo inválido"}), 400
+
+    if user_id_to_exclude:
+        query = query.filter(Usuario.id != user_id_to_exclude)
+
+    existing = query.first()
+
+    if existing:
+        return jsonify(
+            {
+                "available": False,
+                "message": f"{field_name.capitalize()} já está em uso.",
+            }
+        )
+    else:
+        return jsonify(
+            {
+                "available": True,
+                "message": f"{field_name.capitalize()} está disponível.",
+            }
+        )

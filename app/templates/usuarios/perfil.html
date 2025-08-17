@@ -10,7 +10,11 @@
         <h5 class="mb-0">Editar Informações do Perfil</h5>
       </div>
       <div class="card-body">
-        <form method="POST" action="{{ url_for('usuario.perfil') }}">
+        <form
+          method="POST"
+          action="{{ url_for('usuario.perfil') }}"
+          data-user-id="{{ current_user.id }}"
+        >
           {{ form.csrf_token }}
 
           <div class="row">
@@ -18,7 +22,10 @@
             <div class="col-md-6 mb-3">{{ render_field(form.sobrenome) }}</div>
           </div>
           <div class="row">
-            <div class="col-md-7 mb-3">{{ render_field(form.email) }}</div>
+            <div class="col-md-7 mb-3">
+              {{ render_field(form.email, attrs={'id': 'email'}) }}
+              <div id="email-feedback" class="form-text mt-1"></div>
+            </div>
             <div class="col-md-5 mb-3">{{ render_field(form.login) }}</div>
           </div>
 
@@ -33,11 +40,59 @@
               {{ render_field(form.senha_atual, attrs={'type': 'password'}) }}
             </div>
             <div class="col-md-4 mb-3">
-              {{ render_field(form.nova_senha, attrs={'type': 'password'}) }}
+              {{ form.nova_senha.label(class="form-label") }}
+              <div class="input-group">
+                {{ form.nova_senha(class="form-control", id="senha") }}
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="toggleSenha"
+                  title="Mostrar/Ocultar Senha"
+                >
+                  <i class="fas fa-eye" id="toggleSenhaIcon"></i>
+                </button>
+              </div>
+              <div class="progress mt-2" style="height: 5px">
+                <div
+                  id="password-strength-bar"
+                  class="progress-bar"
+                  role="progressbar"
+                  style="width: 0%"
+                  aria-valuenow="0"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <small
+                id="password-strength-text"
+                class="form-text text-muted"
+              ></small>
+              {% if form.nova_senha.errors %}
+              <div class="text-danger">
+                {% for error in form.nova_senha.errors %}{{ error }}{% endfor %}
+              </div>
+              {% endif %}
             </div>
             <div class="col-md-4 mb-3">
-              {{ render_field(form.confirmar_nova_senha, attrs={'type':
-              'password'}) }}
+              {{ form.confirmar_nova_senha.label(class="form-label") }}
+              <div class="input-group">
+                {{ form.confirmar_nova_senha(class="form-control",
+                id="confirmar_senha") }}
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="toggleConfirmarSenha"
+                  title="Mostrar/Ocultar Senha"
+                >
+                  <i class="fas fa-eye" id="toggleConfirmarSenhaIcon"></i>
+                </button>
+              </div>
+              {% if form.confirmar_nova_senha.errors %}
+              <div class="text-danger">
+                {% for error in form.confirmar_nova_senha.errors %}{{ error }}{%
+                endfor %}
+              </div>
+              {% endif %}
             </div>
           </div>
 

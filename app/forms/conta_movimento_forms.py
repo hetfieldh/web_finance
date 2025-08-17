@@ -173,10 +173,10 @@ class EditarContaMovimentoForm(FlaskForm):
         render_kw={"readonly": True},
     )
     descricao = TextAreaField(
-        "Descrição",
+        "Descrição (opcional)",
         validators=[
-            DataRequired("A descrição é obrigatória."),
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
+            Optional(),
         ],
     )
     submit = SubmitField("Atualizar")

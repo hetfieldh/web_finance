@@ -336,4 +336,154 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
+
+  // --- 14. Melhorias de UX para Cadastro de Usuário ---
+  const senhaInput = document.getElementById("senha");
+  const confirmarSenhaInput = document.getElementById("confirmar_senha");
+  const toggleSenhaBtn = document.getElementById("toggleSenha");
+  const toggleConfirmarSenhaBtn = document.getElementById(
+    "toggleConfirmarSenha"
+  );
+  const strengthBar = document.getElementById("password-strength-bar");
+  const strengthText = document.getElementById("password-strength-text");
+
+  // Função para alternar a visibilidade da senha
+  const togglePasswordVisibility = (input, iconId) => {
+    const icon = document.getElementById(iconId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  };
+
+  if (toggleSenhaBtn && senhaInput) {
+    toggleSenhaBtn.addEventListener("click", () => {
+      togglePasswordVisibility(senhaInput, "toggleSenhaIcon");
+    });
+  }
+
+  if (toggleConfirmarSenhaBtn && confirmarSenhaInput) {
+    toggleConfirmarSenhaBtn.addEventListener("click", () => {
+      togglePasswordVisibility(confirmarSenhaInput, "toggleConfirmarSenhaIcon");
+    });
+  }
+
+  // Função para verificar a força da senha
+  if (senhaInput && strengthBar && strengthText) {
+    senhaInput.addEventListener("input", () => {
+      const password = senhaInput.value;
+      let score = 0;
+      let text = "";
+      let color = "";
+
+      // Critérios de pontuação
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+      // Define a força baseada na pontuação
+      switch (score) {
+        case 0:
+        case 1:
+        case 2:
+          text = "Fraca";
+          color = "bg-danger";
+          break;
+        case 3:
+          text = "Média";
+          color = "bg-warning";
+          break;
+        case 4:
+        case 5:
+          text = "Forte";
+          color = "bg-success";
+          break;
+      }
+
+      if (password.length === 0) {
+        strengthBar.style.width = "0%";
+        strengthText.textContent = "";
+      } else {
+        strengthBar.style.width = (score / 5) * 100 + "%";
+        strengthBar.className = "progress-bar " + color;
+        strengthText.textContent = `Força da senha: ${text}`;
+      }
+    });
+  }
+
+  // --- 15. Verificação de Disponibilidade de Login/Email com AJAX ---
+  const loginInput = document.getElementById("login");
+  const emailInput = document.getElementById("email");
+
+  const debounce = (func, delay) => {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+  };
+
+  const checkAvailability = async (inputElement, feedbackElement) => {
+    const fieldName = inputElement.id;
+    const value = inputElement.value.trim();
+    feedbackElement.innerHTML = "";
+
+    if (value.length < 4) {
+      return;
+    }
+
+    const form = inputElement.closest("form");
+    let userIdToExclude = null;
+    if (form && form.action) {
+      const actionUrl = form.action;
+      const match =
+        actionUrl.match(/\/editar\/(\d+)/) || actionUrl.match(/\/perfil/);
+      if (match && match[1]) {
+        userIdToExclude = match[1];
+      } else if (match && actionUrl.includes("/perfil")) {
+        userIdToExclude = form.dataset.userId;
+      }
+    }
+
+    try {
+      let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(value)}`;
+      if (userIdToExclude) {
+        url += `&user_id=${userIdToExclude}`;
+      }
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.available) {
+        feedbackElement.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i><small class="text-success">${data.message}</small>`;
+      } else {
+        feedbackElement.innerHTML = `<i class="fas fa-times-circle text-danger me-1"></i><small class="text-danger">${data.message}</small>`;
+      }
+    } catch (error) {
+      console.error("Erro na verificação AJAX:", error);
+      feedbackElement.innerHTML = `<small class="text-warning">Não foi possível verificar a disponibilidade.</small>`;
+    }
+  };
+
+  if (loginInput) {
+    const loginFeedback = document.getElementById("login-feedback");
+    loginInput.addEventListener(
+      "keyup",
+      debounce(() => checkAvailability(loginInput, loginFeedback), 500)
+    );
+  }
+
+  if (emailInput) {
+    const emailFeedback = document.getElementById("email-feedback");
+    emailInput.addEventListener(
+      "keyup",
+      debounce(() => checkAvailability(emailInput, emailFeedback), 500)
+    );
+  }
 });

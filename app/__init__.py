@@ -55,6 +55,7 @@ def create_app(config_class=Config):
     from app.models.salario_item_model import SalarioItem
     from app.models.salario_movimento_item_model import SalarioMovimentoItem
     from app.models.salario_movimento_model import SalarioMovimento
+    from app.models.solicitacao_acesso_model import SolicitacaoAcesso
     from app.models.usuario_model import Usuario
 
     @login_manager.user_loader
@@ -80,6 +81,7 @@ def create_app(config_class=Config):
     from app.routes.pagamentos_routes import pagamentos_bp
     from app.routes.recebimentos_routes import recebimentos_bp
     from app.routes.salario_routes import salario_bp
+    from app.routes.solicitacao_routes import solicitacao_bp
     from app.routes.usuario_routes import usuario_bp
 
     app.register_blueprint(usuario_bp)
@@ -102,6 +104,7 @@ def create_app(config_class=Config):
     app.register_blueprint(recebimentos_bp)
     app.register_blueprint(fluxo_caixa_bp)
     app.register_blueprint(graphics_bp)
+    app.register_blueprint(solicitacao_bp)
 
     @app.route("/")
     def index():

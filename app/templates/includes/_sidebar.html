@@ -38,10 +38,12 @@
                 class="list-group-item list-group-item-action bg-transparent ps-4">
                 <i class="fas fa-file-invoice-dollar me-2"></i>Itens da Salário
             </a>
-            <a href="{{ url_for('usuario.listar_usuarios') }}"
-                class="list-group-item list-group-item-action bg-transparent ps-4">
-                <i class="fas fa-users me-2"></i>Usuários
-            </a>
+            {% if current_user.is_admin %}
+                <a href="{{ url_for('usuario.listar_usuarios') }}"
+                    class="list-group-item list-group-item-action bg-transparent ps-4">
+                    <i class="fas fa-users me-2"></i>Usuários
+                </a>
+            {% endif %}
         </div>
 
         <!-- Menu "Lançamentos" -->
