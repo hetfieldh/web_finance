@@ -1,5 +1,7 @@
 // app/static/js/script.js
 
+// app/static/js/script.js
+
 // Exibe uma mensagem no console para confirmar que o script foi carregado
 console.log("script.js carregado com sucesso!");
 
@@ -56,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 6. Script para Modal de Pagamento ---
+  // --- 5. Script para Modal de Pagamento ---
   const pagamentoModal = document.getElementById("pagamentoModal");
   if (pagamentoModal) {
     pagamentoModal.addEventListener("show.bs.modal", function (event) {
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 7. Script para Modal de Recebimento ---
+  // --- 6. Script para Modal de Recebimento ---
   const recebimentoModal = document.getElementById("recebimentoModal");
   if (recebimentoModal) {
     recebimentoModal.addEventListener("show.bs.modal", function (event) {
@@ -82,17 +84,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const itemTipo = button.getAttribute("data-item-tipo");
       const itemValor = button.getAttribute("data-item-valor");
       const itemDescricao = button.getAttribute("data-item-descricao");
-      const itemData = button.getAttribute("data-item-data");
       const modal = this;
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+      const dia = String(hoje.getDate()).padStart(2, "0");
+      const dataFormatada = `${ano}-${mes}-${dia}`;
       modal.querySelector("#item_id").value = itemId;
       modal.querySelector("#item_tipo").value = itemTipo;
       modal.querySelector("#valor_recebido").value = itemValor;
       modal.querySelector("#item_descricao").value = itemDescricao;
-      modal.querySelector("#data_recebimento").value = itemData;
+      modal.querySelector("#data_recebimento").value = dataFormatada;
     });
   }
 
-  // --- 8. Lógica para formulário dinâmico de Lançamento Bancário ---
+  // --- 7. Lógica para formulário dinâmico de Lançamento Bancário ---
   const formMovimentacao = document.getElementById("form-movimentacao");
   if (formMovimentacao) {
     const contaId = document.getElementById("container-conta_id");
@@ -155,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     moverCampos();
   }
 
-  // --- 9. Lógica para o formulário de transferência ---
+  // --- 8. Lógica para o formulário de transferência (evitar conta de destino igual à origem) ---
   const contaOrigemSelect = document.querySelector("#conta_id select");
   const contaDestinoSelect = document.querySelector(
     "#transferencia_fields select[name='conta_destino_id']"
@@ -177,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarContaDestino();
   }
 
-  // --- 10. Lógica para filtros dinâmicos do Extrato Desp/Rec ---
+  // --- 9. Lógica para filtros dinâmicos do Extrato Desp/Rec ---
   const tipoRelatorioSelect = document.getElementById("tipo_relatorio");
   if (tipoRelatorioSelect) {
     const filtroMensal = document.getElementById("filtro_mensal");
@@ -201,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleFilters();
   }
 
-  // --- 11. Lógica AJAX para Gerenciar Folha de Pagamento ---
+  // --- 10. Lógica AJAX para Gerenciar Folha de Pagamento ---
   const formAdicionarVerba = document.getElementById("form-adicionar-verba");
   const tabelaVerbasCorpo = document.getElementById("tabela-verbas-corpo");
   if (formAdicionarVerba) {
@@ -261,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 12. Lógica para preenchimento automático da data de vencimento no Lançamento Único ---
+  // --- 11. Lógica para preenchimento automático da data de vencimento no Lançamento Único ---
   const formLancamentoUnico = document.getElementById("form-lancamento-unico");
   if (formLancamentoUnico) {
     const vencimentosDataElement = document.getElementById("vencimentos-data");
@@ -279,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
       despRecSelect.addEventListener("change", function () {
         const selectedId = this.value;
         const diaVencimento = vencimentosMap[selectedId];
-
         if (diaVencimento) {
           const hoje = new Date();
           const dataAtualNoCampo = dataVencimentoInput.value
@@ -297,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 13. Lógica para preenchimento automático da data na Geração de Previsão ---
+  // --- 12. Lógica para preenchimento automático da data na Geração de Previsão ---
   const formGerarPrevisao = document.getElementById("form-gerar-previsao");
   if (formGerarPrevisao) {
     const vencimentosDataElement = document.getElementById(
@@ -319,7 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
       despRecSelect.addEventListener("change", function () {
         const selectedId = this.value;
         const diaVencimento = vencimentosMap[selectedId];
-
         if (diaVencimento) {
           const hoje = new Date();
           const dataAtualNoCampo = dataInicioInput.value
@@ -337,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 14. Melhorias de UX para Cadastro de Usuário ---
+  // --- 13. Melhorias de UX para Cadastro de Usuário ---
   const senhaInput = document.getElementById("senha");
   const confirmarSenhaInput = document.getElementById("confirmar_senha");
   const toggleSenhaBtn = document.getElementById("toggleSenha");
@@ -347,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const strengthBar = document.getElementById("password-strength-bar");
   const strengthText = document.getElementById("password-strength-text");
 
-  // Função para alternar a visibilidade da senha
   const togglePasswordVisibility = (input, iconId) => {
     const icon = document.getElementById(iconId);
     if (input.type === "password") {
@@ -373,22 +376,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Função para verificar a força da senha
   if (senhaInput && strengthBar && strengthText) {
     senhaInput.addEventListener("input", () => {
       const password = senhaInput.value;
       let score = 0;
       let text = "";
       let color = "";
-
-      // Critérios de pontuação
       if (password.length >= 8) score++;
       if (/[A-Z]/.test(password)) score++;
       if (/[a-z]/.test(password)) score++;
       if (/[0-9]/.test(password)) score++;
       if (/[^A-Za-z0-9]/.test(password)) score++;
-
-      // Define a força baseada na pontuação
       switch (score) {
         case 0:
         case 1:
@@ -406,7 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
           color = "bg-success";
           break;
       }
-
       if (password.length === 0) {
         strengthBar.style.width = "0%";
         strengthText.textContent = "";
@@ -418,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- 15. Verificação de Disponibilidade de Login/Email com AJAX ---
+  // --- 14. Verificação de Disponibilidade de Login/Email com AJAX ---
   const loginInput = document.getElementById("login");
   const emailInput = document.getElementById("email");
 
@@ -430,64 +427,134 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   };
 
-  const checkAvailability = async (inputElement, feedbackElement) => {
-    const fieldName = inputElement.id;
-    const value = inputElement.value.trim();
-    feedbackElement.innerHTML = "";
+  if (loginInput || emailInput) {
+    const checkAvailability = async (inputElement, feedbackElement) => {
+      const fieldName = inputElement.id;
+      const value = inputElement.value.trim();
+      feedbackElement.innerHTML = "";
+      if (value.length < 4) return;
 
-    if (value.length < 4) {
-      return;
+      const form = inputElement.closest("form");
+      let userIdToExclude = null;
+      if (form && form.action) {
+        const actionUrl = form.action;
+        const match =
+          actionUrl.match(/\/editar\/(\d+)/) || actionUrl.match(/\/perfil/);
+        if (match && match[1]) {
+          userIdToExclude = match[1];
+        } else if (match && actionUrl.includes("/perfil")) {
+          userIdToExclude = form.dataset.userId;
+        }
+      }
+
+      try {
+        let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(value)}`;
+        if (userIdToExclude) {
+          url += `&user_id=${userIdToExclude}`;
+        }
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.available) {
+          feedbackElement.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i><small class="text-success">${data.message}</small>`;
+        } else {
+          feedbackElement.innerHTML = `<i class="fas fa-times-circle text-danger me-1"></i><small class="text-danger">${data.message}</small>`;
+        }
+      } catch (error) {
+        console.error("Erro na verificação AJAX:", error);
+        feedbackElement.innerHTML = `<small class="text-warning">Não foi possível verificar a disponibilidade.</small>`;
+      }
+    };
+
+    if (loginInput) {
+      const loginFeedback = document.getElementById("login-feedback");
+      loginInput.addEventListener(
+        "keyup",
+        debounce(() => checkAvailability(loginInput, loginFeedback), 500)
+      );
     }
 
-    const form = inputElement.closest("form");
-    let userIdToExclude = null;
-    if (form && form.action) {
-      const actionUrl = form.action;
-      const match =
-        actionUrl.match(/\/editar\/(\d+)/) || actionUrl.match(/\/perfil/);
-      if (match && match[1]) {
-        userIdToExclude = match[1];
-      } else if (match && actionUrl.includes("/perfil")) {
-        userIdToExclude = form.dataset.userId;
-      }
-    }
+    if (emailInput) {
+      const emailFeedback = document.getElementById("email-feedback");
+      if (window.location.pathname.includes("/solicitacao/acesso")) {
+        const formFields = document.querySelectorAll(
+          'input[name="nome"], input[name="sobrenome"], textarea[name="justificativa"]'
+        );
+        const submitButton = document.querySelector('button[type="submit"]');
 
-    try {
-      let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(value)}`;
-      if (userIdToExclude) {
-        url += `&user_id=${userIdToExclude}`;
-      }
-      const response = await fetch(url);
-      const data = await response.json();
+        const disableFormFields = (disabled) => {
+          formFields.forEach((field) => {
+            field.disabled = disabled;
+          });
+          if (submitButton) {
+            submitButton.disabled = disabled;
+          }
+        };
 
-      if (data.available) {
-        feedbackElement.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i><small class="text-success">${data.message}</small>`;
+        const checkEmailSolicitacao = async () => {
+          const email = emailInput.value.trim();
+          if (email.length < 5 || !email.includes("@")) {
+            emailFeedback.innerHTML = "";
+            disableFormFields(false);
+            return;
+          }
+          try {
+            const response = await fetch(
+              `/solicitacao/check-email?email=${encodeURIComponent(email)}`
+            );
+            const data = await response.json();
+
+            if (data.exists) {
+              emailFeedback.innerHTML = `
+                <div class="alert alert-info p-2 small mt-2">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Já existe uma solicitação para este e-mail.
+                  <a href="${data.status_url}" class="alert-link">Acesse</a>.
+                </div>
+              `;
+              disableFormFields(true);
+            } else if (data.user_exists) {
+              emailFeedback.innerHTML = `
+                <div class="alert alert-warning p-2 small mt-2">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  Este e-mail já está cadastrado.
+                  <a href="${data.login_url}" class="alert-link">Tente fazer login</a>.
+                </div>
+              `;
+              disableFormFields(true);
+            } else {
+              emailFeedback.innerHTML = `
+                <div class="text-success small mt-2">
+                  <i class="fas fa-check-circle me-1"></i>
+                  E-mail disponível para solicitação.
+                </div>
+              `;
+              disableFormFields(false);
+            }
+          } catch (error) {
+            console.error(
+              "Erro na verificação de e-mail de solicitação:",
+              error
+            );
+            emailFeedback.innerHTML = "";
+            disableFormFields(false);
+          }
+        };
+
+        emailInput.addEventListener(
+          "input",
+          debounce(checkEmailSolicitacao, 500)
+        );
       } else {
-        feedbackElement.innerHTML = `<i class="fas fa-times-circle text-danger me-1"></i><small class="text-danger">${data.message}</small>`;
+        emailInput.addEventListener(
+          "keyup",
+          debounce(() => checkAvailability(emailInput, emailFeedback), 500)
+        );
       }
-    } catch (error) {
-      console.error("Erro na verificação AJAX:", error);
-      feedbackElement.innerHTML = `<small class="text-warning">Não foi possível verificar a disponibilidade.</small>`;
     }
-  };
-
-  if (loginInput) {
-    const loginFeedback = document.getElementById("login-feedback");
-    loginInput.addEventListener(
-      "keyup",
-      debounce(() => checkAvailability(loginInput, loginFeedback), 500)
-    );
   }
 
-  if (emailInput) {
-    const emailFeedback = document.getElementById("email-feedback");
-    emailInput.addEventListener(
-      "keyup",
-      debounce(() => checkAvailability(emailInput, emailFeedback), 500)
-    );
-  }
-
-  // --- 16. Lógica para Modal de Rejeição de Solicitação ---
+  // --- 15. Lógica para Modal de Rejeição de Solicitação ---
   const rejeicaoModal = document.getElementById("rejeicaoModal");
   if (rejeicaoModal) {
     rejeicaoModal.addEventListener("show.bs.modal", function (event) {

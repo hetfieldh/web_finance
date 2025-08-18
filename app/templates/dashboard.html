@@ -104,7 +104,7 @@
 </div>
 
 <div class="row g-2">
-  <!-- Coluna da Esquerda: Contas Bancárias -->
+  <!-- Coluna 1: Contas Bancárias -->
   <div class="col-lg-3">
     <div class="card shadow-sm">
       <div class="card-header bg-light">
@@ -123,7 +123,9 @@
                   class="fas fa-wallet fa-lg text-secondary opacity-50 me-2"
                 ></i>
                 <div>
-                  <div class="fw-semibold extra-small">{{ conta.nome_banco }}</div>
+                  <div class="fw-semibold extra-small">
+                    {{ conta.nome_banco }}
+                  </div>
                   <div class="text-muted extra-small">{{ conta.tipo }}</div>
                 </div>
               </div>
@@ -147,7 +149,7 @@
     </div>
   </div>
 
-  <!-- Coluna da Direita: Próximos Movimentos -->
+  <!-- Coluna 2: Próximos Movimentos -->
   <div class="col-lg-3">
     <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
@@ -191,5 +193,67 @@
       </div>
     </div>
   </div>
+
+  <!-- Coluna 3: Saldos Devedores -->
+  <div class="col-lg-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-light">
+        <h6 class="fw-semibold mb-0 text-secondary">Saldos Devedores</h6>
+      </div>
+      <div class="card-body p-1">
+        <div class="d-flex flex-column gap-1">
+          {% if financiamentos %} {% for financ in financiamentos %}
+          <div class="card border-1">
+            <div
+              class="card-body p-1 d-flex justify-content-between align-items-center"
+            >
+              <div class="d-flex align-items-center">
+                <i
+                  class="fas fa-file-invoice-dollar fa-lg text-secondary opacity-50 me-2"
+                ></i>
+                <div>
+                  <div class="fw-semibold small">
+                    {{ financ.nome_financiamento }}
+                  </div>
+                  <div class="text-muted extra-small">Financiamento</div>
+                </div>
+              </div>
+              <span class="fw-semibold h5 mb-0 text-danger">
+                R$ {{ "%.2f"|format(financ.saldo_devedor_atual) }}
+              </span>
+            </div>
+          </div>
+          {% endfor %} {% endif %} {% if saldos_crediarios %} {% for cred in
+          saldos_crediarios %}
+          <div class="card border-1">
+            <div
+              class="card-body p-1 d-flex justify-content-between align-items-center"
+            >
+              <div class="d-flex align-items-center">
+                <i
+                  class="fas fa-credit-card fa-lg text-secondary opacity-50 me-2"
+                ></i>
+                <div>
+                  <div class="fw-semibold small">{{ cred.nome }}</div>
+                  <div class="text-muted extra-small">Crediário</div>
+                </div>
+              </div>
+              <span class="fw-semibold h5 mb-0 text-danger">
+                R$ {{ "%.2f"|format(cred.saldo_devedor) }}
+              </span>
+            </div>
+          </div>
+          {% endfor %} {% endif %} {% if not financiamentos and not
+          saldos_crediarios %}
+          <div class="text-center p-2">
+            <p class="text-muted small mb-0">
+              Nenhum saldo devedor encontrado.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
 </div>
-{% endblock %}

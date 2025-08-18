@@ -58,7 +58,7 @@ def adicionar_item():
         try:
             novo_item = SalarioItem(
                 usuario_id=current_user.id,
-                nome=form.nome.data.strip(),
+                nome=form.nome.data.strip().upper(),
                 tipo=form.tipo.data,
                 descricao=form.descricao.data.strip() if form.descricao.data else None,
                 ativo=form.ativo.data,
@@ -90,6 +90,7 @@ def editar_item(id):
 
     if form.validate_on_submit():
         try:
+            item.nome = form.nome.data.strip().upper()
             item.descricao = (
                 form.descricao.data.strip() if form.descricao.data else None
             )

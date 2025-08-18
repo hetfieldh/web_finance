@@ -12,13 +12,15 @@ from sqlalchemy.orm import joinedload, subqueryload
 from app import db
 from app.models.conta_model import Conta
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_model import Crediario
+from app.models.crediario_movimento_model import CrediarioMovimento
+from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
-from app.models.solicitacao_acesso_model import (
-    SolicitacaoAcesso,
-)
+from app.models.solicitacao_acesso_model import SolicitacaoAcesso
 
 main_bp = Blueprint("main", __name__)
 
@@ -228,6 +230,28 @@ def dashboard():
         "balanco_mes": balanco_mes,
     }
 
+    financiamentos_ativos = Financiamento.query.filter_by(
+        usuario_id=current_user.id
+    ).all()
+
+    crediarios_ativos = Crediario.query.filter_by(
+        usuario_id=current_user.id, ativa=True
+    ).all()
+    saldos_crediarios = []
+    for crediario in crediarios_ativos:
+        saldo_devedor = db.session.query(func.sum(CrediarioParcela.valor_parcela)).join(
+            CrediarioParcela.movimento_pai
+        ).filter(
+            CrediarioMovimento.crediario_id == crediario.id,
+            CrediarioParcela.pago.is_(False),
+        ).scalar() or Decimal(
+            "0.00"
+        )
+
+        saldos_crediarios.append(
+            {"nome": crediario.nome_crediario, "saldo_devedor": saldo_devedor}
+        )
+
     pending_requests_count = 0
     if current_user.is_admin:
         pending_requests_count = SolicitacaoAcesso.query.filter_by(
@@ -240,6 +264,8 @@ def dashboard():
         kpis=kpis,
         proximos_movimentos=proximos_movimentos[:10],
         pending_requests=pending_requests_count,
+        financiamentos=financiamentos_ativos,
+        saldos_crediarios=saldos_crediarios,
     )
 
 

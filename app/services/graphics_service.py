@@ -7,6 +7,7 @@ from flask_login import current_user
 from sqlalchemy import func
 
 from app import db
+from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
@@ -62,7 +63,7 @@ def get_monthly_graphics_data(user_id, year, month):
 
     total_obrigacoes += len(salarios_mes) + len(receitas_mes)
     obrigacoes_concluidas += sum(1 for s in salarios_mes if s.status == "Recebido")
-    obrigacoes_concluidas += sum(1 for r in receitas_mes if r.status == "Pago")
+    obrigacoes_concluidas += sum(1 for r in receitas_mes if r.status == "Recebido")
 
     progresso_percentual = (
         (obrigacoes_concluidas / total_obrigacoes * 100) if total_obrigacoes > 0 else 0
@@ -101,8 +102,13 @@ def get_monthly_graphics_data(user_id, year, month):
         .scalar()
         or 0
     )
+
     saidas_financiamento = (
-        db.session.query(func.sum(FinanciamentoParcela.valor_total_previsto))
+        db.session.query(func.sum(ContaMovimento.valor))
+        .join(
+            FinanciamentoParcela,
+            FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
+        )
         .filter(
             FinanciamentoParcela.status == "Paga",
             FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
@@ -111,6 +117,7 @@ def get_monthly_graphics_data(user_id, year, month):
         .scalar()
         or 0
     )
+
     saidas_crediario = (
         db.session.query(func.sum(CrediarioFatura.valor_pago_fatura))
         .filter(
@@ -162,7 +169,7 @@ def get_monthly_graphics_data(user_id, year, month):
         .join(DespRec)
         .filter(
             DespRecMovimento.usuario_id == user_id,
-            DespRecMovimento.status == "Pago",
+            DespRecMovimento.status == "Recebido",
             DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
             DespRec.natureza == "Receita",
         )
@@ -214,7 +221,6 @@ def get_annual_evolution_data(user_id, year):
             day=1
         ) - timedelta(days=1)
 
-        # Soma Receitas (Salário + Outras)
         total_receitas_mes = Decimal("0.00")
         salarios_mes = SalarioMovimento.query.filter(
             SalarioMovimento.usuario_id == user_id,
@@ -237,7 +243,7 @@ def get_annual_evolution_data(user_id, year):
             .join(DespRec)
             .filter(
                 DespRecMovimento.usuario_id == user_id,
-                DespRecMovimento.status == "Pago",
+                DespRecMovimento.status == "Recebido",
                 DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
                 DespRec.natureza == "Receita",
             )
@@ -247,7 +253,6 @@ def get_annual_evolution_data(user_id, year):
         total_receitas_mes += outras_receitas_mes
         receitas_por_mes[month - 1] = float(total_receitas_mes)
 
-        # Soma Despesas (DespRec + Financiamento + Crediário)
         total_despesas_mes = Decimal("0.00")
         despesas_normais = (
             db.session.query(func.sum(DespRecMovimento.valor_realizado))
@@ -333,7 +338,6 @@ def get_financing_progress_data(user_id, year):
             day=1
         ) - timedelta(days=1)
 
-        # Soma o valor previsto de todas as parcelas do mês
         previsto_mes = (
             db.session.query(func.sum(FinanciamentoParcela.valor_total_previsto))
             .filter(
@@ -347,9 +351,12 @@ def get_financing_progress_data(user_id, year):
         )
         valores_previstos[month - 1] = float(previsto_mes)
 
-        # Soma o valor realizado (apenas de parcelas pagas) do mês
         realizado_mes = (
-            db.session.query(func.sum(FinanciamentoParcela.valor_total_previsto))
+            db.session.query(func.sum(ContaMovimento.valor))
+            .join(
+                FinanciamentoParcela,
+                FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
+            )
             .filter(
                 FinanciamentoParcela.financiamento_id == financiamento.id,
                 FinanciamentoParcela.status == "Paga",

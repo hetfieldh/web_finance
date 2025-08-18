@@ -6,16 +6,18 @@ import string
 import unicodedata
 from datetime import datetime, timezone
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user
 
 from app import db
 from app.forms.solicitacao_forms import (
+    AprovacaoForm,
     RejeicaoForm,
     SolicitacaoAcessoForm,
     VerificarStatusForm,
 )
 from app.models.solicitacao_acesso_model import SolicitacaoAcesso
+from app.models.usuario_model import Usuario
 from app.routes.usuario_routes import admin_required
 
 solicitacao_bp = Blueprint("solicitacao", __name__, url_prefix="/solicitacao")
@@ -46,26 +48,76 @@ def gerar_senha_segura(tamanho=12):
 def solicitar_acesso():
     form = SolicitacaoAcessoForm()
     if form.validate_on_submit():
+        email_solicitado = form.email.data.strip()
+
+        solicitacao_existente = SolicitacaoAcesso.query.filter_by(
+            email=email_solicitado
+        ).first()
+        if solicitacao_existente:
+            flash(
+                "Já encontramos uma solicitação para este e-mail. Veja o status abaixo.",
+                "info",
+            )
+            return redirect(
+                url_for("solicitacao.verificar_status", email=email_solicitado)
+            )
+
+        usuario_existente = Usuario.query.filter_by(email=email_solicitado).first()
+        if usuario_existente:
+            flash(
+                "Este e-mail já pertence a um usuário cadastrado. Tente fazer o login.",
+                "warning",
+            )
+            return redirect(url_for("auth.login"))
+
         nova_solicitacao = SolicitacaoAcesso(
             nome=form.nome.data,
             sobrenome=form.sobrenome.data,
-            email=form.email.data,
+            email=email_solicitado,
             justificativa=form.justificativa.data,
         )
         db.session.add(nova_solicitacao)
         db.session.commit()
-        flash(
-            "Sua solicitação de acesso foi enviada com sucesso! Um administrador irá analisá-la em breve.",
-            "success",
-        )
-        return redirect(url_for("auth.login"))
+        flash("Sua solicitação de acesso foi enviada com sucesso!", "success")
+        return redirect(url_for("solicitacao.verificar_status", email=email_solicitado))
+
     return render_template("solicitacoes/solicitar_acesso.html", form=form)
+
+
+@solicitacao_bp.route("/check-email")
+def check_solicitacao_email():
+    email = request.args.get("email", "", type=str).strip()
+    if not email:
+        return jsonify({"exists": False, "user_exists": False})
+
+    solicitacao = SolicitacaoAcesso.query.filter_by(email=email).first()
+    usuario = Usuario.query.filter_by(email=email).first()
+
+    if solicitacao:
+        status_url = url_for("solicitacao.verificar_status", email=email)
+        return jsonify({"exists": True, "status_url": status_url, "user_exists": False})
+    elif usuario:
+        login_url = url_for("auth.login")
+        return jsonify({"exists": False, "user_exists": True, "login_url": login_url})
+    else:
+        return jsonify({"exists": False, "user_exists": False})
 
 
 @solicitacao_bp.route("/status", methods=["GET", "POST"])
 def verificar_status():
     form = VerificarStatusForm()
     solicitacao = None
+
+    if request.method == "GET":
+        email_da_url = request.args.get("email")
+        if email_da_url:
+            form.email.data = email_da_url
+            solicitacao = (
+                SolicitacaoAcesso.query.filter_by(email=email_da_url)
+                .order_by(SolicitacaoAcesso.data_solicitacao.desc())
+                .first()
+            )
+
     if form.validate_on_submit():
         email_buscado = form.email.data.strip()
         solicitacao = (
@@ -78,6 +130,7 @@ def verificar_status():
                 "Nenhuma solicitação de acesso foi encontrada para o e-mail informado.",
                 "warning",
             )
+
     return render_template(
         "solicitacoes/verificar_status.html", form=form, solicitacao=solicitacao
     )
@@ -87,6 +140,7 @@ def verificar_status():
 @admin_required
 def gerenciar_solicitacoes():
     rejeicao_form = RejeicaoForm()
+    aprovacao_form = AprovacaoForm()
     solicitacoes = SolicitacaoAcesso.query.order_by(
         SolicitacaoAcesso.data_solicitacao.desc()
     ).all()
@@ -94,6 +148,7 @@ def gerenciar_solicitacoes():
         "solicitacoes/gerenciar.html",
         solicitacoes=solicitacoes,
         rejeicao_form=rejeicao_form,
+        aprovacao_form=aprovacao_form,
     )
 
 
