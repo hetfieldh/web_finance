@@ -1,6 +1,8 @@
 # app\routes\solicitacao_routes.py
 
 import re
+import secrets
+import string
 import unicodedata
 from datetime import datetime, timezone
 
@@ -9,7 +11,6 @@ from flask_login import current_user
 
 from app import db
 from app.forms.solicitacao_forms import (
-    AprovacaoForm,
     RejeicaoForm,
     SolicitacaoAcessoForm,
     VerificarStatusForm,
@@ -25,6 +26,20 @@ def sanitizar_login(texto):
         unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("utf-8")
     )
     return re.sub(r"[^a-z0-9._]", "", texto_sem_acentos.lower())
+
+
+def gerar_senha_segura(tamanho=12):
+    alfabeto = string.ascii_letters + string.digits + string.punctuation
+    while True:
+        senha = "".join(secrets.choice(alfabeto) for i in range(tamanho))
+        if (
+            any(c.islower() for c in senha)
+            and any(c.isupper() for c in senha)
+            and any(c.isdigit() for c in senha)
+            and any(c in string.punctuation for c in senha)
+        ):
+            break
+    return senha
 
 
 @solicitacao_bp.route("/acesso", methods=["GET", "POST"])
@@ -72,7 +87,6 @@ def verificar_status():
 @admin_required
 def gerenciar_solicitacoes():
     rejeicao_form = RejeicaoForm()
-    aprovacao_form = AprovacaoForm()
     solicitacoes = SolicitacaoAcesso.query.order_by(
         SolicitacaoAcesso.data_solicitacao.desc()
     ).all()
@@ -80,7 +94,6 @@ def gerenciar_solicitacoes():
         "solicitacoes/gerenciar.html",
         solicitacoes=solicitacoes,
         rejeicao_form=rejeicao_form,
-        aprovacao_form=aprovacao_form,
     )
 
 
@@ -97,11 +110,15 @@ def aprovar_solicitacao(id):
         sobrenome_sanitizado = sanitizar_login(solicitacao.sobrenome.split(" ")[0])
         login_sugerido = f"{nome_sanitizado}.{sobrenome_sanitizado}"
 
+        senha_gerada = gerar_senha_segura()
+        solicitacao.senha_provisoria = senha_gerada
+
         db.session.commit()
         flash(
             f"Solicitação de {solicitacao.email} aprovada. Agora crie o usuário.",
             "success",
         )
+
         return redirect(
             url_for(
                 "usuario.adicionar_usuario",

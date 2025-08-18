@@ -5,7 +5,7 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -18,8 +18,6 @@ login_manager = LoginManager()
 
 
 def create_app(config_class=Config):
-    from config import Config
-
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -61,6 +59,22 @@ def create_app(config_class=Config):
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(Usuario, int(user_id))
+
+    @app.before_request
+    def check_force_password_change():
+        if not current_user.is_authenticated:
+            return
+
+        if current_user.precisa_alterar_senha and request.endpoint not in [
+            "usuario.perfil",
+            "auth.logout",
+            "static",
+        ]:
+            flash(
+                "Por segurança, você deve alterar sua senha provisória para continuar.",
+                "warning",
+            )
+            return redirect(url_for("usuario.perfil"))
 
     from app.routes.auth_routes import auth_bp
     from app.routes.conta_movimento_routes import conta_movimento_bp
@@ -114,26 +128,26 @@ def create_app(config_class=Config):
         os.mkdir("logs")
 
     file_handler = RotatingFileHandler(
-        app.config["LOG_FILE"],
-        maxBytes=app.config["LOG_MAX_BYTES"],
-        backupCount=app.config["LOG_BACKUP_COUNT"],
+        "logs/web_finance.log",
+        maxBytes=10240,
+        backupCount=10,
         encoding="utf-8",
     )
     formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+        "%(asctime)s - %(levelname)s - %(name)s - %(message)s [in %(pathname)s:%(lineno)d]"
     )
     file_handler.setFormatter(formatter)
-    file_handler.setLevel(app.config["LOG_LEVEL"])
+    file_handler.setLevel(logging.INFO)
 
     app.logger.addHandler(file_handler)
 
-    if app.debug or app.config["LOG_TO_STDOUT"]:
+    if app.debug or os.environ.get("LOG_TO_STDOUT"):
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
         stream_handler.setLevel(logging.DEBUG)
         app.logger.addHandler(stream_handler)
 
-    app.logger.setLevel(app.config["LOG_LEVEL"])
+    app.logger.setLevel(logging.INFO)
     app.logger.info("Web Finance startup")
 
     @app.after_request

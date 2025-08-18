@@ -18,10 +18,7 @@ def criar_novo_usuario(form):
             is_admin=form.is_admin.data,
         )
 
-        if form.senha.data:
-            novo_usuario.set_password(form.senha.data)
-        else:
-            novo_usuario.set_password("BemVindo@987")
+        novo_usuario.set_password(form.senha.data)
 
         db.session.add(novo_usuario)
         db.session.commit()
@@ -37,17 +34,13 @@ def criar_novo_usuario(form):
 
 
 def excluir_usuario_por_id(usuario_id):
-    """
-    Processa a lógica de negócio para excluir um usuário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     usuario_a_excluir = Usuario.query.get_or_404(usuario_id)
 
     if current_user.id == usuario_a_excluir.id:
         current_app.logger.warning(
             f"Tentativa de auto-exclusão bloqueada para {current_user.login}."
         )
-        return False, "Você не pode excluir seu próprio usuário."
+        return False, "Você não pode excluir seu próprio usuário."
 
     if usuario_a_excluir.contas:
         return (
@@ -91,6 +84,7 @@ def atualizar_perfil_usuario(usuario, form):
                 return False, {"senha_atual": ["A senha atual está incorreta."]}
 
             usuario.set_password(form.nova_senha.data)
+            usuario.precisa_alterar_senha = False
 
         db.session.commit()
         current_app.logger.info(

@@ -75,6 +75,19 @@ def adicionar_usuario():
         form.login.data = f"{nome_sugerido}.{sobrenome_sugerido}"
 
     if form.validate_on_submit():
+        if not form.senha.data:
+            solicitacao_original = SolicitacaoAcesso.query.filter_by(
+                email=form.email.data
+            ).first()
+
+            if solicitacao_original and solicitacao_original.senha_provisoria:
+                form.senha.data = solicitacao_original.senha_provisoria
+            else:
+                form.senha.errors.append(
+                    "A senha é obrigatória para criação manual de usuário."
+                )
+                return render_template("usuarios/add.html", form=form)
+
         success, message, new_user = criar_novo_usuario(form)
         if success:
             solicitacao_original = SolicitacaoAcesso.query.filter_by(
@@ -83,11 +96,12 @@ def adicionar_usuario():
             if solicitacao_original and solicitacao_original.status == "Aprovada":
                 solicitacao_original.login_criado = new_user.login
 
-                mensagem_padrao = (
+                senha_para_mensagem = solicitacao_original.senha_provisoria
+                mensagem_final = (
                     f"Seja bem-vindo(a)! Seu acesso foi aprovado. Você pode entrar no sistema usando seu e-mail ou o login '{new_user.login}'. "
-                    "Sua senha provisória é 'BemVindo@987'. Recomendamos que você a altere no primeiro acesso através do seu perfil."
+                    f"Sua senha provisória é '{senha_para_mensagem}'. Recomendamos que você a altere no primeiro acesso através do seu perfil."
                 )
-                solicitacao_original.motivo_decisao = mensagem_padrao
+                solicitacao_original.motivo_decisao = mensagem_final
                 db.session.commit()
 
             flash(message, "success")

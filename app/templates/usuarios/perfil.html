@@ -2,7 +2,14 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block title %}Web Finance - Meu Perfil{% endblock %} {% block page_title
-%}Meu Perfil{% endblock %} {% block content %}
+%}Meu Perfil{% endblock %} {% block content %} {% if
+current_user.precisa_alterar_senha %}
+<div class="alert alert-warning" role="alert">
+  <strong>Atenção!</strong> Por motivos de segurança, você precisa definir uma
+  nova senha para ter acesso completo ao sistema.
+</div>
+{% endif %}
+
 <div class="row">
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">

@@ -27,6 +27,9 @@ class SolicitacaoAcesso(db.Model):
     data_decisao = db.Column(db.DateTime, nullable=True)
     motivo_decisao = db.Column(db.Text, nullable=True)
     login_criado = db.Column(db.String(80), nullable=True)
+
+    senha_provisoria = db.Column(db.String(128), nullable=True)
+
     admin = db.relationship("Usuario")
 
     def __repr__(self):

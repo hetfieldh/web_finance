@@ -1,8 +1,8 @@
-"""Versão inicial do banco de dados
+"""Versão Final do Banco de Dados
 
-Revision ID: 6ab34685a049
+Revision ID: d90d2c8fc97e
 Revises: 
-Create Date: 2025-08-16 16:30:06.366286
+Create Date: 2025-08-17 22:12:30.814318
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6ab34685a049'
+revision = 'd90d2c8fc97e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,7 +38,7 @@ def upgrade():
     sa.Column('nome_banco', sa.String(length=100), nullable=False),
     sa.Column('agencia', sa.String(length=20), nullable=False),
     sa.Column('conta', sa.String(length=50), nullable=False),
-    sa.Column('tipo', sa.Enum('Corrente', 'Poupança', 'Digital', 'Investimento', 'Caixinha', 'Dinheiro', 'Benefício', name='tipo_conta_enum'), nullable=False),
+    sa.Column('tipo', sa.Enum('Corrente', 'Poupança', 'Digital', 'Investimento', 'Caixinha', 'Dinheiro', 'Benefício', 'FGTS', name='tipo_conta_enum'), nullable=False),
     sa.Column('saldo_inicial', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('saldo_atual', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('limite', sa.Numeric(precision=12, scale=2), nullable=True),
@@ -106,6 +106,23 @@ def upgrade():
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('usuario_id', 'nome', 'tipo', name='_usuario_salario_item_uc')
+    )
+    op.create_table('solicitacao_acesso',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('nome', sa.String(length=100), nullable=False),
+    sa.Column('sobrenome', sa.String(length=100), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('justificativa', sa.Text(), nullable=True),
+    sa.Column('status', sa.Enum('Pendente', 'Aprovada', 'Rejeitada', name='status_solicitacao_enum'), nullable=False),
+    sa.Column('data_solicitacao', sa.DateTime(), nullable=False),
+    sa.Column('admin_id', sa.Integer(), nullable=True),
+    sa.Column('data_decisao', sa.DateTime(), nullable=True),
+    sa.Column('motivo_decisao', sa.Text(), nullable=True),
+    sa.Column('login_criado', sa.String(length=80), nullable=True),
+    sa.Column('senha_provisoria', sa.String(length=128), nullable=True),
+    sa.ForeignKeyConstraint(['admin_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('conta_movimento',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -273,6 +290,7 @@ def downgrade():
     op.drop_table('financiamento')
     op.drop_table('crediario_movimento')
     op.drop_table('conta_movimento')
+    op.drop_table('solicitacao_acesso')
     op.drop_table('salario_item')
     op.drop_table('desp_rec')
     op.drop_table('crediario_grupo')

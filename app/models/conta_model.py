@@ -25,6 +25,7 @@ class Conta(db.Model):
             "Caixinha",
             "Dinheiro",
             "Benefício",
+            "FGTS",
             name="tipo_conta_enum",
         ),
         nullable=False,

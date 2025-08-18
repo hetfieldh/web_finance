@@ -48,8 +48,8 @@
             <i class="fas fa-search me-1"></i> {{ form.submit.label.text }}
           </button>
           <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Voltar</a
-          >
+            <i class="fas fa-arrow-left me-1"></i> Voltar para o Login
+          </a>
         </div>
       </form>
 
@@ -76,15 +76,13 @@
               <span class="badge bg-danger">{{ solicitacao.status }}</span>
               {% endif %}
             </p>
-            {% if solicitacao.status == 'Aprovada' %}
-            <small class="text-muted d-block mt-2"
-              >Sua solicitação foi aprovada! Você deve receber suas credenciais
-              de acesso em breve.</small
-            >
-            {% if solicitacao.motivo_decisao %}
-            <div class="alert alert-info mt-2 p-2">
-              <strong>Mensagem do Administrador:</strong> {{
-              solicitacao.motivo_decisao }}
+            {% if solicitacao.status == 'Aprovada' %} {% if
+            solicitacao.motivo_decisao %}
+            <div class="alert alert-success mt-2 p-2">
+              <strong>Acesso Aprovado!</strong><br />
+              <span style="white-space: pre-wrap"
+                >{{ solicitacao.motivo_decisao }}</span
+              >
             </div>
             {% endif %} {% elif solicitacao.status == 'Rejeitada' %}
             <small class="text-muted d-block mt-2"
