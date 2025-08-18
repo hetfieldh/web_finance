@@ -104,11 +104,7 @@ def get_monthly_graphics_data(user_id, year, month):
     )
 
     saidas_financiamento = (
-        db.session.query(func.sum(ContaMovimento.valor))
-        .join(
-            FinanciamentoParcela,
-            FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
-        )
+        db.session.query(func.sum(FinanciamentoParcela.valor_pago))
         .filter(
             FinanciamentoParcela.status == "Paga",
             FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
@@ -269,7 +265,7 @@ def get_annual_evolution_data(user_id, year):
         total_despesas_mes += despesas_normais
 
         financiamentos_mes = (
-            db.session.query(func.sum(FinanciamentoParcela.valor_total_previsto))
+            db.session.query(func.sum(FinanciamentoParcela.valor_pago))
             .filter(
                 FinanciamentoParcela.status == "Paga",
                 FinanciamentoParcela.data_pagamento.between(
@@ -352,11 +348,7 @@ def get_financing_progress_data(user_id, year):
         valores_previstos[month - 1] = float(previsto_mes)
 
         realizado_mes = (
-            db.session.query(func.sum(ContaMovimento.valor))
-            .join(
-                FinanciamentoParcela,
-                FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
-            )
+            db.session.query(func.sum(FinanciamentoParcela.valor_pago))
             .filter(
                 FinanciamentoParcela.financiamento_id == financiamento.id,
                 FinanciamentoParcela.status == "Paga",

@@ -45,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
         responsive: true,
         maintainAspectRatio: false,
         cutout: "60%",
+        rotation: 90,
         plugins: {
           legend: {
             position: "bottom",

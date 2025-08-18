@@ -54,39 +54,44 @@
           <h6 class="alert-heading">Atenção ao Formato do Arquivo CSV!</h6>
           <p>
             O arquivo .csv deve conter um cabeçalho e as seguintes
-            <strong>14 colunas</strong>, exatamente nesta ordem:
+            <strong>15 colunas</strong>, exatamente nesta ordem:
           </p>
           <ul>
             <li><strong>numero_parcela</strong> (Ex: 1)</li>
-            <li>
-              <strong>data_vencimento</strong> (Formato: AAAA-MM-DD, Ex:
-              2025-08-25)
-            </li>
+            <li><strong>data_vencimento</strong> (Formato: AAAA-MM-DD)</li>
             <li>
               <strong>valor_principal</strong> (Formato numérico com ponto, Ex:
               1500.50)
             </li>
-            <li><strong>valor_juros</strong> (Ex: 350.20)</li>
-            <li><strong>valor_seguro</strong> (Ex: 25.00)</li>
-            <li><strong>valor_seguro_2</strong> (Ex: 15.00)</li>
-            <li><strong>valor_seguro_3</strong> (Ex: 10.00)</li>
-            <li><strong>valor_taxas</strong> (Ex: 5.50)</li>
-            <li><strong>multa</strong> (Ex: 0.00)</li>
-            <li><strong>mora</strong> (Ex: 0.00)</li>
-            <li><strong>ajustes</strong> (Ex: 0.00)</li>
+            <li><strong>valor_juros</strong></li>
+            <li><strong>valor_seguro</strong></li>
+            <li><strong>valor_seguro_2</strong></li>
+            <li><strong>valor_seguro_3</strong></li>
+            <li><strong>valor_taxas</strong></li>
+            <li><strong>multa</strong></li>
+            <li><strong>mora</strong></li>
+            <li><strong>ajustes</strong></li>
             <li>
-              <strong>valor_total_previsto</strong> (Ex: 1906.20 - será
-              recalculado pelo sistema)
+              <strong>valor_total_previsto</strong> (será recalculado pelo
+              sistema)
             </li>
             <li>
-              <strong>saldo_devedor</strong> (Ex: 448500.00 - será recalculado
-              pelo sistema)
+              <strong>saldo_devedor</strong> (será recalculado pelo sistema)
+            </li>
+            <li>
+              <strong>data_pagamento</strong> (Formato: AAAA-MM-DD. Deixe em
+              branco se a parcela estiver pendente)
+            </li>
+            <li>
+              <strong>valor_pago</strong> (Formato numérico. Deixe em branco se
+              a parcela estiver pendente)
             </li>
             <li><strong>observacoes</strong> (Texto opcional)</li>
           </ul>
           <hr />
           <p class="mb-0">
-            Qualquer desvio deste formato resultará em erro na importação.
+            O sistema irá definir o status da parcela como "Paga"
+            automaticamente se uma data de pagamento for fornecida.
           </p>
         </div>
 

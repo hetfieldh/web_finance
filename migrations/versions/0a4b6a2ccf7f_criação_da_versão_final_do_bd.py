@@ -1,8 +1,8 @@
-"""Versão Final do Banco de Dados
+"""Criação da versão final do BD
 
-Revision ID: d90d2c8fc97e
+Revision ID: 0a4b6a2ccf7f
 Revises: 
-Create Date: 2025-08-17 22:12:30.814318
+Create Date: 2025-08-18 16:49:45.213076
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd90d2c8fc97e'
+revision = '0a4b6a2ccf7f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,9 +25,10 @@ def upgrade():
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('login', sa.String(length=80), nullable=False),
     sa.Column('senha_hash', sa.String(length=256), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('is_admin', sa.Boolean(), nullable=True),
-    sa.Column('data_criacao', sa.DateTime(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('is_admin', sa.Boolean(), nullable=False),
+    sa.Column('data_criacao', sa.DateTime(), nullable=False),
+    sa.Column('precisa_alterar_senha', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('login')
@@ -241,9 +242,10 @@ def upgrade():
     sa.Column('saldo_devedor', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('pago', sa.Boolean(), nullable=False),
     sa.Column('data_pagamento', sa.Date(), nullable=True),
+    sa.Column('valor_pago', sa.Numeric(precision=12, scale=2), nullable=True),
+    sa.Column('observacoes', sa.String(length=255), nullable=True),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
     sa.Column('status', sa.Enum('Pendente', 'Paga', 'Atrasada', 'Amortizada', name='status_parcela_enum'), nullable=False),
-    sa.Column('observacoes', sa.String(length=255), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['financiamento_id'], ['financiamento.id'], ),
     sa.ForeignKeyConstraint(['movimento_bancario_id'], ['conta_movimento.id'], ),

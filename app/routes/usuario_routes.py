@@ -178,7 +178,7 @@ def perfil():
         success, result = atualizar_perfil_usuario(current_user, form)
         if success:
             flash(result, "success")
-            return redirect(url_for("usuario.perfil"))
+            return redirect(url_for("main.dashboard"))
         else:
             if isinstance(result, dict):
                 for field, errors in result.items():

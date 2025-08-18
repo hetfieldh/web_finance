@@ -6,6 +6,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from flask import current_app
+from sqlalchemy import func
 
 from app import db
 from app.models.financiamento_parcela_model import FinanciamentoParcela
@@ -13,12 +14,11 @@ from app.models.financiamento_parcela_model import FinanciamentoParcela
 
 def importar_e_processar_csv(financiamento, csv_file):
     """
-    Processa um arquivo CSV de parcelas para um financiamento.
-    Retorna uma tupla (sucesso, mensagem).
+    Processa um arquivo CSV de parcelas para um financiamento, incluindo o status de pagamento.
     """
     try:
-        # Garante que as parcelas existentes sejam removidas antes de uma nova importação
         FinanciamentoParcela.query.filter_by(financiamento_id=financiamento.id).delete()
+        db.session.flush()
 
         stream = io.StringIO(csv_file.stream.read().decode("UTF-8"), newline=None)
         csv_reader = csv.reader(stream)
@@ -33,13 +33,11 @@ def importar_e_processar_csv(financiamento, csv_file):
             )
             return False, message
 
-        saldo_devedor_corrente = financiamento.valor_total_financiado
         parcelas_para_adicionar = []
 
         for i, row in enumerate(all_rows, start=1):
             if not row:
                 continue
-
             (
                 numero_parcela,
                 data_vencimento_str,
@@ -52,26 +50,22 @@ def importar_e_processar_csv(financiamento, csv_file):
                 multa_str,
                 mora_str,
                 ajustes_str,
-                _,
-                _,
+                valor_total_previsto_str,
+                saldo_devedor_str,
+                data_pagamento_str,
+                valor_pago_str,
                 *observacoes_tuple,
             ) = row
 
-            valor_principal = Decimal(valor_principal_str)
-
-            valor_total_calculado = (
-                valor_principal
-                + Decimal(valor_juros_str)
-                + Decimal(valor_seguro_str)
-                + Decimal(valor_seguro_2_str)
-                + Decimal(valor_seguro_3_str)
-                + Decimal(valor_taxas_str)
-                + Decimal(multa_str)
-                + Decimal(mora_str)
-                + Decimal(ajustes_str)
+            data_pagamento = (
+                datetime.strptime(data_pagamento_str, "%Y-%m-%d").date()
+                if data_pagamento_str.strip()
+                else None
             )
+            pago = bool(data_pagamento)
+            status = "Paga" if pago else "Pendente"
 
-            saldo_devedor_corrente -= valor_principal
+            valor_pago = Decimal(valor_pago_str) if valor_pago_str.strip() else None
 
             nova_parcela = FinanciamentoParcela(
                 financiamento_id=financiamento.id,
@@ -79,7 +73,7 @@ def importar_e_processar_csv(financiamento, csv_file):
                 data_vencimento=datetime.strptime(
                     data_vencimento_str, "%Y-%m-%d"
                 ).date(),
-                valor_principal=valor_principal,
+                valor_principal=Decimal(valor_principal_str),
                 valor_juros=Decimal(valor_juros_str),
                 valor_seguro=Decimal(valor_seguro_str),
                 valor_seguro_2=Decimal(valor_seguro_2_str),
@@ -88,14 +82,29 @@ def importar_e_processar_csv(financiamento, csv_file):
                 multa=Decimal(multa_str),
                 mora=Decimal(mora_str),
                 ajustes=Decimal(ajustes_str),
-                valor_total_previsto=valor_total_calculado,
-                saldo_devedor=saldo_devedor_corrente,
+                valor_total_previsto=Decimal(valor_total_previsto_str),
+                saldo_devedor=Decimal(saldo_devedor_str),
+                pago=pago,
+                data_pagamento=data_pagamento,
+                valor_pago=valor_pago,
+                status=status,
                 observacoes=(observacoes_tuple[0] if observacoes_tuple else None),
             )
             parcelas_para_adicionar.append(nova_parcela)
 
         db.session.bulk_save_objects(parcelas_para_adicionar)
-        financiamento.saldo_devedor_atual = saldo_devedor_corrente
+
+        novo_saldo_devedor = db.session.query(
+            func.sum(FinanciamentoParcela.valor_principal)
+        ).filter(
+            FinanciamentoParcela.financiamento_id == financiamento.id,
+            FinanciamentoParcela.status != "Paga",
+        ).scalar() or Decimal(
+            "0.00"
+        )
+
+        financiamento.saldo_devedor_atual = novo_saldo_devedor
+
         db.session.commit()
 
         return True, f"{len(parcelas_para_adicionar)} parcelas importadas com sucesso!"
@@ -104,8 +113,8 @@ def importar_e_processar_csv(financiamento, csv_file):
         db.session.rollback()
         message = (
             f"Erro de formato no arquivo CSV na linha {i}. Verifique se todas as "
-            "14 colunas estão presentes e no formato correto (data como AAAA-MM-DD, "
-            f"números com ponto decimal). Detalhe: {e}"
+            "15 colunas estão presentes e no formato correto."
+            f" Detalhe: {e}"
         )
         current_app.logger.error(message)
         return False, message

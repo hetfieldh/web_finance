@@ -30,9 +30,6 @@ financiamento.nome_financiamento }}{% endblock %} {% block content %}
                 <th>Juros</th>
                 <th>Seguros</th>
                 <th>Taxas</th>
-                <th>Multa</th>
-                <th>Mora</th>
-                <th>Ajustes</th>
                 <th>Total Previsto</th>
                 <th>Valor Pago</th>
                 <th>Saldo Devedor</th>
@@ -53,15 +50,12 @@ financiamento.nome_financiamento }}{% endblock %} {% block content %}
                   parcela.valor_seguro_2 + parcela.valor_seguro_3) }}
                 </td>
                 <td>R$ {{ "%.2f"|format(parcela.valor_taxas) }}</td>
-                <td>R$ {{ "%.2f"|format(parcela.multa) }}</td>
-                <td>R$ {{ "%.2f"|format(parcela.mora) }}</td>
-                <td>R$ {{ "%.2f"|format(parcela.ajustes) }}</td>
                 <td class="fw-bold">
                   R$ {{ "%.2f"|format(parcela.valor_total_previsto) }}
                 </td>
                 <td class="fw-bold text-success">
-                  {% if valor_pago %} R$ {{ "%.2f"|format(valor_pago) }} {% else
-                  %} R$ 0.00 {% endif %}
+                  {% if parcela.valor_pago %} R$ {{
+                  "%.2f"|format(parcela.valor_pago) }} {% else %} - {% endif %}
                 </td>
                 <td class="fw-bold text-danger">
                   R$ {{ "%.2f"|format(parcela.saldo_devedor) }}

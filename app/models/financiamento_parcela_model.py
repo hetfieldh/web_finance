@@ -28,9 +28,10 @@ class FinanciamentoParcela(db.Model):
     ajustes = db.Column(Numeric(12, 2), nullable=False, default=0.00)
     valor_total_previsto = db.Column(Numeric(12, 2), nullable=False)
     saldo_devedor = db.Column(Numeric(12, 2), nullable=False)
-
     pago = db.Column(db.Boolean, nullable=False, default=False)
     data_pagamento = db.Column(db.Date, nullable=True)
+    valor_pago = db.Column(Numeric(12, 2), nullable=True)
+    observacoes = db.Column(db.String(255), nullable=True)
     movimento_bancario_id = db.Column(
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
     )
@@ -39,17 +40,13 @@ class FinanciamentoParcela(db.Model):
         nullable=False,
         default="Pendente",
     )
-
-    observacoes = db.Column(db.String(255), nullable=True)
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
-
     financiamento = db.relationship(
         "Financiamento",
         backref=db.backref("parcelas", lazy=True, cascade="all, delete-orphan"),
     )
-
     __table_args__ = (
         UniqueConstraint(
             "financiamento_id", "numero_parcela", name="_financiamento_parcela_uc"

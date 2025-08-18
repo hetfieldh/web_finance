@@ -43,14 +43,20 @@ def dashboard():
     else:
         data_fim_mes = hoje.replace(month=hoje.month + 1, day=1) - timedelta(days=1)
 
-    saldo_operacional = Decimal("0.00")
-    saldo_investimentos = Decimal("0.00")
-    tipos_operacionais = ["Corrente", "Digital", "Dinheiro"]
-    for conta in contas_do_usuario:
-        if conta.tipo in tipos_operacionais:
-            saldo_operacional += conta.saldo_atual
-        else:
-            saldo_investimentos += conta.saldo_atual
+    saldo_operacional = sum(
+        c.saldo_atual
+        for c in contas_do_usuario
+        if c.tipo in ["Corrente", "Digital", "Dinheiro"]
+    )
+    saldo_investimentos = sum(
+        c.saldo_atual
+        for c in contas_do_usuario
+        if c.tipo in ["Poupança", "Caixinha", "Investimento"]
+    )
+    saldo_beneficios = sum(
+        c.saldo_atual for c in contas_do_usuario if c.tipo == "Benefício"
+    )
+    saldo_fgts = sum(c.saldo_atual for c in contas_do_usuario if c.tipo == "FGTS")
 
     receitas_realizadas = Decimal("0.00")
     salario_recebido = SalarioMovimento.query.filter(
@@ -115,6 +121,16 @@ def dashboard():
     despesas_realizadas += outras_despesas
 
     balanco_mes = receitas_realizadas - despesas_realizadas
+
+    kpis = {
+        "saldo_operacional": saldo_operacional,
+        "saldo_investimentos": saldo_investimentos,
+        "saldo_beneficios": saldo_beneficios,
+        "saldo_fgts": saldo_fgts,
+        "receitas_mes": receitas_realizadas,
+        "despesas_mes": despesas_realizadas,
+        "balanco_mes": balanco_mes,
+    }
 
     proximos_movimentos = []
 
@@ -221,14 +237,6 @@ def dashboard():
             )
 
     proximos_movimentos.sort(key=lambda x: x["data"])
-
-    kpis = {
-        "saldo_operacional": saldo_operacional,
-        "saldo_investimentos": saldo_investimentos,
-        "receitas_mes": receitas_realizadas,
-        "despesas_mes": despesas_realizadas,
-        "balanco_mes": balanco_mes,
-    }
 
     financiamentos_ativos = Financiamento.query.filter_by(
         usuario_id=current_user.id

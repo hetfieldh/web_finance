@@ -72,6 +72,29 @@
   <div class="col">
     <div class="card shadow-sm h-100 bg-light">
       <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">BENEFÍCIOS</h6>
+        <p class="card-text h5 fw-semibold text-info">
+          R$ {{ "%.2f"|format(kpis.saldo_beneficios) }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
+        <h6 class="card-title text-muted small">FGTS</h6>
+        <p class="card-text h5 fw-semibold text-secondary">
+          R$ {{ "%.2f"|format(kpis.saldo_fgts) }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-2 mb-2">
+  <div class="col">
+    <div class="card shadow-sm h-100 bg-light">
+      <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">RECEITAS DO MÊS</h6>
         <p class="card-text h5 fw-semibold text-success">
           R$ {{ "%.2f"|format(kpis.receitas_mes) }}
@@ -196,7 +219,7 @@
 
   <!-- Coluna 3: Saldos Devedores -->
   <div class="col-lg-3">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Saldos Devedores</h6>
       </div>

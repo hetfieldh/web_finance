@@ -1,5 +1,7 @@
 # app/services/recebimento_service.py
 
+from datetime import date, timedelta
+
 from flask import current_app
 from flask_login import current_user
 
@@ -9,6 +11,61 @@ from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.salario_movimento_model import SalarioMovimento
+
+
+def _simular_impacto_estorno(movimento_a_estornar):
+    """
+    Simula o impacto de um estorno no saldo da conta para evitar saldos negativos.
+    Retorna True se o estorno for seguro, False caso contrário.
+    """
+    conta = movimento_a_estornar.conta
+    valor_estorno = movimento_a_estornar.valor
+    data_estorno = movimento_a_estornar.data_movimento
+
+    # Calcula o saldo da conta no momento EXATO antes do movimento que será estornado
+    saldo_no_momento = conta.saldo_inicial
+    movimentos_anteriores = (
+        ContaMovimento.query.filter(
+            ContaMovimento.conta_id == conta.id,
+            ContaMovimento.data_movimento < data_estorno,
+        )
+        .order_by(ContaMovimento.data_movimento, ContaMovimento.id)
+        .all()
+    )
+
+    for mov in movimentos_anteriores:
+        if mov.tipo_transacao.tipo == "Crédito":
+            saldo_no_momento += mov.valor
+        else:
+            saldo_no_momento -= mov.valor
+
+    # Agora, simula o futuro a partir desse ponto, mas sem o valor do estorno
+    saldo_simulado = saldo_no_momento
+    movimentos_posteriores = (
+        ContaMovimento.query.filter(
+            ContaMovimento.conta_id == conta.id,
+            ContaMovimento.data_movimento >= data_estorno,
+            ContaMovimento.id != movimento_a_estornar.id,
+        )
+        .order_by(ContaMovimento.data_movimento, ContaMovimento.id)
+        .all()
+    )
+
+    limite_seguro = (
+        -conta.limite if conta.limite and conta.tipo in ["Corrente", "Digital"] else 0
+    )
+
+    for mov in movimentos_posteriores:
+        if mov.tipo_transacao.tipo == "Crédito":
+            saldo_simulado += mov.valor
+        else:
+            saldo_simulado -= mov.valor
+
+        # Se em qualquer ponto a simulação resultar em saldo insuficiente, o estorno é inseguro
+        if saldo_simulado < limite_seguro:
+            return False
+
+    return True
 
 
 def registrar_recebimento(form):
@@ -78,8 +135,8 @@ def registrar_recebimento(form):
 
 def estornar_recebimento(item_id, item_tipo):
     """
-    Processa a lógica de negócio para estornar um recebimento.
-    Retorna uma tupla (sucesso, mensagem).
+    Processa a lógica de negócio para estornar um recebimento,
+    validando o impacto no saldo futuro.
     """
     try:
         movimento_bancario_id = None
@@ -89,38 +146,51 @@ def estornar_recebimento(item_id, item_tipo):
             item_a_atualizar = DespRecMovimento.query.get(item_id)
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-                item_a_atualizar.status = "Pendente"
-                item_a_atualizar.valor_realizado = None
-                item_a_atualizar.data_pagamento = None
-                item_a_atualizar.movimento_bancario_id = None
         elif item_tipo in ["Salário", "Benefício"]:
             item_a_atualizar = SalarioMovimento.query.get(item_id)
             if item_a_atualizar:
-                if item_tipo == "Salário":
-                    movimento_bancario_id = (
-                        item_a_atualizar.movimento_bancario_salario_id
-                    )
-                    item_a_atualizar.movimento_bancario_salario_id = None
-                else:
-                    movimento_bancario_id = (
-                        item_a_atualizar.movimento_bancario_beneficio_id
-                    )
-                    item_a_atualizar.movimento_bancario_beneficio_id = None
-
-                if (
+                movimento_bancario_id = (
                     item_a_atualizar.movimento_bancario_salario_id
-                    or item_a_atualizar.movimento_bancario_beneficio_id
-                ):
-                    item_a_atualizar.status = "Parcialmente Recebido"
-                else:
-                    item_a_atualizar.status = "Pendente"
+                    if item_tipo == "Salário"
+                    else item_a_atualizar.movimento_bancario_beneficio_id
+                )
 
-        if movimento_bancario_id:
-            movimento_bancario = ContaMovimento.query.get(movimento_bancario_id)
-            if movimento_bancario:
-                conta_bancaria = Conta.query.get(movimento_bancario.conta_id)
-                conta_bancaria.saldo_atual -= movimento_bancario.valor
-                db.session.delete(movimento_bancario)
+        if not movimento_bancario_id:
+            return False, "Movimentação bancária associada não encontrada para estorno."
+
+        movimento_a_estornar = ContaMovimento.query.get(movimento_bancario_id)
+        if not movimento_a_estornar:
+            return False, "Movimentação bancária para estorno não existe mais."
+
+        if not _simular_impacto_estorno(movimento_a_estornar):
+            return (
+                False,
+                f"Estorno não permitido. Esta ação resultaria em saldo insuficiente na conta '{movimento_a_estornar.conta.nome_banco}' em transações futuras.",
+            )
+
+        # Se a simulação passou, prossiga com o estorno
+        if item_tipo == "Receita":
+            item_a_atualizar.status = "Pendente"
+            item_a_atualizar.valor_realizado = None
+            item_a_atualizar.data_pagamento = None
+            item_a_atualizar.movimento_bancario_id = None
+        elif item_tipo in ["Salário", "Benefício"]:
+            if item_tipo == "Salário":
+                item_a_atualizar.movimento_bancario_salario_id = None
+            else:
+                item_a_atualizar.movimento_bancario_beneficio_id = None
+
+            if (
+                item_a_atualizar.movimento_bancario_salario_id
+                or item_a_atualizar.movimento_bancario_beneficio_id
+            ):
+                item_a_atualizar.status = "Parcialmente Recebido"
+            else:
+                item_a_atualizar.status = "Pendente"
+
+        conta_bancaria = Conta.query.get(movimento_a_estornar.conta_id)
+        conta_bancaria.saldo_atual -= movimento_a_estornar.valor
+        db.session.delete(movimento_a_estornar)
 
         db.session.commit()
         return True, "Recebimento estornado com sucesso!"
