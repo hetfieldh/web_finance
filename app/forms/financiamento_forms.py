@@ -8,6 +8,7 @@ from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (
     DateField,
     DecimalField,
+    FieldList,
     IntegerField,
     SelectField,
     StringField,
@@ -235,3 +236,35 @@ class ImportarParcelasForm(FlaskForm):
         ],
     )
     submit = SubmitField("Importar")
+
+
+class AmortizacaoForm(FlaskForm):
+    valor_amortizacao = DecimalField(
+        "Valor Total a Amortizar",
+        places=2,
+        validators=[
+            InputRequired("O valor é obrigatório."),
+            NumberRange(min=0.01, message="O valor deve ser maior que zero."),
+        ],
+    )
+    conta_id = SelectField(
+        "Debitar da Conta",
+        coerce=lambda x: int(x) if x is not None and x != "" else None,
+        validators=[DataRequired("Selecione a conta para o débito.")],
+    )
+    data_pagamento = DateField(
+        "Data do Pagamento",
+        format="%Y-%m-%d",
+        validators=[DataRequired("A data do pagamento é obrigatória.")],
+        default=date.today,
+    )
+    submit = SubmitField("Confirmar Amortização")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.conta_id.choices = [("", "Selecione...")] + [
+            (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: R$ {c.saldo_atual:.2f})")
+            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+            .order_by(Conta.nome_banco.asc())
+            .all()
+        ]

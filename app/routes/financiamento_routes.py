@@ -1,7 +1,13 @@
 # app/routes/financiamento_routes.py
 
+import functools
+import re
+from datetime import datetime
+from decimal import Decimal
+
 from flask import (
     Blueprint,
+    abort,
     current_app,
     flash,
     redirect,
@@ -10,10 +16,13 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import asc, desc
 from sqlalchemy.orm import joinedload
+from werkzeug.security import generate_password_hash
 
 from app import db
 from app.forms.financiamento_forms import (
+    AmortizacaoForm,
     CadastroFinanciamentoForm,
     EditarFinanciamentoForm,
     ImportarParcelasForm,
@@ -21,7 +30,10 @@ from app.forms.financiamento_forms import (
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
-from app.services.financiamento_service import importar_e_processar_csv
+from app.services.financiamento_service import (
+    amortizar_parcelas,
+    importar_e_processar_csv,
+)
 
 financiamento_bp = Blueprint("financiamento", __name__, url_prefix="/financiamentos")
 
@@ -157,4 +169,53 @@ def visualizar_parcelas(id):
         "financiamentos/parcelas.html",
         financiamento=financiamento,
         parcelas_data=parcelas_data,
+    )
+
+
+@financiamento_bp.route("/amortizar/<int:id>", methods=["GET", "POST"])
+@login_required
+def amortizar_financiamento(id):
+    financiamento = Financiamento.query.filter_by(
+        id=id, usuario_id=current_user.id
+    ).first_or_404()
+    form = AmortizacaoForm(request.form)
+
+    if request.method == "POST":
+        ids_parcelas_selecionadas = request.form.getlist(
+            "parcelas_selecionadas", type=int
+        )
+
+        if not ids_parcelas_selecionadas:
+            flash("Selecione pelo menos uma parcela para amortizar.", "danger")
+        elif form.validate():
+            success, message = amortizar_parcelas(
+                financiamento, form, ids_parcelas_selecionadas
+            )
+            if success:
+                flash(message, "success")
+                return redirect(url_for("financiamento.listar_financiamentos"))
+            else:
+                flash(message, "danger")
+        elif form.errors:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(
+                        f"Erro no campo '{getattr(form, field).label.text}': {error}",
+                        "danger",
+                    )
+
+    parcelas_pendentes = (
+        FinanciamentoParcela.query.filter(
+            FinanciamentoParcela.financiamento_id == id,
+            FinanciamentoParcela.status == "Pendente",
+        )
+        .order_by(FinanciamentoParcela.numero_parcela.desc())
+        .all()
+    )
+
+    return render_template(
+        "financiamentos/amortizar.html",
+        form=form,
+        financiamento=financiamento,
+        parcelas=parcelas_pendentes,
     )

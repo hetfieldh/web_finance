@@ -7,14 +7,12 @@ endblock %} {% block page_title %}Financiamentos{% endblock %} {% block content
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Financiamentos Cadastrados</h4>
-      <div>
-        <a
-          href="{{ url_for('financiamento.adicionar_financiamento') }}"
-          class="btn btn-success btn-add"
-        >
-          <i class="fas fa-plus"></i> Adicionar
-        </a>
-      </div>
+      <a
+        href="{{ url_for('financiamento.adicionar_financiamento') }}"
+        class="btn btn-success btn-add"
+      >
+        <i class="fas fa-plus"></i> Financiamento
+      </a>
     </div>
 
     <div class="card shadow-sm">
@@ -27,50 +25,56 @@ endblock %} {% block page_title %}Financiamentos{% endblock %} {% block content
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Conta</th>
-                <th>Valor Total</th>
+                <th>Valor Financiado</th>
                 <th>Saldo Devedor</th>
-                <th>Juros Anual</th>
-                <th>Prazo (meses)</th>
-                <th>Tipo Amortização</th>
-                <th>Início</th>
-                <th>Criação</th>
+                <th>Prazo (Meses)</th>
+                <th>Amortização</th>
+                <th>Data Início</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {% for financ in financiamentos %}
+              {% for financiamento in financiamentos %}
               <tr>
-                <td>{{ financ.id }}</td>
-                <td>{{ financ.nome_financiamento }}</td>
+                <td>{{ financiamento.id }}</td>
+                <td>{{ financiamento.nome_financiamento }}</td>
+                <td>{{ financiamento.conta.nome_banco }}</td>
                 <td>
-                  {{ financ.conta.nome_banco }} ({{ financ.conta.conta }})
+                  R$ {{ "%.2f"|format(financiamento.valor_total_financiado) }}
                 </td>
-                <td>R$ {{ "%.2f"|format(financ.valor_total_financiado) }}</td>
-                <td>R$ {{ "%.2f"|format(financ.saldo_devedor_atual) }}</td>
-                <td>{{ "%.2f"|format(financ.taxa_juros_anual) }}%</td>
-                <td>{{ financ.prazo_meses }}</td>
-                <td>{{ financ.tipo_amortizacao }}</td>
-                <td>{{ financ.data_inicio.strftime('%d/%m/%Y') }}</td>
-                <td>{{ financ.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td class="fw-bold text-danger">
+                  R$ {{ "%.2f"|format(financiamento.saldo_devedor_atual) }}
+                </td>
+                <td>{{ financiamento.prazo_meses }}</td>
+                <td>{{ financiamento.tipo_amortizacao }}</td>
+                <td>{{ financiamento.data_inicio.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
-                    href="{{ url_for('financiamento.visualizar_parcelas', id=financ.id) }}"
+                    href="{{ url_for('financiamento.visualizar_parcelas', id=financiamento.id) }}"
                     class="btn btn-info me-2"
                     title="Visualizar Parcelas"
                   >
                     <i class="fas fa-list-ol"></i>
                   </a>
                   <a
-                    href="{{ url_for('financiamento.editar_financiamento', id=financ.id) }}"
+                    href="{{ url_for('financiamento.amortizar_financiamento', id=financiamento.id) }}"
+                    class="btn btn-primary me-2"
+                    title="Amortizar Parcelas"
+                  >
+                    <i class="fas fa-dollar-sign"></i>
+                  </a>
+                  <a
+                    href="{{ url_for('financiamento.editar_financiamento', id=financiamento.id) }}"
                     class="btn btn-warning me-2"
                     title="Editar"
                   >
                     <i class="fas fa-edit"></i>
                   </a>
                   <form
-                    action="{{ url_for('financiamento.excluir_financiamento', id=financ.id) }}"
+                    action="{{ url_for('financiamento.excluir_financiamento', id=financiamento.id) }}"
                     method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir este financiamento?');"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este financiamento e todas as suas parcelas?');"
+                    class="d-inline"
                   >
                     <button
                       type="submit"

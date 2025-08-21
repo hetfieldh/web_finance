@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     moverCampos();
   }
 
-  // --- 8. Lógica para o formulário de transferência (evitar conta de destino igual à origem) ---
+  // --- 8. Lógica para o formulário de transferência ---
   const contaOrigemSelect = document.querySelector("#conta_id select");
   const contaDestinoSelect = document.querySelector(
     "#transferencia_fields select[name='conta_destino_id']"
@@ -564,5 +564,43 @@ document.addEventListener("DOMContentLoaded", () => {
       const solicitacaoIdInput = form.querySelector("#solicitacao_id");
       solicitacaoIdInput.value = solicitacaoId;
     });
+  }
+
+  // --- 16. Lógica para a tela de Amortização de Financiamento ---
+  const formAmortizacao = document.getElementById("form-amortizacao");
+  if (formAmortizacao) {
+    const valorAmortizacaoInput = document.getElementById("valor_amortizacao");
+    const checkboxes = document.querySelectorAll(".parcela-checkbox");
+    const resumoValor = document.getElementById("resumo-valor");
+    const resumoParcelas = document.getElementById("resumo-parcelas");
+    const resumoValorParcela = document.getElementById("resumo-valor-parcela");
+
+    function atualizarResumo() {
+      const valorTotal = parseFloat(valorAmortizacaoInput.value) || 0;
+      const parcelasSelecionadas = document.querySelectorAll(
+        ".parcela-checkbox:checked"
+      ).length;
+
+      resumoValor.textContent = valorTotal.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+      resumoParcelas.textContent = parcelasSelecionadas;
+
+      if (parcelasSelecionadas > 0 && valorTotal > 0) {
+        const valorPorParcela = valorTotal / parcelasSelecionadas;
+        resumoValorParcela.textContent = valorPorParcela.toLocaleString(
+          "pt-BR",
+          { style: "currency", currency: "BRL" }
+        );
+      } else {
+        resumoValorParcela.textContent = "R$ 0,00";
+      }
+    }
+
+    valorAmortizacaoInput.addEventListener("input", atualizarResumo);
+    checkboxes.forEach((cb) => cb.addEventListener("change", atualizarResumo));
+
+    atualizarResumo();
   }
 });

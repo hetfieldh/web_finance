@@ -5,7 +5,7 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, app, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -15,6 +15,12 @@ from config import Config
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+
+
+try:
+    locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
+except locale.Error:
+    print("Locale pt_BR.UTF-8 não encontrado, usando o padrão do sistema.")
 
 
 def create_app(config_class=Config):
