@@ -12,6 +12,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
 
+from .template_filters import format_currency
+
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
@@ -43,6 +45,8 @@ def create_app(config_class=Config):
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
     login_manager.login_message = "Faça login para acessar."
+
+    app.jinja_env.filters["format_currency"] = format_currency
 
     from app.models.conta_model import Conta
     from app.models.conta_movimento_model import ContaMovimento

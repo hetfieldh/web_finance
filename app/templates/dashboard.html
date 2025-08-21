@@ -54,7 +54,7 @@
         <p
           class="card-text h5 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %}"
         >
-          R$ {{ "%.2f"|format(kpis.saldo_operacional) }}
+          {{ kpis.saldo_operacional | format_currency }}
         </p>
       </div>
     </div>
@@ -64,7 +64,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">INVESTIMENTOS</h6>
         <p class="card-text h5 fw-semibold text-primary">
-          R$ {{ "%.2f"|format(kpis.saldo_investimentos) }}
+          {{ kpis.saldo_investimentos | format_currency }}
         </p>
       </div>
     </div>
@@ -74,7 +74,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">BENEFÍCIOS</h6>
         <p class="card-text h5 fw-semibold text-info">
-          R$ {{ "%.2f"|format(kpis.saldo_beneficios) }}
+          {{ kpis.saldo_beneficios | format_currency }}
         </p>
       </div>
     </div>
@@ -84,7 +84,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">FGTS</h6>
         <p class="card-text h5 fw-semibold text-secondary">
-          R$ {{ "%.2f"|format(kpis.saldo_fgts) }}
+          {{ kpis.saldo_fgts | format_currency }}
         </p>
       </div>
     </div>
@@ -97,7 +97,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">RECEITAS DO MÊS</h6>
         <p class="card-text h5 fw-semibold text-success">
-          R$ {{ "%.2f"|format(kpis.receitas_mes) }}
+          {{ kpis.receitas_mes | format_currency }}
         </p>
       </div>
     </div>
@@ -107,7 +107,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
         <p class="card-text h5 fw-semibold text-danger">
-          R$ {{ "%.2f"|format(kpis.despesas_mes) }}
+          {{ kpis.despesas_mes | format_currency }}
         </p>
       </div>
     </div>
@@ -119,7 +119,7 @@
         <p
           class="card-text h5 fw-semibold {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
         >
-          R$ {{ "%.2f"|format(kpis.balanco_mes) }}
+          {{ kpis.balanco_mes | format_currency }}
         </p>
       </div>
     </div>
@@ -128,8 +128,8 @@
 
 <div class="row g-2">
   <!-- Coluna 1: Contas Bancárias -->
-  <div class="col-lg-3">
-    <div class="card shadow-sm">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Contas Bancárias Ativas</h6>
       </div>
@@ -155,7 +155,7 @@
               <span
                 class="fw-semibold h6 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
               >
-                R$ {{ "%.2f"|format(conta.saldo_atual) }}
+                {{ conta.saldo_atual | format_currency }}
               </span>
             </div>
           </div>
@@ -173,7 +173,7 @@
   </div>
 
   <!-- Coluna 2: Próximos Movimentos -->
-  <div class="col-lg-3">
+  <div class="col-lg-4">
     <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Próximos Movimentos</h6>
@@ -195,11 +195,11 @@
             </div>
             {% if item.tipo == 'saida' %}
             <span class="badge bg-danger"
-              >R$ {{ "%.2f"|format(item.valor) }}</span
+              >{{ item.valor | format_currency }}</span
             >
             {% else %}
             <span class="badge bg-success"
-              >R$ {{ "%.2f"|format(item.valor) }}</span
+              >{{ item.valor | format_currency }}</span
             >
             {% endif %}
           </li>
@@ -218,8 +218,8 @@
   </div>
 
   <!-- Coluna 3: Saldos Devedores -->
-  <div class="col-lg-3">
-    <div class="card shadow-sm">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Saldos Devedores</h6>
       </div>
@@ -242,7 +242,7 @@
                 </div>
               </div>
               <span class="fw-semibold h5 mb-0 text-danger">
-                R$ {{ "%.2f"|format(financ.saldo_devedor_atual) }}
+                {{ financ.saldo_devedor_atual | format_currency }}
               </span>
             </div>
           </div>
@@ -262,7 +262,7 @@
                 </div>
               </div>
               <span class="fw-semibold h5 mb-0 text-danger">
-                R$ {{ "%.2f"|format(cred.saldo_devedor) }}
+                {{ cred.saldo_devedor | format_currency }}
               </span>
             </div>
           </div>
@@ -278,5 +278,5 @@
       </div>
     </div>
   </div>
-  {% endblock %}
 </div>
+{% endblock %}

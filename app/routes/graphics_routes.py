@@ -26,13 +26,15 @@ def view_graphics():
         user_id=current_user.id, year=hoje.year
     )
 
+    dados_graficos = {
+        **dados_mensais,
+        "evolucao_anual": dados_anuais,
+        "progresso_financiamento": dados_financiamento,
+    }
+
     return render_template(
         "graphics.html",
-        dados_graficos={
-            **dados_mensais,
-            "evolucao_anual": dados_anuais,
-            "progresso_financiamento": dados_financiamento,
-        },
-        mes_referencia=hoje.strftime("%B/%y").capitalize(),
+        dados_graficos=dados_graficos,
+        mes_referencia=hoje.strftime("%B/%Y").capitalize(),
         ano_atual=hoje.year,
     )
