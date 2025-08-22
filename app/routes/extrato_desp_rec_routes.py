@@ -11,6 +11,7 @@ from app import db
 from app.forms.extrato_desp_rec_forms import ExtratoDespRecForm
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.services import desp_rec_service
 
 extrato_desp_rec_bp = Blueprint("extrato_desp_rec", __name__, url_prefix="/extratos")
 
@@ -18,7 +19,8 @@ extrato_desp_rec_bp = Blueprint("extrato_desp_rec", __name__, url_prefix="/extra
 @extrato_desp_rec_bp.route("/despesas_receitas", methods=["GET", "POST"])
 @login_required
 def extrato_despesas_receitas():
-    form = ExtratoDespRecForm(request.form)
+    desp_rec_choices = desp_rec_service.get_all_desp_rec_for_user_choices()
+    form = ExtratoDespRecForm(request.form, desp_rec_choices=desp_rec_choices)
 
     movimentos = []
     totais = {
@@ -30,7 +32,6 @@ def extrato_despesas_receitas():
         "saldo_realizado": Decimal("0.00"),
     }
 
-    # Define o mês/ano atual como padrão no primeiro carregamento (GET)
     if request.method == "GET":
         hoje = date.today()
         mes_ano_atual = hoje.strftime("%Y-%m")
@@ -65,13 +66,12 @@ def extrato_despesas_receitas():
 
         movimentos = query.order_by(DespRecMovimento.data_vencimento.asc()).all()
 
-        # Calcula os totais com base nos movimentos filtrados
         for mov in movimentos:
             if mov.despesa_receita.natureza == "Receita":
                 totais["receitas_previstas"] += mov.valor_previsto
                 if mov.valor_realizado is not None:
                     totais["receitas_realizadas"] += mov.valor_realizado
-            else:  # Despesa
+            else:
                 totais["despesas_previstas"] += mov.valor_previsto
                 if mov.valor_realizado is not None:
                     totais["despesas_realizadas"] += mov.valor_realizado

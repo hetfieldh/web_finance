@@ -96,19 +96,13 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
+        crediario_choices = kwargs.pop("crediario_choices", [])
+        grupo_choices = kwargs.pop("grupo_choices", [])
+
         super().__init__(*args, **kwargs)
-        self.crediario_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})")
-            for c in Crediario.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Crediario.nome_crediario.asc())
-            .all()
-        ]
-        self.crediario_grupo_id.choices = [("", "Nenhum")] + [
-            (str(cg.id), f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})")
-            for cg in CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
-            .order_by(CrediarioGrupo.grupo_crediario.asc())
-            .all()
-        ]
+
+        self.crediario_id.choices = crediario_choices
+        self.crediario_grupo_id.choices = grupo_choices
 
         meses_anos = []
         hoje = date.today()
@@ -198,19 +192,13 @@ class EditarCrediarioMovimentoForm(FlaskForm):
     submit = SubmitField("Atualizar")
 
     def __init__(self, *args, **kwargs):
+        crediario_choices = kwargs.pop('crediario_choices', [])
+        grupo_choices = kwargs.pop('grupo_choices', [])
+
         super().__init__(*args, **kwargs)
-        self.crediario_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})")
-            for c in Crediario.query.filter_by(usuario_id=current_user.id)
-            .order_by(Crediario.nome_crediario.asc())
-            .all()
-        ]
-        self.crediario_grupo_id.choices = [("", "Nenhum")] + [
-            (str(cg.id), f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})")
-            for cg in CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
-            .order_by(CrediarioGrupo.grupo_crediario.asc())
-            .all()
-        ]
+
+        self.crediario_id.choices = crediario_choices
+        self.crediario_grupo_id.choices = grupo_choices
 
         meses_anos = []
         hoje = date.today()

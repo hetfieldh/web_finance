@@ -5,6 +5,7 @@ import secrets
 import string
 import unicodedata
 from datetime import datetime, timezone
+from types import SimpleNamespace
 
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user
@@ -19,6 +20,7 @@ from app.forms.solicitacao_forms import (
 from app.models.solicitacao_acesso_model import SolicitacaoAcesso
 from app.models.usuario_model import Usuario
 from app.routes.usuario_routes import admin_required
+from app.services.usuario_service import criar_novo_usuario
 
 solicitacao_bp = Blueprint("solicitacao", __name__, url_prefix="/solicitacao")
 
@@ -46,9 +48,27 @@ def gerar_senha_segura(tamanho=12):
 
 @solicitacao_bp.route("/acesso", methods=["GET", "POST"])
 def solicitar_acesso():
+    # --- CORREÇÃO: Mover a verificação de limite para o início ---
+    solicitacoes_pendentes = SolicitacaoAcesso.query.filter_by(
+        status="Pendente"
+    ).count()
+    limite_atingido = solicitacoes_pendentes >= 10
+
+    if limite_atingido:
+        flash(
+            "O número máximo de solicitações pendentes foi atingido. O envio de novas solicitações está temporariamente desabilitado.",
+            "warning",
+        )
+        # Impede o processamento do formulário e renderiza a página com o aviso
+        form = SolicitacaoAcessoForm()
+        return render_template(
+            "solicitacoes/solicitar_acesso.html", form=form, limite_atingido=True
+        )
+
+    # O resto da lógica só é executado se o limite não for atingido
     form = SolicitacaoAcessoForm()
     if form.validate_on_submit():
-        email_solicitado = form.email.data.strip()
+        email_solicitado = form.email.data.strip().lower()
 
         solicitacao_existente = SolicitacaoAcesso.query.filter_by(
             email=email_solicitado
@@ -81,12 +101,14 @@ def solicitar_acesso():
         flash("Sua solicitação de acesso foi enviada com sucesso!", "success")
         return redirect(url_for("solicitacao.verificar_status", email=email_solicitado))
 
-    return render_template("solicitacoes/solicitar_acesso.html", form=form)
+    return render_template(
+        "solicitacoes/solicitar_acesso.html", form=form, limite_atingido=False
+    )
 
 
 @solicitacao_bp.route("/check-email")
 def check_solicitacao_email():
-    email = request.args.get("email", "", type=str).strip()
+    email = request.args.get("email", "", type=str).strip().lower()
     if not email:
         return jsonify({"exists": False, "user_exists": False})
 
@@ -119,7 +141,7 @@ def verificar_status():
             )
 
     if form.validate_on_submit():
-        email_buscado = form.email.data.strip()
+        email_buscado = form.email.data.strip().lower()
         solicitacao = (
             SolicitacaoAcesso.query.filter_by(email=email_buscado)
             .order_by(SolicitacaoAcesso.data_solicitacao.desc())
@@ -156,35 +178,56 @@ def gerenciar_solicitacoes():
 @admin_required
 def aprovar_solicitacao(id):
     solicitacao = SolicitacaoAcesso.query.get_or_404(id)
-    if solicitacao.status == "Pendente":
-        solicitacao.status = "Aprovada"
-        solicitacao.admin_id = current_user.id
-        solicitacao.data_decisao = datetime.now(timezone.utc)
+    if solicitacao.status != "Pendente":
+        flash("Esta solicitação já foi processada.", "info")
+        return redirect(url_for("usuario.listar_usuarios"))
 
+    try:
         nome_sanitizado = sanitizar_login(solicitacao.nome.split(" ")[0])
         sobrenome_sanitizado = sanitizar_login(solicitacao.sobrenome.split(" ")[0])
         login_sugerido = f"{nome_sanitizado}.{sobrenome_sanitizado}"
 
-        senha_gerada = gerar_senha_segura()
-        solicitacao.senha_provisoria = senha_gerada
+        senha_provisoria_texto_puro = gerar_senha_segura()
 
+        form_data = SimpleNamespace(
+            nome=SimpleNamespace(data=solicitacao.nome),
+            sobrenome=SimpleNamespace(data=solicitacao.sobrenome),
+            email=SimpleNamespace(data=solicitacao.email),
+            login=SimpleNamespace(data=login_sugerido),
+            senha=SimpleNamespace(data=senha_provisoria_texto_puro),
+            is_admin=SimpleNamespace(data=False),
+        )
+
+        success, message, novo_usuario = criar_novo_usuario(form_data)
+
+        if not success:
+            flash(message, "danger")
+            return redirect(url_for("solicitacao.gerenciar_solicitacoes"))
+
+        solicitacao.status = "Aprovada"
+        solicitacao.admin_id = current_user.id
+        solicitacao.data_decisao = datetime.now(timezone.utc)
+        solicitacao.login_criado = novo_usuario.login
+
+        mensagem_final = (
+            f"Seu acesso foi aprovado!\n\n"
+            f"Use seu e-mail ou o login: <strong>{novo_usuario.login}</strong>.\n"
+            f"Sua senha provisória é: <strong>{senha_provisoria_texto_puro}</strong>\n\n"
+            f"Recomendamos que você a altere no primeiro acesso através do seu perfil."
+        )
+        solicitacao.motivo_decisao = mensagem_final
         db.session.commit()
+
         flash(
-            f"Solicitação de {solicitacao.email} aprovada. Agora crie o usuário.",
+            f"Usuário '{novo_usuario.login}' criado com sucesso a partir da solicitação! Senha provisória: {senha_provisoria_texto_puro}",
             "success",
         )
 
-        return redirect(
-            url_for(
-                "usuario.adicionar_usuario",
-                nome=solicitacao.nome,
-                sobrenome=solicitacao.sobrenome,
-                email=solicitacao.email,
-                login=login_sugerido,
-            )
-        )
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Ocorreu um erro ao aprovar a solicitação: {e}", "danger")
 
-    return redirect(url_for("solicitacao.gerenciar_solicitacoes"))
+    return redirect(url_for("usuario.listar_usuarios"))
 
 
 @solicitacao_bp.route("/rejeitar", methods=["POST"])
@@ -210,4 +253,4 @@ def rejeitar_solicitacao():
                     "danger",
                 )
 
-    return redirect(url_for("solicitacao.gerenciar_solicitacoes"))
+    return redirect(url_for("usuario.listar_usuarios"))

@@ -1,4 +1,4 @@
-# app/services/desp_rec_service.py (Completo e Atualizado)
+# app/services/desp_rec_service.py
 
 from datetime import date
 
@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_login import current_user
 from sqlalchemy import extract
+from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models.desp_rec_model import DespRec
@@ -13,72 +14,59 @@ from app.models.desp_rec_movimento_model import DespRecMovimento
 
 
 def gerar_previsoes(form):
+    """
+    Processa a criação em lote de lançamentos de despesas/receitas fixas,
+    confiando na UniqueConstraint do banco de dados para evitar duplicatas.
+    """
+    desp_rec_id = form.desp_rec_id.data
+    valor_previsto = form.valor_previsto.data
+    data_inicio = form.data_inicio.data
+    numero_meses = form.numero_meses.data
+    descricao = form.descricao.data.strip() if form.descricao.data else None
+
+    cadastro_base = db.session.get(DespRec, desp_rec_id)
+    if not cadastro_base:
+        return False, "Cadastro base não encontrado."
+
+    novos_lancamentos = []
+    for i in range(numero_meses):
+        data_vencimento_atual = data_inicio + relativedelta(months=i)
+        dia_venc = cadastro_base.dia_vencimento or data_vencimento_atual.day
+        try:
+            data_vencimento_final = data_vencimento_atual.replace(day=dia_venc)
+        except ValueError:
+            ultimo_dia_mes = (
+                data_vencimento_atual.replace(day=28) + relativedelta(days=4)
+            ).replace(day=1) - relativedelta(days=1)
+            data_vencimento_final = ultimo_dia_mes
+
+        novo_movimento = DespRecMovimento(
+            usuario_id=current_user.id,
+            desp_rec_id=desp_rec_id,
+            data_vencimento=data_vencimento_final,
+            mes=data_vencimento_final.month,
+            ano=data_vencimento_final.year,
+            valor_previsto=valor_previsto,
+            descricao=descricao,
+            status="Pendente",
+        )
+        novos_lancamentos.append(novo_movimento)
+
     try:
-        desp_rec_id = form.desp_rec_id.data
-        valor_previsto = form.valor_previsto.data
-        data_inicio = form.data_inicio.data
-        numero_meses = form.numero_meses.data
-        descricao = form.descricao.data.strip() if form.descricao.data else None
-
-        cadastro_base = db.session.get(DespRec, desp_rec_id)
-        if not cadastro_base:
-            return False, "Cadastro base не encontrado."
-
-        datas_a_verificar = [
-            data_inicio + relativedelta(months=i) for i in range(numero_meses)
-        ]
-        meses_anos_a_verificar = {(d.year, d.month) for d in datas_a_verificar}
-
-        conflitos = DespRecMovimento.query.filter(
-            DespRecMovimento.usuario_id == current_user.id,
-            DespRecMovimento.desp_rec_id == desp_rec_id,
-            extract("year", DespRecMovimento.data_vencimento).in_(
-                [y for y, m in meses_anos_a_verificar]
-            ),
-            extract("month", DespRecMovimento.data_vencimento).in_(
-                [m for y, m in meses_anos_a_verificar]
-            ),
-        ).all()
-
-        if conflitos:
-            meses_conflito = sorted(
-                {c.data_vencimento.strftime("%m/%Y") for c in conflitos}
-            )
-            return (
-                False,
-                f"Erro: Já existem lançamentos para '{cadastro_base.nome}' nos seguintes meses: {', '.join(meses_conflito)}. Nenhuma previsão foi gerada.",
-            )
-
-        novos_lancamentos = []
-        for i in range(numero_meses):
-            data_vencimento_atual = data_inicio + relativedelta(months=i)
-            dia_venc = cadastro_base.dia_vencimento or data_vencimento_atual.day
-            try:
-                data_vencimento_final = data_vencimento_atual.replace(day=dia_venc)
-            except ValueError:
-                ultimo_dia_mes = (
-                    data_vencimento_atual.replace(day=28) + relativedelta(days=4)
-                ).replace(day=1) - relativedelta(days=1)
-                data_vencimento_final = ultimo_dia_mes
-
-            novo_movimento = DespRecMovimento(
-                usuario_id=current_user.id,
-                desp_rec_id=desp_rec_id,
-                data_vencimento=data_vencimento_final,
-                valor_previsto=valor_previsto,
-                descricao=descricao,
-                status="Pendente",
-            )
-            novos_lancamentos.append(novo_movimento)
-
         db.session.bulk_save_objects(novos_lancamentos)
         db.session.commit()
         return True, f"{numero_meses} lançamentos previstos gerados com sucesso!"
 
+    except IntegrityError:
+        db.session.rollback()
+        return (
+            False,
+            f"Erro: Um ou mais lançamentos para '{cadastro_base.nome}' já existem no período selecionado. Nenhuma previsão foi gerada.",
+        )
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Erro ao gerar previsões: {e}", exc_info=True)
-        return False, "Erro ao gerar previsões. Tente novamente."
+        return False, "Erro inesperado ao gerar previsões. Tente novamente."
 
 
 def criar_cadastro(form):
@@ -157,3 +145,58 @@ def excluir_cadastro_por_id(cadastro_id):
             f"Erro ao excluir DespRec ID {cadastro_id}: {e}", exc_info=True
         )
         return False, "Erro ao excluir o cadastro. Tente novamente."
+
+
+def get_fixed_desp_rec_for_user_choices():
+    """
+    Busca os cadastros de Desp/Rec do tipo 'Fixa' e formata como choices.
+    """
+    contas_fixas = (
+        DespRec.query.filter_by(usuario_id=current_user.id, tipo="Fixa", ativo=True)
+        .order_by(DespRec.nome.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [(c.id, f"{c.nome}") for c in contas_fixas]
+    return choices
+
+
+def get_variable_desp_rec_for_user_choices():
+    """
+    Busca os cadastros de Desp/Rec do tipo 'Variável' e formata como choices.
+    """
+    contas_variaveis = (
+        DespRec.query.filter_by(usuario_id=current_user.id, tipo="Variável", ativo=True)
+        .order_by(DespRec.nome.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [(c.id, f"{c.nome}") for c in contas_variaveis]
+    return choices
+
+
+def get_all_desp_rec_for_user_choices():
+    """
+    Busca todos os cadastros de Desp/Rec ativos do usuário e formata como choices.
+    """
+    cadastros = (
+        DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
+        .order_by(DespRec.nome.asc())
+        .all()
+    )
+    choices = [("", "Todas")] + [(c.id, f"{c.nome} ({c.natureza})") for c in cadastros]
+    return choices
+
+
+def get_all_active_desp_rec_for_user_choices():
+    """
+    Busca todos os cadastros de Desp/Rec ativos do usuário (Fixa e Variável)
+    e formata como choices para um SelectField.
+    """
+    cadastros = (
+        DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
+        .order_by(DespRec.nome.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (c.id, f"{c.nome} ({c.tipo})") for c in cadastros
+    ]
+    return choices

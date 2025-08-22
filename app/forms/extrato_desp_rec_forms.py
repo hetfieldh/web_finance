@@ -31,15 +31,9 @@ class ExtratoDespRecForm(FlaskForm):
     submit = SubmitField("Filtrar")
 
     def __init__(self, *args, **kwargs):
+        desp_rec_choices = kwargs.pop("desp_rec_choices", [])
         super().__init__(*args, **kwargs)
-
+        self.desp_rec_id.choices = desp_rec_choices
         self.mes_ano.choices = gerar_opcoes_mes_ano(
             meses_passados=12, meses_futuros=12, incluir_selecione=False
         )
-
-        self.desp_rec_id.choices = [("", "Todas")] + [
-            (c.id, f"{c.nome} ({c.natureza})")
-            for c in DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
-            .order_by(DespRec.nome.asc())
-            .all()
-        ]

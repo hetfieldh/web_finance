@@ -1,10 +1,14 @@
 # app/models/crediario_model.py
 
 from datetime import datetime, timezone
+from decimal import Decimal
 
-from sqlalchemy import Enum, Numeric, UniqueConstraint
+from sqlalchemy import Enum, Numeric, UniqueConstraint, func
 
 from app import db
+
+from .crediario_movimento_model import CrediarioMovimento
+from .crediario_parcela_model import CrediarioParcela
 
 
 class Crediario(db.Model):
@@ -46,3 +50,17 @@ class Crediario(db.Model):
 
     def __repr__(self):
         return f"<Crediario {self.nome_crediario} ({self.tipo_crediario})>"
+
+    @property
+    def saldo_devedor(self):
+        """Calcula o saldo devedor somando as parcelas não pagas."""
+        saldo = (
+            db.session.query(func.sum(CrediarioParcela.valor_parcela))
+            .join(CrediarioMovimento)
+            .filter(
+                CrediarioMovimento.crediario_id == self.id,
+                CrediarioParcela.pago.is_(False),
+            )
+            .scalar()
+        )
+        return saldo or Decimal("0.00")

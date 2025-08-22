@@ -19,6 +19,7 @@ from app.forms.recebimentos_forms import PainelRecebimentosForm, RecebimentoForm
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
+from app.services import conta_service
 from app.services.recebimento_service import (
     estornar_recebimento as estornar_recebimento_service,
 )
@@ -33,7 +34,8 @@ recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos"
 @login_required
 def painel():
     form = PainelRecebimentosForm(request.form)
-    recebimento_form = RecebimentoForm()
+    account_choices = conta_service.get_active_accounts_for_user_choices()
+    recebimento_form = RecebimentoForm(account_choices=account_choices)
 
     if request.method == "GET" and not form.mes_ano.data:
         form.mes_ano.data = date.today().strftime("%Y-%m")
@@ -71,16 +73,8 @@ def painel():
         )
 
         for movimento in salario_movimentos:
-            salario_liquido = sum(
-                i.valor for i in movimento.itens if i.salario_item.tipo == "Provento"
-            ) - sum(
-                i.valor
-                for i in movimento.itens
-                if i.salario_item.tipo in ["Imposto", "Desconto"]
-            )
-            total_beneficios = sum(
-                i.valor for i in movimento.itens if i.salario_item.tipo == "Benefício"
-            )
+            salario_liquido = movimento.salario_liquido
+            total_beneficios = movimento.total_beneficios
 
             if salario_liquido > 0:
                 status_salario = (
@@ -98,6 +92,11 @@ def painel():
                         "vencimento": movimento.data_recebimento,
                         "origem": f"Salário Líquido (Ref: {movimento.mes_referencia})",
                         "valor": salario_liquido,
+                        "valor_recebido": (
+                            salario_liquido
+                            if status_salario == "Recebido"
+                            else Decimal("0.00")
+                        ),
                         "status": status_salario,
                         "data_pagamento": data_pag_salario,
                         "tipo": "Salário",
@@ -124,6 +123,11 @@ def painel():
                         "vencimento": movimento.data_recebimento,
                         "origem": f"Benefícios (Ref: {movimento.mes_referencia})",
                         "valor": total_beneficios,
+                        "valor_recebido": (
+                            total_beneficios
+                            if status_beneficio == "Recebido"
+                            else Decimal("0.00")
+                        ),
                         "status": status_beneficio,
                         "data_pagamento": data_pag_beneficio,
                         "tipo": "Benefício",
@@ -153,6 +157,7 @@ def painel():
                     "vencimento": receita.data_vencimento,
                     "origem": receita.despesa_receita.nome,
                     "valor": valor_previsto,
+                    "valor_recebido": valor_recebido,
                     "status": receita.status,
                     "data_pagamento": receita.data_pagamento,
                     "tipo": "Receita",
@@ -178,13 +183,23 @@ def painel():
 @recebimentos_bp.route("/registrar", methods=["POST"])
 @login_required
 def registrar_recebimento():
-    form = RecebimentoForm()
+    account_choices = conta_service.get_active_accounts_for_user_choices()
+    form = RecebimentoForm(request.form, account_choices=account_choices)
+
     if form.validate_on_submit():
         success, message = registrar_recebimento_service(form)
         if success:
             flash(message, "success")
         else:
             flash(message, "danger")
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(
+                    f"Erro no campo '{getattr(form, field).label.text}': {error}",
+                    "danger",
+                )
+
     return redirect(url_for("recebimentos.painel", mes_ano=request.form.get("mes_ano")))
 
 

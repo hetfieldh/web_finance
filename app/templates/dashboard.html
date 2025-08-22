@@ -128,8 +128,8 @@
 
 <div class="row g-2">
   <!-- Coluna 1: Contas Bancárias -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm h-100">
+  <div class="col-lg-3">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Contas Bancárias Ativas</h6>
       </div>
@@ -173,8 +173,8 @@
   </div>
 
   <!-- Coluna 2: Próximos Movimentos -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm h-100">
+  <div class="col-lg-3">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Próximos Movimentos</h6>
       </div>
@@ -218,8 +218,8 @@
   </div>
 
   <!-- Coluna 3: Saldos Devedores -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm h-100">
+  <div class="col-lg-3">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Saldos Devedores</h6>
       </div>
@@ -246,8 +246,8 @@
               </span>
             </div>
           </div>
-          {% endfor %} {% endif %} {% if saldos_crediarios %} {% for cred in
-          saldos_crediarios %}
+          {% endfor %} {% endif %} {% if crediarios %} {% for cred in crediarios
+          %}
           <div class="card border-1">
             <div
               class="card-body p-1 d-flex justify-content-between align-items-center"
@@ -257,7 +257,7 @@
                   class="fas fa-credit-card fa-lg text-secondary opacity-50 me-2"
                 ></i>
                 <div>
-                  <div class="fw-semibold small">{{ cred.nome }}</div>
+                  <div class="fw-semibold small">{{ cred.nome_crediario }}</div>
                   <div class="text-muted extra-small">Crediário</div>
                 </div>
               </div>

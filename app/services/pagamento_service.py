@@ -1,4 +1,4 @@
-# app/services/pagamento_service.py
+# app\services\pagamento_service.py
 
 from datetime import date, timedelta
 from decimal import Decimal
@@ -75,6 +75,8 @@ def registrar_pagamento(form):
             item.data_pagamento = form.data_pagamento.data
             item.movimento_bancario_id = novo_movimento.id
             item.valor_pago = valor_pago
+            data_formatada = form.data_pagamento.data.strftime("%d/%m/%Y")
+            item.observacoes = f"Paga em {data_formatada}"
 
             financiamento_pai = item.financiamento
             novo_saldo_devedor = db.session.query(
@@ -100,9 +102,10 @@ def registrar_pagamento(form):
 
             ano, mes = map(int, item.mes_referencia.split("-"))
             data_inicio_mes = date(ano, mes, 1)
-            data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
-                day=1
-            ) - timedelta(days=1)
+            if mes == 12:
+                data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
+            else:
+                data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
             parcelas_da_fatura = (
                 CrediarioParcela.query.join(CrediarioMovimento)
@@ -130,7 +133,6 @@ def registrar_pagamento(form):
 def estornar_pagamento(item_id, item_tipo):
     """
     Processa a lógica de negócio para estornar um pagamento.
-    Retorna uma tupla (sucesso, mensagem).
     """
     try:
         movimento_bancario_id = None
@@ -156,12 +158,6 @@ def estornar_pagamento(item_id, item_tipo):
         if not movimento_a_estornar:
             return False, "Movimentação bancária para estorno não existe mais."
 
-        if not _simular_impacto_estorno_pagamento(movimento_a_estornar):
-            return (
-                False,
-                f"Estorno não permitido. Esta ação resultaria em saldo insuficiente na conta '{movimento_a_estornar.conta.nome_banco}' em transações futuras.",
-            )
-
         if item_tipo == "Despesa":
             item_a_atualizar.status = "Pendente"
             item_a_atualizar.valor_realizado = None
@@ -174,6 +170,7 @@ def estornar_pagamento(item_id, item_tipo):
             item_a_atualizar.pago = False
             item_a_atualizar.movimento_bancario_id = None
             item_a_atualizar.valor_pago = None
+            item_a_atualizar.observacoes = None
 
             financiamento_pai = item_a_atualizar.financiamento
             novo_saldo_devedor = db.session.query(
@@ -194,9 +191,10 @@ def estornar_pagamento(item_id, item_tipo):
 
             ano, mes = map(int, item_a_atualizar.mes_referencia.split("-"))
             data_inicio_mes = date(ano, mes, 1)
-            data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
-                day=1
-            ) - timedelta(days=1)
+            if mes == 12:
+                data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
+            else:
+                data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
             parcelas_da_fatura = (
                 CrediarioParcela.query.join(CrediarioMovimento)
                 .filter(
@@ -221,55 +219,3 @@ def estornar_pagamento(item_id, item_tipo):
         db.session.rollback()
         current_app.logger.error(f"Erro ao estornar pagamento: {e}", exc_info=True)
         return False, "Ocorreu um erro ao estornar o pagamento."
-
-
-def _simular_impacto_estorno_pagamento(movimento_a_estornar):
-    """
-    Simula o impacto de um estorno de pagamento no saldo da conta para evitar saldos negativos.
-    Retorna True se o estorno for seguro, False caso contrário.
-    """
-    conta = movimento_a_estornar.conta
-    data_estorno = movimento_a_estornar.data_movimento
-
-    saldo_no_momento = conta.saldo_inicial
-    movimentos_anteriores = (
-        ContaMovimento.query.filter(
-            ContaMovimento.conta_id == conta.id,
-            ContaMovimento.data_movimento < data_estorno,
-        )
-        .order_by(ContaMovimento.data_movimento, ContaMovimento.id)
-        .all()
-    )
-
-    for mov in movimentos_anteriores:
-        if mov.tipo_transacao.tipo == "Crédito":
-            saldo_no_momento += mov.valor
-        else:
-            saldo_no_momento -= mov.valor
-
-    saldo_simulado = saldo_no_momento + movimento_a_estornar.valor
-
-    movimentos_posteriores = (
-        ContaMovimento.query.filter(
-            ContaMovimento.conta_id == conta.id,
-            ContaMovimento.data_movimento >= data_estorno,
-            ContaMovimento.id != movimento_a_estornar.id,
-        )
-        .order_by(ContaMovimento.data_movimento, ContaMovimento.id)
-        .all()
-    )
-
-    limite_seguro = (
-        -conta.limite if conta.limite and conta.tipo in ["Corrente", "Digital"] else 0
-    )
-
-    for mov in movimentos_posteriores:
-        if mov.tipo_transacao.tipo == "Crédito":
-            saldo_simulado += mov.valor
-        else:
-            saldo_simulado -= mov.valor
-
-        if saldo_simulado < limite_seguro:
-            return False
-
-    return True

@@ -12,6 +12,7 @@ from app.forms.extrato_forms import ExtratoBancarioForm
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
+from app.services import conta_service
 
 extrato_bp = Blueprint("extrato", __name__, url_prefix="/extratos")
 
@@ -19,7 +20,9 @@ extrato_bp = Blueprint("extrato", __name__, url_prefix="/extratos")
 @extrato_bp.route("/bancario", methods=["GET", "POST"])
 @login_required
 def extrato_bancario():
-    form = ExtratoBancarioForm()
+    account_choices = conta_service.get_active_accounts_for_user_choices_simple()
+    form = ExtratoBancarioForm(account_choices=account_choices)
+
     movimentacoes = []
     saldo_anterior = Decimal("0.00")
     saldo_final_mes = Decimal("0.00")
@@ -111,8 +114,8 @@ def extrato_bancario():
         saldo_final_mes = saldo_acumulado_temp
 
     elif request.method == "GET":
-        if form.conta_id.choices:
-            form.conta_id.data = form.conta_id.choices[0][0]
+        if form.conta_id.choices and len(form.conta_id.choices) > 1:
+            form.conta_id.data = form.conta_id.choices[1][0]
 
         hoje = date.today()
         mes_atual_str = f"{hoje.year}-{hoje.month:02d}"

@@ -1,11 +1,41 @@
-# app/services/usuario_service.py
+# app/services/usuario_service.py (Completo e Atualizado)
 
 from flask import current_app
 from flask_login import current_user
 from werkzeug.security import generate_password_hash
 
 from app import db
+from app.models.conta_transacao_model import ContaTransacao
 from app.models.usuario_model import Usuario
+
+
+def _criar_transacoes_padrao(novo_usuario):
+    """
+    Cria um conjunto de tipos de transação padrão para um novo usuário.
+    """
+    transacoes_padrao = [
+        {"transacao_tipo": "PAGAMENTO", "tipo": "Débito"},
+        {"transacao_tipo": "RECEBIMENTO", "tipo": "Crédito"},
+        {"transacao_tipo": "AMORTIZAÇÃO", "tipo": "Débito"},
+        {"transacao_tipo": "TRANSFERÊNCIA", "tipo": "Débito"},
+        {"transacao_tipo": "TRANSFERÊNCIA", "tipo": "Crédito"},
+        {"transacao_tipo": "SALÁRIO", "tipo": "Crédito"},
+        {"transacao_tipo": "DEPÓSITO", "tipo": "Crédito"},
+        {"transacao_tipo": "SAQUE", "tipo": "Débito"},
+        {"transacao_tipo": "APORTE", "tipo": "Débito"},
+        {"transacao_tipo": "APORTE", "tipo": "Crédito"},
+        {"transacao_tipo": "RESGATE", "tipo": "Crédito"},
+        {"transacao_tipo": "PIX", "tipo": "Crédito"},
+        {"transacao_tipo": "PIX", "tipo": "Débito"},
+    ]
+
+    for transacao_data in transacoes_padrao:
+        nova_transacao = ContaTransacao(
+            usuario_id=novo_usuario.id,
+            transacao_tipo=transacao_data["transacao_tipo"],
+            tipo=transacao_data["tipo"],
+        )
+        db.session.add(nova_transacao)
 
 
 def criar_novo_usuario(form):
@@ -21,6 +51,10 @@ def criar_novo_usuario(form):
         novo_usuario.set_password(form.senha.data)
 
         db.session.add(novo_usuario)
+        db.session.flush()
+
+        _criar_transacoes_padrao(novo_usuario)
+
         db.session.commit()
 
         current_app.logger.info(
@@ -42,20 +76,14 @@ def excluir_usuario_por_id(usuario_id):
         )
         return False, "Você não pode excluir seu próprio usuário."
 
-    if usuario_a_excluir.contas:
+    if (
+        usuario_a_excluir.contas
+        or usuario_a_excluir.movimentos
+        or usuario_a_excluir.tipos_transacao
+    ):
         return (
             False,
-            "Não é possível excluir o usuário. Existem contas bancárias associadas a ele.",
-        )
-    if usuario_a_excluir.movimentos:
-        return (
-            False,
-            "Não é possível excluir o usuário. Existem movimentações associadas a ele.",
-        )
-    if usuario_a_excluir.tipos_transacao:
-        return (
-            False,
-            "Não é possível excluir o usuário. Existem tipos de transação associados a ele.",
+            "Não é possível excluir o usuário. Existem dados associados a ele.",
         )
 
     try:

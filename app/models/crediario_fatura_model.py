@@ -30,7 +30,7 @@ class CrediarioFatura(db.Model):
             name="status_fatura_enum",
         ),
         nullable=False,
-        default="Aberta",
+        default="Pendente",
     )
     data_pagamento = db.Column(db.Date, nullable=True)
 

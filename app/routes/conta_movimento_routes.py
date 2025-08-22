@@ -17,6 +17,7 @@ from app.forms.conta_movimento_forms import (
     EditarContaMovimentoForm,
 )
 from app.models.conta_movimento_model import ContaMovimento
+from app.services import conta_service, conta_transacao_service
 from app.services.movimento_service import (
     excluir_movimento as excluir_movimento_service,
 )
@@ -42,7 +43,20 @@ def listar_movimentacoes():
 @conta_movimento_bp.route("/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_movimentacao():
-    form = CadastroContaMovimentoForm()
+    account_choices = conta_service.get_active_accounts_for_user_choices()
+    transaction_choices = (
+        conta_transacao_service.get_all_transaction_types_for_user_choices()
+    )
+    transfer_choices = (
+        conta_transacao_service.get_debit_transaction_types_for_user_choices()
+    )
+
+    form = CadastroContaMovimentoForm(
+        account_choices=account_choices,
+        transaction_choices=transaction_choices,
+        transfer_choices=transfer_choices,
+    )
+
     if form.validate_on_submit():
         success, message = registrar_movimento(form)
         if success:

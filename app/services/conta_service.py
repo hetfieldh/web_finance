@@ -4,9 +4,11 @@ from decimal import Decimal
 
 from flask import current_app
 from flask_login import current_user
+from sqlalchemy import case, func
 
 from app import db
 from app.models.conta_model import Conta
+from app.models.conta_movimento_model import ContaMovimento
 
 
 def criar_conta(form):
@@ -119,3 +121,103 @@ def excluir_conta_por_id(conta_id):
             f"Erro ao excluir conta ID {conta.id}: {e}", exc_info=True
         )
         return False, "Ocorreu um erro inesperado ao excluir a conta."
+
+
+def get_active_accounts_for_user_choices():
+    """
+    Busca contas ativas de um usuário e formata como choices para um SelectField.
+    """
+    contas_ativas = (
+        Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+        .order_by(Conta.nome_banco.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: R$ {c.saldo_atual:.2f})")
+        for c in contas_ativas
+    ]
+    return choices
+
+
+def get_active_accounts_for_user_choices_simple():
+    """
+    Busca contas ativas de um usuário e formata como choices (versão simples).
+    """
+    contas_ativas = (
+        Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+        .order_by(Conta.nome_banco.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (c.id, f"{c.nome_banco} - {c.conta} ({c.tipo})") for c in contas_ativas
+    ]
+    return choices
+
+
+def get_account_balance_kpis(user_id):
+    """
+    Calcula os KPIs de saldo (operacional, investimentos, etc.) com uma única
+    consulta consolidada ao banco de dados.
+    """
+    saldos = (
+        db.session.query(
+            func.sum(
+                case(
+                    (
+                        Conta.tipo.in_(["Corrente", "Digital", "Dinheiro"]),
+                        Conta.saldo_atual,
+                    ),
+                    else_=0,
+                )
+            ).label("operacional"),
+            func.sum(
+                case(
+                    (
+                        Conta.tipo.in_(["Poupança", "Caixinha", "Investimento"]),
+                        Conta.saldo_atual,
+                    ),
+                    else_=0,
+                )
+            ).label("investimentos"),
+            func.sum(
+                case((Conta.tipo == "Benefício", Conta.saldo_atual), else_=0)
+            ).label("beneficios"),
+            func.sum(case((Conta.tipo == "FGTS", Conta.saldo_atual), else_=0)).label(
+                "fgts"
+            ),
+        )
+        .filter(Conta.usuario_id == user_id, Conta.ativa.is_(True))
+        .one()
+    )
+
+    return {
+        "saldo_operacional": saldos.operacional or Decimal("0.00"),
+        "saldo_investimentos": saldos.investimentos or Decimal("0.00"),
+        "saldo_beneficios": saldos.beneficios or Decimal("0.00"),
+        "saldo_fgts": saldos.fgts or Decimal("0.00"),
+    }
+
+
+def validar_estorno_saldo(conta, valor_a_debitar):
+    """
+    Verifica se o estorno de um valor de uma conta é seguro.
+
+    Um estorno é seguro se o saldo atual da conta, mais qualquer limite,
+    for maior ou igual ao valor que será debitado.
+
+    :param conta: O objeto da Conta a ser verificado.
+    :param valor_a_debitar: O valor (Decimal) que será retirado da conta.
+    :return: (bool, str) Tupla indicando sucesso e uma mensagem.
+    """
+    saldo_disponivel = conta.saldo_atual
+    if conta.tipo in ["Corrente", "Digital"] and conta.limite:
+        saldo_disponivel += conta.limite
+
+    if valor_a_debitar > saldo_disponivel:
+        mensagem = (
+            f"Estorno não permitido. Saldo insuficiente na conta {conta.nome_banco}. "
+            f"Saldo disponível (com limite): R$ {saldo_disponivel:.2f}"
+        )
+        return False, mensagem
+
+    return True, "Validação de saldo para estorno bem-sucedida."

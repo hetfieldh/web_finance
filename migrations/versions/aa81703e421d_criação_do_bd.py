@@ -1,8 +1,8 @@
-"""Criação da versão final do BD
+"""Criação do BD
 
-Revision ID: 0a4b6a2ccf7f
+Revision ID: aa81703e421d
 Revises: 
-Create Date: 2025-08-18 16:49:45.213076
+Create Date: 2025-08-22 13:37:17.374692
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0a4b6a2ccf7f'
+revision = 'aa81703e421d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -120,7 +120,6 @@ def upgrade():
     sa.Column('data_decisao', sa.DateTime(), nullable=True),
     sa.Column('motivo_decisao', sa.Text(), nullable=True),
     sa.Column('login_criado', sa.String(length=80), nullable=True),
-    sa.Column('senha_provisoria', sa.String(length=128), nullable=True),
     sa.ForeignKeyConstraint(['admin_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
@@ -212,6 +211,8 @@ def upgrade():
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('desp_rec_id', sa.Integer(), nullable=False),
     sa.Column('data_vencimento', sa.Date(), nullable=False),
+    sa.Column('mes', sa.Integer(), nullable=False),
+    sa.Column('ano', sa.Integer(), nullable=False),
     sa.Column('valor_previsto', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('data_pagamento', sa.Date(), nullable=True),
     sa.Column('valor_realizado', sa.Numeric(precision=12, scale=2), nullable=True),

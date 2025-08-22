@@ -1,5 +1,3 @@
-# app\routes\usuario_routes.py
-
 import functools
 import re
 
@@ -76,34 +74,13 @@ def adicionar_usuario():
 
     if form.validate_on_submit():
         if not form.senha.data:
-            solicitacao_original = SolicitacaoAcesso.query.filter_by(
-                email=form.email.data
-            ).first()
-
-            if solicitacao_original and solicitacao_original.senha_provisoria:
-                form.senha.data = solicitacao_original.senha_provisoria
-            else:
-                form.senha.errors.append(
-                    "A senha é obrigatória para criação manual de usuário."
-                )
-                return render_template("usuarios/add.html", form=form)
+            form.senha.errors.append(
+                "A senha é obrigatória para criação manual de usuário."
+            )
+            return render_template("usuarios/add.html", form=form)
 
         success, message, new_user = criar_novo_usuario(form)
         if success:
-            solicitacao_original = SolicitacaoAcesso.query.filter_by(
-                email=new_user.email
-            ).first()
-            if solicitacao_original and solicitacao_original.status == "Aprovada":
-                solicitacao_original.login_criado = new_user.login
-
-                senha_para_mensagem = solicitacao_original.senha_provisoria
-                mensagem_final = (
-                    f"Seja bem-vindo(a)! Seu acesso foi aprovado. Você pode entrar no sistema usando seu e-mail ou o login '{new_user.login}'. "
-                    f"Sua senha provisória é '{senha_para_mensagem}'. Recomendamos que você a altere no primeiro acesso através do seu perfil."
-                )
-                solicitacao_original.motivo_decisao = mensagem_final
-                db.session.commit()
-
             flash(message, "success")
             return redirect(url_for("usuario.listar_usuarios"))
         else:
@@ -133,6 +110,7 @@ def editar_usuario(id):
 
         if form.senha.data:
             usuario.set_password(form.senha.data)
+            usuario.precisa_alterar_senha = False
 
         if current_user.id != usuario.id:
             usuario.is_active = form.is_active.data

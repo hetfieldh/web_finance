@@ -23,6 +23,7 @@ from app.forms.salario_forms import (
 from app.models.salario_item_model import SalarioItem
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
+from app.services import salario_service
 from app.services.salario_service import (
     adicionar_item_folha,
     criar_folha_pagamento,
@@ -186,10 +187,11 @@ def gerenciar_itens_folha(id):
     movimento = SalarioMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    form = AdicionarItemFolhaForm()
+    salario_item_choices = salario_service.get_active_salario_items_for_user_choices()
+    form = AdicionarItemFolhaForm(salario_item_choices=salario_item_choices)
 
     if form.validate_on_submit():
-        success, message, item_data = adicionar_item_folha(id, form)
+        success, message, item_data = salario_service.adicionar_item_folha(id, form)
 
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             if success:

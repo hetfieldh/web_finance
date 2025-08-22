@@ -31,12 +31,12 @@
             ></span
           >
           <span class="d-none d-md-inline">|</span>
-          <span
-            >Total Recebido:
-            <strong class="text-success"
-              >R$ {{ "%.2f"|format(totais.recebido) }}</strong
-            ></span
-          >
+          <span>
+            Total Recebido:
+            <span class="text-success">
+              R$ {{ "%.2f"|format(totais.recebido) }}
+            </span>
+          </span>
           <span class="d-none d-md-inline">|</span>
           <span
             >Pendente:
@@ -64,6 +64,7 @@
                 <th>Origem</th>
                 <th>Tipo</th>
                 <th class="text-end">Valor Previsto</th>
+                <th class="text-end">Valor Recebido</th>
                 <th class="text-center">Data Recebimento</th>
                 <th class="text-center">Status</th>
                 <th class="text-center">Ações</th>
@@ -75,8 +76,13 @@
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
                 <td><span class="badge bg-primary">{{ conta.tipo }}</span></td>
-                <td class="text-end fw-bold text-success">
+                <td class="text-end fw-regular text-dark">
                   R$ {{ "%.2f"|format(conta.valor) }}
+                </td>
+                <td class="text-end fw-bold text-success">
+                  {% if conta.valor_recebido > 0 %} R$ {{
+                  "%.2f"|format(conta.valor_recebido) }} {% else %} - {% endif
+                  %}
                 </td>
                 <td class="text-center">
                   {{ conta.data_pagamento.strftime('%d/%m/%Y') if
@@ -206,4 +212,6 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 {% endblock %}

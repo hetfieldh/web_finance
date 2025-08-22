@@ -124,12 +124,6 @@ class AdicionarItemFolhaForm(FlaskForm):
     submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
+        salario_item_choices = kwargs.pop("salario_item_choices", [])
         super().__init__(*args, **kwargs)
-        self.salario_item_id.choices = [("", "Selecione...")] + [
-            (item.id, f"{item.nome} ({item.tipo})")
-            for item in SalarioItem.query.filter_by(
-                usuario_id=current_user.id, ativo=True
-            )
-            .order_by(SalarioItem.tipo, SalarioItem.nome)
-            .all()
-        ]
+        self.salario_item_id.choices = salario_item_choices

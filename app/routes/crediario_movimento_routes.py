@@ -16,6 +16,7 @@ from app.forms.crediario_movimento_forms import (
     EditarCrediarioMovimentoForm,
 )
 from app.models.crediario_movimento_model import CrediarioMovimento
+from app.services import crediario_grupo_service, crediario_service
 from app.services.crediario_movimento_service import (
     adicionar_movimento,
 )
@@ -54,7 +55,11 @@ def listar_movimentos_crediario():
 @crediario_movimento_bp.route("/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_movimento_crediario():
-    form = CadastroCrediarioMovimentoForm()
+    crediario_choices = crediario_service.get_active_crediarios_for_user_choices()
+    grupo_choices = crediario_grupo_service.get_all_crediario_grupos_for_user_choices()
+    form = CadastroCrediarioMovimentoForm(
+        crediario_choices=crediario_choices, grupo_choices=grupo_choices
+    )
     if form.validate_on_submit():
         success, message = adicionar_movimento(form)
         if success:
@@ -72,7 +77,11 @@ def editar_movimento_crediario(id):
     movimento = CrediarioMovimento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    form = EditarCrediarioMovimentoForm(obj=movimento)
+    crediario_choices = crediario_service.get_active_crediarios_for_user_choices()
+    grupo_choices = crediario_grupo_service.get_all_crediario_grupos_for_user_choices()
+    form = EditarCrediarioMovimentoForm(
+        obj=movimento, crediario_choices=crediario_choices, grupo_choices=grupo_choices
+    )
 
     if form.validate_on_submit():
         success, message = editar_movimento_service(movimento, form)

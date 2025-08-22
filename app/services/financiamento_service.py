@@ -21,10 +21,8 @@ def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
     Função auxiliar para determinar o status da parcela de forma clara e eficiente.
     """
     if data_vencimento < hoje:
-        # Vencimento está no passado
         return "Paga" if valor_pago else "Atrasada"
     else:
-        # Vencimento é hoje ou no futuro
         return "Amortizada" if valor_pago else "Pendente"
 
 
@@ -203,7 +201,7 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
             parcela.movimento_bancario_id = novo_movimento.id
             data_formatada = data_pagamento.strftime("%d/%m/%Y")
             parcela.saldo_devedor = Decimal("0.00")
-            parcela.observacoes = f"Amortização em {data_formatada}"
+            parcela.observacoes = f"Amortizada em {data_formatada}"
 
         novo_saldo_devedor = db.session.query(
             func.sum(FinanciamentoParcela.valor_principal)

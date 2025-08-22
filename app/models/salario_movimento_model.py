@@ -1,6 +1,7 @@
 # app/models/salario_movimento_model.py
 
 from datetime import datetime, timezone
+from decimal import Decimal
 
 from sqlalchemy import Enum, UniqueConstraint
 
@@ -59,3 +60,21 @@ class SalarioMovimento(db.Model):
 
     def __repr__(self):
         return f"<SalarioMovimento Mês: {self.mes_referencia} | Status: {self.status}>"
+
+    @property
+    def salario_liquido(self):
+        """Calcula o salário líquido (Proventos - Impostos - Descontos)."""
+        proventos = sum(
+            i.valor for i in self.itens if i.salario_item.tipo == "Provento"
+        )
+        descontos_impostos = sum(
+            i.valor
+            for i in self.itens
+            if i.salario_item.tipo in ["Imposto", "Desconto"]
+        )
+        return proventos - descontos_impostos
+
+    @property
+    def total_beneficios(self):
+        """Calcula o total de benefícios."""
+        return sum(i.valor for i in self.itens if i.salario_item.tipo == "Benefício")

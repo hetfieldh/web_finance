@@ -22,6 +22,7 @@ from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
+from app.services import crediario_service
 from app.services.fatura_service import (
     gerar_fatura as gerar_fatura_service,
 )
@@ -78,7 +79,8 @@ def listar_faturas():
 @crediario_fatura_bp.route("/gerar", methods=["GET", "POST"])
 @login_required
 def gerar_fatura():
-    form = GerarFaturaForm()
+    crediario_choices = crediario_service.get_active_crediarios_for_user_choices()
+    form = GerarFaturaForm(crediario_choices=crediario_choices)
     if form.validate_on_submit():
         crediario_id = form.crediario_id.data
         mes_ano_str = form.mes_ano.data

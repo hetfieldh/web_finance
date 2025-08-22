@@ -22,6 +22,7 @@ from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.services import conta_service
 from app.services.pagamento_service import (
     estornar_pagamento as estornar_pagamento_service,
 )
@@ -34,7 +35,9 @@ pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 @login_required
 def painel():
     form = PainelPagamentosForm(request.form)
-    pagamento_form = PagamentoForm()
+
+    account_choices = conta_service.get_active_accounts_for_user_choices()
+    pagamento_form = PagamentoForm(account_choices=account_choices)
 
     if request.method == "GET" and not form.mes_ano.data:
         form.mes_ano.data = date.today().strftime("%Y-%m")
@@ -84,13 +87,14 @@ def painel():
             )
             desatualizada = fatura.valor_total_fatura != soma_real_parcelas
             valor_original = fatura.valor_total_fatura
-            valor_pago = fatura.valor_pago_fatura
+            valor_pago = fatura.valor_pago_fatura or Decimal("0.00")
             contas_a_pagar.append(
                 {
                     "vencimento": fatura.data_vencimento_fatura,
                     "origem": f"Fatura {fatura.crediario.nome_crediario}",
                     "valor_display": valor_original,
                     "valor_pendente": valor_original - valor_pago,
+                    "valor_pago": valor_pago,
                     "status": fatura.status,
                     "data_pagamento": fatura.data_pagamento,
                     "tipo": "Crediário",
@@ -113,17 +117,14 @@ def painel():
         )
         for parcela in parcelas:
             valor_original = parcela.valor_total_previsto
-            valor_pago = (
-                valor_original
-                if parcela.status in ["Paga", "Pago"]
-                else Decimal("0.00")
-            )
+            valor_pago = parcela.valor_pago or Decimal("0.00")
             contas_a_pagar.append(
                 {
                     "vencimento": parcela.data_vencimento,
                     "origem": f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})",
                     "valor_display": valor_original,
                     "valor_pendente": valor_original - valor_pago,
+                    "valor_pago": valor_pago,
                     "status": parcela.status,
                     "data_pagamento": parcela.data_pagamento,
                     "tipo": "Financiamento",
@@ -154,6 +155,7 @@ def painel():
                     "origem": despesa.despesa_receita.nome,
                     "valor_display": valor_original,
                     "valor_pendente": valor_original - valor_pago,
+                    "valor_pago": valor_pago,
                     "status": despesa.status,
                     "data_pagamento": despesa.data_pagamento,
                     "tipo": "Despesa",
@@ -180,13 +182,22 @@ def painel():
 @pagamentos_bp.route("/pagar", methods=["POST"])
 @login_required
 def pagar_conta():
-    form = PagamentoForm()
+    account_choices = conta_service.get_active_accounts_for_user_choices()
+    form = PagamentoForm(request.form, account_choices=account_choices)
+
     if form.validate_on_submit():
         success, message = registrar_pagamento(form)
         if success:
             flash(message, "success")
         else:
             flash(message, "danger")
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(
+                    f"Erro no campo '{getattr(form, field).label.text}': {error}",
+                    "danger",
+                )
 
     return redirect(url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano")))
 

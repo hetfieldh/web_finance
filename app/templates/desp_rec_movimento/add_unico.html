@@ -53,4 +53,6 @@
 <script type="application/json" id="vencimentos-data">
   {{ vencimentos_map|safe }}
 </script>
-{% endblock %} {% block scripts %} {% endblock %}
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+{% endblock %}

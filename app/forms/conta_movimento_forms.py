@@ -88,17 +88,17 @@ class CadastroContaMovimentoForm(FlaskForm):
     submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        contas_ativas = (
-            Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Conta.nome_banco.asc())
-            .all()
-        )
+        # Removemos o recebimento dos choices do kwargs para definir manualmente
+        account_choices = kwargs.pop("account_choices", [])
+        transaction_choices = kwargs.pop("transaction_choices", [])
+        transfer_choices = kwargs.pop("transfer_choices", [])
 
-        self.conta_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: {c.saldo_atual})")
-            for c in contas_ativas
-        ]
+        super().__init__(*args, **kwargs)
+
+        self.conta_id.choices = account_choices
+        self.conta_destino_id.choices = account_choices
+        self.conta_transacao_id.choices = transaction_choices
+        self.transferencia_tipo_id.choices = transfer_choices
         self.conta_destino_id.choices = self.conta_id.choices
 
         self.conta_transacao_id.choices = [("", "Selecione...")] + [

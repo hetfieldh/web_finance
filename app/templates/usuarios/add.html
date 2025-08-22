@@ -42,7 +42,8 @@ block page_title %}Adicionar Usuário{% endblock %} {% block content %}
                 </button>
               </div>
               <small class="form-text text-muted"
-                >Deixe em branco para enviar uma senha aleatória gerada pelo sistema.</small
+                >Deixe em branco para enviar uma senha aleatória gerada pelo
+                sistema.</small
               >
               <div class="progress mt-2" style="height: 5px">
                 <div
@@ -105,4 +106,7 @@ block page_title %}Adicionar Usuário{% endblock %} {% block content %}
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ajax-forms.js') }}"></script>
 {% endblock %}

@@ -81,3 +81,33 @@ def excluir_tipo_transacao_por_id(tipo_transacao_id):
             exc_info=True,
         )
         return False, "Ocorreu um erro ao excluir o tipo de transação."
+
+
+def get_all_transaction_types_for_user_choices():
+    """
+    Busca todos os tipos de transação de um usuário e formata como choices.
+    """
+    transacoes = (
+        ContaTransacao.query.filter_by(usuario_id=current_user.id)
+        .order_by(ContaTransacao.transacao_tipo.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (ct.id, f"{ct.transacao_tipo} ({ct.tipo})") for ct in transacoes
+    ]
+    return choices
+
+
+def get_debit_transaction_types_for_user_choices():
+    """
+    Busca os tipos de transação de débito de um usuário e formata como choices.
+    """
+    transacoes_debito = (
+        ContaTransacao.query.filter_by(usuario_id=current_user.id, tipo="Débito")
+        .order_by(ContaTransacao.transacao_tipo.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (ct.id, f"{ct.transacao_tipo}") for ct in transacoes_debito
+    ]
+    return choices

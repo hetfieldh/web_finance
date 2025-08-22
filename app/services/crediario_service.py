@@ -94,3 +94,18 @@ def excluir_crediario_por_id(crediario_id):
             f"Erro ao excluir crediário ID {crediario.id}: {e}", exc_info=True
         )
         return False, "Ocorreu um erro ao excluir o crediário."
+
+
+def get_active_crediarios_for_user_choices():
+    """
+    Busca os crediários ativos do usuário e formata como choices para um SelectField.
+    """
+    crediarios = (
+        Crediario.query.filter_by(usuario_id=current_user.id, ativa=True)
+        .order_by(Crediario.nome_crediario.asc())
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})") for c in crediarios
+    ]
+    return choices

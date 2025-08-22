@@ -109,13 +109,9 @@ class CadastroFinanciamentoForm(FlaskForm):
     submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
+        account_choices = kwargs.pop("account_choices", [])
         super().__init__(*args, **kwargs)
-        self.conta_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_banco} - {c.conta} ({c.tipo})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Conta.nome_banco.asc())
-            .all()
-        ]
+        self.conta_id.choices = account_choices
 
     def validate(self, extra_validators=None):
         initial_validation = super().validate(extra_validators)
@@ -198,14 +194,11 @@ class EditarFinanciamentoForm(FlaskForm):
     submit = SubmitField("Atualizar")
 
     def __init__(self, original_nome_financiamento, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.original_nome_financiamento = original_nome_financiamento
-        self.conta_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_banco} - {c.conta} ({c.tipo})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id)
-            .order_by(Conta.nome_banco.asc())
-            .all()
-        ]
+        account_choices = kwargs.pop("account_choices", [])
+        super().__init__(
+            original_nome_financiamento=original_nome_financiamento, *args, **kwargs
+        )
+        self.conta_id.choices = account_choices
 
     def validate(self, extra_validators=None):
         initial_validation = super().validate(extra_validators)
@@ -258,13 +251,9 @@ class AmortizacaoForm(FlaskForm):
         validators=[DataRequired("A data do pagamento é obrigatória.")],
         default=date.today,
     )
-    submit = SubmitField("Confirmar Amortização")
+    submit = SubmitField("Amortizar")
 
     def __init__(self, *args, **kwargs):
+        account_choices_with_balance = kwargs.pop("account_choices_with_balance", [])
         super().__init__(*args, **kwargs)
-        self.conta_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: R$ {c.saldo_atual:.2f})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Conta.nome_banco.asc())
-            .all()
-        ]
+        self.conta_id.choices = account_choices_with_balance

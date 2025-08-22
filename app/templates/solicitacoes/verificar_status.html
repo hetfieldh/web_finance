@@ -57,7 +57,7 @@
             <div class="alert alert-success mt-2 p-2">
               <strong>Acesso Aprovado!</strong><br />
               <span style="white-space: pre-wrap"
-                >{{ solicitacao.motivo_decisao }}</span
+                >{{ solicitacao.motivo_decisao|safe }}</span
               >
             </div>
             {% endif %} {% elif solicitacao.status == 'Rejeitada' %}

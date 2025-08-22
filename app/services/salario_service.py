@@ -4,6 +4,7 @@ from flask import current_app
 from flask_login import current_user
 
 from app import db
+from app.models.salario_item_model import SalarioItem
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 
@@ -145,3 +146,18 @@ def excluir_folha_pagamento(movimento_id):
             f"Erro ao excluir folha de pagamento ID {movimento_id}: {e}", exc_info=True
         )
         return False, "Erro ao excluir a folha de pagamento."
+
+
+def get_active_salario_items_for_user_choices():
+    """
+    Busca os itens de salário ativos do usuário e formata como choices.
+    """
+    itens = (
+        SalarioItem.query.filter_by(usuario_id=current_user.id, ativo=True)
+        .order_by(SalarioItem.tipo, SalarioItem.nome)
+        .all()
+    )
+    choices = [("", "Selecione...")] + [
+        (item.id, f"{item.nome} ({item.tipo})") for item in itens
+    ]
+    return choices

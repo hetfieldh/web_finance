@@ -81,3 +81,19 @@ def excluir_grupo_por_id(grupo_id):
             f"Erro ao excluir grupo de crediário ID {grupo.id}: {e}", exc_info=True
         )
         return False, "Ocorreu um erro ao excluir o grupo."
+
+
+def get_all_crediario_grupos_for_user_choices():
+    """
+    Busca todos os grupos de crediário do usuário e formata como choices.
+    """
+    grupos = (
+        CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
+        .order_by(CrediarioGrupo.grupo_crediario.asc())
+        .all()
+    )
+    choices = [("", "Nenhum")] + [
+        (str(cg.id), f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})")
+        for cg in grupos
+    ]
+    return choices

@@ -145,15 +145,9 @@ class GerarPrevisaoForm(FlaskForm):
     submit = SubmitField("Gerar")
 
     def __init__(self, *args, **kwargs):
+        desp_rec_choices = kwargs.pop("desp_rec_choices", [])
         super().__init__(*args, **kwargs)
-        self.desp_rec_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome}")
-            for c in DespRec.query.filter_by(
-                usuario_id=current_user.id, tipo="Fixa", ativo=True
-            )
-            .order_by(DespRec.nome.asc())
-            .all()
-        ]
+        self.desp_rec_id.choices = desp_rec_choices
 
 
 class EditarMovimentoForm(FlaskForm):
@@ -161,7 +155,7 @@ class EditarMovimentoForm(FlaskForm):
         "Data de Vencimento",
         format="%Y-%m-%d",
         validators=[DataRequired("A data de vencimento é obrigatória.")],
-        render_kw={"readonly": True}
+        render_kw={"readonly": True},
     )
     valor_previsto = DecimalField(
         "Valor Previsto",
@@ -170,7 +164,7 @@ class EditarMovimentoForm(FlaskForm):
             NumberRange(min=0.00),
         ],
         places=2,
-        render_kw={"readonly": True}
+        render_kw={"readonly": True},
     )
     descricao = TextAreaField(
         "Descrição",
@@ -212,12 +206,6 @@ class LancamentoUnicoForm(FlaskForm):
     submit = SubmitField("Adicionar")
 
     def __init__(self, *args, **kwargs):
+        desp_rec_choices = kwargs.pop("desp_rec_choices", [])
         super().__init__(*args, **kwargs)
-        self.desp_rec_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome}")
-            for c in DespRec.query.filter_by(
-                usuario_id=current_user.id, ativo=True, tipo="Variável"
-            )
-            .order_by(DespRec.nome.asc())
-            .all()
-        ]
+        self.desp_rec_id.choices = desp_rec_choices

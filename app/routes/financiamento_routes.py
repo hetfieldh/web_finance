@@ -30,6 +30,7 @@ from app.forms.financiamento_forms import (
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.services import conta_service
 from app.services.financiamento_service import (
     amortizar_parcelas,
     importar_e_processar_csv,
@@ -53,7 +54,8 @@ def listar_financiamentos():
 @financiamento_bp.route("/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_financiamento():
-    form = CadastroFinanciamentoForm()
+    account_choices = conta_service.get_active_accounts_for_user_choices_simple()
+    form = CadastroFinanciamentoForm(account_choices=account_choices)
     if form.validate_on_submit():
         novo_financiamento = Financiamento(
             usuario_id=current_user.id,
@@ -91,8 +93,11 @@ def editar_financiamento(id):
             "danger",
         )
         return redirect(url_for("financiamento.listar_financiamentos"))
+    account_choices = conta_service.get_active_accounts_for_user_choices_simple()
     form = EditarFinanciamentoForm(
-        obj=financiamento, original_nome_financiamento=financiamento.nome_financiamento
+        obj=financiamento,
+        original_nome_financiamento=financiamento.nome_financiamento,
+        account_choices=account_choices,
     )
     if form.validate_on_submit():
         financiamento.descricao = (
@@ -178,7 +183,11 @@ def amortizar_financiamento(id):
     financiamento = Financiamento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    form = AmortizacaoForm(request.form)
+    account_choices_with_balance = conta_service.get_active_accounts_for_user_choices()
+
+    form = AmortizacaoForm(
+        request.form, account_choices_with_balance=account_choices_with_balance
+    )
 
     if request.method == "POST":
         ids_parcelas_selecionadas = request.form.getlist(

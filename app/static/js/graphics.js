@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const chartData = JSON.parse(dataElement.textContent);
 
-  // --- GRÁFICO 1: Progresso das Obrigações (NOVO VISUAL) ---
+  // --- GRÁFICO 1: Progresso das Obrigações ---
   const progressoCanvas = document.getElementById("progressoChart");
   if (progressoCanvas && chartData.dados_progresso_valores) {
     const dados = chartData.dados_progresso_valores;
@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
         responsive: true,
         maintainAspectRatio: false,
         cutout: "70%",
-        rotation: 90,
         plugins: {
           legend: {
             display: false,

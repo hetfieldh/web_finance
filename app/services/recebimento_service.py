@@ -11,61 +11,7 @@ from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.salario_movimento_model import SalarioMovimento
-
-
-def _simular_impacto_estorno(movimento_a_estornar):
-    """
-    Simula o impacto de um estorno no saldo da conta para evitar saldos negativos.
-    Retorna True se o estorno for seguro, False caso contrário.
-    """
-    conta = movimento_a_estornar.conta
-    valor_estorno = movimento_a_estornar.valor
-    data_estorno = movimento_a_estornar.data_movimento
-
-    # Calcula o saldo da conta no momento EXATO antes do movimento que será estornado
-    saldo_no_momento = conta.saldo_inicial
-    movimentos_anteriores = (
-        ContaMovimento.query.filter(
-            ContaMovimento.conta_id == conta.id,
-            ContaMovimento.data_movimento < data_estorno,
-        )
-        .order_by(ContaMovimento.data_movimento, ContaMovimento.id)
-        .all()
-    )
-
-    for mov in movimentos_anteriores:
-        if mov.tipo_transacao.tipo == "Crédito":
-            saldo_no_momento += mov.valor
-        else:
-            saldo_no_momento -= mov.valor
-
-    # Agora, simula o futuro a partir desse ponto, mas sem o valor do estorno
-    saldo_simulado = saldo_no_momento
-    movimentos_posteriores = (
-        ContaMovimento.query.filter(
-            ContaMovimento.conta_id == conta.id,
-            ContaMovimento.data_movimento >= data_estorno,
-            ContaMovimento.id != movimento_a_estornar.id,
-        )
-        .order_by(ContaMovimento.data_movimento, ContaMovimento.id)
-        .all()
-    )
-
-    limite_seguro = (
-        -conta.limite if conta.limite and conta.tipo in ["Corrente", "Digital"] else 0
-    )
-
-    for mov in movimentos_posteriores:
-        if mov.tipo_transacao.tipo == "Crédito":
-            saldo_simulado += mov.valor
-        else:
-            saldo_simulado -= mov.valor
-
-        # Se em qualquer ponto a simulação resultar em saldo insuficiente, o estorno é inseguro
-        if saldo_simulado < limite_seguro:
-            return False
-
-    return True
+from app.services import conta_service
 
 
 def registrar_recebimento(form):
@@ -136,7 +82,7 @@ def registrar_recebimento(form):
 def estornar_recebimento(item_id, item_tipo):
     """
     Processa a lógica de negócio para estornar um recebimento,
-    validando o impacto no saldo futuro.
+    validando o impacto no saldo atual.
     """
     try:
         movimento_bancario_id = None
@@ -162,13 +108,15 @@ def estornar_recebimento(item_id, item_tipo):
         if not movimento_a_estornar:
             return False, "Movimentação bancária para estorno não existe mais."
 
-        if not _simular_impacto_estorno(movimento_a_estornar):
-            return (
-                False,
-                f"Estorno não permitido. Esta ação resultaria em saldo insuficiente na conta '{movimento_a_estornar.conta.nome_banco}' em transações futuras.",
-            )
+        valor_a_debitar = movimento_a_estornar.valor
+        conta_bancaria = movimento_a_estornar.conta
 
-        # Se a simulação passou, prossiga com o estorno
+        is_safe, message = conta_service.validar_estorno_saldo(
+            conta_bancaria, valor_a_debitar
+        )
+        if not is_safe:
+            return False, message
+
         if item_tipo == "Receita":
             item_a_atualizar.status = "Pendente"
             item_a_atualizar.valor_realizado = None
@@ -188,8 +136,7 @@ def estornar_recebimento(item_id, item_tipo):
             else:
                 item_a_atualizar.status = "Pendente"
 
-        conta_bancaria = Conta.query.get(movimento_a_estornar.conta_id)
-        conta_bancaria.saldo_atual -= movimento_a_estornar.valor
+        conta_bancaria.saldo_atual -= valor_a_debitar
         db.session.delete(movimento_a_estornar)
 
         db.session.commit()

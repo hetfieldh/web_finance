@@ -12,7 +12,7 @@
   {{ form.csrf_token }}
   <div class="row">
     <!-- Coluna Esquerda: Formulário -->
-    <div class="col-lg-4">
+    <div class="col-lg-3">
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="card-title">Detalhes da Amortização</h5>
@@ -38,25 +38,26 @@
               <span id="resumo-valor-parcela">R$ 0,00</span></small
             >
           </div>
-          {{ form.submit(class="btn btn-success w-100") }}
+          <div class="d-flex justify-content-center">
+            {{ form.submit(class="btn btn-success") }}
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Coluna Direita: Lista de Parcelas -->
-    <div class="col-lg-8">
+    <div class="col-lg-5">
       <div class="card shadow-sm">
-        <div class="card-header">
-          Selecione as parcelas a serem amortizadas (da última para a primeira)
-        </div>
-        <div class="card-body" style="max-height: 500px; overflow-y: auto">
+        <div class="card-header">Selecione as parcelas</div>
+        <div class="card-body" style="max-height: 450px; overflow-y: auto">
           <table class="table table-sm table-hover">
             <thead>
               <tr>
                 <th>Sel.</th>
-                <th>#</th>
-                <th>Vencimento</th>
+                <th class="text-center">#</th>
+                <th class="text-end"  >Vencimento</th>
                 <th class="text-end">Valor Principal</th>
+                <th class="text-end">Valor Parcela no Vencimento</th>
               </tr>
             </thead>
             <tbody>
@@ -71,10 +72,15 @@
                     data-valor="{{ parcela.valor_principal }}"
                   />
                 </td>
-                <td>{{ parcela.numero_parcela }}</td>
-                <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                <td class="text-end">
+                <td class="text-center fw-bold text-danger">
+                  {{ parcela.numero_parcela }}
+                </td>
+                <td class="text-end">{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                <td class="text-end fw-bold text-success">
                   R$ {{ "%.2f"|format(parcela.valor_principal) }}
+                </td>
+                <td class="text-end">
+                  R$ {{ "%.2f"|format(parcela.valor_total_previsto) }}
                 </td>
               </tr>
               {% endfor %}
@@ -85,4 +91,6 @@
     </div>
   </div>
 </form>
-{% endblock %} {% block scripts %} {% endblock %}
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+{% endblock %}

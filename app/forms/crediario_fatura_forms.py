@@ -21,8 +21,7 @@ from app.models.crediario_model import Crediario
 from app.utils import gerar_opcoes_mes_ano
 
 STATUS_FATURA = [
-    ("Aberta", "Aberta"),
-    ("Fechada", "Fechada"),
+    ("Pendente", "Pendente"),
     ("Paga", "Paga"),
     ("Atrasada", "Atrasada"),
     ("Parcialmente Paga", "Parcialmente Paga"),
@@ -35,24 +34,16 @@ class GerarFaturaForm(FlaskForm):
         validators=[DataRequired("O crediário é obrigatório.")],
         coerce=lambda x: int(x) if x else None,
     )
-
     mes_ano = SelectField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
     )
-
     submit = SubmitField("Gerar Fatura")
 
     def __init__(self, *args, **kwargs):
+        crediario_choices = kwargs.pop("crediario_choices", [])
         super().__init__(*args, **kwargs)
-
-        self.crediario_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})")
-            for c in Crediario.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Crediario.nome_crediario.asc())
-            .all()
-        ]
-
+        self.crediario_id.choices = crediario_choices
         self.mes_ano.choices = gerar_opcoes_mes_ano(meses_passados=11, meses_futuros=1)
 
 
@@ -117,11 +108,9 @@ class EditarFaturaForm(FlaskForm):
     submit = SubmitField("Atualizar Fatura")
 
     def __init__(self, *args, **kwargs):
+        crediario_choices = kwargs.pop("crediario_choices", [])
         super().__init__(*args, **kwargs)
-        self.crediario_id.choices = [("", "Selecione...")] + [
-            (str(c.id), f"{c.nome_crediario} ({c.tipo_crediario})")
-            for c in Crediario.query.filter_by(usuario_id=current_user.id).all()
-        ]
+        self.crediario_id.choices = crediario_choices
 
     def validate_status(self, field):
         if field.data == "Paga" and not self.data_pagamento.data:

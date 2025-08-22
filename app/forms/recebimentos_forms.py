@@ -53,10 +53,6 @@ class RecebimentoForm(FlaskForm):
     submit = SubmitField("Confirmar Recebimento")
 
     def __init__(self, *args, **kwargs):
+        account_choices = kwargs.pop("account_choices", [])
         super().__init__(*args, **kwargs)
-        self.conta_id.choices = [("", "Selecione...")] + [
-            (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: R$ {c.saldo_atual:.2f})")
-            for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
-            .order_by(Conta.nome_banco.asc())
-            .all()
-        ]
+        self.conta_id.choices = account_choices
