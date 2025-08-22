@@ -96,7 +96,7 @@ def create_app(config_class=Config):
     from app.routes.crediario_routes import crediario_bp
     from app.routes.desp_rec_movimento_routes import desp_rec_movimento_bp
     from app.routes.desp_rec_routes import desp_rec_bp
-    from app.routes.extrato_desp_rec_routes import extrato_desp_rec_bp
+    from app.routes.extrato_consolidado_routes import extrato_consolidado_bp
     from app.routes.extrato_routes import extrato_bp
     from app.routes.financiamento_routes import financiamento_bp
     from app.routes.fluxo_caixa_routes import fluxo_caixa_bp
@@ -122,7 +122,7 @@ def create_app(config_class=Config):
     app.register_blueprint(financiamento_bp)
     app.register_blueprint(desp_rec_bp)
     app.register_blueprint(desp_rec_movimento_bp)
-    app.register_blueprint(extrato_desp_rec_bp)
+    app.register_blueprint(extrato_consolidado_bp)
     app.register_blueprint(salario_bp)
     app.register_blueprint(pagamentos_bp)
     app.register_blueprint(recebimentos_bp)
