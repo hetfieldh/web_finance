@@ -1,8 +1,8 @@
 """Criação do BD
 
-Revision ID: aa81703e421d
+Revision ID: ca91cdd76f48
 Revises: 
-Create Date: 2025-08-22 13:37:17.374692
+Create Date: 2025-08-22 17:49:43.591485
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'aa81703e421d'
+revision = 'ca91cdd76f48'
 down_revision = None
 branch_labels = None
 depends_on = None

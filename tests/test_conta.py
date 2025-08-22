@@ -65,14 +65,12 @@ def test_update_bank_account(auth_client, app):
         db.session.commit()
         conta_id = conta_original.id
 
-    # Act: Envia os dados atualizados para a rota de edição
     response = auth_client.post(
         f"/contas/editar/{conta_id}",
         data={"limite": 250.75, "ativa": "y"},
         follow_redirects=True,
     )
 
-    # Assert: Verifica a resposta e o estado final no banco de dados
     assert response.status_code == 200
     assert "Conta bancária atualizada com sucesso!" in response.data.decode("utf-8")
 

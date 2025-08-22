@@ -83,7 +83,7 @@ def registrar_pagamento(form):
                 func.sum(FinanciamentoParcela.valor_principal)
             ).filter(
                 FinanciamentoParcela.financiamento_id == financiamento_pai.id,
-                FinanciamentoParcela.status != "Paga",
+                FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
             ).scalar() or Decimal(
                 "0.00"
             )
@@ -177,7 +177,7 @@ def estornar_pagamento(item_id, item_tipo):
                 func.sum(FinanciamentoParcela.valor_principal)
             ).filter(
                 FinanciamentoParcela.financiamento_id == financiamento_pai.id,
-                FinanciamentoParcela.status != "Paga",
+                FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
             ).scalar() or Decimal(
                 "0.00"
             )

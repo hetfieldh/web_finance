@@ -2,6 +2,32 @@
 
 import csv
 import io
+from datetime import datetime
+from decimal import ROUND_DOWN, Decimal
+
+from flask import current_app
+from flask_login import current_user
+from sqlalchemy import func
+
+from app import db
+from app.models.conta_model import Conta
+from app.models.conta_movimento_model import ContaMovimento
+from app.models.conta_transacao_model import ContaTransacao
+from app.models.financiamento_parcela_model import FinanciamentoParcela
+
+
+def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
+    """
+    Função auxiliar para determinar o status da parcela de forma clara e eficiente.
+    """
+    if data_vencimento < hoje:
+        return "Paga" if valor_pago else "Atrasada"
+    else:
+        return "Amortizada" if valor_pago else "Pendente"
+
+
+import csv
+import io
 from datetime import date, datetime
 from decimal import ROUND_DOWN, Decimal
 
@@ -28,7 +54,7 @@ def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
 
 def importar_e_processar_csv(financiamento, csv_file):
     """
-    Processa um arquivo CSV de parcelas para um financiamento, incluindo o status de pagamento.
+    Processa um arquivo CSV de parcelas para um financiamento, calculando o saldo devedor dinamicamente.
     """
     try:
         FinanciamentoParcela.query.filter_by(financiamento_id=financiamento.id).delete()
@@ -47,8 +73,8 @@ def importar_e_processar_csv(financiamento, csv_file):
             )
             return False, message
 
-        parcelas_para_adicionar = []
-
+        soma_principal_csv = Decimal("0.00")
+        parcelas_temporarias = []
         hoje = date.today()
 
         for i, row in enumerate(all_rows, start=1):
@@ -68,12 +94,18 @@ def importar_e_processar_csv(financiamento, csv_file):
                 mora_str,
                 ajustes_str,
                 valor_total_previsto_str,
-                saldo_devedor_str,
+                _,
                 data_pagamento_str,
                 valor_pago_str,
                 *observacoes_tuple,
             ) = row
 
+            valor_principal = Decimal(valor_principal_str)
+            soma_principal_csv += valor_principal
+
+            data_vencimento_obj = datetime.strptime(
+                data_vencimento_str, "%Y-%m-%d"
+            ).date()
             data_pagamento = (
                 datetime.strptime(data_pagamento_str, "%Y-%m-%d").date()
                 if data_pagamento_str.strip()
@@ -81,31 +113,51 @@ def importar_e_processar_csv(financiamento, csv_file):
             )
             valor_pago = Decimal(valor_pago_str) if valor_pago_str.strip() else None
 
-            data_vencimento = datetime.strptime(data_vencimento_str, "%Y-%m-%d").date()
-            status = _determinar_status_parcela(valor_pago, data_vencimento, hoje)
+            status = _determinar_status_parcela(valor_pago, data_vencimento_obj, hoje)
+            pago = status in ["Paga", "Amortizada"]
 
-            nova_parcela = FinanciamentoParcela(
-                financiamento_id=financiamento.id,
-                numero_parcela=int(numero_parcela),
-                data_vencimento=data_vencimento,
-                valor_principal=Decimal(valor_principal_str),
-                valor_juros=Decimal(valor_juros_str),
-                valor_seguro=Decimal(valor_seguro_str),
-                valor_seguro_2=Decimal(valor_seguro_2_str),
-                valor_seguro_3=Decimal(valor_seguro_3_str),
-                valor_taxas=Decimal(valor_taxas_str),
-                multa=Decimal(multa_str),
-                mora=Decimal(mora_str),
-                ajustes=Decimal(ajustes_str),
-                valor_total_previsto=Decimal(valor_total_previsto_str),
-                saldo_devedor=Decimal(saldo_devedor_str),
-                pago=bool(data_pagamento_str),
-                data_pagamento=data_pagamento,
-                valor_pago=valor_pago,
-                status=status,
-                observacoes=(observacoes_tuple[0] if observacoes_tuple else None),
+            parcelas_temporarias.append(
+                {
+                    "financiamento_id": financiamento.id,
+                    "numero_parcela": int(numero_parcela),
+                    "data_vencimento": data_vencimento_obj,
+                    "valor_principal": valor_principal,
+                    "valor_juros": Decimal(valor_juros_str),
+                    "valor_seguro": Decimal(valor_seguro_str),
+                    "valor_seguro_2": Decimal(valor_seguro_2_str),
+                    "valor_seguro_3": Decimal(valor_seguro_3_str),
+                    "valor_taxas": Decimal(valor_taxas_str),
+                    "multa": Decimal(multa_str),
+                    "mora": Decimal(mora_str),
+                    "ajustes": Decimal(ajustes_str),
+                    "valor_total_previsto": Decimal(valor_total_previsto_str),
+                    "pago": pago,
+                    "data_pagamento": data_pagamento,
+                    "valor_pago": valor_pago,
+                    "status": status,
+                    "observacoes": (
+                        observacoes_tuple[0] if observacoes_tuple else None
+                    ),
+                }
             )
-            parcelas_para_adicionar.append(nova_parcela)
+
+        if soma_principal_csv.quantize(
+            Decimal("0.01")
+        ) != financiamento.valor_total_financiado.quantize(Decimal("0.01")):
+            message = (
+                f"Erro de validação: O valor total financiado (R$ {financiamento.valor_total_financiado:,.2f}) "
+                f"não corresponde à soma do valor principal das parcelas no arquivo CSV (R$ {soma_principal_csv:,.2f})."
+            )
+            return False, message
+
+        saldo_devedor_cumulativo = Decimal("0.00")
+        parcelas_para_adicionar = []
+        for parcela_data in reversed(parcelas_temporarias):
+            saldo_devedor_cumulativo += parcela_data["valor_principal"]
+            parcela_data["saldo_devedor"] = saldo_devedor_cumulativo
+            parcelas_para_adicionar.append(FinanciamentoParcela(**parcela_data))
+
+        parcelas_para_adicionar.reverse()
 
         db.session.bulk_save_objects(parcelas_para_adicionar)
 
@@ -113,7 +165,7 @@ def importar_e_processar_csv(financiamento, csv_file):
             func.sum(FinanciamentoParcela.valor_principal)
         ).filter(
             FinanciamentoParcela.financiamento_id == financiamento.id,
-            FinanciamentoParcela.status != "Paga",
+            FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
         ).scalar() or Decimal(
             "0.00"
         )
@@ -128,7 +180,7 @@ def importar_e_processar_csv(financiamento, csv_file):
         db.session.rollback()
         message = (
             f"Erro de formato no arquivo CSV na linha {i}. Verifique se todas as "
-            "17 colunas estão presentes e no formato correto."
+            "colunas necessárias estão presentes e no formato correto."
             f" Detalhe: {e}"
         )
         current_app.logger.error(message)
@@ -200,8 +252,7 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
             parcela.valor_pago = valor_por_parcela
             parcela.movimento_bancario_id = novo_movimento.id
             data_formatada = data_pagamento.strftime("%d/%m/%Y")
-            parcela.saldo_devedor = Decimal("0.00")
-            parcela.observacoes = f"Amortizada em {data_formatada}"
+            parcela.observacoes = f"Amortização em {data_formatada}"
 
         novo_saldo_devedor = db.session.query(
             func.sum(FinanciamentoParcela.valor_principal)

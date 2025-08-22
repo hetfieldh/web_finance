@@ -74,17 +74,18 @@ def test_import_parcelas_successfully(auth_client, app):
         db.session.commit()
         financiamento_id = financiamento.id
 
-    # Cria um arquivo CSV em memória
+    # CORREÇÃO: CSV atualizado para o formato de 15 colunas
     csv_content = (
-        "numero_parcela,data_vencimento,valor_principal,valor_juros,valor_seguro,valor_seguro_2,valor_seguro_3,valor_taxas,multa,mora,ajustes,valor_total_previsto,saldo_devedor,observacoes\n"
-        "1,2025-02-01,500.00,8.33,10,0,0,5,0,0,0,523.33,500.00,\n"
-        "2,2025-03-01,500.00,4.17,10,0,0,5,0,0,0,519.17,0.00,"
+        "numero_parcela,data_vencimento,valor_principal,valor_juros,valor_seguro,valor_seguro_2,valor_seguro_3,valor_taxas,multa,mora,ajustes,valor_total_previsto,saldo_devedor,data_pagamento,valor_pago,observacoes\n"
+        "1,2025-02-01,500.00,8.33,10,0,0,5,0,0,0,523.33,500.00,2025-02-01,523.33,\n"
+        "2,2025-03-01,500.00,4.17,10,0,0,5,0,0,0,519.17,0.00,,,Parcela Pendente"
     )
     csv_file = io.BytesIO(csv_content.encode("utf-8"))
 
     response = auth_client.post(
         f"/financiamentos/{financiamento_id}/importar",
         data={"csv_file": (csv_file, "parcelas.csv")},
+        content_type="multipart/form-data",
         follow_redirects=True,
     )
 

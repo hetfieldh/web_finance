@@ -24,66 +24,71 @@ financiamento.nome_financiamento }}{% endblock %} {% block content %}
           <table class="table table-striped table-hover">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Vencimento</th>
-                <th>Amortização</th>
-                <th>Juros</th>
-                <th>Seguros</th>
-                <th>Taxas</th>
-                <th>Total Previsto</th>
-                <th>Valor Pago</th>
-                <th>Saldo Devedor</th>
-                <th>Status</th>
-                <th>Data Pagamento</th>
-                <th>Obs.</th>
+                <th class="text-center">#</th>
+                <th class="text-center">Vencimento</th>
+                <th class="text-center">Amortização</th>
+                <th class="text-center">Juros</th>
+                <th class="text-center">Seguros</th>
+                <th class="text-center">Taxas</th>
+                <th class="text-center">Total Previsto</th>
+                <th class="text-center">Valor Pago</th>
+                <th class="text-center">Saldo Devedor</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Data Pagamento</th>
+                <th class="text-left">Obs.</th>
               </tr>
             </thead>
             <tbody>
-              {% for parcela, valor_pago in parcelas_data %}
+              {% for item in parcelas_data %}
               <tr>
-                <td>{{ parcela.numero_parcela }}</td>
-                <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                <td>R$ {{ "%.2f"|format(parcela.valor_principal) }}</td>
-                <td>R$ {{ "%.2f"|format(parcela.valor_juros) }}</td>
-                <td>
-                  R$ {{ "%.2f"|format(parcela.valor_seguro +
-                  parcela.valor_seguro_2 + parcela.valor_seguro_3) }}
+                <td class="text-center">{{ item.parcela.numero_parcela }}</td>
+                <td class="text-center">{{ item.parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                <td class="text-center">{{ item.parcela.valor_principal | format_currency }}</td>
+                <td class="text-center">{{ item.parcela.valor_juros | format_currency }}</td>
+                <td class="text-center">
+                  {{ (item.parcela.valor_seguro + item.parcela.valor_seguro_2 +
+                  item.parcela.valor_seguro_3) | format_currency }}
                 </td>
-                <td>R$ {{ "%.2f"|format(parcela.valor_taxas) }}</td>
-                <td class="fw-bold">
-                  R$ {{ "%.2f"|format(parcela.valor_total_previsto) }}
+                <td class="text-center">{{ item.parcela.valor_taxas | format_currency }}</td>
+                <td class="fw-bold text-center">
+                  {{ item.parcela.valor_total_previsto | format_currency }}
                 </td>
-                <td class="fw-bold text-success">
-                  {% if parcela.valor_pago %} R$ {{
-                  "%.2f"|format(parcela.valor_pago) }} {% else %} - {% endif %}
+                <td class="fw-bold text-success text-center">
+                  {% if item.parcela.valor_pago %} {{ item.parcela.valor_pago |
+                  format_currency }} {% else %} - {% endif %}
                 </td>
-                <td class="fw-bold text-danger">
-                  R$ {{ "%.2f"|format(parcela.saldo_devedor) }}
+                <td
+                  class="fw-bold text-center {{ 'text-secondary' if item.parcela.status in ['Paga', 'Amortizada'] else 'text-danger' }}"
+                >
+                  {{ "-" | format_currency if item.parcela.status in ['Paga',
+                  'Amortizada'] else item.saldo_devedor_futuro | format_currency
+                  }}
                 </td>
-                <td>
-                  {% if parcela.status == 'Paga' %}<span
+                <td class= text-center>
+                  {% if item.parcela.status == 'Paga' %}<span
                     class="badge bg-success"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
-                  {% elif parcela.status == 'Atrasada' %}<span
+                  {% elif item.parcela.status == 'Atrasada' %}<span
                     class="badge bg-danger"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
-                  {% elif parcela.status == 'Amortizada' %}<span
-                    class="badge bg-primary"
-                    >{{ parcela.status }}</span
+                  {% elif item.parcela.status == 'Amortizada' %}<span
+                    class="badge bg-info"
+                    >{{ item.parcela.status }}</span
                   >
                   {% else %}<span class="badge bg-secondary"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
                   {% endif %}
                 </td>
-                <td>
-                  {{ parcela.data_pagamento.strftime('%d/%m/%Y') if
-                  parcela.data_pagamento else 'N/A' }}
+                <td class="text-center">
+                  {{ item.parcela.data_pagamento.strftime('%d/%m/%Y') if
+                  item.parcela.data_pagamento else 'N/A' }}
                 </td>
-                <td>
-                  {{ parcela.observacoes if parcela.observacoes else '' }}
+                <td class="text-left">
+                  {{ item.parcela.observacoes if item.parcela.observacoes else
+                  '' }}
                 </td>
               </tr>
               {% endfor %}

@@ -159,17 +159,26 @@ def visualizar_parcelas(id):
     financiamento = Financiamento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    parcelas_data = (
-        db.session.query(FinanciamentoParcela, ContaMovimento.valor)
-        .outerjoin(
-            ContaMovimento,
-            FinanciamentoParcela.movimento_bancario_id == ContaMovimento.id,
-        )
-        .filter(FinanciamentoParcela.financiamento_id == id)
-        .options(joinedload(FinanciamentoParcela.financiamento))
+
+    parcelas = (
+        FinanciamentoParcela.query.filter(FinanciamentoParcela.financiamento_id == id)
         .order_by(FinanciamentoParcela.numero_parcela.asc())
         .all()
     )
+
+    saldo_devedor_futuro = financiamento.saldo_devedor_atual
+    parcelas_data = []
+
+    for parcela in parcelas:
+        saldo_parcela = saldo_devedor_futuro
+        
+        if parcela.status in ["Pendente", "Atrasada"]:
+            saldo_devedor_futuro -= parcela.valor_principal
+
+        parcelas_data.append(
+            {"parcela": parcela, "saldo_devedor_futuro": saldo_parcela}
+        )
+
     return render_template(
         "financiamentos/parcelas.html",
         financiamento=financiamento,
@@ -216,7 +225,7 @@ def amortizar_financiamento(id):
     parcelas_pendentes = (
         FinanciamentoParcela.query.filter(
             FinanciamentoParcela.financiamento_id == id,
-            FinanciamentoParcela.status == "Pendente",
+            FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
         )
         .order_by(FinanciamentoParcela.numero_parcela.desc())
         .all()
