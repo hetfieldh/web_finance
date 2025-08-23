@@ -8,12 +8,17 @@ content %}
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Faturas Cadastradas</h4>
       <div>
-        <a
-          href="{{ url_for('crediario_fatura.gerar_fatura') }}"
-          class="btn btn-success btn-add"
+        <form
+          action="{{ url_for('crediario_fatura.automatizar_faturas') }}"
+          method="POST"
+          onsubmit="return confirm('Isto irá procurar por todas as compras futuras e irá criar ou atualizar as faturas pendentes. Deseja continuar?');"
+          style="display: inline"
         >
-          <i class="fas fa-plus"></i> Gerar Fatura
-        </a>
+          {{ form.csrf_token }}
+          <button type="submit" class="btn btn-primary btn-add">
+            <i class="fas fa-sync-alt"></i> Sincronizar Faturas
+          </button>
+        </form>
       </div>
     </div>
 

@@ -31,16 +31,15 @@ class CrediarioMovimento(db.Model):
         "Usuario", backref=db.backref("crediario_movimentos", lazy=True)
     )
     crediario = db.relationship(
-        "Crediario", backref=db.backref("movimentos", lazy=True)
+        "Crediario", backref=db.backref("movimentos_crediario", lazy=True)
     )
     crediario_grupo = db.relationship(
-        "CrediarioGrupo", backref=db.backref("movimentos", lazy=True)
+        "CrediarioGrupo", backref=db.backref("movimentos_grupo", lazy=True)
     )
 
     parcelas = db.relationship(
         "CrediarioParcela",
-        backref="movimento_pai",
-        lazy=True,
+        back_populates="movimento_pai",
         cascade="all, delete-orphan",
     )
 

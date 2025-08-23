@@ -13,6 +13,15 @@
         </h5>
       </div>
       <div class="card-body">
+        {% if is_locked %}
+        <div class="alert alert-info">
+          <i class="fas fa-lock me-2"></i>
+          Este lançamento já foi conciliado (pago/recebido) e não pode mais ter
+          sua data ou valor alterados. Para fazer modificações, primeiro estorne
+          o pagamento/recebimento no painel correspondente.
+        </div>
+        {% endif %}
+
         <form
           method="POST"
           action="{{ url_for('desp_rec_movimento.editar_movimento', id=movimento.id) }}"
@@ -32,7 +41,16 @@
           <div class="mb-3">{{ render_field(form.descricao) }}</div>
 
           <div class="mt-4">
-            <button type="submit" class="btn btn-info btn-add">
+            <button
+              type="submit"
+              class="btn btn-info btn-add"
+              {%
+              if
+              is_locked
+              %}disabled{%
+              endif
+              %}
+            >
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>
             <a

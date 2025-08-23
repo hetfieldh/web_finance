@@ -27,18 +27,18 @@ endblock %} {% block content %}
         <div class="row text-center">
           <div class="col-md-3">
             <h6>Total de Receitas</h6>
-            <p class="h5 text-success">R$ {{ "%.2f"|format(kpis.receitas) }}</p>
+            <p class="h5 text-success">{{ kpis.receitas | format_currency }}</p>
           </div>
           <div class="col-md-3">
             <h6>Total de Despesas</h6>
-            <p class="h5 text-danger">R$ {{ "%.2f"|format(kpis.despesas) }}</p>
+            <p class="h5 text-danger">{{ kpis.despesas | format_currency }}</p>
           </div>
           <div class="col-md-3">
             <h6>Balanço do Mês</h6>
             <p
               class="h5 fw-bold {% if kpis.balanco >= 0 %}text-success{% else %}text-danger{% endif %}"
             >
-              R$ {{ "%.2f"|format(kpis.balanco) }}
+              {{ kpis.balanco | format_currency }}
             </p>
           </div>
           <div class="col-md-3">
@@ -52,7 +52,7 @@ endblock %} {% block content %}
     <div class="card shadow-sm">
       <div class="card-header bg-secondary text-white">
         <h5 class="mb-0">
-          <i class="fas fa-list-ul me-2"></i>Movimentações Realizadas no Mês
+          <i class="fas fa-list-ul me-2"></i>Resumo do Fluxo de Caixa do Mês
         </h5>
       </div>
       <div class="card-body">
@@ -64,10 +64,7 @@ endblock %} {% block content %}
                 <th>Data</th>
                 <th>Descrição</th>
                 <th>Categoria</th>
-                <th class="text-end">Valor Previsto</th>
                 <th class="text-end">Valor Realizado</th>
-                <th class="text-end">Diferença</th>
-                <th class="text-center">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -76,27 +73,17 @@ endblock %} {% block content %}
                 <td>{{ mov.data.strftime('%d/%m/%Y') }}</td>
                 <td>{{ mov.descricao }}</td>
                 <td>
-                  <span class="badge bg-secondary">{{ mov.categoria }}</span>
+                  {% if mov.categoria == 'Receita' %}
+                  <span class="badge bg-success">{{ mov.categoria }}</span>
+                  {% else %}
+                  <span class="badge bg-danger">{{ mov.categoria }}</span>
+                  {% endif %}
                 </td>
                 <td
-                  class="text-end fw-bold {% if mov.tipo == 'entrada' %}text-success{% else %}text-danger{% endif %}"
+                  class="text-end fw-bold {% if mov.categoria == 'Receita' %}text-success{% else %}text-danger{% endif %}"
                 >
-                  {% if mov.tipo == 'entrada' %}+{% else %}-{% endif %} R$ {{
-                  "%.2f"|format(mov.valor) }}
-                </td>
-                <td
-                  class="text-end fw-bold {% if mov.tipo == 'entrada' %}text-success{% else %}text-danger{% endif %}"
-                >
-                  {% if mov.tipo == 'entrada' %}+{% else %}-{% endif %} R$ {{
-                  "%.2f"|format(mov.valor_realizado) }}
-                </td>
-                <td
-                  class="text-end fw-bold {% if mov.tipo == 'entrada' and mov.diferenca < 0 %}text-success{% elif mov.tipo == 'entrada' and mov.diferenca > 0 %}text-danger {% elif mov.tipo == 'saida' and mov.diferenca > 0 %}text-success{% elif mov.tipo == 'saida' and mov.diferenca < 0 %}text-danger{% endif %}"
-                >
-                  {{ "%.2f"|format(mov.diferenca) }}
-                </td>
-                <td class="text-center">
-                  <span class="badge bg-success">{{ mov.status }}</span>
+                  {% if mov.categoria == 'Receita' %}+{% else %}-{% endif %} {{
+                  mov.valor | format_currency }}
                 </td>
               </tr>
               {% endfor %}
@@ -105,7 +92,7 @@ endblock %} {% block content %}
         </div>
         {% else %}
         <p class="text-center alert alert-info">
-          Nenhuma movimentação realizada encontrada para este mês.
+          Nenhuma movimentação realizada foi encontrada para este mês.
         </p>
         {% endif %}
       </div>

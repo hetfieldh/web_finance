@@ -1,4 +1,4 @@
-# app/services/usuario_service.py (Completo e Atualizado)
+# app/services/usuario_service.py
 
 from flask import current_app
 from flask_login import current_user

@@ -1,4 +1,4 @@
-# app/forms/conta_forms.py (Completo e Corrigido)
+# app/forms/conta_forms.py
 
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DecimalField, SelectField, StringField, SubmitField

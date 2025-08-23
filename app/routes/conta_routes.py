@@ -1,4 +1,4 @@
-# app/routes/conta_routes.py (Corrigido)
+# app/routes/conta_routes.py
 
 from flask import (
     Blueprint,

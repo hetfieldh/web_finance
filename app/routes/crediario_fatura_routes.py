@@ -13,6 +13,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from flask_wtf import FlaskForm
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
@@ -22,7 +23,10 @@ from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
-from app.services import crediario_service
+from app.services import (
+    crediario_service,
+    fatura_service,
+)
 from app.services.fatura_service import (
     gerar_fatura as gerar_fatura_service,
 )
@@ -38,6 +42,7 @@ crediario_fatura_bp = Blueprint(
 @crediario_fatura_bp.route("/")
 @login_required
 def listar_faturas():
+    form = FlaskForm()
     faturas = (
         CrediarioFatura.query.filter_by(usuario_id=current_user.id)
         .options(joinedload(CrediarioFatura.crediario))
@@ -73,7 +78,11 @@ def listar_faturas():
         desatualizada = fatura.valor_total_fatura != soma_real_parcelas
         faturas_com_status.append({"fatura": fatura, "desatualizada": desatualizada})
 
-    return render_template("crediario_faturas/list.html", faturas=faturas_com_status)
+    return render_template(
+        "crediario_faturas/list.html",
+        faturas=faturas_com_status,
+        form=form,
+    )
 
 
 @crediario_fatura_bp.route("/gerar", methods=["GET", "POST"])
@@ -182,4 +191,17 @@ def excluir_fatura(id):
     current_app.logger.info(
         f"Fatura (ID: {fatura.id}) excluída por {current_user.login}."
     )
+    return redirect(url_for("crediario_fatura.listar_faturas"))
+
+
+@crediario_fatura_bp.route("/automatizar", methods=["POST"])
+@login_required
+def automatizar_faturas():
+    success, message = fatura_service.automatizar_geracao_e_atualizacao_faturas(
+        current_user.id
+    )
+    if success:
+        flash(message, "success")
+    else:
+        flash(message, "danger")
     return redirect(url_for("crediario_fatura.listar_faturas"))

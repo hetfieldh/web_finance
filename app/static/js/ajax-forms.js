@@ -1,4 +1,5 @@
 // app/static/js/ajax-forms.js
+
 console.log("ajax-forms.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {

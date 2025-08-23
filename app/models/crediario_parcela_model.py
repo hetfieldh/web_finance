@@ -24,6 +24,8 @@ class CrediarioParcela(db.Model):
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
+    movimento_pai = db.relationship("CrediarioMovimento", back_populates="parcelas")
+
     __table_args__ = (
         UniqueConstraint(
             "crediario_movimento_id", "numero_parcela", name="_crediario_parcela_uc"

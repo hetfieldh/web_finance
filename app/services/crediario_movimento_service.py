@@ -1,5 +1,6 @@
-# app/services/crediario_movimento_service.py
+# app/services/crediario_movimento_service.py (FICHEIRO COMPLETO E CORRIGIDO)
 
+from datetime import date
 from decimal import Decimal
 
 from dateutil.relativedelta import relativedelta
@@ -21,7 +22,6 @@ def adicionar_movimento(form):
     try:
         crediario_id = form.crediario_id.data
         data_primeira_parcela_obj = form.data_primeira_parcela.data
-
         mes_ano_referencia = data_primeira_parcela_obj.strftime("%Y-%m")
         fatura_existente = CrediarioFatura.query.filter_by(
             usuario_id=current_user.id,
@@ -59,19 +59,17 @@ def adicionar_movimento(form):
             numero_parcelas=numero_parcelas,
         )
         db.session.add(novo_movimento)
-        db.session.flush()
 
         valor_por_parcela = valor_total_compra / Decimal(str(numero_parcelas))
         for i in range(numero_parcelas):
             data_vencimento = data_primeira_parcela_obj + relativedelta(months=i)
             nova_parcela = CrediarioParcela(
-                crediario_movimento_id=novo_movimento.id,
                 numero_parcela=i + 1,
                 data_vencimento=data_vencimento,
                 valor_parcela=valor_por_parcela,
                 pago=False,
             )
-            db.session.add(nova_parcela)
+            novo_movimento.parcelas.append(nova_parcela)
 
         db.session.commit()
         return True, "Compra no crediário registrada e parcelas geradas com sucesso!"
@@ -133,13 +131,12 @@ def editar_movimento(movimento, form):
         for i in range(form.numero_parcelas.data):
             data_vencimento = form.data_primeira_parcela.data + relativedelta(months=i)
             nova_parcela = CrediarioParcela(
-                crediario_movimento_id=movimento.id,
                 numero_parcela=i + 1,
                 data_vencimento=data_vencimento,
                 valor_parcela=valor_por_parcela,
                 pago=False,
             )
-            db.session.add(nova_parcela)
+            movimento.parcelas.append(nova_parcela)
 
         db.session.commit()
         return True, "Movimento de crediário atualizado com sucesso!"

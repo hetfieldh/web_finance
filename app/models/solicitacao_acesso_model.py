@@ -1,4 +1,4 @@
-# app/models/solicitacao_acesso_model.py (Refatorado)
+# app/models/solicitacao_acesso_model.py
 
 from datetime import datetime, timezone
 

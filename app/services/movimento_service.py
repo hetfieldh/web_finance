@@ -1,4 +1,4 @@
-# app/services/movimento_service.py (Completo e Corrigido)
+# app/services/movimento_service.py
 
 from decimal import Decimal
 

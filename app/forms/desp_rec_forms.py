@@ -1,3 +1,5 @@
+# app\forms\desp_rec_forms.py
+
 from datetime import date
 
 from flask_login import current_user
@@ -164,7 +166,7 @@ class EditarMovimentoForm(FlaskForm):
             NumberRange(min=0.00),
         ],
         places=2,
-        render_kw={"readonly": True},
+        render_kw={"readonly": False},
     )
     descricao = TextAreaField(
         "Descrição",

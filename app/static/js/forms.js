@@ -1,4 +1,5 @@
 // app/static/js/forms.js
+
 console.log("forms.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {

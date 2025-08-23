@@ -1,3 +1,5 @@
+# app\routes\desp_rec_movimento_routes.py
+
 import json
 from datetime import date
 from decimal import Decimal
@@ -138,7 +140,20 @@ def editar_movimento(id):
     ).first_or_404()
     form = EditarMovimentoForm(obj=movimento)
 
+    is_locked = movimento.status in ["Pago", "Recebido"]
+
+    if is_locked:
+        form.data_vencimento.render_kw = {"readonly": True}
+        form.valor_previsto.render_kw = {"readonly": True}
+
     if form.validate_on_submit():
+        if is_locked:
+            flash(
+                "Este lançamento já foi pago/recebido e não pode mais ser alterado.",
+                "warning",
+            )
+            return redirect(url_for("desp_rec_movimento.listar_movimentos"))
+
         try:
             movimento.data_vencimento = form.data_vencimento.data
             movimento.valor_previsto = form.valor_previsto.data
@@ -168,6 +183,7 @@ def editar_movimento(id):
         form=form,
         title="Editar Lançamento",
         movimento=movimento,
+        is_locked=is_locked,
     )
 
 
