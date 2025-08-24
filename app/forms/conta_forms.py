@@ -84,7 +84,7 @@ class CadastroContaForm(FlaskForm):
     limite = DecimalField(
         "Limite (opcional)",
         validators=[
-            Optional(),
+            InputRequired("O limite é obrigatório."),
             NumberRange(
                 min=0.00, max=9999999999.99, message="Limite fora do limite permitido."
             ),
@@ -137,7 +137,7 @@ class EditarContaForm(FlaskForm):
     limite = DecimalField(
         "Limite (opcional)",
         validators=[
-            Optional(),
+            InputRequired("O limite é obrigatório."),
             NumberRange(
                 min=0.00, max=9999999999.99, message="Limite fora do limite permitido."
             ),

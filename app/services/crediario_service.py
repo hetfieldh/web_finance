@@ -75,7 +75,7 @@ def excluir_crediario_por_id(crediario_id):
         id=crediario_id, usuario_id=current_user.id
     ).first_or_404()
 
-    if crediario.movimentos:
+    if crediario.movimentos_crediario:
         return (
             False,
             "Não é possível excluir este crediário. Existem movimentos de crediário associados a ele.",

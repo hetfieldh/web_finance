@@ -108,8 +108,18 @@ def atualizar_perfil_usuario(usuario, form):
         usuario.email = form.email.data.strip()
 
         if form.nova_senha.data:
-            if not usuario.check_password(form.senha_atual.data):
-                return False, {"senha_atual": ["A senha atual está incorreta."]}
+            if not usuario.precisa_alterar_senha:
+                if not form.senha_atual.data:
+                    return False, {
+                        "senha_atual": [
+                            "A senha atual é obrigatória para alterar a senha."
+                        ]
+                    }
+                if not usuario.check_password(form.senha_atual.data):
+                    return False, {"senha_atual": ["A senha atual está incorreta."]}
+
+            if usuario.precisa_alterar_senha and not form.nova_senha.data.strip():
+                return False, {"nova_senha": ["A nova senha não pode estar em branco."]}
 
             usuario.set_password(form.nova_senha.data)
             usuario.precisa_alterar_senha = False

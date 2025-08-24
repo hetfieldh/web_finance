@@ -1,5 +1,7 @@
 # app/routes/salario_routes.py
 
+from datetime import datetime
+
 from flask import (
     Blueprint,
     current_app,
@@ -168,7 +170,14 @@ def listar_movimentos():
 def novo_lancamento_folha():
     form = CabecalhoFolhaForm()
     if form.validate_on_submit():
-        success, message, movimento = criar_folha_pagamento(form)
+        data_recebimento_obj = datetime.strptime(
+            form.data_recebimento.data, "%Y-%m-%d"
+        ).date()
+
+        success, message, movimento = criar_folha_pagamento(
+            form.mes_referencia.data, data_recebimento_obj
+        )
+
         if success:
             flash(message, "success")
         else:

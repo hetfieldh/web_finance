@@ -56,6 +56,13 @@
                 <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td class="table-actions">
                   <a
+                    href="{{ url_for('crediario_movimento.detalhes_movimento', id=mov.id) }}"
+                    class="btn btn-info me-2"
+                    title="Ver Detalhes das Parcelas"
+                  >
+                    <i class="fas fa-list-ul"></i>
+                  </a>
+                  <a
                     href="{{ url_for('crediario_movimento.editar_movimento_crediario', id=mov.id) }}"
                     class="btn btn-warning me-2"
                     title="Editar"

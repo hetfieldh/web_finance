@@ -1,6 +1,5 @@
 # app/forms/crediario_fatura_forms.py
 
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     DateField,
@@ -17,34 +16,12 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from app.models.crediario_model import Crediario
-from app.utils import gerar_opcoes_mes_ano
-
 STATUS_FATURA = [
     ("Pendente", "Pendente"),
     ("Paga", "Paga"),
     ("Atrasada", "Atrasada"),
     ("Parcialmente Paga", "Parcialmente Paga"),
 ]
-
-
-class GerarFaturaForm(FlaskForm):
-    crediario_id = SelectField(
-        "Crediário",
-        validators=[DataRequired("O crediário é obrigatório.")],
-        coerce=lambda x: int(x) if x else None,
-    )
-    mes_ano = SelectField(
-        "Mês/Ano de Referência",
-        validators=[DataRequired("O mês e ano são obrigatórios.")],
-    )
-    submit = SubmitField("Gerar Fatura")
-
-    def __init__(self, *args, **kwargs):
-        crediario_choices = kwargs.pop("crediario_choices", [])
-        super().__init__(*args, **kwargs)
-        self.crediario_id.choices = crediario_choices
-        self.mes_ano.choices = gerar_opcoes_mes_ano(meses_passados=11, meses_futuros=1)
 
 
 class EditarFaturaForm(FlaskForm):

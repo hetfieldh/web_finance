@@ -112,3 +112,22 @@ def excluir_movimento_crediario(id):
         flash(message, "danger")
 
     return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
+
+
+@crediario_movimento_bp.route("/detalhes/<int:id>")
+@login_required
+def detalhes_movimento(id):
+    """
+    Exibe os detalhes de um movimento de crediário e todas as suas parcelas.
+    """
+    movimento = (
+        CrediarioMovimento.query.options(
+            joinedload(CrediarioMovimento.parcelas),
+            joinedload(CrediarioMovimento.crediario),
+            joinedload(CrediarioMovimento.crediario_grupo),
+        )
+        .filter_by(id=id, usuario_id=current_user.id)
+        .first_or_404()
+    )
+
+    return render_template("crediario_movimentos/detalhes.html", movimento=movimento)

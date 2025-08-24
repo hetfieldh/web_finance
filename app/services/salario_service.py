@@ -9,24 +9,24 @@ from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 
 
-def criar_folha_pagamento(form):
+def criar_folha_pagamento(mes_referencia, data_recebimento):
     """
     Processa a criação de uma nova folha de pagamento, verificando duplicatas.
     Retorna (sucesso, mensagem, objeto_movimento).
     """
     movimento_existente = SalarioMovimento.query.filter_by(
-        usuario_id=current_user.id, mes_referencia=form.mes_referencia.data
+        usuario_id=current_user.id, mes_referencia=mes_referencia
     ).first()
 
     if movimento_existente:
-        msg = f"Já existe uma folha de pagamento para o mês {form.mes_referencia.data}."
+        msg = f"Já existe uma folha de pagamento para o mês {mes_referencia}."
         return False, msg, movimento_existente
 
     try:
         novo_movimento = SalarioMovimento(
             usuario_id=current_user.id,
-            mes_referencia=form.mes_referencia.data,
-            data_recebimento=form.data_recebimento.data,
+            mes_referencia=mes_referencia,
+            data_recebimento=data_recebimento,
         )
         db.session.add(novo_movimento)
         db.session.commit()

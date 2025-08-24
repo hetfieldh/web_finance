@@ -123,6 +123,7 @@ class EditarUsuarioForm(FlaskForm):
                 message="O nome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
+        render_kw={"readonly": True},
     )
     sobrenome = StringField(
         "Sobrenome",
@@ -136,6 +137,7 @@ class EditarUsuarioForm(FlaskForm):
                 message="O sobrenome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
+        render_kw={"readonly": True},
     )
     email = StringField(
         "E-mail",
@@ -144,6 +146,7 @@ class EditarUsuarioForm(FlaskForm):
             validar_email_strict_custom,
             Length(max=120),
         ],
+        render_kw={"readonly": True},
     )
     login = StringField(
         "Login/Usuário",
@@ -155,6 +158,7 @@ class EditarUsuarioForm(FlaskForm):
                 message="O login contém caracteres inválidos. Use apenas letras minúsculas, números, pontos ou sublinhados.",
             ),
         ],
+        render_kw={"readonly": True},
     )
     senha = PasswordField(
         "Nova Senha (opcional)",
@@ -213,6 +217,7 @@ class PerfilUsuarioForm(FlaskForm):
                 message="O nome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
+        render_kw={"readonly": True},
     )
     sobrenome = StringField(
         "Sobrenome",
@@ -226,6 +231,7 @@ class PerfilUsuarioForm(FlaskForm):
                 message="O sobrenome contém caracteres inválidos ou múltiplos espaços. Use apenas letras, espaços, hífens ou apóstrofos.",
             ),
         ],
+        render_kw={"readonly": True},
     )
     email = StringField(
         "E-mail",
@@ -234,6 +240,7 @@ class PerfilUsuarioForm(FlaskForm):
             validar_email_strict_custom,
             Length(max=120),
         ],
+        render_kw={"readonly": True},
     )
     login = StringField("Login/Usuário", render_kw={"readonly": True})
 
@@ -272,9 +279,3 @@ class PerfilUsuarioForm(FlaskForm):
                 raise ValidationError(
                     "Este e-mail já está cadastrado por outro usuário."
                 )
-
-    def validate_senha_atual(self, field):
-        if self.nova_senha.data and not field.data:
-            raise ValidationError(
-                "A senha atual é obrigatória para definir uma nova senha."
-            )

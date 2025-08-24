@@ -62,7 +62,7 @@ def excluir_grupo_por_id(grupo_id):
     grupo = CrediarioGrupo.query.filter_by(
         id=grupo_id, usuario_id=current_user.id
     ).first_or_404()
-    if grupo.movimentos:
+    if grupo.movimentos_grupo:
         return (
             False,
             "Não é possível excluir este grupo. Existem movimentos de crediário associados a ele.",

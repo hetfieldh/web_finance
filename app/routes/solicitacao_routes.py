@@ -219,7 +219,7 @@ def aprovar_solicitacao(id):
         db.session.commit()
 
         flash(
-            f"Usuário '{novo_usuario.login}' criado com sucesso a partir da solicitação! Senha provisória: {senha_provisoria_texto_puro}",
+            f"Usuário '{novo_usuario.login}' criado com sucesso a partir da solicitação! Uma senha provisória foi enviada para o primeiro acesso.",
             "success",
         )
 

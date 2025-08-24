@@ -1,0 +1,96 @@
+<!--- app\templates\crediario_movimentos\detalhes.html -->
+
+{% extends "base.html" %} {% block title %}Detalhes da Compra{% endblock %} {%
+block page_title %}Detalhes da Compra no Crediário{% endblock %} {% block
+content %}
+<div class="row">
+  <div class="col-lg-10 mx-auto">
+    <div class="card shadow-sm mb-4">
+      <div
+        class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0">Resumo da Compra</h5>
+        <a
+          href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
+          class="btn btn-light btn-sm"
+        >
+          <i class="fas fa-arrow-left me-1"></i> Voltar
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <p class="mb-1"><strong>Descrição:</strong></p>
+            <p>{{ movimento.descricao }}</p>
+          </div>
+          <div class="col-md-4">
+            <p class="mb-1"><strong>Crediário:</strong></p>
+            <p>{{ movimento.crediario.nome_crediario }}</p>
+          </div>
+          <div class="col-md-4">
+            <p class="mb-1"><strong>Grupo:</strong></p>
+            <p>
+              {{ movimento.crediario_grupo.grupo_crediario if
+              movimento.crediario_grupo else 'N/A' }}
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <p class="mb-1"><strong>Data da Compra:</strong></p>
+            <p>{{ movimento.data_compra.strftime('%d/%m/%Y') }}</p>
+          </div>
+          <div class="col-md-4">
+            <p class="mb-1"><strong>Valor Total:</strong></p>
+            <p class="fw-bold">
+              {{ movimento.valor_total_compra | format_currency }}
+            </p>
+          </div>
+          <div class="col-md-4">
+            <p class="mb-1"><strong>Parcelamento:</strong></p>
+            <p>{{ movimento.numero_parcelas }}x</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Extrato de Parcelas</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th class="text-center">Nº da Parcela</th>
+                <th>Data de Vencimento</th>
+                <th class="text-end">Valor da Parcela</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for parcela in movimento.parcelas %}
+              <tr>
+                <td class="text-center">{{ parcela.numero_parcela }}</td>
+                <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                <td class="text-end">
+                  {{ parcela.valor_parcela | format_currency }}
+                </td>
+                <td class="text-center">
+                  {% if parcela.pago %}
+                  <span class="badge bg-success">Paga</span>
+                  {% else %}
+                  <span class="badge bg-secondary">Pendente</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

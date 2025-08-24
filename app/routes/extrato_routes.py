@@ -20,8 +20,7 @@ extrato_bp = Blueprint("extrato", __name__, url_prefix="/extratos")
 @extrato_bp.route("/bancario", methods=["GET", "POST"])
 @login_required
 def extrato_bancario():
-    account_choices = conta_service.get_active_accounts_for_user_choices_simple()
-    form = ExtratoBancarioForm(account_choices=account_choices)
+    form = ExtratoBancarioForm()
 
     movimentacoes = []
     saldo_anterior = Decimal("0.00")
@@ -33,7 +32,7 @@ def extrato_bancario():
     conta_elegivel_limite = False
 
     if form.validate_on_submit():
-        conta_id = form.conta_id.data
+        conta_id = int(form.conta_id.data)
         mes_ano_str = form.mes_ano.data
 
         conta_selecionada = Conta.query.filter_by(
@@ -50,12 +49,10 @@ def extrato_bancario():
 
         ano = int(mes_ano_str.split("-")[0])
         mes = int(mes_ano_str.split("-")[1])
-
         data_inicio_mes = datetime(ano, mes, 1)
-        if mes == 12:
-            data_fim_mes = datetime(ano + 1, 1, 1) - timedelta(days=1)
-        else:
-            data_fim_mes = datetime(ano, mes + 1, 1) - timedelta(days=1)
+        data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
+            day=1
+        ) - timedelta(days=1)
 
         saldo_anterior = Decimal(str(conta_selecionada.saldo_inicial))
 
@@ -109,14 +106,10 @@ def extrato_bancario():
                         "saldo_acumulado": saldo_acumulado_temp,
                     }
                 )
-
         movimentacoes = movimentacoes_para_template
         saldo_final_mes = saldo_acumulado_temp
 
     elif request.method == "GET":
-        if form.conta_id.choices and len(form.conta_id.choices) > 1:
-            form.conta_id.data = form.conta_id.choices[1][0]
-
         hoje = date.today()
         mes_atual_str = f"{hoje.year}-{hoje.month:02d}"
         if any(choice[0] == mes_atual_str for choice in form.mes_ano.choices):

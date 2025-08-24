@@ -16,7 +16,6 @@ class ExtratoBancarioForm(FlaskForm):
 
     conta_id = SelectField(
         "Conta Bancária",
-        coerce=int,
         validators=[DataRequired("Selecione uma conta.")],
     )
     mes_ano = SelectField(
@@ -29,12 +28,14 @@ class ExtratoBancarioForm(FlaskForm):
         super().__init__(*args, **kwargs)
         from app.models.conta_model import Conta
 
-        self.conta_id.choices = [
+        lista_de_contas = [
             (c.id, f"{c.nome_banco} - {c.tipo}")
             for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Conta.nome_banco.asc())
             .all()
         ]
+        self.conta_id.choices = [("", "Selecione...")] + lista_de_contas
+
         self.mes_ano.choices = gerar_opcoes_mes_ano(
             meses_passados=24, meses_futuros=12, incluir_selecione=False
         )

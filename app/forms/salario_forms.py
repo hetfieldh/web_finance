@@ -8,6 +8,7 @@ from wtforms import (
     BooleanField,
     DateField,
     DecimalField,
+    HiddenField,
     SelectField,
     StringField,
     SubmitField,
@@ -88,23 +89,13 @@ class EditarSalarioItemForm(FlaskForm):
 
 
 class CabecalhoFolhaForm(FlaskForm):
-    mes_referencia = SelectField(
+    mes_referencia = StringField(
         "Mês de Referência",
         validators=[DataRequired("O mês de referência é obrigatório.")],
+        render_kw={"placeholder": "Selecione...", "readonly": True},
     )
-    data_recebimento = DateField(
-        "Data de Recebimento",
-        format="%Y-%m-%d",
-        validators=[DataRequired("A data de recebimento é obrigatória.")],
-        default=date.today,
-    )
+    data_recebimento = HiddenField()
     submit = SubmitField("Adicionar Verbas")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.mes_referencia.choices = gerar_opcoes_mes_ano(
-            meses_passados=12, meses_futuros=12
-        )
 
 
 class AdicionarItemFolhaForm(FlaskForm):

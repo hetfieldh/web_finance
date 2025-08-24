@@ -37,11 +37,28 @@ current_user.precisa_alterar_senha %}
           </div>
 
           <hr />
+
+          {% if current_user.precisa_alterar_senha %}
+          <h6 class="text-danger">Defina a sua nova senha</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.nova_senha, label='Senha', attrs={'id':
+              'senha', 'required': true}) }} {% if form.nova_senha.errors %}
+              <div class="text-danger">
+                {% for error in form.nova_senha.errors %}{{ error }}{% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.confirmar_nova_senha, label='Confirmar
+              Senha', attrs={'id': 'confirmar_senha', 'required': true}) }}
+            </div>
+          </div>
+          {% else %}
           <h6 class="text-muted">Alterar Senha (opcional)</h6>
           <p class="text-muted small">
             Preencha os campos abaixo apenas se desejar alterar sua senha.
           </p>
-
           <div class="row">
             <div class="col-md-4 mb-3">
               {{ render_field(form.senha_atual, attrs={'type': 'password'}) }}
@@ -59,21 +76,6 @@ current_user.precisa_alterar_senha %}
                   <i class="fas fa-eye" id="toggleSenhaIcon"></i>
                 </button>
               </div>
-              <div class="progress mt-2" style="height: 5px">
-                <div
-                  id="password-strength-bar"
-                  class="progress-bar"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <small
-                id="password-strength-text"
-                class="form-text text-muted"
-              ></small>
               {% if form.nova_senha.errors %}
               <div class="text-danger">
                 {% for error in form.nova_senha.errors %}{{ error }}{% endfor %}
@@ -94,14 +96,25 @@ current_user.precisa_alterar_senha %}
                   <i class="fas fa-eye" id="toggleConfirmarSenhaIcon"></i>
                 </button>
               </div>
-              {% if form.confirmar_nova_senha.errors %}
-              <div class="text-danger">
-                {% for error in form.confirmar_nova_senha.errors %}{{ error }}{%
-                endfor %}
-              </div>
-              {% endif %}
             </div>
           </div>
+          {% endif %}
+
+          <div class="progress mt-2" style="height: 5px">
+            <div
+              id="password-strength-bar"
+              class="progress-bar"
+              role="progressbar"
+              style="width: 0%"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          <small
+            id="password-strength-text"
+            class="form-text text-muted"
+          ></small>
 
           <div class="mt-4">
             <button type="submit" class="btn btn-success btn-add">

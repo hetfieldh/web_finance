@@ -7,22 +7,22 @@
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">Adicionar Salário Mensal</h5>
+        <h5 class="mb-0">Adicionar Folha de Pagamento</h5>
       </div>
       <div class="card-body">
         <p class="card-text">
-          Primeiro, informe o mês de referência e a data de recebimento. Depois,
-          você será direcionado para adicionar as verbas.
+          Selecione o mês de referência e o sistema irá sugerir a data de
+          recebimento padrão (5º dia útil do mês seguinte).
         </p>
         <form
           method="POST"
           action="{{ url_for('salario.novo_lancamento_folha') }}"
         >
-          {{ form.csrf_token }}
+          {{ form.csrf_token }} {{ form.data_recebimento }}
           <div class="row mb-3 align-items-end">
-            <div class="col-md-4">{{ render_field(form.mes_referencia) }}</div>
-            <div class="col-md-4">
-              {{ render_field(form.data_recebimento, attrs={'type': 'date'}) }}
+            <div class="col-md-3">
+              {{ render_field(form.mes_referencia, attrs={'id':
+              'mes_referencia'}) }}
             </div>
           </div>
           <div class="mt-4">
@@ -38,4 +38,6 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/salario_form.js') }}"></script>
 {% endblock %}

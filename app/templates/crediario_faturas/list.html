@@ -50,7 +50,7 @@ content %}
                     class="fas fa-exclamation-triangle text-warning"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title="Desatualizada! O valor total das parcelas do mês é diferente do valor da fatura. Use o botão 'Atualizar' para corrigir."
+                    title="Desatualizada! O valor total das parcelas do mês é diferente do valor da fatura. Use 'Sincronizar Faturas' para corrigir."
                   ></i>
                   {% else %}
                   <i
@@ -68,7 +68,7 @@ content %}
                 </td>
                 <td>{{ item.fatura.mes_referencia }}</td>
                 <td>
-                  {{ item.fatura.data_vencimento_fatura.strftime('%m/%Y') }}
+                  {{ item.fatura.data_vencimento_fatura.strftime('%d/%m/%Y') }}
                 </td>
                 <td>R$ {{ "%.2f"|format(item.fatura.valor_total_fatura) }}</td>
                 <td>R$ {{ "%.2f"|format(item.fatura.valor_pago_fatura) }}</td>
@@ -96,20 +96,6 @@ content %}
                   >
                     <i class="fas fa-eye"></i>
                   </a>
-                  <form
-                    action="{{ url_for('crediario_fatura.recalcular_fatura', id=item.fatura.id) }}"
-                    method="POST"
-                    style="display: inline"
-                    onsubmit="return confirm('Tem certeza que deseja atualizar esta fatura com o valor recalculado das parcelas?');"
-                  >
-                    <button
-                      type="submit"
-                      class="btn btn-primary me-2"
-                      title="Atualizar"
-                    >
-                      <i class="fas fa-sync-alt"></i>
-                    </button>
-                  </form>
                   <form
                     action="{{ url_for('crediario_fatura.excluir_fatura', id=item.fatura.id) }}"
                     method="POST"
