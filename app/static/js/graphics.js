@@ -60,13 +60,15 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(progressoCanvas, {
       type: "doughnut",
       data: {
-        labels: ["Pago", "Pendente"],
+        labels: dados.labels,
         datasets: [
           {
-            data: [dados.pago, dados.pendente],
+            data: dados.valores,
             backgroundColor: [
-              "rgba(40, 167, 69, 0.5)",
-              "rgba(255, 17, 65, 0.5)",
+              "rgba(40, 167, 69, 0.7)", // Verde para "Pago"
+              "rgba(23, 162, 184, 0.7)", // Azul para "Descontos"
+              "rgba(255, 193, 7, 0.7)", // Amarelo para "Pendente"
+              "rgba(220, 53, 69, 0.7)", // Vermelho para "Custos Extras"
             ],
             borderColor: ["#ffffff"],
             borderWidth: 2,
@@ -79,32 +81,34 @@ document.addEventListener("DOMContentLoaded", function () {
         cutout: "70%",
         plugins: {
           legend: {
-            display: false,
+            display: true,
+            position: "right",
           },
           centerText: {
             text: totalFormatted,
-            subText: "Total Despesas do Mês",
+            subText: "Total de Obrigações do Mês",
           },
           datalabels: {
             anchor: "end",
             align: "end",
-            offset: 2,
-            color: "#6c757d",
+            offset: 8,
+            color: "#495057",
             font: {
               weight: "bold",
-              size: 12,
+              size: 11,
             },
             formatter: (value, ctx) => {
-              const total = ctx.chart.data.datasets[0].data.reduce(
-                (a, b) => a + b,
-                0
-              );
-              if (total === 0 || value === 0) return "";
-              const percentage = (value / total) * 100;
-              if (percentage < 3) return "";
+              const total = dados.total;
+              if (total === 0 || value === 0) return null;
 
-              const label = ctx.chart.data.labels[ctx.dataIndex];
-              return `${label}\n${percentage.toFixed(1)}%`;
+              const percentage = (value / total) * 100;
+              const valueFormatted = new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(value);
+
+              // Mostra o valor e a porcentagem
+              return `${valueFormatted}\n(${percentage.toFixed(1)}%)`;
             },
           },
         },

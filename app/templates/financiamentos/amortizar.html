@@ -10,34 +10,48 @@
   action="{{ url_for('financiamento.amortizar_financiamento', id=financiamento.id) }}"
 >
   {{ form.csrf_token }}
-  <div class="row">
-    <div class="col-lg-3">
+  <div class="row g-4">
+    <div class="col-lg-4">
       <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-calculator me-2"></i>Painel de Amortização
+          </h5>
+        </div>
         <div class="card-body">
-          <h5 class="card-title">Detalhes da Amortização</h5>
-          <div class="mb-3">
+          <h6 class="card-title">1. Detalhes do Pagamento</h6>
+          <div class="mb-2">
             {{ render_field(form.valor_amortizacao, attrs={'type': 'number',
             'step': '0.01', 'id': 'valor_amortizacao'}) }}
           </div>
-          <div class="mb-3">{{ render_field(form.conta_id) }}</div>
-          <div class="mb-3">
+          <div class="mb-2">{{ render_field(form.conta_id) }}</div>
+          <div class="mb-2">
             {{ render_field(form.data_pagamento, attrs={'type': 'date'}) }}
           </div>
-          <hr />
-          <div id="resumo-amortizacao" class="alert alert-info">
-            <strong>Resumo da Operação:</strong><br />
-            <small
-              >Total a Amortizar: <span id="resumo-valor">R$ 0,00</span></small
-            ><br />
-            <small
-              >Parcelas Selecionadas: <span id="resumo-parcelas">0</span></small
-            ><br />
-            <small
-              >Valor por Parcela:
-              <span id="resumo-valor-parcela">R$ 0,00</span></small
-            >
+
+          <hr class="my-3" />
+
+          <h6 class="card-title">2. Resumo da Operação</h6>
+          <div id="resumo-amortizacao" class="bg-light p-3 rounded">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Total a Amortizar:</span>
+              <span id="resumo-valor" class="fw-bold text-dark">R$ 0,00</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <span class="text-muted">Parcelas Selecionadas:</span>
+              <span id="resumo-parcelas" class="fw-bold text-dark">0</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <span class="text-muted">Valor por Parcela:</span>
+              <span id="resumo-valor-parcela" class="fw-bold text-dark"
+                >R$ 0,00</span
+              >
+            </div>
           </div>
 
+          <hr class="my-3" />
+
+          <h6 class="card-title">3. Ação</h6>
           <div class="d-flex justify-content-center gap-2">
             <button type="submit" class="btn btn-success btn-add">
               <i class="fas fa-hand-holding-usd me-1"></i> {{
@@ -45,7 +59,7 @@
             </button>
             <a
               href="{{ url_for('financiamento.listar_financiamentos') }}"
-              class="btn btn-secondary btn-add"
+              class="btn btn-outline-secondary btn-add"
             >
               <i class="fas fa-arrow-left me-1"></i> Voltar
             </a>
@@ -54,53 +68,69 @@
       </div>
     </div>
 
-    <div class="col-lg-5">
+    <div class="col-lg-8">
       <div class="card shadow-sm">
-        <div class="card-header">Selecione as parcelas</div>
-        <div class="card-body" style="max-height: 450px; overflow-y: auto">
-          <table class="table table-sm table-hover">
-            <thead>
-              <tr>
-                <th>Sel.</th>
-                <th class="text-center">#</th>
-                <th class="text-end">Vencimento</th>
-                <th class="text-end">Valor Principal</th>
-                <th class="text-end">Valor Parcela no Vencimento</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for parcela in parcelas %}
-              <tr>
-                <td>
-                  <input
-                    type="checkbox"
-                    name="parcelas_selecionadas"
-                    value="{{ parcela.id }}"
-                    class="form-check-input parcela-checkbox"
-                    data-valor="{{ parcela.valor_principal }}"
-                  />
-                </td>
-                <td class="text-center fw-bold text-danger">
-                  {{ parcela.numero_parcela }}
-                </td>
-                <td class="text-end">
-                  {{ parcela.data_vencimento.strftime('%d/%m/%Y') }}
-                </td>
-                <td class="text-end fw-bold text-success">
-                  R$ {{ "%.2f"|format(parcela.valor_principal) }}
-                </td>
-                <td class="text-end">
-                  R$ {{ "%.2f"|format(parcela.valor_total_previsto) }}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-tasks me-2"></i>Selecione as Parcelas a Amortizar
+          </h5>
+        </div>
+        <div class="card-body" style="max-height: 600px; overflow-y: auto">
+          {% if parcelas %}
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 5%">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="selecionar-todas"
+                      title="Selecionar/Desselecionar Todas"
+                    />
+                  </th>
+                  <th class="text-center">#</th>
+                  <th>Vencimento</th>
+                  <th class="text-end">Valor Principal</th>
+                  <th class="text-end">Valor Total da Parcela</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for parcela in parcelas %}
+                <tr>
+                  <td class="text-center">
+                    <input
+                      type="checkbox"
+                      name="parcelas_selecionadas"
+                      value="{{ parcela.id }}"
+                      class="form-check-input parcela-checkbox"
+                    />
+                  </td>
+                  <td class="text-center fw-bold text-danger">
+                    {{ parcela.numero_parcela }}
+                  </td>
+                  <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                  <td class="text-end fw-bold text-success">
+                    {{ parcela.valor_principal | format_currency }}
+                  </td>
+                  <td class="text-end">
+                    {{ parcela.valor_total_previsto | format_currency }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-center text-muted p-4">
+            Nenhuma parcela pendente para amortização.
+          </p>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </form>
 {% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+<script src="{{ url_for('static', filename='js/financiamento.js') }}"></script>
 {% endblock %}
