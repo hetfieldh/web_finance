@@ -439,3 +439,14 @@ body.login-body {
         padding: 0;
     }
 }
+
+/* ==========================================================================
+   8. AJUSTES CUSTOMIZADOS
+   ========================================================================== */
+
+.select-height-custom {
+    height: 1.4rem;
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    font-size: 0.7rem;
+}

@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ctx.textBaseline = "middle";
 
         // Texto Principal (Valor Total)
-        ctx.font = `bold ${centerConfig.fontSize || "22px"} ${centerConfig.fontFamily || "Arial"}`;
+        ctx.font = `bold ${centerConfig.fontSize || "16px"} ${centerConfig.fontFamily || "Arial"}`;
         ctx.fillStyle = centerConfig.color || "#495057";
         const text = centerConfig.text;
         const textX = (chartArea.left + chartArea.right) / 2;
@@ -26,9 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Subtexto (Rótulo)
         if (centerConfig.subText) {
-          ctx.font = `${centerConfig.subFontSize || "11px"} ${centerConfig.subFontFamily || "Arial"}`;
+          ctx.font = `${centerConfig.subFontSize || "9px"} ${centerConfig.subFontFamily || "Arial"}`;
           ctx.fillStyle = centerConfig.subColor || "#6c757d";
-          ctx.fillText(centerConfig.subText, textX, textY + 25);
+          ctx.fillText(centerConfig.subText, textX, textY + 15);
         }
 
         ctx.restore();
@@ -86,30 +86,10 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           centerText: {
             text: totalFormatted,
-            subText: "Total de Obrigações do Mês",
+            subText: "Obrigações do Mês",
           },
           datalabels: {
-            anchor: "end",
-            align: "end",
-            offset: 8,
-            color: "#495057",
-            font: {
-              weight: "bold",
-              size: 11,
-            },
-            formatter: (value, ctx) => {
-              const total = dados.total;
-              if (total === 0 || value === 0) return null;
-
-              const percentage = (value / total) * 100;
-              const valueFormatted = new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(value);
-
-              // Mostra o valor e a porcentagem
-              return `${valueFormatted}\n(${percentage.toFixed(1)}%)`;
-            },
+            display: false,
           },
         },
       },
