@@ -16,6 +16,7 @@ from sqlalchemy.orm import joinedload, subqueryload
 
 from app import db
 from app.forms.recebimentos_forms import PainelRecebimentosForm, RecebimentoForm
+from app.models.conta_movimento_model import ContaMovimento
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
@@ -51,23 +52,43 @@ def painel():
     if mes_ano_str:
         ano, mes = map(int, mes_ano_str.split("-"))
         data_inicio_mes = date(ano, mes, 1)
-        if mes == 12:
-            data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
-        else:
-            data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
+        data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
+            day=1
+        ) - timedelta(days=1)
 
         salario_movimentos = (
             SalarioMovimento.query.filter(
                 SalarioMovimento.usuario_id == current_user.id,
-                SalarioMovimento.data_recebimento >= data_inicio_mes,
-                SalarioMovimento.data_recebimento <= data_fim_mes,
+                SalarioMovimento.data_recebimento.between(
+                    data_inicio_mes, data_fim_mes
+                ),
             )
             .options(
                 subqueryload(SalarioMovimento.itens).joinedload(
                     SalarioMovimentoItem.salario_item
                 ),
-                joinedload(SalarioMovimento.movimento_bancario_salario),
-                joinedload(SalarioMovimento.movimento_bancario_beneficio),
+                joinedload(SalarioMovimento.movimento_bancario_salario).joinedload(
+                    ContaMovimento.conta
+                ),
+                joinedload(SalarioMovimento.movimento_bancario_beneficio).joinedload(
+                    ContaMovimento.conta
+                ),
+            )
+            .all()
+        )
+
+        outras_receitas = (
+            DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
+            .filter(
+                DespRecMovimento.usuario_id == current_user.id,
+                DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
+                DespRecMovimento.despesa_receita.has(natureza="Receita"),
+            )
+            .options(
+                joinedload(DespRecMovimento.despesa_receita),
+                joinedload(DespRecMovimento.movimento_bancario).joinedload(
+                    ContaMovimento.conta
+                ),
             )
             .all()
         )
@@ -77,95 +98,82 @@ def painel():
             total_beneficios = movimento.total_beneficios
 
             if salario_liquido > 0:
-                status_salario = (
-                    "Recebido"
-                    if movimento.movimento_bancario_salario_id
-                    else "Pendente"
-                )
-                data_pag_salario = (
-                    movimento.movimento_bancario_salario.data_movimento
-                    if movimento.movimento_bancario_salario
-                    else None
-                )
+                recebido_em = ""
+                is_recebido = movimento.movimento_bancario_salario_id is not None
+                if is_recebido and movimento.movimento_bancario_salario.conta:
+                    conta = movimento.movimento_bancario_salario.conta
+                    recebido_em = f"{conta.nome_banco} ({conta.tipo})"
+
                 contas_a_receber.append(
                     {
                         "vencimento": movimento.data_recebimento,
                         "origem": f"Salário Líquido (Ref: {movimento.mes_referencia})",
-                        "valor": salario_liquido,
+                        "valor_previsto": salario_liquido,
                         "valor_recebido": (
-                            salario_liquido
-                            if status_salario == "Recebido"
-                            else Decimal("0.00")
+                            salario_liquido if is_recebido else Decimal("0.00")
                         ),
-                        "status": status_salario,
-                        "data_pagamento": data_pag_salario,
+                        "status": "Recebido" if is_recebido else "Pendente",
+                        "data_pagamento": (
+                            movimento.movimento_bancario_salario.data_movimento
+                            if is_recebido
+                            else None
+                        ),
                         "tipo": "Salário",
                         "id_original": movimento.id,
+                        "recebido_em": recebido_em,
                     }
                 )
-                totais["previsto"] += salario_liquido
-                if status_salario == "Recebido":
-                    totais["recebido"] += salario_liquido
 
             if total_beneficios > 0:
-                status_beneficio = (
-                    "Recebido"
-                    if movimento.movimento_bancario_beneficio_id
-                    else "Pendente"
-                )
-                data_pag_beneficio = (
-                    movimento.movimento_bancario_beneficio.data_movimento
-                    if movimento.movimento_bancario_beneficio
-                    else None
-                )
+                recebido_em = ""
+                is_recebido = movimento.movimento_bancario_beneficio_id is not None
+                if is_recebido and movimento.movimento_bancario_beneficio.conta:
+                    conta = movimento.movimento_bancario_beneficio.conta
+                    recebido_em = f"{conta.nome_banco} ({conta.tipo})"
+
                 contas_a_receber.append(
                     {
                         "vencimento": movimento.data_recebimento,
                         "origem": f"Benefícios (Ref: {movimento.mes_referencia})",
-                        "valor": total_beneficios,
+                        "valor_previsto": total_beneficios,
                         "valor_recebido": (
-                            total_beneficios
-                            if status_beneficio == "Recebido"
-                            else Decimal("0.00")
+                            total_beneficios if is_recebido else Decimal("0.00")
                         ),
-                        "status": status_beneficio,
-                        "data_pagamento": data_pag_beneficio,
+                        "status": "Recebido" if is_recebido else "Pendente",
+                        "data_pagamento": (
+                            movimento.movimento_bancario_beneficio.data_movimento
+                            if is_recebido
+                            else None
+                        ),
                         "tipo": "Benefício",
                         "id_original": movimento.id,
+                        "recebido_em": recebido_em,
                     }
                 )
-                totais["previsto"] += total_beneficios
-                if status_beneficio == "Recebido":
-                    totais["recebido"] += total_beneficios
 
-        outras_receitas = (
-            DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
-            .filter(
-                DespRecMovimento.usuario_id == current_user.id,
-                DespRecMovimento.data_vencimento >= data_inicio_mes,
-                DespRecMovimento.data_vencimento <= data_fim_mes,
-                DespRecMovimento.despesa_receita.has(natureza="Receita"),
-            )
-            .options(joinedload(DespRecMovimento.despesa_receita))
-            .all()
-        )
         for receita in outras_receitas:
-            valor_previsto = receita.valor_previsto
-            valor_recebido = receita.valor_realizado or Decimal("0.00")
+            recebido_em = ""
+            if receita.movimento_bancario and receita.movimento_bancario.conta:
+                conta = receita.movimento_bancario.conta
+                recebido_em = f"{conta.nome_banco} ({conta.tipo})"
+
             contas_a_receber.append(
                 {
                     "vencimento": receita.data_vencimento,
                     "origem": receita.despesa_receita.nome,
-                    "valor": valor_previsto,
-                    "valor_recebido": valor_recebido,
+                    "valor_previsto": receita.valor_previsto,
+                    "valor_recebido": receita.valor_realizado or Decimal("0.00"),
                     "status": receita.status,
                     "data_pagamento": receita.data_pagamento,
                     "tipo": "Receita",
                     "id_original": receita.id,
+                    "recebido_em": recebido_em,
                 }
             )
-            totais["previsto"] += valor_previsto
-            totais["recebido"] += valor_recebido
+
+        for conta in contas_a_receber:
+            totais["previsto"] += conta["valor_previsto"]
+            totais["recebido"] += conta["valor_recebido"]
 
         contas_a_receber.sort(key=lambda x: x["vencimento"])
         totais["pendente"] = totais["previsto"] - totais["recebido"]

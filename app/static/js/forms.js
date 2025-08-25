@@ -296,4 +296,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     atualizarResumo();
   }
+
+  // --- 8. Lógica para formulário de contas  ---
+  const tipoContaSelect = document.getElementById("tipo-conta-select");
+  const limiteContainer = document.getElementById("limite-container");
+
+  if (tipoContaSelect && limiteContainer) {
+    const limiteInput = limiteContainer.querySelector("input");
+
+    const toggleLimiteField = () => {
+      const tipoSelecionado = tipoContaSelect.value;
+      const tiposComLimite = ["Corrente", "Digital"];
+
+      if (tiposComLimite.includes(tipoSelecionado)) {
+        limiteContainer.style.display = "block";
+      } else {
+        limiteContainer.style.display = "none";
+        if (limiteInput) {
+          limiteInput.value = "0.00";
+        }
+      }
+    };
+    tipoContaSelect.addEventListener("change", toggleLimiteField);
+    toggleLimiteField();
+  }
 });

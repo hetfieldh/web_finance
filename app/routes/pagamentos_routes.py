@@ -17,6 +17,7 @@ from sqlalchemy.orm import joinedload
 
 from app import db
 from app.forms.pagamentos_forms import PagamentoForm, PainelPagamentosForm
+from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
@@ -35,7 +36,6 @@ pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 @login_required
 def painel():
     form = PainelPagamentosForm(request.form)
-
     account_choices = conta_service.get_active_accounts_for_user_choices()
     pagamento_form = PagamentoForm(account_choices=account_choices)
 
@@ -53,118 +53,122 @@ def painel():
     if mes_ano_str:
         ano, mes = map(int, mes_ano_str.split("-"))
         data_inicio_mes = date(ano, mes, 1)
-        if mes == 12:
-            data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
-        else:
-            data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
+        data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
+            day=1
+        ) - timedelta(days=1)
 
         faturas = (
             CrediarioFatura.query.filter(
                 CrediarioFatura.usuario_id == current_user.id,
-                CrediarioFatura.data_vencimento_fatura >= data_inicio_mes,
-                CrediarioFatura.data_vencimento_fatura <= data_fim_mes,
+                CrediarioFatura.data_vencimento_fatura.between(
+                    data_inicio_mes, data_fim_mes
+                ),
             )
-            .options(joinedload(CrediarioFatura.crediario))
+            .options(
+                joinedload(CrediarioFatura.crediario),
+                joinedload(CrediarioFatura.movimento_bancario).joinedload(
+                    ContaMovimento.conta
+                ),
+            )
             .all()
         )
-
-        for fatura in faturas:
-            soma_real_parcelas = (
-                db.session.query(
-                    func.coalesce(
-                        func.sum(CrediarioParcela.valor_parcela), Decimal("0.00")
-                    )
-                )
-                .join(CrediarioMovimento)
-                .filter(
-                    CrediarioMovimento.id == CrediarioParcela.crediario_movimento_id,
-                    CrediarioMovimento.crediario_id == fatura.crediario_id,
-                    CrediarioMovimento.usuario_id == current_user.id,
-                    CrediarioParcela.data_vencimento >= data_inicio_mes,
-                    CrediarioParcela.data_vencimento <= data_fim_mes,
-                )
-                .scalar()
-            )
-            desatualizada = fatura.valor_total_fatura != soma_real_parcelas
-            valor_original = fatura.valor_total_fatura
-            valor_pago = fatura.valor_pago_fatura or Decimal("0.00")
-            contas_a_pagar.append(
-                {
-                    "vencimento": fatura.data_vencimento_fatura,
-                    "origem": f"Fatura {fatura.crediario.nome_crediario}",
-                    "valor_display": valor_original,
-                    "valor_pendente": valor_original - valor_pago,
-                    "valor_pago": valor_pago,
-                    "status": fatura.status,
-                    "data_pagamento": fatura.data_pagamento,
-                    "tipo": "Crediário",
-                    "id_original": fatura.id,
-                    "desatualizada": desatualizada,
-                }
-            )
-            totais["previsto"] += valor_original
-            totais["pago"] += valor_pago
 
         parcelas = (
             FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
             .filter(
-                FinanciamentoParcela.data_vencimento >= data_inicio_mes,
-                FinanciamentoParcela.data_vencimento <= data_fim_mes,
+                FinanciamentoParcela.data_vencimento.between(
+                    data_inicio_mes, data_fim_mes
+                ),
                 FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
             )
-            .options(joinedload(FinanciamentoParcela.financiamento))
+            .options(
+                joinedload(FinanciamentoParcela.financiamento),
+                joinedload(FinanciamentoParcela.movimento_bancario).joinedload(
+                    ContaMovimento.conta
+                ),
+            )
             .all()
         )
-        for parcela in parcelas:
-            valor_original = parcela.valor_total_previsto
-            valor_pago = parcela.valor_pago or Decimal("0.00")
-            contas_a_pagar.append(
-                {
-                    "vencimento": parcela.data_vencimento,
-                    "origem": f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})",
-                    "valor_display": valor_original,
-                    "valor_pendente": valor_original - valor_pago,
-                    "valor_pago": valor_pago,
-                    "status": parcela.status,
-                    "data_pagamento": parcela.data_pagamento,
-                    "tipo": "Financiamento",
-                    "id_original": parcela.id,
-                    "desatualizada": False,
-                }
-            )
-            totais["previsto"] += valor_original
-            totais["pago"] += valor_pago
 
         despesas = (
             DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
             .filter(
                 DespRecMovimento.usuario_id == current_user.id,
-                DespRecMovimento.data_vencimento >= data_inicio_mes,
-                DespRecMovimento.data_vencimento <= data_fim_mes,
+                DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
                 DespRecMovimento.despesa_receita.has(natureza="Despesa"),
             )
-            .options(joinedload(DespRecMovimento.despesa_receita))
+            .options(
+                joinedload(DespRecMovimento.despesa_receita),
+                joinedload(DespRecMovimento.movimento_bancario).joinedload(
+                    ContaMovimento.conta
+                ),
+            )
             .all()
         )
-        for despesa in despesas:
-            valor_original = despesa.valor_previsto
-            valor_pago = despesa.valor_realizado or Decimal("0.00")
-            contas_a_pagar.append(
+
+        def adicionar_conta_a_pagar(item, tipo):
+            pago_com = ""
+            if item.movimento_bancario and item.movimento_bancario.conta:
+                conta = item.movimento_bancario.conta
+                pago_com = f"{conta.nome_banco} ({conta.tipo})"
+
+            item_dict = {}
+            if tipo == "Crediário":
+                item_dict.update(
+                    {
+                        "vencimento": item.data_vencimento_fatura,
+                        "origem": f"Fatura {item.crediario.nome_crediario}",
+                        "valor_display": item.valor_total_fatura,
+                        "valor_pago": item.valor_pago_fatura or Decimal("0.00"),
+                        "status": item.status,
+                        "data_pagamento": item.data_pagamento,
+                        "id_original": item.id,
+                    }
+                )
+            elif tipo == "Financiamento":
+                item_dict.update(
+                    {
+                        "vencimento": item.data_vencimento,
+                        "origem": f"{item.financiamento.nome_financiamento} ({item.numero_parcela}/{item.financiamento.prazo_meses})",
+                        "valor_display": item.valor_total_previsto,
+                        "valor_pago": item.valor_pago or Decimal("0.00"),
+                        "status": item.status,
+                        "data_pagamento": item.data_pagamento,
+                        "id_original": item.id,
+                    }
+                )
+            elif tipo == "Despesa":
+                item_dict.update(
+                    {
+                        "vencimento": item.data_vencimento,
+                        "origem": item.despesa_receita.nome,
+                        "valor_display": item.valor_previsto,
+                        "valor_pago": item.valor_realizado or Decimal("0.00"),
+                        "status": item.status,
+                        "data_pagamento": item.data_pagamento,
+                        "id_original": item.id,
+                    }
+                )
+
+            item_dict.update(
                 {
-                    "vencimento": despesa.data_vencimento,
-                    "origem": despesa.despesa_receita.nome,
-                    "valor_display": valor_original,
-                    "valor_pendente": valor_original - valor_pago,
-                    "valor_pago": valor_pago,
-                    "status": despesa.status,
-                    "data_pagamento": despesa.data_pagamento,
-                    "tipo": "Despesa",
-                    "id_original": despesa.id,
-                    "desatualizada": False,
+                    "tipo": tipo,
+                    "pago_com": pago_com,
+                    "valor_pendente": item_dict["valor_display"]
+                    - item_dict["valor_pago"],
                 }
             )
-            totais["previsto"] += valor_original
-            totais["pago"] += valor_pago
+
+            contas_a_pagar.append(item_dict)
+            totais["previsto"] += item_dict["valor_display"]
+            totais["pago"] += item_dict["valor_pago"]
+
+        for fatura in faturas:
+            adicionar_conta_a_pagar(fatura, "Crediário")
+        for parcela in parcelas:
+            adicionar_conta_a_pagar(parcela, "Financiamento")
+        for despesa in despesas:
+            adicionar_conta_a_pagar(despesa, "Despesa")
 
         contas_a_pagar.sort(key=lambda x: x["vencimento"])
         totais["pendente"] = totais["previsto"] - totais["pago"]

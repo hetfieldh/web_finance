@@ -4,6 +4,7 @@ import pytest
 
 from app import create_app, db
 from app.models.usuario_model import Usuario
+from app.services import usuario_service
 from config import TestConfig
 
 
@@ -36,6 +37,8 @@ def auth_client(client, app):
         )
         user.set_password("password")
         db.session.add(user)
+        db.session.flush()
+        usuario_service._criar_transacoes_padrao(user)
         db.session.commit()
 
     client.post("/login", data={"login_ou_email": "defaultuser", "senha": "password"})
@@ -56,6 +59,8 @@ def admin_auth_client(client, app):
         )
         admin_user.set_password("password")
         db.session.add(admin_user)
+        db.session.flush()
+        usuario_service._criar_transacoes_padrao(admin_user)
         db.session.commit()
 
     client.post("/login", data={"login_ou_email": "adminuser", "senha": "password"})

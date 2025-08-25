@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, Numeric, UniqueConstraint, event, text
 
 from app import db
+from app.models.conta_movimento_model import ContaMovimento
 
 from .desp_rec_model import DespRec
 
@@ -30,6 +31,7 @@ class DespRecMovimento(db.Model):
     movimento_bancario_id = db.Column(
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
     )
+    movimento_bancario = db.relationship("ContaMovimento")
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )

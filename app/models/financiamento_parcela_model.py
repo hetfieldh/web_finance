@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
+from app.models.conta_movimento_model import ContaMovimento
 
 
 class FinanciamentoParcela(db.Model):
@@ -35,6 +36,7 @@ class FinanciamentoParcela(db.Model):
     movimento_bancario_id = db.Column(
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
     )
+    movimento_bancario = db.relationship("ContaMovimento")
     status = db.Column(
         Enum("Pendente", "Paga", "Atrasada", "Amortizada", name="status_parcela_enum"),
         nullable=False,

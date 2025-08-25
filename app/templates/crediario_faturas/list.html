@@ -15,7 +15,7 @@ content %}
           style="display: inline"
         >
           {{ form.csrf_token }}
-          <button type="submit" class="btn btn-primary btn-add">
+          <button type="submit" class="btn btn-success btn-add">
             <i class="fas fa-sync-alt"></i> Sincronizar Faturas
           </button>
         </form>
@@ -38,19 +38,21 @@ content %}
                 <th>Valor Pago</th>
                 <th>Status</th>
                 <th>Criação</th>
-                <th>Ações</th>
+                <th class="text-center">Ações</th>
               </tr>
             </thead>
             <tbody>
               {% for item in faturas %}
               <tr>
-                <td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-info{% endif %}"
+                >
                   {% if item.desatualizada %}
                   <i
                     class="fas fa-exclamation-triangle text-warning"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title="Desatualizada! O valor total das parcelas do mês é diferente do valor da fatura. Use 'Sincronizar Faturas' para corrigir."
+                    title="Desatualizada! O valor das parcelas do mês é diferente do valor da fatura. Use 'Sincronizar Faturas' para corrigir."
                   ></i>
                   {% else %}
                   <i
@@ -61,17 +63,45 @@ content %}
                   ></i>
                   {% endif %}
                 </td>
-                <td>{{ item.fatura.id }}</td>
-                <td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
+                  {{ item.fatura.id }}
+                </td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
                   {{ item.fatura.crediario.nome_crediario }} ({{
                   item.fatura.crediario.tipo_crediario }})
                 </td>
-                <td>{{ item.fatura.mes_referencia }}</td>
-                <td>
-                  {{ item.fatura.data_vencimento_fatura.strftime('%d/%m/%Y') }}
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
+                  {{ item.fatura.mes_referencia }}
                 </td>
-                <td>R$ {{ "%.2f"|format(item.fatura.valor_total_fatura) }}</td>
-                <td>R$ {{ "%.2f"|format(item.fatura.valor_pago_fatura) }}</td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
+                  {% if item.destaque_status == 'atrasada' %}
+                  <i
+                    class="fas fa-exclamation-circle me-1"
+                    title="FATURA ATRASADA!"
+                  ></i>
+                  {% elif item.destaque_status == 'vence_este_mes' %}
+                  <i class="fas fa-bell me-1" title="Vence este mês!"></i>
+                  {% endif %} {{
+                  item.fatura.data_vencimento_fatura.strftime('%d/%m/%Y') }}
+                </td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
+                  R$ {{ "%.2f"|format(item.fatura.valor_total_fatura) }}
+                </td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
+                  R$ {{ "%.2f"|format(item.fatura.valor_pago_fatura) }}
+                </td>
                 <td>
                   {% if item.fatura.status == 'Paga' %}
                   <span class="badge bg-success">{{ item.fatura.status }}</span>
@@ -85,10 +115,12 @@ content %}
                   >
                   {% endif %}
                 </td>
-                <td>
+                <td
+                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-primary{% endif %}"
+                >
                   {{ item.fatura.data_criacao.strftime('%d/%m/%Y %H:%M') }}
                 </td>
-                <td class="table-actions">
+                <td class="table-actions text-center">
                   <a
                     href="{{ url_for('crediario_fatura.visualizar_fatura', id=item.fatura.id) }}"
                     class="btn btn-info me-2"

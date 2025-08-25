@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
+from app.models.conta_movimento_model import ContaMovimento
 
 
 class CrediarioFatura(db.Model):
@@ -44,6 +45,7 @@ class CrediarioFatura(db.Model):
 
     usuario = db.relationship("Usuario", backref=db.backref("faturas", lazy=True))
     crediario = db.relationship("Crediario", backref=db.backref("faturas", lazy=True))
+    movimento_bancario = db.relationship("ContaMovimento")
 
     __table_args__ = (
         UniqueConstraint(

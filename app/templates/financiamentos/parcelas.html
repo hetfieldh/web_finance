@@ -5,91 +5,159 @@ endblock %} {% block page_title %}Parcelas de {{
 financiamento.nome_financiamento }}{% endblock %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="d-flex justify-content-end mb-3">
-      <a
-        href="{{ url_for('financiamento.listar_financiamentos') }}"
-        class="btn btn-secondary btn-add"
+    <div class="card shadow-sm mb-2">
+      <div
+        class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
       >
-        <i class="fas fa-arrow-left"></i> Voltar
-      </a>
+        <h5 class="mb-0">
+          <i class="fas fa-chart-pie me-2"></i>Resumo Financeiro
+        </h5>
+        <a
+          href="{{ url_for('financiamento.listar_financiamentos') }}"
+          class="btn btn-secondary btn-add"
+        >
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+      </div>
+      <div class="card-body">
+        <h6 class="text-muted">
+          Visão: Fluxo de Caixa (Valores Totais de Parcela)
+        </h6>
+        <div class="row text-center">
+          <div class="col border-end">
+            <small class="text-muted">Total Previsto</small>
+            <p class="h5 fw-semibold mb-0">
+              {{ resumo_fluxo_caixa.total_previsto | format_currency }}
+            </p>
+          </div>
+          <div class="col border-end">
+            <small class="text-muted">Pago</small>
+            <p class="h5 fw-semibold text-success mb-0">
+              {{ resumo_fluxo_caixa.pago | format_currency }}
+            </p>
+          </div>
+          <div class="col border-end">
+            <small class="text-muted">Amortizado</small>
+            <p class="h5 fw-semibold text-info mb-0">
+              {{ resumo_fluxo_caixa.amortizado | format_currency }}
+            </p>
+          </div>
+          <div class="col">
+            <small class="text-muted">Pendente</small>
+            <p class="h5 fw-semibold text-warning mb-0">
+              {{ resumo_fluxo_caixa.pendente | format_currency }}
+            </p>
+          </div>
+        </div>
+
+        <hr class="my-3" />
+
+        <h6 class="text-muted">
+          Visão: Balanço do Principal (Amortização da Dívida)
+        </h6>
+        <div class="row text-center">
+          <div class="col border-end">
+            <small class="text-muted">Valor do Contrato</small>
+            <p class="h5 fw-semibold mb-0">
+              {{ resumo_principal.total_contrato | format_currency }}
+            </p>
+          </div>
+          <div class="col border-end">
+            <small class="text-muted">Pago (Principal)</small>
+            <p class="h5 fw-semibold text-success mb-0">
+              {{ resumo_principal.pago | format_currency }}
+            </p>
+          </div>
+          <div class="col border-end">
+            <small class="text-muted">Amortizado</small>
+            <p class="h5 fw-semibold text-info mb-0">
+              {{ resumo_principal.amortizado | format_currency }}
+            </p>
+          </div>
+          <div class="col border-end">
+            <small class="text-muted">Pendente (Principal)</small>
+            <p class="h5 fw-semibold text-warning mb-0">
+              {{ resumo_principal.pendente | format_currency }}
+            </p>
+          </div>
+          <div class="col">
+            <small class="text-muted">Saldo Devedor</small>
+            <p class="h5 fw-bold text-danger mb-0">
+              {{ resumo_principal.saldo_devedor | format_currency }}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">Tabela de Amortização</h5>
-      </div>
       <div class="card-body">
-        {% if parcelas_data %}
+        {% if parcelas %}
         <div class="table-responsive">
           <table class="table table-striped table-hover">
             <thead>
               <tr>
                 <th class="text-center">#</th>
                 <th class="text-center">Vencimento</th>
-                <th class="text-center">Amortização</th>
-                <th class="text-center">Juros</th>
-                <th class="text-center">Seguros</th>
-                <th class="text-center">Taxas</th>
-                <th class="text-center">Total Previsto</th>
-                <th class="text-center">Valor Pago</th>
-                <th class="text-center">Saldo Devedor</th>
+                <th class="text-end">Amortização</th>
+                <th class="text-end">Juros</th>
+                <th class="text-end">Seguros/Taxas</th>
+                <th class="text-end">Total Previsto</th>
+                <th class="text-end">Valor Pago</th>
+                <th class="text-end">Saldo Devedor</th>
                 <th class="text-center">Status</th>
-                <th class="text-center">Data Pagamento</th>
-                <th class="text-left">Obs.</th>
+                <th class="text-start">Observações</th>
               </tr>
             </thead>
             <tbody>
-              {% for item in parcelas_data %}
+              {% for parcela in parcelas %}
               <tr>
-                <td class="text-center">{{ item.parcela.numero_parcela }}</td>
-                <td class="text-center">{{ item.parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                <td class="text-center">{{ item.parcela.valor_principal | format_currency }}</td>
-                <td class="text-center">{{ item.parcela.valor_juros | format_currency }}</td>
+                <td class="text-center">{{ parcela.numero_parcela }}</td>
                 <td class="text-center">
-                  {{ (item.parcela.valor_seguro + item.parcela.valor_seguro_2 +
-                  item.parcela.valor_seguro_3) | format_currency }}
+                  {{ parcela.data_vencimento.strftime('%d/%m/%Y') }}
                 </td>
-                <td class="text-center">{{ item.parcela.valor_taxas | format_currency }}</td>
-                <td class="fw-bold text-center">
-                  {{ item.parcela.valor_total_previsto | format_currency }}
+                <td class="text-end">
+                  {{ parcela.valor_principal | format_currency }}
                 </td>
-                <td class="fw-bold text-success text-center">
-                  {% if item.parcela.valor_pago %} {{ item.parcela.valor_pago |
+                <td class="text-end">
+                  {{ parcela.valor_juros | format_currency }}
+                </td>
+                <td class="text-end">
+                  {{ (parcela.valor_seguro + parcela.valor_seguro_2 +
+                  parcela.valor_seguro_3 + parcela.valor_taxas) |
+                  format_currency }}
+                </td>
+                <td class="fw-bold text-end">
+                  {{ parcela.valor_total_previsto | format_currency }}
+                </td>
+                <td class="fw-bold text-success text-end">
+                  {% if parcela.valor_pago %} {{ parcela.valor_pago |
                   format_currency }} {% else %} - {% endif %}
                 </td>
                 <td
-                  class="fw-bold text-center {{ 'text-secondary' if item.parcela.status in ['Paga', 'Amortizada'] else 'text-danger' }}"
+                  class="fw-bold text-end {{ 'text-secondary' if parcela.status in ['Paga', 'Amortizada'] else 'text-danger' }}"
                 >
-                  {{ "-" | format_currency if item.parcela.status in ['Paga',
-                  'Amortizada'] else item.saldo_devedor_futuro | format_currency
-                  }}
+                  {{ parcela.saldo_devedor | format_currency }}
                 </td>
-                <td class= text-center>
-                  {% if item.parcela.status == 'Paga' %}<span
+                <td class="text-center">
+                  {% if parcela.status == 'Paga' %}<span
                     class="badge bg-success"
-                    >{{ item.parcela.status }}</span
+                    >{{ parcela.status }}</span
                   >
-                  {% elif item.parcela.status == 'Atrasada' %}<span
+                  {% elif parcela.status == 'Atrasada' %}<span
                     class="badge bg-danger"
-                    >{{ item.parcela.status }}</span
+                    >{{ parcela.status }}</span
                   >
-                  {% elif item.parcela.status == 'Amortizada' %}<span
+                  {% elif parcela.status == 'Amortizada' %}<span
                     class="badge bg-info"
-                    >{{ item.parcela.status }}</span
+                    >{{ parcela.status }}</span
                   >
                   {% else %}<span class="badge bg-secondary"
-                    >{{ item.parcela.status }}</span
+                    >{{ parcela.status }}</span
                   >
                   {% endif %}
                 </td>
-                <td class="text-center">
-                  {{ item.parcela.data_pagamento.strftime('%d/%m/%Y') if
-                  item.parcela.data_pagamento else 'N/A' }}
-                </td>
-                <td class="text-left">
-                  {{ item.parcela.observacoes if item.parcela.observacoes else
-                  '' }}
-                </td>
+                <td class="text-start">{{ parcela.observacoes or '' }}</td>
               </tr>
               {% endfor %}
             </tbody>

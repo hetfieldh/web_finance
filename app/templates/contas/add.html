@@ -19,11 +19,15 @@ render_checkbox %} {% block title %}Web Finance - Contas Bancárias{% endblock %
             <div class="col-md-3 mb-3">{{ render_field(form.conta) }}</div>
           </div>
           <div class="row">
-            <div class="col-md-3 mb-3">{{ render_field(form.tipo) }}</div>
+            <div class="col-md-3 mb-3">
+              {{ render_field(form.tipo, attrs={'id': 'tipo-conta-select'}) }}
+            </div>
             <div class="col-md-3 mb-3">
               {{ render_field(form.saldo_inicial) }}
             </div>
-            <div class="col-md-3 mb-3">{{ render_field(form.limite) }}</div>
+            <div class="col-md-3 mb-3" id="limite-container">
+              {{ render_field(form.limite) }}
+            </div>
           </div>
 
           <div class="mb-3">{{ render_checkbox(form.ativa) }}</div>
@@ -43,4 +47,6 @@ render_checkbox %} {% block title %}Web Finance - Contas Bancárias{% endblock %
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
 {% endblock %}

@@ -2,6 +2,7 @@
 
 from app import db
 from app.models.usuario_model import Usuario
+from app.services import usuario_service
 
 
 def test_login_page_loads(client):
@@ -19,6 +20,8 @@ def test_successful_login(client, app):
         )
         user.set_password("password123")
         db.session.add(user)
+        db.session.flush()
+        usuario_service._criar_transacoes_padrao(user)
         db.session.commit()
 
     response = client.post(
@@ -40,6 +43,8 @@ def test_failed_login(client, app):
         )
         user.set_password("correct_password")
         db.session.add(user)
+        db.session.flush()
+        usuario_service._criar_transacoes_padrao(user)
         db.session.commit()
 
     response = client.post(

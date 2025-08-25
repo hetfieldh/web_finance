@@ -32,14 +32,17 @@ crediario_fatura_bp = Blueprint(
 @login_required
 def listar_faturas():
     form = FlaskForm()
+
     faturas = (
         CrediarioFatura.query.filter_by(usuario_id=current_user.id)
         .options(joinedload(CrediarioFatura.crediario))
-        .order_by(CrediarioFatura.mes_referencia.desc())
+        .order_by(CrediarioFatura.data_vencimento_fatura.asc())
         .all()
     )
 
     faturas_com_status = []
+    hoje = date.today()
+
     for fatura in faturas:
         ano = int(fatura.mes_referencia.split("-")[0])
         mes = int(fatura.mes_referencia.split("-")[1])
@@ -48,7 +51,6 @@ def listar_faturas():
             data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
         else:
             data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
-
         soma_real_parcelas = (
             db.session.query(
                 func.coalesce(func.sum(CrediarioParcela.valor_parcela), Decimal("0.00"))
@@ -63,9 +65,25 @@ def listar_faturas():
             )
             .scalar()
         )
-
         desatualizada = fatura.valor_total_fatura != soma_real_parcelas
-        faturas_com_status.append({"fatura": fatura, "desatualizada": desatualizada})
+
+        destaque_status = ""
+        if fatura.status in ["Pendente", "Atrasada", "Parcialmente Paga"]:
+            if fatura.data_vencimento_fatura < hoje:
+                destaque_status = "atrasada"
+            elif (
+                fatura.data_vencimento_fatura.year == hoje.year
+                and fatura.data_vencimento_fatura.month == hoje.month
+            ):
+                destaque_status = "vence_este_mes"
+
+        faturas_com_status.append(
+            {
+                "fatura": fatura,
+                "desatualizada": desatualizada,
+                "destaque_status": destaque_status,
+            }
+        )
 
     return render_template(
         "crediario_faturas/list.html",

@@ -2,7 +2,7 @@
 
 import functools
 import re
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from flask import (
@@ -166,23 +166,44 @@ def visualizar_parcelas(id):
         .all()
     )
 
-    saldo_devedor_futuro = financiamento.saldo_devedor_atual
-    parcelas_data = []
+    resumo_fluxo_caixa = {
+        "total_previsto": Decimal("0.00"),
+        "pago": Decimal("0.00"),
+        "amortizado": Decimal("0.00"),
+        "pendente": Decimal("0.00"),
+    }
+    resumo_principal = {
+        "total_contrato": financiamento.valor_total_financiado,
+        "pago": Decimal("0.00"),
+        "amortizado": Decimal("0.00"),
+        "pendente": Decimal("0.00"),
+        "saldo_devedor": financiamento.saldo_devedor_atual,
+    }
 
-    for parcela in parcelas:
-        saldo_parcela = saldo_devedor_futuro
-        
-        if parcela.status in ["Pendente", "Atrasada"]:
-            saldo_devedor_futuro -= parcela.valor_principal
+    hoje = date.today()
 
-        parcelas_data.append(
-            {"parcela": parcela, "saldo_devedor_futuro": saldo_parcela}
-        )
+    for p in parcelas:
+        resumo_fluxo_caixa["total_previsto"] += p.valor_total_previsto
+        if p.status == "Paga":
+            resumo_fluxo_caixa["pago"] += p.valor_pago or Decimal("0.00")
+        elif p.status == "Amortizada":
+            resumo_fluxo_caixa["amortizado"] += p.valor_pago or Decimal("0.00")
+        elif p.status in ["Pendente", "Atrasada"]:
+            resumo_fluxo_caixa["pendente"] += p.valor_total_previsto
+
+        if p.status == "Paga":
+            resumo_principal["pago"] += p.valor_principal
+        elif p.status == "Amortizada":
+            resumo_principal["amortizado"] += p.valor_pago or Decimal("0.00")
+        elif p.status in ["Pendente", "Atrasada"]:
+            resumo_principal["pendente"] += p.valor_principal
 
     return render_template(
         "financiamentos/parcelas.html",
         financiamento=financiamento,
-        parcelas_data=parcelas_data,
+        parcelas=parcelas,
+        resumo_fluxo_caixa=resumo_fluxo_caixa,
+        resumo_principal=resumo_principal,
     )
 
 

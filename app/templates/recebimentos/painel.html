@@ -20,28 +20,27 @@
             <i class="fas fa-search"></i>
           </button>
         </form>
-
         <div
           class="d-flex align-items-center text-muted small gap-3 flex-wrap justify-content-center"
         >
           <span
             >Total Previsto:
             <strong class="text-primary"
-              >R$ {{ "%.2f"|format(totais.previsto) }}</strong
+              >{{ totais.previsto | format_currency }}</strong
             ></span
           >
           <span class="d-none d-md-inline">|</span>
-          <span>
-            Total Recebido:
-            <span class="text-success">
-              R$ {{ "%.2f"|format(totais.recebido) }}
-            </span>
-          </span>
+          <span
+            >Total Recebido:
+            <strong class="text-success"
+              >{{ totais.recebido | format_currency }}</strong
+            ></span
+          >
           <span class="d-none d-md-inline">|</span>
           <span
             >Pendente:
             <strong class="text-warning text-dark"
-              >R$ {{ "%.2f"|format(totais.pendente) }}</strong
+              >{{ totais.pendente | format_currency }}</strong
             ></span
           >
         </div>
@@ -66,6 +65,7 @@
                 <th class="text-end">Valor Previsto</th>
                 <th class="text-end">Valor Recebido</th>
                 <th class="text-center">Data Recebimento</th>
+                <th class="text-start">Recebido Em</th>
                 <th class="text-center">Status</th>
                 <th class="text-center">Ações</th>
               </tr>
@@ -76,18 +76,18 @@
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
                 <td><span class="badge bg-primary">{{ conta.tipo }}</span></td>
-                <td class="text-end fw-regular text-dark">
-                  R$ {{ "%.2f"|format(conta.valor) }}
+                <td class="text-end text-muted">
+                  {{ conta.valor_previsto | format_currency }}
                 </td>
                 <td class="text-end fw-bold text-success">
-                  {% if conta.valor_recebido > 0 %} R$ {{
-                  "%.2f"|format(conta.valor_recebido) }} {% else %} - {% endif
-                  %}
+                  {% if conta.valor_recebido > 0 %} {{ conta.valor_recebido |
+                  format_currency }} {% else %} - {% endif %}
                 </td>
                 <td class="text-center">
                   {{ conta.data_pagamento.strftime('%d/%m/%Y') if
                   conta.data_pagamento else '-' }}
                 </td>
+                <td class="text-start">{{ conta.recebido_em or '-' }}</td>
                 <td class="text-center">
                   {% set status_text = conta.status %} {% set status_class =
                   'bg-warning text-dark' %} {% if conta.status in ['Recebido',
@@ -109,9 +109,8 @@
                     data-bs-target="#recebimentoModal"
                     data-item-id="{{ conta.id_original }}"
                     data-item-tipo="{{ conta.tipo }}"
-                    data-item-valor="{{ '%.2f'|format(conta.valor) }}"
+                    data-item-valor="{{ '%.2f'|format(conta.valor_previsto) }}"
                     data-item-descricao="{{ conta.origem }}"
-                    data-item-data="{{ conta.vencimento.strftime('%Y-%m-%d') }}"
                   >
                     <i class="fas fa-check-double fa-sm"></i>
                   </button>
