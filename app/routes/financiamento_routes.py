@@ -181,8 +181,8 @@ def visualizar_parcelas(id):
     }
 
     hoje = date.today()
-
     for p in parcelas:
+        # Lógica para Fluxo de Caixa (valores totais e pagos)
         resumo_fluxo_caixa["total_previsto"] += p.valor_total_previsto
         if p.status == "Paga":
             resumo_fluxo_caixa["pago"] += p.valor_pago or Decimal("0.00")
@@ -191,19 +191,49 @@ def visualizar_parcelas(id):
         elif p.status in ["Pendente", "Atrasada"]:
             resumo_fluxo_caixa["pendente"] += p.valor_total_previsto
 
+        # Lógica para Balanço do Principal
         if p.status == "Paga":
             resumo_principal["pago"] += p.valor_principal
         elif p.status == "Amortizada":
-            resumo_principal["amortizado"] += p.valor_pago or Decimal("0.00")
-        elif p.status in ["Pendente", "Atrasada"]:
+            resumo_principal["amortizado"] += p.valor_principal
+        elif p.status == "Atrasada" or (
+            p.status == "Pendente" and p.data_vencimento < hoje
+        ):
             resumo_principal["pendente"] += p.valor_principal
+            if "atrasado_valor" not in resumo_principal:
+                resumo_principal["atrasado_valor"] = Decimal("0.00")
+            if "atrasado_qtd" not in resumo_principal:
+                resumo_principal["atrasado_qtd"] = 0
+            resumo_principal["atrasado_valor"] += p.valor_principal
+            resumo_principal["atrasado_qtd"] += 1
+
+        elif p.status == "Pendente":
+            resumo_principal["pendente"] += p.valor_principal
+
+    resumo_fluxo_caixa["diferenca"] = resumo_fluxo_caixa["total_previsto"] - (
+        resumo_fluxo_caixa["pago"]
+        + resumo_fluxo_caixa["amortizado"]
+        + resumo_fluxo_caixa["pendente"]
+    )
+
+    parcelas_com_saldo_dinamico = []
+    saldo_devedor_corrente = financiamento.saldo_devedor_atual
+
+    for parcela in parcelas:
+        saldo_para_exibir = Decimal("0.00")
+        if parcela.status in ["Pendente", "Atrasada"]:
+            saldo_para_exibir = saldo_devedor_corrente
+            saldo_devedor_corrente -= parcela.valor_principal
+        parcelas_com_saldo_dinamico.append(
+            {"parcela": parcela, "saldo_devedor_dinamico": saldo_para_exibir}
+        )
 
     return render_template(
         "financiamentos/parcelas.html",
         financiamento=financiamento,
-        parcelas=parcelas,
         resumo_fluxo_caixa=resumo_fluxo_caixa,
         resumo_principal=resumo_principal,
+        parcelas_com_saldo_dinamico=parcelas_com_saldo_dinamico,
     )
 
 

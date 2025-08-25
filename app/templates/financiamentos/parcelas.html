@@ -48,9 +48,21 @@ financiamento.nome_financiamento }}{% endblock %} {% block content %}
               {{ resumo_fluxo_caixa.pendente | format_currency }}
             </p>
           </div>
+          <div class="col">
+            <small class="text-muted">
+              {% if resumo_fluxo_caixa.diferenca > 0 %} Descontos Obtidos {%
+              elif resumo_fluxo_caixa.diferenca < 0 %} Custos Extras {% else %}
+              Diferença {% endif %}
+            </small>
+            <p
+              class="h5 fw-semibold {% if resumo_fluxo_caixa.diferenca > 0 %}text-success{% elif resumo_fluxo_caixa.diferenca < 0 %}text-danger{% endif %} mb-0"
+            >
+              {{ resumo_fluxo_caixa.diferenca|abs|format_currency }}
+            </p>
+          </div>
         </div>
 
-        <hr class="my-3" />
+        <hr class="my-2" />
 
         <h6 class="text-muted">
           Visão: Balanço do Principal (Amortização da Dívida)
@@ -92,14 +104,14 @@ financiamento.nome_financiamento }}{% endblock %} {% block content %}
 
     <div class="card shadow-sm">
       <div class="card-body">
-        {% if parcelas %}
+        {% if parcelas_com_saldo_dinamico %}
         <div class="table-responsive">
           <table class="table table-striped table-hover">
             <thead>
               <tr>
                 <th class="text-center">#</th>
                 <th class="text-center">Vencimento</th>
-                <th class="text-end">Amortização</th>
+                <th class="text-end">Amortização (Principal)</th>
                 <th class="text-end">Juros</th>
                 <th class="text-end">Seguros/Taxas</th>
                 <th class="text-end">Total Previsto</th>
@@ -110,54 +122,56 @@ financiamento.nome_financiamento }}{% endblock %} {% block content %}
               </tr>
             </thead>
             <tbody>
-              {% for parcela in parcelas %}
+              {% for item in parcelas_com_saldo_dinamico %}
               <tr>
-                <td class="text-center">{{ parcela.numero_parcela }}</td>
+                <td class="text-center">{{ item.parcela.numero_parcela }}</td>
                 <td class="text-center">
-                  {{ parcela.data_vencimento.strftime('%d/%m/%Y') }}
+                  {{ item.parcela.data_vencimento.strftime('%d/%m/%Y') }}
                 </td>
                 <td class="text-end">
-                  {{ parcela.valor_principal | format_currency }}
+                  {{ item.parcela.valor_principal | format_currency }}
                 </td>
                 <td class="text-end">
-                  {{ parcela.valor_juros | format_currency }}
+                  {{ item.parcela.valor_juros | format_currency }}
                 </td>
                 <td class="text-end">
-                  {{ (parcela.valor_seguro + parcela.valor_seguro_2 +
-                  parcela.valor_seguro_3 + parcela.valor_taxas) |
+                  {{ (item.parcela.valor_seguro + item.parcela.valor_seguro_2 +
+                  item.parcela.valor_seguro_3 + item.parcela.valor_taxas) |
                   format_currency }}
                 </td>
                 <td class="fw-bold text-end">
-                  {{ parcela.valor_total_previsto | format_currency }}
+                  {{ item.parcela.valor_total_previsto | format_currency }}
                 </td>
                 <td class="fw-bold text-success text-end">
-                  {% if parcela.valor_pago %} {{ parcela.valor_pago |
+                  {% if item.parcela.valor_pago %} {{ item.parcela.valor_pago |
                   format_currency }} {% else %} - {% endif %}
                 </td>
                 <td
-                  class="fw-bold text-end {{ 'text-secondary' if parcela.status in ['Paga', 'Amortizada'] else 'text-danger' }}"
+                  class="fw-bold text-end {{ 'text-secondary' if item.parcela.status in ['Paga', 'Amortizada'] else 'text-danger' }}"
                 >
-                  {{ parcela.saldo_devedor | format_currency }}
+                  {% if item.parcela.status in ['Paga', 'Amortizada'] %} - {%
+                  else %} {{ item.saldo_devedor_dinamico | format_currency }} {%
+                  endif %}
                 </td>
                 <td class="text-center">
-                  {% if parcela.status == 'Paga' %}<span
+                  {% if item.parcela.status == 'Paga' %}<span
                     class="badge bg-success"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
-                  {% elif parcela.status == 'Atrasada' %}<span
+                  {% elif item.parcela.status == 'Atrasada' %}<span
                     class="badge bg-danger"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
-                  {% elif parcela.status == 'Amortizada' %}<span
+                  {% elif item.parcela.status == 'Amortizada' %}<span
                     class="badge bg-info"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
                   {% else %}<span class="badge bg-secondary"
-                    >{{ parcela.status }}</span
+                    >{{ item.parcela.status }}</span
                   >
                   {% endif %}
                 </td>
-                <td class="text-start">{{ parcela.observacoes or '' }}</td>
+                <td class="text-start">{{ item.parcela.observacoes or '' }}</td>
               </tr>
               {% endfor %}
             </tbody>
