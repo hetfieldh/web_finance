@@ -9,6 +9,7 @@ from app.models.financiamento_model import Financiamento
 from app.services.graphics_service import (
     get_annual_evolution_data,
     get_financing_progress_data,
+    get_financing_summary_data,
     get_monthly_graphics_data,
 )
 
@@ -57,4 +58,29 @@ def view_graphics():
         # 5. Enviar a lista e o ID selecionado para o template
         todos_financiamentos=todos_financiamentos,
         selected_finan_id=selected_finan_id,
+    )
+
+
+@graphics_bp.route("/resumo-financiamentos")
+@login_required
+def resumo_financiamentos():
+    # 1. Buscar todos os financiamentos para a caixa de seleção
+    todos_financiamentos = Financiamento.query.filter_by(
+        usuario_id=current_user.id
+    ).order_by(Financiamento.nome_financiamento.asc()).all()
+
+    # 2. Verificar qual financiamento foi selecionado (ou usar o primeiro como padrão)
+    selected_finan_id = request.args.get('financiamento_id', type=int)
+    if not selected_finan_id and todos_financiamentos:
+        selected_finan_id = todos_financiamentos[0].id
+
+    # 3. Chamar o serviço com o ID do financiamento selecionado
+    summary_data = get_financing_summary_data(current_user.id, financiamento_id=selected_finan_id)
+
+    # 4. Enviar tudo para o template
+    return render_template(
+        "graphics_2.html",
+        summary_data=summary_data,
+        todos_financiamentos=todos_financiamentos,
+        selected_finan_id=selected_finan_id
     )

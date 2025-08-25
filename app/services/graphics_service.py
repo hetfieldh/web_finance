@@ -311,3 +311,35 @@ def get_financing_progress_data(user_id, year, financiamento_id):
         "previsto": valores_previstos,
         "realizado": valores_realizados,
     }
+
+
+def get_financing_summary_data(user_id, financiamento_id=None):
+    """
+    Busca a contagem de parcelas de financiamento por status.
+    Se um financiamento_id for fornecido, filtra para apenas esse financiamento.
+    """
+    query = (
+        db.session.query(
+            FinanciamentoParcela.status,
+            func.count(FinanciamentoParcela.id).label("total"),
+        )
+        .join(Financiamento)
+        .filter(Financiamento.usuario_id == user_id)
+    )
+
+    if financiamento_id:
+        query = query.filter(Financiamento.id == financiamento_id)
+
+    counts = (
+        query.group_by(FinanciamentoParcela.status)
+        .order_by(func.count(FinanciamentoParcela.id).desc())
+        .all()
+    )
+
+    if not counts:
+        return None
+
+    labels = [item.status for item in counts]
+    valores = [item.total for item in counts]
+
+    return {"labels": labels, "valores": valores}
