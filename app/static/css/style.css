@@ -22,6 +22,7 @@
     --wf-box-negativo: #f8d7da;
     --wf-borda-negativo: #dc3545;
     --wf-shadow: rgba(0, 0, 0, 0.1);
+    --wf-box-bg: #ffffa6cf;
 }
 
 
@@ -444,9 +445,25 @@ body.login-body {
    8. AJUSTES CUSTOMIZADOS
    ========================================================================== */
 
-.select-height-custom {
-    height: 1.4rem;
+/* Classe utilitária para campos de formulário pequenos e compactos */
+.input-compacto {
+    width: 80px;
+    height: auto;
+    font-size: 0.7rem;
+    text-align: center;
     padding-top: 0rem;
     padding-bottom: 0rem;
-    font-size: 0.7rem;
+    margin: 0.01rem;
+    background-color: var(--wf-box-bg) !important;
+}
+
+.input-normal {
+    width: auto;
+    height: auto;
+    font-size: 1rem;
+    text-align: center;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    margin: 0rem;
+    background-color: var(--wf-box-bg) !important;
 }

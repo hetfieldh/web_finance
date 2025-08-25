@@ -1,22 +1,20 @@
-# app/forms/fluxo_caixa_forms.py
+# app/forms/fluxo_caixa_forms.py (CORRIGIDO)
 
 from flask_wtf import FlaskForm
-from wtforms import SelectField, SubmitField
+from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
 from app.utils import gerar_opcoes_mes_ano
 
 
 class FluxoCaixaForm(FlaskForm):
-    mes_ano = SelectField(
+    mes_ano = StringField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
+        render_kw={
+            "placeholder": "Selecione o Mês/Ano",
+            "readonly": True,
+            "style": "background-color: white; cursor: pointer;",
+        },
     )
     submit = SubmitField("Filtrar")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.mes_ano.choices = gerar_opcoes_mes_ano(
-            meses_passados=12, meses_futuros=12, incluir_selecione=False
-        )

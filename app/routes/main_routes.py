@@ -4,17 +4,19 @@ import os
 from datetime import date, timedelta
 from decimal import Decimal
 
-from flask import Blueprint, render_template, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory
 from flask_login import current_user, login_required
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload, subqueryload
 
 from app import db
+from app.forms.fluxo_caixa_forms import FluxoCaixaForm
 from app.models.conta_model import Conta
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
+from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
@@ -29,13 +31,12 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
+    # --- Lógica de KPIs e buscas gerais (permanece igual) ---
     balance_kpis = conta_service.get_account_balance_kpis(current_user.id)
-
     hoje = date.today()
     balanco_do_mes = relatorios_service.get_balanco_mensal(
         current_user.id, hoje.year, hoje.month
     )
-
     kpis = {
         "saldo_operacional": balance_kpis["saldo_operacional"],
         "saldo_investimentos": balance_kpis["saldo_investimentos"],
@@ -45,24 +46,47 @@ def dashboard():
         "despesas_mes": balanco_do_mes["despesas"],
         "balanco_mes": balanco_do_mes["balanco"],
     }
-
     contas_do_usuario = (
         Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
         .order_by(Conta.nome_banco.asc())
         .all()
     )
+    financiamentos_ativos = Financiamento.query.filter_by(
+        usuario_id=current_user.id
+    ).all()
+    crediarios_ativos = Crediario.query.filter_by(
+        usuario_id=current_user.id, ativa=True
+    ).all()
+
+    # --- LÓGICA PARA MOVIMENTOS DO MÊS (COM FILTROS CORRIGIDOS) ---
+    form = FluxoCaixaForm(request.args)
+    mes_ano_selecionado = form.mes_ano.data
+    if not mes_ano_selecionado:
+        mes_ano_selecionado = hoje.strftime("%m/%Y")
+        form.mes_ano.data = mes_ano_selecionado
+
+    mes, ano = map(int, mes_ano_selecionado.split("/"))
+    data_inicio_mes = date(ano, mes, 1)
+    data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(day=1) - timedelta(
+        days=1
+    )
 
     proximos_movimentos = []
-    desp_rec_pendentes = (
-        DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
+
+    # Busca Despesas e Receitas PENDENTES com vencimento no mês
+    desp_rec_mes = (
+        DespRecMovimento.query.join(DespRec)
         .filter(
             DespRecMovimento.usuario_id == current_user.id,
-            DespRecMovimento.status == "Pendente",
+            DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
+            DespRecMovimento.status.in_(
+                ["Pendente", "Atrasado"]
+            ),  # <-- FILTRO ADICIONADO
         )
         .options(joinedload(DespRecMovimento.despesa_receita))
         .all()
     )
-    for item in desp_rec_pendentes:
+    for item in desp_rec_mes:
         proximos_movimentos.append(
             {
                 "data": item.data_vencimento,
@@ -73,15 +97,22 @@ def dashboard():
                 ),
             }
         )
-    faturas_pendentes = (
+
+    # Busca Faturas PENDENTES com vencimento no mês
+    faturas_mes = (
         CrediarioFatura.query.filter(
             CrediarioFatura.usuario_id == current_user.id,
-            CrediarioFatura.status == "Pendente",
+            CrediarioFatura.data_vencimento_fatura.between(
+                data_inicio_mes, data_fim_mes
+            ),
+            CrediarioFatura.status.in_(
+                ["Pendente", "Atrasada", "Parcialmente Paga"]
+            ),  # <-- FILTRO ADICIONADO
         )
         .options(joinedload(CrediarioFatura.crediario))
         .all()
     )
-    for fatura in faturas_pendentes:
+    for fatura in faturas_mes:
         proximos_movimentos.append(
             {
                 "data": fatura.data_vencimento_fatura,
@@ -90,16 +121,21 @@ def dashboard():
                 "tipo": "saida",
             }
         )
-    parcelas_pendentes = (
-        FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
+
+    # Busca Parcelas de Financiamento PENDENTES com vencimento no mês
+    parcelas_mes = (
+        FinanciamentoParcela.query.join(Financiamento)
         .filter(
-            FinanciamentoParcela.status == "Pendente",
-            FinanciamentoParcela.financiamento.has(usuario_id=current_user.id),
+            Financiamento.usuario_id == current_user.id,
+            FinanciamentoParcela.data_vencimento.between(data_inicio_mes, data_fim_mes),
+            FinanciamentoParcela.status.in_(
+                ["Pendente", "Atrasada"]
+            ),  # <-- FILTRO ADICIONADO
         )
         .options(joinedload(FinanciamentoParcela.financiamento))
         .all()
     )
-    for parcela in parcelas_pendentes:
+    for parcela in parcelas_mes:
         proximos_movimentos.append(
             {
                 "data": parcela.data_vencimento,
@@ -108,12 +144,17 @@ def dashboard():
                 "tipo": "saida",
             }
         )
-    salarios_pendentes = SalarioMovimento.query.filter(
+
+    # Busca Salários PENDENTES com data de recebimento no mês
+    salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == current_user.id,
-        SalarioMovimento.status == "Pendente",
+        SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
+        SalarioMovimento.status.in_(
+            ["Pendente", "Parcialmente Recebido"]
+        ),  # <-- FILTRO ADICIONADO
     ).all()
-    for salario in salarios_pendentes:
-        if salario.salario_liquido > 0:
+    for salario in salarios_mes:
+        if not salario.movimento_bancario_salario_id and salario.salario_liquido > 0:
             proximos_movimentos.append(
                 {
                     "data": salario.data_recebimento,
@@ -122,7 +163,7 @@ def dashboard():
                     "tipo": "entrada",
                 }
             )
-        if salario.total_beneficios > 0:
+        if not salario.movimento_bancario_beneficio_id and salario.total_beneficios > 0:
             proximos_movimentos.append(
                 {
                     "data": salario.data_recebimento,
@@ -131,28 +172,24 @@ def dashboard():
                     "tipo": "entrada",
                 }
             )
-    proximos_movimentos.sort(key=lambda x: x["data"])
-    financiamentos_ativos = Financiamento.query.filter_by(
-        usuario_id=current_user.id
-    ).all()
-    crediarios_ativos = Crediario.query.filter_by(
-        usuario_id=current_user.id, ativa=True
-    ).all()
 
-    pending_requests_count = 0
-    if current_user.is_admin:
-        pending_requests_count = SolicitacaoAcesso.query.filter_by(
-            status="Pendente"
-        ).count()
+    proximos_movimentos.sort(key=lambda x: x["data"])
+
+    pending_requests_count = (
+        SolicitacaoAcesso.query.filter_by(status="Pendente").count()
+        if current_user.is_admin
+        else 0
+    )
 
     return render_template(
         "dashboard.html",
-        contas_do_usuario=contas_do_usuario,
         kpis=kpis,
-        proximos_movimentos=proximos_movimentos[:10],
+        contas_do_usuario=contas_do_usuario,
+        proximos_movimentos=proximos_movimentos,
         pending_requests=pending_requests_count,
         financiamentos=financiamentos_ativos,
         crediarios=crediarios_ativos,
+        form_movimentos=form,
     )
 
 

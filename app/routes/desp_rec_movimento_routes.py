@@ -44,7 +44,7 @@ def listar_movimentos():
     movimentos = (
         DespRecMovimento.query.filter_by(usuario_id=current_user.id)
         .options(joinedload(DespRecMovimento.despesa_receita))
-        .order_by(DespRecMovimento.data_vencimento.desc())
+        .order_by(DespRecMovimento.data_vencimento.asc())
         .all()
     )
     return render_template("desp_rec_movimento/list.html", movimentos=movimentos)

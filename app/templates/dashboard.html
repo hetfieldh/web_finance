@@ -1,9 +1,9 @@
 <!--- app\templates\dashboard.html -->
 
-{% extends 'base.html' %} {% block title %}Web Finance - Dashboard{% endblock %}
-{% block page_title %}Dashboard{% endblock %} {% block content %}
-<!-- Cabeçalho -->
-<div class="d-flex justify-content-between align-items-center mb-3">
+{% extends 'base.html' %} {% from "includes/_macros.html" import render_field %}
+{% block title %}Web Finance - Dashboard{% endblock %} {% block page_title
+%}Dashboard{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
   <div>
     <h4 class="text-secondary mb-0">
       Bem-vindo(a),
@@ -33,7 +33,6 @@
       </span>
     </a>
     {% endif %}
-
     <a
       href="{{ url_for('graphics.resumo_financiamentos') }}"
       class="btn btn-lg btn-transparent text-secondary"
@@ -55,7 +54,6 @@
   </div>
 </div>
 
-<!-- KPIs (Indicadores Chave) -->
 <div class="row g-2 mb-2">
   <div class="col">
     <div class="card shadow-sm h-100 bg-light">
@@ -137,13 +135,12 @@
 </div>
 
 <div class="row g-2">
-  <!-- Coluna 1: Contas Bancárias -->
   <div class="col-lg-3">
     <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Contas Bancárias Ativas</h6>
       </div>
-      <div class="card-body p-1">
+      <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
         {% if contas_do_usuario %}
         <div class="d-flex flex-column gap-1">
           {% for conta in contas_do_usuario %}
@@ -164,9 +161,8 @@
               </div>
               <span
                 class="fw-semibold h6 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
+                >{{ conta.saldo_atual | format_currency }}</span
               >
-                {{ conta.saldo_atual | format_currency }}
-              </span>
             </div>
           </div>
           {% endfor %}
@@ -182,13 +178,20 @@
     </div>
   </div>
 
-  <!-- Coluna 2: Próximos Movimentos -->
   <div class="col-lg-3">
     <div class="card shadow-sm">
       <div class="card-header bg-light">
-        <h6 class="fw-semibold mb-0 text-secondary">Próximos Movimentos</h6>
+        <form
+          id="form-movimentos-mes"
+          method="GET"
+          class="d-flex align-items-center justify-content-between"
+        >
+          <h6 class="fw-semibold mb-0 text-secondary">Próximas Contas do mês:</h6>
+          {{ form_movimentos.mes_ano(class="form-control form-control-xs
+          input-compacto", id="mes_ano_dashboard") }}
+        </form>
       </div>
-      <div class="card-body p-0">
+      <div class="card-body p-0" style="overflow-y: auto; max-height: 500px">
         {% if proximos_movimentos %}
         <ul class="list-group list-group-flush">
           {% for item in proximos_movimentos %}
@@ -196,19 +199,24 @@
             class="list-group-item py-1 d-flex justify-content-between align-items-center small"
           >
             <div>
-              <div class="fw-semibold text-dark extra-small-2">
-                {{ item.descricao }}
+              <div
+                class="fw-semibold text-dark extra-small-2"
+                title="{{ item.descricao }}"
+              >
+                {{ item.descricao | truncate(25) }}
               </div>
               <div class="text-muted extra-small-3">
                 {{ item.data.strftime('%d/%m/%Y') }}
               </div>
             </div>
             {% if item.tipo == 'saida' %}
-            <span class="badge bg-danger"
+            <span
+              class="badge bg-danger-subtle text-danger-emphasis rounded-pill"
               >{{ item.valor | format_currency }}</span
             >
             {% else %}
-            <span class="badge bg-success"
+            <span
+              class="badge bg-success-subtle text-success-emphasis rounded-pill"
               >{{ item.valor | format_currency }}</span
             >
             {% endif %}
@@ -218,8 +226,8 @@
         {% else %}
         <div class="text-center p-3">
           <i class="fas fa-check-circle fa-2x text-success mb-1"></i>
-          <p class="text-muted small">
-            Nenhum movimento pendente nos próximos dias.
+          <p class="text-muted small mb-0">
+            Não há nada em aberto para este mês.
           </p>
         </div>
         {% endif %}
@@ -227,13 +235,12 @@
     </div>
   </div>
 
-  <!-- Coluna 3: Saldos Devedores -->
   <div class="col-lg-3">
     <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">Saldos Devedores</h6>
       </div>
-      <div class="card-body p-1">
+      <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
         <div class="d-flex flex-column gap-1">
           {% if financiamentos %} {% for financ in financiamentos %}
           <div class="card border-1">
@@ -251,9 +258,9 @@
                   <div class="text-muted extra-small">Financiamento</div>
                 </div>
               </div>
-              <span class="fw-semibold h5 mb-0 text-danger">
-                {{ financ.saldo_devedor_atual | format_currency }}
-              </span>
+              <span class="fw-semibold h5 mb-0 text-danger"
+                >{{ financ.saldo_devedor_atual | format_currency }}</span
+              >
             </div>
           </div>
           {% endfor %} {% endif %} {% if crediarios %} {% for cred in crediarios
@@ -271,13 +278,13 @@
                   <div class="text-muted extra-small">Crediário</div>
                 </div>
               </div>
-              <span class="fw-semibold h5 mb-0 text-danger">
-                {{ cred.saldo_devedor | format_currency }}
-              </span>
+              <span class="fw-semibold h5 mb-0 text-danger"
+                >{{ cred.saldo_devedor | format_currency }}</span
+              >
             </div>
           </div>
-          {% endfor %} {% endif %} {% if not financiamentos and not
-          saldos_crediarios %}
+          {% endfor %} {% endif %} {% if not financiamentos and not crediarios
+          %}
           <div class="text-center p-2">
             <p class="text-muted small mb-0">
               Nenhum saldo devedor encontrado.
@@ -289,4 +296,35 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Lógica para o seletor de mês do painel de movimentos
+    $("#mes_ano_dashboard")
+      .datepicker({
+        format: "mm-yyyy",
+        startView: "months",
+        minViewMode: "months",
+        language: "pt-BR",
+        autoclose: true,
+        orientation: "bottom right",
+      })
+      .on("changeDate", function (e) {
+        document.getElementById("form-movimentos-mes").submit();
+      });
+
+    // Lógica para exibir a data atual no topo da página
+    const dataAtualElement = document.getElementById("data-atual");
+    if (dataAtualElement) {
+      const hoje = new Date();
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      dataAtualElement.textContent = hoje.toLocaleDateString("pt-BR", options);
+    }
+  });
+</script>
 {% endblock %}

@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Inicializa o Datepicker usando jQuery
   $("#mes_referencia")
     .datepicker({
-      format: "yyyy-mm",
+      format: "mm-yyyy",
       startView: "months",
       minViewMode: "months",
       language: "pt-BR", // Se tiver o locale do datepicker, senão pode remover

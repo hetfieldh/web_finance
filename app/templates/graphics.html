@@ -24,7 +24,7 @@
         {% if todos_financiamentos %}
         <form id="form-select-finan" method="GET" class="d-flex align-items-center">
             <label for="financiamento_id" class="form-label mb-0 me-2 fw-semibold text-secondary">Progresso do Financiamento:</label>
-            <select name="financiamento_id" id="financiamento_id" class="form-select form-select-sm w-auto select-height-custom">
+            <select name="financiamento_id" id="financiamento_id" class="form-select form-select-sm w-auto input-compacto">
                 {% for finan in todos_financiamentos %}
                     <option value="{{ finan.id }}" {{ 'selected' if finan.id == selected_finan_id else '' }}>
                         {{ finan.nome_financiamento }}
