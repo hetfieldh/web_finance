@@ -213,4 +213,11 @@
 </div>
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    inicializarDatepickerMesAno("#mes_ano_input", function () {
+      document.getElementById("form-filtro").submit();
+    });
+  });
+</script>
 {% endblock %}

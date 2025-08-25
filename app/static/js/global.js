@@ -37,3 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+/**
+ * Inicializa o bootstrap-datepicker em um elemento para seleção de Mês/Ano.
+ * @param {string} selector - O seletor jQuery para o campo de input (ex: '#meu-campo').
+ * @param {function} onChangeCallback - Uma função a ser executada quando a data é alterada.
+ */
+function inicializarDatepickerMesAno(selector, onChangeCallback) {
+  const elemento = $(selector);
+  if (elemento.length) {
+    elemento
+      .datepicker({
+        format: "mm-yyyy",
+        startView: "months",
+        minViewMode: "months",
+        language: "pt-BR",
+        autoclose: true,
+        orientation: "bottom right",
+      })
+      .on("changeDate", function (e) {
+        if (typeof onChangeCallback === "function") {
+          onChangeCallback(e);
+        }
+      });
+  }
+}

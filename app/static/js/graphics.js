@@ -420,3 +420,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const selectFinan = document.getElementById("financiamento_id");
+  if (selectFinan) {
+    selectFinan.addEventListener("change", function () {
+      this.closest("form").submit();
+    });
+  }
+});

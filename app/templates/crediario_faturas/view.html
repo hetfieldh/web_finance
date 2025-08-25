@@ -7,8 +7,8 @@ content %}
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">
-        Fatura de {{ fatura.crediario.nome_crediario }} ({{
-        fatura.mes_referencia }})
+        Fatura de {{ fatura.crediario.nome_crediario }} ({%set partes =
+        fatura.mes_referencia.split('-') %}{{ partes[1] }}-{{ partes[0]}})
       </h4>
       <div>
         <a
@@ -33,7 +33,9 @@ content %}
           </div>
           <div class="col-md-3">
             <p>
-              <strong>Mês de Referência:</strong> {{ fatura.mes_referencia }}
+              <strong>Mês de Referência:</strong>
+              {% set partes = fatura.mes_referencia.split('-') %} {{ partes[1]
+              }}-{{ partes[0]}}
             </p>
           </div>
           <div class="col-md-3">
@@ -89,7 +91,7 @@ content %}
                   {{ parcela.numero_parcela }}/{{
                   parcela.movimento_pai.numero_parcelas }}
                 </td>
-                <td>{{ parcela.data_vencimento.strftime('%m/%Y') }}</td>
+                <td>{{ parcela.data_vencimento.strftime('%m-%Y') }}</td>
                 <td
                   class="text-end {% if parcela.valor_parcela < 0 %}text-danger fw-bold{% endif %}"
                 >

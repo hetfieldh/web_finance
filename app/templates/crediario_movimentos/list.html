@@ -51,7 +51,7 @@
                 <td>{{ mov.data_compra.strftime('%d/%m/%Y') }}</td>
                 <td>R$ {{ "%.2f"|format(mov.valor_total_compra) }}</td>
                 <td>{{ mov.numero_parcelas }}</td>
-                <td>{{ mov.data_primeira_parcela.strftime('%m/%Y') }}</td>
+                <td>{{ mov.data_primeira_parcela.strftime('%m-%Y') }}</td>
                 <td>{{ mov.descricao }}</td>
                 <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td class="table-actions">

@@ -1,8 +1,8 @@
-"""Versão Final do BD
+"""Criação do BD consolidado
 
-Revision ID: 6c2aa3907e61
+Revision ID: a1838653d6a8
 Revises: 
-Create Date: 2025-08-25 13:58:41.510252
+Create Date: 2025-08-25 18:43:19.396756
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6c2aa3907e61'
+revision = 'a1838653d6a8'
 down_revision = None
 branch_labels = None
 depends_on = None

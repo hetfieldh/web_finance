@@ -97,15 +97,4 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/graphics.js') }}"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const selectFinan = document.getElementById('financiamento_id');
-    if (selectFinan) {
-        selectFinan.addEventListener('change', function() {
-            this.form.submit();
-        });
-    }
-});
-</script>
 {% endblock %}

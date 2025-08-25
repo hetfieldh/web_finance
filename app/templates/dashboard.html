@@ -186,7 +186,9 @@
           method="GET"
           class="d-flex align-items-center justify-content-between"
         >
-          <h6 class="fw-semibold mb-0 text-secondary">Próximas Contas do mês:</h6>
+          <h6 class="fw-semibold mb-0 text-secondary">
+            Próximas Contas do mês:
+          </h6>
           {{ form_movimentos.mes_ano(class="form-control form-control-xs
           input-compacto", id="mes_ano_dashboard") }}
         </form>
@@ -297,34 +299,5 @@
   </div>
 </div>
 {% endblock %} {% block scripts %}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Lógica para o seletor de mês do painel de movimentos
-    $("#mes_ano_dashboard")
-      .datepicker({
-        format: "mm-yyyy",
-        startView: "months",
-        minViewMode: "months",
-        language: "pt-BR",
-        autoclose: true,
-        orientation: "bottom right",
-      })
-      .on("changeDate", function (e) {
-        document.getElementById("form-movimentos-mes").submit();
-      });
-
-    // Lógica para exibir a data atual no topo da página
-    const dataAtualElement = document.getElementById("data-atual");
-    if (dataAtualElement) {
-      const hoje = new Date();
-      const options = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      };
-      dataAtualElement.textContent = hoje.toLocaleDateString("pt-BR", options);
-    }
-  });
-</script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}

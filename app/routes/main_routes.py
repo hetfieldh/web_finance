@@ -62,10 +62,10 @@ def dashboard():
     form = FluxoCaixaForm(request.args)
     mes_ano_selecionado = form.mes_ano.data
     if not mes_ano_selecionado:
-        mes_ano_selecionado = hoje.strftime("%m/%Y")
+        mes_ano_selecionado = hoje.strftime("%m-%Y")
         form.mes_ano.data = mes_ano_selecionado
 
-    mes, ano = map(int, mes_ano_selecionado.split("/"))
+    mes, ano = map(int, mes_ano_selecionado.split("-"))
     data_inicio_mes = date(ano, mes, 1)
     data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(day=1) - timedelta(
         days=1
