@@ -19,8 +19,6 @@ from app import db
 from app.forms.pagamentos_forms import PagamentoForm, PainelPagamentosForm
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
-from app.models.crediario_movimento_model import CrediarioMovimento
-from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.services import conta_service
@@ -35,14 +33,15 @@ pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 @pagamentos_bp.route("/painel", methods=["GET", "POST"])
 @login_required
 def painel():
-    form = PainelPagamentosForm(request.form)
+    form = PainelPagamentosForm(request.args)
     account_choices = conta_service.get_active_accounts_for_user_choices()
     pagamento_form = PagamentoForm(account_choices=account_choices)
 
-    if request.method == "GET" and not form.mes_ano.data:
-        form.mes_ano.data = date.today().strftime("%Y-%m")
-
     mes_ano_str = form.mes_ano.data
+    if not mes_ano_str:
+        mes_ano_str = date.today().strftime("%m-%Y")
+        form.mes_ano.data = mes_ano_str
+
     contas_a_pagar = []
     totais = {
         "previsto": Decimal("0.00"),
@@ -51,11 +50,15 @@ def painel():
     }
 
     if mes_ano_str:
-        ano, mes = map(int, mes_ano_str.split("-"))
-        data_inicio_mes = date(ano, mes, 1)
-        data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
-            day=1
-        ) - timedelta(days=1)
+        try:
+            mes, ano = map(int, mes_ano_str.split("-"))
+            data_inicio_mes = date(ano, mes, 1)
+            data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
+                day=1
+            ) - timedelta(days=1)
+        except ValueError:
+            flash("Formato de data inválido.", "danger")
+            return redirect(url_for("pagamentos.painel"))
 
         faturas = (
             CrediarioFatura.query.filter(

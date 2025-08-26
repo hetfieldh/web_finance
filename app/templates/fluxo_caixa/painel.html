@@ -7,15 +7,15 @@ endblock %} {% block content %}
   <div class="col-12">
     <div class="card shadow-sm mb-2">
       <div class="card-body">
-        <form method="POST" action="{{ url_for('fluxo_caixa.painel') }}">
-          {{ form.csrf_token }}
-          <div class="row align-items-end">
-            <div class="col-md-3">{{ render_field(form.mes_ano) }}</div>
+        <form
+          id="form-fluxo-caixa"
+          method="GET"
+          action="{{ url_for('fluxo_caixa.painel') }}"
+        >
+          <div class="row align-items-center">
             <div class="col-md-3">
-              <button type="submit" class="btn btn-success btn-add">
-                <i class="fas fa-search me-1"></i> {{ form.submit.label.text or
-                'Filtrar' }}
-              </button>
+              {{ form.mes_ano(class="form-control input-normal",
+              id="mes_ano_fluxo_caixa") }}
             </div>
           </div>
         </form>
@@ -52,7 +52,7 @@ endblock %} {% block content %}
     <div class="card shadow-sm">
       <div class="card-header bg-secondary text-white">
         <h5 class="mb-0">
-          <i class="fas fa-list-ul me-2"></i>Resumo do Fluxo de Caixa do Mês
+          <i class="fas fa-list-ul me-2"></i>Movimentações Realizadas no Mês
         </h5>
       </div>
       <div class="card-body">
@@ -62,8 +62,8 @@ endblock %} {% block content %}
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Descrição</th>
-                <th>Categoria</th>
+                <th>Origem</th>
+                <th>Tipo</th>
                 <th class="text-end">Valor Realizado</th>
               </tr>
             </thead>
@@ -71,19 +71,17 @@ endblock %} {% block content %}
               {% for mov in movimentacoes %}
               <tr>
                 <td>{{ mov.data.strftime('%d/%m/%Y') }}</td>
-                <td>{{ mov.descricao }}</td>
+                <td>{{ mov.origem }}</td>
                 <td>
-                  {% if mov.categoria == 'Receita' %}
+                  {% if mov.categoria == 'Receita' or mov.categoria == 'Salário'
+                  or mov.categoria == 'Benefício' %}
                   <span class="badge bg-success">{{ mov.categoria }}</span>
                   {% else %}
                   <span class="badge bg-danger">{{ mov.categoria }}</span>
                   {% endif %}
                 </td>
-                <td
-                  class="text-end fw-bold {% if mov.categoria == 'Receita' %}text-success{% else %}text-danger{% endif %}"
-                >
-                  {% if mov.categoria == 'Receita' %}+{% else %}-{% endif %} {{
-                  mov.valor | format_currency }}
+                <td class="text-end fw-bold">
+                  {{ mov.valor | format_currency }}
                 </td>
               </tr>
               {% endfor %}
@@ -92,11 +90,13 @@ endblock %} {% block content %}
         </div>
         {% else %}
         <p class="text-center alert alert-info">
-          Nenhuma movimentação realizada foi encontrada para este mês.
+          Nenhuma movimentação realizada encontrada para este mês.
         </p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/fluxo_caixa.js') }}"></script>
 {% endblock %}

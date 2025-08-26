@@ -4,7 +4,14 @@ from datetime import date
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import DateField, DecimalField, HiddenField, SelectField, SubmitField
+from wtforms import (
+    DateField,
+    DecimalField,
+    HiddenField,
+    SelectField,
+    StringField,
+    SubmitField,
+)
 from wtforms.validators import DataRequired, InputRequired, NumberRange
 
 from app.models.conta_model import Conta
@@ -12,18 +19,15 @@ from app.utils import gerar_opcoes_mes_ano
 
 
 class PainelRecebimentosForm(FlaskForm):
-    mes_ano = SelectField(
+    mes_ano = StringField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
+        render_kw={
+            "readonly": True,
+            "style": "background-color: white; cursor: pointer;",
+        },
     )
     submit = SubmitField("Filtrar")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.mes_ano.choices = gerar_opcoes_mes_ano(
-            meses_passados=12, meses_futuros=12, incluir_selecione=False
-        )
 
 
 class RecebimentoForm(FlaskForm):

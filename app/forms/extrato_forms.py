@@ -4,7 +4,7 @@ from datetime import date
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import DateField, SelectField, SubmitField
+from wtforms import DateField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Optional
 
 from app.models.desp_rec_model import DespRec
@@ -18,9 +18,13 @@ class ExtratoBancarioForm(FlaskForm):
         "Conta Bancária",
         validators=[DataRequired("Selecione uma conta.")],
     )
-    mes_ano = SelectField(
+    mes_ano = StringField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
+        render_kw={
+            "readonly": True,
+            "style": "background-color: white; cursor: pointer;",
+        },
     )
     submit = SubmitField("Filtrar")
 
@@ -28,17 +32,12 @@ class ExtratoBancarioForm(FlaskForm):
         super().__init__(*args, **kwargs)
         from app.models.conta_model import Conta
 
-        lista_de_contas = [
+        self.conta_id.choices = [("", "Selecione...")] + [
             (c.id, f"{c.nome_banco} - {c.tipo}")
             for c in Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
             .order_by(Conta.nome_banco.asc())
             .all()
         ]
-        self.conta_id.choices = [("", "Selecione...")] + lista_de_contas
-
-        self.mes_ano.choices = gerar_opcoes_mes_ano(
-            meses_passados=24, meses_futuros=12, incluir_selecione=False
-        )
 
 
 class ExtratoConsolidadoForm(FlaskForm):

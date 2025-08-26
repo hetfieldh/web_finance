@@ -1,4 +1,4 @@
-# app/forms/fluxo_caixa_forms.py (CORRIGIDO)
+# app/forms/fluxo_caixa_forms.py
 
 from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, SubmitField
@@ -12,7 +12,6 @@ class FluxoCaixaForm(FlaskForm):
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
         render_kw={
-            "placeholder": "Selecione o Mês/Ano",
             "readonly": True,
             "style": "background-color: white; cursor: pointer;",
         },

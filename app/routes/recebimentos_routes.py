@@ -34,14 +34,15 @@ recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos"
 @recebimentos_bp.route("/painel", methods=["GET", "POST"])
 @login_required
 def painel():
-    form = PainelRecebimentosForm(request.form)
+    form = PainelRecebimentosForm(request.args)
     account_choices = conta_service.get_active_accounts_for_user_choices()
     recebimento_form = RecebimentoForm(account_choices=account_choices)
 
-    if request.method == "GET" and not form.mes_ano.data:
-        form.mes_ano.data = date.today().strftime("%Y-%m")
-
     mes_ano_str = form.mes_ano.data
+    if not mes_ano_str:
+        mes_ano_str = date.today().strftime("%m-%Y")
+        form.mes_ano.data = mes_ano_str
+
     contas_a_receber = []
     totais = {
         "previsto": Decimal("0.00"),
@@ -50,11 +51,15 @@ def painel():
     }
 
     if mes_ano_str:
-        ano, mes = map(int, mes_ano_str.split("-"))
-        data_inicio_mes = date(ano, mes, 1)
-        data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
-            day=1
-        ) - timedelta(days=1)
+        try:
+            mes, ano = map(int, mes_ano_str.split("-"))
+            data_inicio_mes = date(ano, mes, 1)
+            data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
+                day=1
+            ) - timedelta(days=1)
+        except ValueError:
+            flash("Formato de data inválido.", "danger")
+            return redirect(url_for("recebimentos.painel"))
 
         salario_movimentos = (
             SalarioMovimento.query.filter(

@@ -7,60 +7,57 @@
   <div class="col-12">
     <div class="card shadow-sm mb-2">
       <div class="card-body">
-        <form method="POST" action="{{ url_for('extrato.extrato_bancario') }}">
-          {{ form.csrf_token }}
+        <form
+          id="form-extrato-bancario"
+          method="GET"
+          action="{{ url_for('extrato.extrato_bancario') }}"
+        >
           <div class="row align-items-end">
             <div class="col-md-4 mb-2 mb-md-0">
-              {{ render_field(form.conta_id) }}
+              {{ render_field(form.conta_id, attrs={'id': 'conta_id'}) }}
             </div>
             <div class="col-md-2 mb-2 mb-md-0">
-              {{ render_field(form.mes_ano) }}
-            </div>
-            <div class="col-md-2">
-              <button type="submit" class="btn btn-success btn-add">
-                <i class="fas fa-search me-1"></i> {{ form.submit.label.text }}
-              </button>
+              {{ render_field(form.mes_ano, attrs={'id': 'mes_ano_extratos'}) }}
             </div>
           </div>
         </form>
       </div>
     </div>
 
-    {% if movimentacoes or (form.is_submitted() and conta_selecionada) %}
-
+    {% if conta_selecionada %}
     <div class="card shadow-sm mb-2">
       <div class="card-body">
         <div class="row g-0 text-center align-items-center">
           <div class="col-lg col-md-6">
             <h6 class="text-muted small mb-0">Saldo Anterior</h6>
-            <p class="h6 mb-0">R$ {{ "%.2f"|format(saldo_anterior) }}</p>
+            <p class="h6 mb-0">{{ saldo_anterior | format_currency }}</p>
           </div>
           <div class="col-lg col-md-6">
             <h6 class="text-muted small mb-0">Créditos no Mês</h6>
             <p class="h6 text-success mb-0">
-              R$ {{ "%.2f"|format(total_creditos) }}
+              {{ total_creditos | format_currency }}
             </p>
           </div>
           <div class="col-lg col-md-6 mt-2 mt-lg-0">
             <h6 class="text-muted small mb-0">Débitos no Mês</h6>
             <p class="h6 text-danger mb-0">
-              R$ {{ "%.2f"|format(total_debitos) }}
+              {{ total_debitos | format_currency }}
             </p>
           </div>
           <div class="col-lg col-md-6 mt-2 mt-lg-0">
             <h6 class="text-muted small mb-0">Limite Disponível</h6>
             <p class="h6 mb-0">
-              R$ {{ "%.2f"|format(limite_conta if limite_conta else 0) }}
+              {{ (limite_conta if limite_conta else 0) | format_currency }}
             </p>
           </div>
           <div class="col-lg col-md-12 mt-2 mt-lg-0">
             <div
               class="card {% if saldo_final_mes >= 0 %}bg-success-subtle border-success{% else %}bg-danger-subtle border-danger{% endif %}"
             >
-              <div class="card-body p-0">
+              <div class="card-body p-1">
                 <h6 class="card-title extra-small mb-0">Saldo Final</h6>
                 <p class="card-text h6 fw-bold mb-0">
-                  R$ {{ "%.2f"|format(saldo_final_mes) }}
+                  {{ saldo_final_mes | format_currency }}
                 </p>
               </div>
             </div>
@@ -85,9 +82,9 @@
                 <th>Data</th>
                 <th>Tipo Transação</th>
                 <th>Movimento</th>
-                <th>Valor</th>
+                <th class="text-end">Valor</th>
                 <th>Descrição</th>
-                <th>Saldo Acumulado</th>
+                <th class="text-end">Saldo Acumulado</th>
               </tr>
             </thead>
             <tbody>
@@ -103,14 +100,14 @@
                   {% else %} {{ mov.tipo_movimento }} {% endif %}
                 </td>
                 <td
-                  class="{% if mov.tipo_movimento == 'Débito' %}text-danger{% else %}text-success{% endif %}"
+                  class="text-end {% if mov.tipo_movimento == 'Débito' %}text-danger{% else %}text-success{% endif %}"
                 >
-                  {% if mov.tipo_movimento == 'Débito' %}-{% endif %}R$ {{
-                  "%.2f"|format(mov.valor) }}
+                  {% if mov.tipo_movimento == 'Débito' %}-{% else %}+{% endif
+                  %}R$ {{ "%.2f"|format(mov.valor) }}
                 </td>
                 <td>{{ mov.descricao if mov.descricao else 'N/A'}}</td>
                 <td
-                  class="fw-bold {% if mov.saldo_acumulado < 0 %}text-danger{% endif %}"
+                  class="text-end fw-bold {% if mov.saldo_acumulado < 0 %}text-danger{% endif %}"
                 >
                   R$ {{ "%.2f"|format(mov.saldo_acumulado) }}
                 </td>
@@ -129,4 +126,6 @@
     {% endif %}
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
 {% endblock %}
