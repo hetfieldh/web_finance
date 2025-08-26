@@ -467,3 +467,14 @@ body.login-body {
     margin: 0rem;
     background-color: var(--wf-box-bg) !important;
 }
+
+.input-maior {
+    width: auto;
+    height: 35px;
+    font-size: 1rem;
+    text-align: center;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    margin: 0rem;
+    background-color: var(--wf-box-bg) !important;
+}

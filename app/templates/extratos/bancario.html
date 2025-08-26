@@ -12,12 +12,13 @@
           method="GET"
           action="{{ url_for('extrato.extrato_bancario') }}"
         >
-          <div class="row align-items-end">
-            <div class="col-md-4 mb-2 mb-md-0">
-              {{ render_field(form.conta_id, attrs={'id': 'conta_id'}) }}
+          <div class="row align-items-center">
+            <div class="col-md-4">
+              {{ form.conta_id(class="form-select", id="conta_id") }}
             </div>
-            <div class="col-md-2 mb-2 mb-md-0">
-              {{ render_field(form.mes_ano, attrs={'id': 'mes_ano_extratos'}) }}
+            <div class="col-md-3">
+              {{ form.mes_ano(class="form-control input-maior",
+              id="mes_ano_extratos") }}
             </div>
           </div>
         </form>

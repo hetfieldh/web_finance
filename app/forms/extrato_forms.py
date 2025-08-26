@@ -43,14 +43,12 @@ class ExtratoBancarioForm(FlaskForm):
 class ExtratoConsolidadoForm(FlaskForm):
     """Formulário para filtrar o extrato consolidado por mês/ano."""
 
-    mes_ano = SelectField(
+    mes_ano = StringField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],
+        render_kw={
+            "readonly": True,
+            "style": "background-color: white; cursor: pointer;",
+        },
     )
     submit = SubmitField("Filtrar")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.mes_ano.choices = gerar_opcoes_mes_ano(
-            meses_passados=24, meses_futuros=12, incluir_selecione=False
-        )
