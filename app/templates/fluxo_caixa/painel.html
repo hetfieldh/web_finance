@@ -13,7 +13,13 @@ endblock %} {% block content %}
           action="{{ url_for('fluxo_caixa.painel') }}"
         >
           <div class="row align-items-center">
-            <div class="col-md-3">
+            <div class="col-md-3 d-flex align-items-center">
+              <label
+                for="mes_ano_consolidado"
+                class="form-label mb-0 me-2 fw-semibold text-secondary"
+              >
+                Mês/Ano:
+              </label>
               {{ form.mes_ano(class="form-control input-maior",
               id="mes_ano_fluxo_caixa") }}
             </div>

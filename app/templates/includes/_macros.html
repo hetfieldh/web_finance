@@ -1,7 +1,6 @@
 <!--- app/templates/includes/_macros.html -->
 
-{% macro render_field(field, label=None, attrs={}) %} {# Se um texto de label
-for passado, usa-o. Senão, usa o label do formulário. #} {% if label %}
+{% macro render_field(field, label=None, attrs={}) %}{% if label %}
 <label for="{{ field.id }}" class="form-label">{{ label }}</label>
 {% else %} {{ field.label(class="form-label") }} {% endif %} {% set
 default_class = 'form-select' if field.type == 'SelectField' else 'form-control'

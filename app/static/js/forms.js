@@ -1,9 +1,43 @@
-// app/static/js/forms.js
+// app/static/js/forms.js (VERSÃO COMPLETA E FINAL)
 
 console.log("forms.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {
-  // --- 1. Lógica para formulário dinâmico de Lançamento Bancário ---
+  // --- 1. Lógica para formulário de ADIÇÃO de contas ---
+  const tipoContaSelect = document.getElementById("tipo-conta-select");
+  const limiteContainer = document.getElementById("limite-container");
+
+  if (tipoContaSelect && limiteContainer) {
+    const limiteInput = limiteContainer.querySelector("input");
+    const toggleLimiteField = () => {
+      const tipoSelecionado = tipoContaSelect.value;
+      const tiposComLimite = ["Corrente", "Digital"];
+      if (tiposComLimite.includes(tipoSelecionado)) {
+        limiteContainer.style.display = "block";
+      } else {
+        limiteContainer.style.display = "none";
+        if (limiteInput) {
+          limiteInput.value = "0.00";
+        }
+      }
+    };
+    tipoContaSelect.addEventListener("change", toggleLimiteField);
+    toggleLimiteField();
+  }
+
+  // --- 2. Lógica para formulário de EDIÇÃO de contas ---
+  const tipoContaSelectEdit = document.getElementById("tipo-conta-select-edit");
+  const limiteContainerEdit = document.getElementById("limite-container-edit");
+
+  if (tipoContaSelectEdit && limiteContainerEdit) {
+    const tipoSelecionado = tipoContaSelectEdit.value;
+    const tiposComLimite = ["Corrente", "Digital"];
+    if (!tiposComLimite.includes(tipoSelecionado)) {
+      limiteContainerEdit.style.display = "none";
+    }
+  }
+
+  // --- 3. Lógica para formulário dinâmico de Lançamento Bancário ---
   const formMovimentacao = document.getElementById("form-movimentacao");
   if (formMovimentacao) {
     const contaId = document.getElementById("container-conta_id");
@@ -32,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
         descricao: document.getElementById("placeholder-transf-descricao"),
       },
     };
-
     function moverCampos() {
       const tipoSelecionado = formMovimentacao.querySelector(
         'input[name="tipo_operacao"]:checked'
@@ -66,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     moverCampos();
   }
 
-  // --- 2. Lógica para o formulário de transferência ---
+  // --- 4. Lógica para o formulário de transferência ---
   const contaOrigemSelect = document.querySelector("select#conta_id");
   const contaDestinoSelect = document.querySelector(
     "#transferencia_fields select[name='conta_destino_id']"
@@ -88,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarContaDestino();
   }
 
-  // --- 3. Lógica para filtros dinâmicos do Extrato Desp/Rec ---
+  // --- 5. Lógica para filtros dinâmicos do Extrato Desp/Rec ---
   const tipoRelatorioSelect = document.getElementById("tipo_relatorio");
   if (tipoRelatorioSelect) {
     const filtroMensal = document.getElementById("filtro_mensal");
@@ -111,155 +144,153 @@ document.addEventListener("DOMContentLoaded", () => {
     tipoRelatorioSelect.addEventListener("change", toggleFilters);
     toggleFilters();
   }
-  // --- 4. Lógica para preenchimento automático da data de vencimento no Lançamento Único ---
+
+  // --- 6. Lógica para preenchimento automático da data de vencimento no Lançamento Único ---
   const formLancamentoUnico = document.getElementById("form-lancamento-unico");
   if (formLancamentoUnico) {
     const vencimentosDataElement = document.getElementById("vencimentos-data");
-    if (!vencimentosDataElement) {
-      console.error("Contêiner de dados #vencimentos-data não encontrado!");
-      return;
-    }
-    const vencimentosMap = JSON.parse(
-      vencimentosDataElement.textContent || "{}"
-    );
-    const despRecSelect = document.getElementById("desp_rec_id");
-    const dataVencimentoInput = document.getElementById("data_vencimento");
-
-    if (despRecSelect && dataVencimentoInput) {
-      despRecSelect.addEventListener("change", function () {
-        const selectedId = this.value;
-        const diaVencimento = vencimentosMap[selectedId];
-        if (diaVencimento) {
-          const hoje = new Date();
-          const dataAtualNoCampo = dataVencimentoInput.value
-            ? new Date(dataVencimentoInput.value + "T00:00:00")
-            : hoje;
-          let ano = dataAtualNoCampo.getFullYear();
-          let mes = dataAtualNoCampo.getMonth() + 1;
-          let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
-          let diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
-          const mesFormatado = String(mes).padStart(2, "0");
-          const diaFormatado = String(diaFinal).padStart(2, "0");
-          dataVencimentoInput.value = `${ano}-${mesFormatado}-${diaFormatado}`;
-        }
-      });
+    if (vencimentosDataElement) {
+      const vencimentosMap = JSON.parse(
+        vencimentosDataElement.textContent || "{}"
+      );
+      const despRecSelect = document.getElementById("desp_rec_id");
+      const dataVencimentoInput = document.getElementById("data_vencimento");
+      if (despRecSelect && dataVencimentoInput) {
+        despRecSelect.addEventListener("change", function () {
+          const selectedId = this.value;
+          const diaVencimento = vencimentosMap[selectedId];
+          if (diaVencimento) {
+            const hoje = new Date();
+            const dataAtualNoCampo = dataVencimentoInput.value
+              ? new Date(dataVencimentoInput.value + "T00:00:00")
+              : hoje;
+            let ano = dataAtualNoCampo.getFullYear();
+            let mes = dataAtualNoCampo.getMonth() + 1;
+            let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
+            let diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
+            const mesFormatado = String(mes).padStart(2, "0");
+            const diaFormatado = String(diaFinal).padStart(2, "0");
+            dataVencimentoInput.value = `${ano}-${mesFormatado}-${diaFormatado}`;
+          }
+        });
+      }
     }
   }
 
-  // --- 5. Lógica para preenchimento automático da data na Geração de Previsão ---
+  // --- 7. Lógica para preenchimento automático da data na Geração de Previsão ---
   const formGerarPrevisao = document.getElementById("form-gerar-previsao");
   if (formGerarPrevisao) {
     const vencimentosDataElement = document.getElementById(
       "vencimentos-previsao-data"
     );
-    if (!vencimentosDataElement) {
-      console.error(
-        "Contêiner de dados #vencimentos-previsao-data não encontrado!"
+    if (vencimentosDataElement) {
+      const vencimentosMap = JSON.parse(
+        vencimentosDataElement.textContent || "{}"
       );
-      return;
+      const despRecSelect = document.getElementById("desp_rec_id_previsao");
+      const dataInicioInput = document.getElementById("data_inicio_previsao");
+      if (despRecSelect && dataInicioInput) {
+        despRecSelect.addEventListener("change", function () {
+          const selectedId = this.value;
+          const diaVencimento = vencimentosMap[selectedId];
+          if (diaVencimento) {
+            const hoje = new Date();
+            const dataAtualNoCampo = dataInicioInput.value
+              ? new Date(dataInicioInput.value + "T00:00:00")
+              : hoje;
+            let ano = dataAtualNoCampo.getFullYear();
+            let mes = dataAtualNoCampo.getMonth() + 1;
+            let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
+            let diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
+            const mesFormatado = String(mes).padStart(2, "0");
+            const diaFormatado = String(diaFinal).padStart(2, "0");
+            dataInicioInput.value = `${ano}-${mesFormatado}-${diaFormatado}`;
+          }
+        });
+      }
     }
-    const vencimentosMap = JSON.parse(
-      vencimentosDataElement.textContent || "{}"
-    );
-    const despRecSelect = document.getElementById("desp_rec_id_previsao");
-    const dataInicioInput = document.getElementById("data_inicio_previsao");
+  }
 
-    if (despRecSelect && dataInicioInput) {
-      despRecSelect.addEventListener("change", function () {
-        const selectedId = this.value;
-        const diaVencimento = vencimentosMap[selectedId];
-        if (diaVencimento) {
-          const hoje = new Date();
-          const dataAtualNoCampo = dataInicioInput.value
-            ? new Date(dataInicioInput.value + "T00:00:00")
-            : hoje;
-          let ano = dataAtualNoCampo.getFullYear();
-          let mes = dataAtualNoCampo.getMonth() + 1;
-          let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
-          let diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
-          const mesFormatado = String(mes).padStart(2, "0");
-          const diaFormatado = String(diaFinal).padStart(2, "0");
-          dataInicioInput.value = `${ano}-${mesFormatado}-${diaFormatado}`;
+  // --- 8. Lógica para Melhorias de UX para Cadastro de Usuário ---
+  const senhaInput = document.getElementById("senha");
+  if (senhaInput) {
+    const confirmarSenhaInput = document.getElementById("confirmar_senha");
+    const toggleSenhaBtn = document.getElementById("toggleSenha");
+    const toggleConfirmarSenhaBtn = document.getElementById(
+      "toggleConfirmarSenha"
+    );
+    const strengthBar = document.getElementById("password-strength-bar");
+    const strengthText = document.getElementById("password-strength-text");
+
+    const togglePasswordVisibility = (input, iconId) => {
+      const icon = document.getElementById(iconId);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    };
+
+    if (toggleSenhaBtn) {
+      toggleSenhaBtn.addEventListener("click", () => {
+        togglePasswordVisibility(senhaInput, "toggleSenhaIcon");
+      });
+    }
+
+    if (toggleConfirmarSenhaBtn && confirmarSenhaInput) {
+      toggleConfirmarSenhaBtn.addEventListener("click", () => {
+        togglePasswordVisibility(
+          confirmarSenhaInput,
+          "toggleConfirmarSenhaIcon"
+        );
+      });
+    }
+
+    if (strengthBar && strengthText) {
+      senhaInput.addEventListener("input", () => {
+        const password = senhaInput.value;
+        let score = 0;
+        let text = "";
+        let color = "";
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        switch (score) {
+          case 0:
+          case 1:
+          case 2:
+            text = "Fraca";
+            color = "bg-danger";
+            break;
+          case 3:
+            text = "Média";
+            color = "bg-warning";
+            break;
+          case 4:
+          case 5:
+            text = "Forte";
+            color = "bg-success";
+            break;
+        }
+        if (password.length === 0) {
+          strengthBar.style.width = "0%";
+          strengthText.textContent = "";
+        } else {
+          strengthBar.style.width = (score / 5) * 100 + "%";
+          strengthBar.className = "progress-bar " + color;
+          strengthText.textContent = `Força da senha: ${text}`;
         }
       });
     }
   }
 
-  // --- 6. Melhorias de UX para Cadastro de Usuário ---
-  const senhaInput = document.getElementById("senha");
-  const confirmarSenhaInput = document.getElementById("confirmar_senha");
-  const toggleSenhaBtn = document.getElementById("toggleSenha");
-  const toggleConfirmarSenhaBtn = document.getElementById(
-    "toggleConfirmarSenha"
-  );
-  const strengthBar = document.getElementById("password-strength-bar");
-  const strengthText = document.getElementById("password-strength-text");
-
-  const togglePasswordVisibility = (input, iconId) => {
-    const icon = document.getElementById(iconId);
-    if (input.type === "password") {
-      input.type = "text";
-      icon.classList.remove("fa-eye");
-      icon.classList.add("fa-eye-slash");
-    } else {
-      input.type = "password";
-      icon.classList.remove("fa-eye-slash");
-      icon.classList.add("fa-eye");
-    }
-  };
-
-  if (toggleSenhaBtn && senhaInput) {
-    toggleSenhaBtn.addEventListener("click", () => {
-      togglePasswordVisibility(senhaInput, "toggleSenhaIcon");
-    });
-  }
-
-  if (toggleConfirmarSenhaBtn && confirmarSenhaInput) {
-    toggleConfirmarSenhaBtn.addEventListener("click", () => {
-      togglePasswordVisibility(confirmarSenhaInput, "toggleConfirmarSenhaIcon");
-    });
-  }
-
-  if (senhaInput && strengthBar && strengthText) {
-    senhaInput.addEventListener("input", () => {
-      const password = senhaInput.value;
-      let score = 0;
-      let text = "";
-      let color = "";
-      if (password.length >= 8) score++;
-      if (/[A-Z]/.test(password)) score++;
-      if (/[a-z]/.test(password)) score++;
-      if (/[0-9]/.test(password)) score++;
-      if (/[^A-Za-z0-9]/.test(password)) score++;
-      switch (score) {
-        case 0:
-        case 1:
-        case 2:
-          text = "Fraca";
-          color = "bg-danger";
-          break;
-        case 3:
-          text = "Média";
-          color = "bg-warning";
-          break;
-        case 4:
-        case 5:
-          text = "Forte";
-          color = "bg-success";
-          break;
-      }
-      if (password.length === 0) {
-        strengthBar.style.width = "0%";
-        strengthText.textContent = "";
-      } else {
-        strengthBar.style.width = (score / 5) * 100 + "%";
-        strengthBar.className = "progress-bar " + color;
-        strengthText.textContent = `Força da senha: ${text}`;
-      }
-    });
-  }
-
-  // --- 7. Lógica para a tela de Amortização de Financiamento ---
+  // --- 9. Lógica para a tela de Amortização de Financiamento ---
   const formAmortizacao = document.getElementById("form-amortizacao");
   if (formAmortizacao) {
     const valorAmortizacaoInput = document.getElementById("valor_amortizacao");
@@ -273,13 +304,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const parcelasSelecionadas = document.querySelectorAll(
         ".parcela-checkbox:checked"
       ).length;
-
       resumoValor.textContent = valorTotal.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL",
       });
       resumoParcelas.textContent = parcelasSelecionadas;
-
       if (parcelasSelecionadas > 0 && valorTotal > 0) {
         const valorPorParcela = valorTotal / parcelasSelecionadas;
         resumoValorParcela.textContent = valorPorParcela.toLocaleString(
@@ -293,31 +322,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     valorAmortizacaoInput.addEventListener("input", atualizarResumo);
     checkboxes.forEach((cb) => cb.addEventListener("change", atualizarResumo));
-
     atualizarResumo();
-  }
-
-  // --- 8. Lógica para formulário de contas  ---
-  const tipoContaSelect = document.getElementById("tipo-conta-select");
-  const limiteContainer = document.getElementById("limite-container");
-
-  if (tipoContaSelect && limiteContainer) {
-    const limiteInput = limiteContainer.querySelector("input");
-
-    const toggleLimiteField = () => {
-      const tipoSelecionado = tipoContaSelect.value;
-      const tiposComLimite = ["Corrente", "Digital"];
-
-      if (tiposComLimite.includes(tipoSelecionado)) {
-        limiteContainer.style.display = "block";
-      } else {
-        limiteContainer.style.display = "none";
-        if (limiteInput) {
-          limiteInput.value = "0.00";
-        }
-      }
-    };
-    tipoContaSelect.addEventListener("change", toggleLimiteField);
-    toggleLimiteField();
   }
 });

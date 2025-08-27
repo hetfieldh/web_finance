@@ -7,10 +7,6 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.forms.extrato_forms import ExtratoConsolidadoForm
-from app.models.crediario_fatura_model import CrediarioFatura
-from app.models.desp_rec_movimento_model import DespRecMovimento
-from app.models.financiamento_parcela_model import FinanciamentoParcela
-from app.models.salario_movimento_model import SalarioMovimento
 from app.services import relatorios_service
 
 extrato_consolidado_bp = Blueprint(
@@ -38,10 +34,9 @@ def extrato_consolidado():
             flash("Formato de data inválido.", "danger")
             return redirect(url_for("extrato_consolidado.extrato_consolidado"))
 
-        # A lógica para buscar os KPIs e a lista de movimentações
-        # é centralizada nos serviços.
         kpis = relatorios_service.get_balanco_mensal(current_user.id, ano, mes)
-        movimentacoes = relatorios_service.get_fluxo_caixa_mensal_consolidado(
+
+        movimentacoes = relatorios_service.get_extrato_detalhado_mensal(
             current_user.id, ano, mes
         )
 

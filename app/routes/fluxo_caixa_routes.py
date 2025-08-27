@@ -31,20 +31,7 @@ def painel():
             flash("Formato de data inválido.", "danger")
             return redirect(url_for("fluxo_caixa.painel"))
 
-        balanco_mensal = relatorios_service.get_balanco_mensal(
-            current_user.id, ano, mes
-        )
-
-        kpis = {
-            "receitas": balanco_mensal.get("receitas", Decimal("0.00")),
-            "despesas": balanco_mensal.get("despesas", Decimal("0.00")),
-            "balanco": balanco_mensal.get("balanco", Decimal("0.00")),
-            "comprometimento": 0,
-        }
-
-        if kpis["receitas"] > 0:
-            kpis["comprometimento"] = round((kpis["despesas"] / kpis["receitas"]) * 100)
-
+        kpis = relatorios_service.get_balanco_mensal(current_user.id, ano, mes)
         movimentacoes = relatorios_service.get_fluxo_caixa_mensal_consolidado(
             current_user.id, ano, mes
         )
