@@ -1,8 +1,7 @@
 <!--- app/templates/financiamentos/edit.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
-{% block title %}Web Finance - Financiamentos{% endblock %} {% block page_title
-%}Editar Financiamento{% endblock %} {% block content %}
+{% block content %}
 <div class="row">
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
@@ -26,14 +25,20 @@
           </div>
           <div class="row">
             <div class="col-md-3 mb-3">
-              {{ render_field(form.valor_total_financiado) }}
+              <label class="form-label">Valor Financiado</label>
+              <input
+                type="text"
+                class="form-control"
+                value="{{ financiamento.valor_total_financiado | format_currency }}"
+                readonly
+              />
             </div>
             <div class="col-md-3 mb-3">
               <label class="form-label">Saldo Devedor Atual</label>
               <input
                 type="text"
                 class="form-control"
-                value="R$ {{ '%.2f'|format(financiamento.saldo_devedor_atual) }}"
+                value="{{ financiamento.saldo_devedor_atual | format_currency }}"
                 readonly
               />
             </div>

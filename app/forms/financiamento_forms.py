@@ -131,51 +131,28 @@ class CadastroFinanciamentoForm(FlaskForm):
 
 
 class EditarFinanciamentoForm(FlaskForm):
+    """
+    Formulário para editar um financiamento.
+    Apenas a descrição é editável. Os outros campos são exibidos como somente leitura.
+    """
+
     nome_financiamento = StringField(
         "Nome do Financiamento",
-        validators=[
-            DataRequired("O nome do financiamento é obrigatório."),
-            Length(min=3, max=100, message="O nome deve ter entre 3 e 100 caracteres."),
-            Regexp(
-                r"^(?!.*\s\s)[a-zA-ZÀ-ÿ0-9\s'\-]+$",
-                message="O nome contém caracteres inválidos ou múltiplos espaços.",
-            ),
-        ],
+        validators=[DataRequired()],
         render_kw={"readonly": True},
     )
-
-    conta_id = SelectField(
-        "Conta Bancária",
-        validators=[Optional()],
-        coerce=lambda x: int(x) if x else None,
-        render_kw={"disabled": True},
-    )
-
     valor_total_financiado = DecimalField(
-        "Valor Total Financiado",
-        validators=[Optional()],
-        places=2,
-        render_kw={"readonly": True},
+        "Valor Total Financiado", validators=[Optional()], render_kw={"readonly": True}
     )
-
     taxa_juros_anual = DecimalField(
-        "Taxa de Juros Anual (%)",
-        validators=[Optional()],
-        places=4,
-        render_kw={"readonly": True},
+        "Taxa de Juros Anual (%)", validators=[Optional()], render_kw={"readonly": True}
     )
-
     data_inicio = DateField(
-        "Data de Início",
-        format="%Y-%m-%d",
-        validators=[Optional()],
-        render_kw={"readonly": True},
+        "Data de Início", validators=[Optional()], render_kw={"readonly": True}
     )
-
     prazo_meses = IntegerField(
         "Prazo (em meses)", validators=[Optional()], render_kw={"readonly": True}
     )
-
     tipo_amortizacao = SelectField(
         "Tipo de Amortização",
         choices=TIPOS_AMORTIZACAO,
@@ -183,41 +160,30 @@ class EditarFinanciamentoForm(FlaskForm):
         render_kw={"disabled": True},
     )
 
+    conta_id = SelectField(
+        "Conta Bancária Associada",
+        coerce=lambda x: int(x) if x is not None and x != "" else None,
+        validators=[DataRequired("Por favor, selecione uma conta.")],
+        render_kw={"disabled": True},
+    )
     descricao = TextAreaField(
-        "Descrição",
+        "Descrição (opcional)",
         validators=[
-            Length(max=255, message="A descrição não pode exceder 255 caracteres."),
             Optional(),
+            Length(max=255, message="A descrição não pode exceder 255 caracteres."),
         ],
     )
-
     submit = SubmitField("Atualizar")
 
-    def __init__(self, original_nome_financiamento, *args, **kwargs):
-        account_choices = kwargs.pop("account_choices", [])
-        super().__init__(
-            original_nome_financiamento=original_nome_financiamento, *args, **kwargs
+    def __init__(self, *args, **kwargs):
+        self.original_nome_financiamento = kwargs.pop(
+            "original_nome_financiamento", None
         )
+        account_choices = kwargs.pop("account_choices", [])
+
+        super(EditarFinanciamentoForm, self).__init__(*args, **kwargs)
+
         self.conta_id.choices = account_choices
-
-    def validate(self, extra_validators=None):
-        initial_validation = super().validate(extra_validators)
-        if not initial_validation:
-            return False
-
-        nome_financiamento_data = self.nome_financiamento.data.strip()
-
-        if nome_financiamento_data != self.original_nome_financiamento:
-            existing_financiamento = Financiamento.query.filter_by(
-                usuario_id=current_user.id, nome_financiamento=nome_financiamento_data
-            ).first()
-
-            if existing_financiamento:
-                raise ValidationError(
-                    "Você já possui outro financiamento com este nome."
-                )
-
-        return True
 
 
 class ImportarParcelasForm(FlaskForm):

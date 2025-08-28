@@ -1,8 +1,6 @@
-<!-- app/templates/financiamentos/list.html -->
+<!--- app\templates\financiamentos\list.html -->
 
-{% extends "base.html" %} {% block title %}Web Finance - Financiamentos{%
-endblock %} {% block page_title %}Financiamentos{% endblock %} {% block content
-%}
+{% extends "base.html" %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -40,10 +38,10 @@ endblock %} {% block page_title %}Financiamentos{% endblock %} {% block content
                 <td>{{ financiamento.nome_financiamento }}</td>
                 <td>{{ financiamento.conta.nome_banco }}</td>
                 <td>
-                  R$ {{ "%.2f"|format(financiamento.valor_total_financiado) }}
+                  {{ financiamento.valor_total_financiado | format_currency }}
                 </td>
                 <td class="fw-bold text-danger">
-                  R$ {{ "%.2f"|format(financiamento.saldo_devedor_atual) }}
+                  {{ financiamento.saldo_devedor_atual | format_currency }}
                 </td>
                 <td>{{ financiamento.prazo_meses }}</td>
                 <td>{{ financiamento.tipo_amortizacao }}</td>

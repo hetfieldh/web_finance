@@ -1,8 +1,12 @@
 <!--- app\templates\solicitacoes\gerenciar.html -->
 
-{% extends "base.html" %} {% block title %}Gerenciar Solicitações{% endblock %}
-{% block page_title %}Gerenciar Solicitações de Acesso{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block content %}
+
+<div class="mb-3 text-end">
+  <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Voltar
+  </a>
+</div>
 <div class="card shadow-sm">
   <div class="card-body">
     <div class="table-responsive">

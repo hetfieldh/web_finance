@@ -1,8 +1,7 @@
 <!--- app/templates/conta_movimentos/add.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
-{% block title %}Web Finance - Lançamentos{% endblock %} {% block page_title
-%}Adicionar Lançamento Bancário{% endblock %} {% block content %}
+{% block content %}
 <div id="campos-moviveis" class="d-none">
   <div id="container-conta_id">
     {{ render_field(form.conta_id, attrs={'id': 'conta_id'}) }}

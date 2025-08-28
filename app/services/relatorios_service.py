@@ -17,7 +17,7 @@ from app.models.salario_movimento_model import SalarioMovimento
 def get_balanco_mensal(user_id, ano, mes):
     """
     Calcula o balanço consolidado de receitas e despesas realizadas para um
-    determinado mês.
+    determinado mês, incluindo o percentual de comprometimento da renda.
     """
     data_inicio_mes = date(ano, mes, 1)
     if mes == 12:
@@ -83,10 +83,17 @@ def get_balanco_mensal(user_id, ano, mes):
     ).scalar() or Decimal("0.00")
     total_despesas += parcelas_pagas
 
+    # --- LÓGICA DO COMPROMETIMENTO ADICIONADA AQUI ---
+    comprometimento = 0
+    if total_receitas > 0:
+        # Arredonda para 2 casas decimais
+        comprometimento = round((total_despesas / total_receitas) * 100, 2)
+
     return {
         "receitas": total_receitas,
         "despesas": total_despesas,
         "balanco": total_receitas - total_despesas,
+        "comprometimento": comprometimento,  # <-- Adicionado ao retorno
     }
 
 

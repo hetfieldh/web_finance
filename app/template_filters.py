@@ -1,12 +1,19 @@
 # app\template_filters.py
 
+import locale
+from decimal import Decimal
+
 
 def format_currency(value):
-    """Formata moeda no padrão PT-BR."""
+    """
+    Formata um valor numérico como moeda no padrão PT-BR.
+    Ex: 1234.56 -> R$ 1.234,56
+    """
     if value is None:
-        value = 0
+        return "R$ 0,00"
     try:
-        value = float(value)
-        return f"R$ {value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        val = Decimal(value)
     except (ValueError, TypeError):
         return value
+
+    return locale.currency(val, grouping=True, symbol=True)

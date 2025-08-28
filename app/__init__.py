@@ -171,6 +171,16 @@ def create_app(config_class=Config):
             )
         return response
 
+    @app.context_processor
+    def inject_page_config():
+        from .utils import PAGE_CONFIG
+
+        endpoint = request.endpoint or "main.dashboard"
+        default_config = {"title": "Bem-vindo", "header": "Web Finance"}
+        page_config = PAGE_CONFIG.get(endpoint, default_config)
+
+        return dict(page_config=page_config)
+
     @app.errorhandler(404)
     def not_found_error(error):
         user_info = current_user.login if current_user.is_authenticated else "Anônimo"
