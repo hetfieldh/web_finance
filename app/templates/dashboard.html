@@ -247,28 +247,30 @@
               >
             </div>
           </div>
-          {% endfor %} {% endif %} {% if crediarios %} {% for cred in crediarios
-          %}
-          <div class="card border-1">
-            <div
-              class="card-body p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="d-flex align-items-center">
-                <i
-                  class="fas fa-credit-card fa-lg text-secondary opacity-50 me-2"
-                ></i>
-                <div>
-                  <div class="fw-semibold small">{{ cred.nome_crediario }}</div>
-                  <div class="text-muted extra-small">Crediário</div>
+          {% endfor %} {% endif %}
+          {% if crediarios %}
+            {% for cred in crediarios %}
+              {% if cred.saldo_devedor > 0 %}  <div class="card border-1">
+                <div
+                  class="card-body p-1 d-flex justify-content-between align-items-center"
+                >
+                  <div class="d-flex align-items-center">
+                    <i
+                      class="fas fa-credit-card fa-lg text-secondary opacity-50 me-2"
+                    ></i>
+                    <div>
+                      <div class="fw-semibold small">{{ cred.nome_crediario }}</div>
+                      <div class="text-muted extra-small">Crediário</div>
+                    </div>
+                  </div>
+                  <span class="fw-semibold h5 mb-0 text-danger"
+                    >{{ cred.saldo_devedor | format_currency }}</span
+                  >
                 </div>
               </div>
-              <span class="fw-semibold h5 mb-0 text-danger"
-                >{{ cred.saldo_devedor | format_currency }}</span
-              >
-            </div>
-          </div>
-          {% endfor %} {% endif %} {% if not financiamentos and not crediarios
-          %}
+              {% endif %} {% endfor %}
+          {% endif %}
+          {% if not financiamentos and not crediarios%}
           <div class="text-center p-2">
             <p class="text-muted small mb-0">
               Nenhum saldo devedor encontrado.

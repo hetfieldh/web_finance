@@ -68,6 +68,7 @@
               <tr>
                 <th>Data</th>
                 <th>Origem</th>
+                <th>Conta Utilizada</th>
                 <th>Tipo</th>
                 <th class="text-end">Valor Realizado</th>
               </tr>
@@ -77,6 +78,7 @@
               <tr>
                 <td>{{ mov.data.strftime('%d/%m/%Y') }}</td>
                 <td>{{ mov.origem }}</td>
+                <td>{{ mov.conta }}</td>
                 <td>
                   {% if mov.categoria == 'Receita' or mov.categoria == 'Salário'
                   or mov.categoria == 'Benefício' %}

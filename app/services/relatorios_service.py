@@ -5,8 +5,10 @@ from decimal import Decimal
 
 from flask_login import current_user
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from app import db
+from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
@@ -107,7 +109,7 @@ def get_balanco_mensal(user_id, ano, mes):
 def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
     """
     Busca e consolida todas as entradas e saídas de caixa realizadas em um mês,
-    agrupadas por sua origem.
+    agrupadas por sua origem e incluindo a conta bancária.
     """
     data_inicio_mes = date(ano, mes, 1)
     if mes == 12:
@@ -118,33 +120,61 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
     movimentacoes_consolidadas = []
 
     # Receitas (Salários e Outras)
-    salarios_mes = SalarioMovimento.query.filter(
-        SalarioMovimento.usuario_id == user_id,
-        SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
-        SalarioMovimento.status.in_([STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]),
-    ).all()
+    salarios_mes = (
+        SalarioMovimento.query.options(
+            joinedload(SalarioMovimento.movimento_bancario_salario).joinedload(
+                ContaMovimento.conta
+            ),
+            joinedload(SalarioMovimento.movimento_bancario_beneficio).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            SalarioMovimento.usuario_id == user_id,
+            SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
+            SalarioMovimento.status.in_([STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]),
+        )
+        .all()
+    )
     for s in salarios_mes:
         if s.movimento_bancario_salario_id:
+            conta_info = (
+                f"{s.movimento_bancario_salario.conta.nome_banco} ({s.movimento_bancario_salario.conta.tipo})"
+                if s.movimento_bancario_salario
+                else "N/A"
+            )
             movimentacoes_consolidadas.append(
                 {
                     "data": s.data_recebimento,
                     "origem": f"Salário (Ref: {s.mes_referencia})",
                     "categoria": "Salário",
                     "valor": s.salario_liquido,
+                    "conta": conta_info,
                 }
             )
         if s.movimento_bancario_beneficio_id:
+            conta_info = (
+                f"{s.movimento_bancario_beneficio.conta.nome_banco} ({s.movimento_bancario_beneficio.conta.tipo})"
+                if s.movimento_bancario_beneficio
+                else "N/A"
+            )
             movimentacoes_consolidadas.append(
                 {
                     "data": s.data_recebimento,
                     "origem": f"Benefícios (Ref: {s.mes_referencia})",
                     "categoria": "Benefício",
                     "valor": s.total_beneficios,
+                    "conta": conta_info,
                 }
             )
 
     outras_receitas = (
-        DespRecMovimento.query.join(DespRec)
+        DespRecMovimento.query.options(
+            joinedload(DespRecMovimento.despesa_receita),
+            joinedload(DespRecMovimento.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
         .filter(
             DespRecMovimento.usuario_id == user_id,
             DespRecMovimento.status == STATUS_RECEBIDO,
@@ -154,18 +184,29 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
         .all()
     )
     for receita in outras_receitas:
+        conta_info = (
+            f"{receita.movimento_bancario.conta.nome_banco} ({receita.movimento_bancario.conta.tipo})"
+            if receita.movimento_bancario
+            else "N/A"
+        )
         movimentacoes_consolidadas.append(
             {
                 "data": receita.data_pagamento,
                 "origem": receita.despesa_receita.nome,
                 "categoria": "Receita",
                 "valor": receita.valor_realizado,
+                "conta": conta_info,
             }
         )
 
     # Despesas (Gerais)
     despesas_gerais = (
-        DespRecMovimento.query.join(DespRec)
+        DespRecMovimento.query.options(
+            joinedload(DespRecMovimento.despesa_receita),
+            joinedload(DespRecMovimento.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
         .filter(
             DespRecMovimento.usuario_id == user_id,
             DespRecMovimento.status == STATUS_PAGO,
@@ -175,54 +216,88 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
         .all()
     )
     for despesa in despesas_gerais:
+        conta_info = (
+            f"{despesa.movimento_bancario.conta.nome_banco} ({despesa.movimento_bancario.conta.tipo})"
+            if despesa.movimento_bancario
+            else "N/A"
+        )
         movimentacoes_consolidadas.append(
             {
                 "data": despesa.data_pagamento,
                 "origem": despesa.despesa_receita.nome,
                 "categoria": "Despesa",
                 "valor": despesa.valor_realizado,
+                "conta": conta_info,
             }
         )
 
     # Faturas de Crediário Pagas
-    faturas_pagas = CrediarioFatura.query.filter(
-        CrediarioFatura.usuario_id == user_id,
-        CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
-        CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
-    ).all()
+    faturas_pagas = (
+        CrediarioFatura.query.options(
+            joinedload(CrediarioFatura.crediario),
+            joinedload(CrediarioFatura.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            CrediarioFatura.usuario_id == user_id,
+            CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
+            CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        )
+        .all()
+    )
     for fatura in faturas_pagas:
+        conta_info = (
+            f"{fatura.movimento_bancario.conta.nome_banco} ({fatura.movimento_bancario.conta.tipo})"
+            if fatura.movimento_bancario
+            else "N/A"
+        )
         movimentacoes_consolidadas.append(
             {
                 "data": fatura.data_pagamento,
                 "origem": f"Fatura: {fatura.crediario.nome_crediario}",
                 "categoria": "Crediário",
                 "valor": fatura.valor_pago_fatura,
+                "conta": conta_info,
             }
         )
 
     # Parcelas de Financiamento Pagas
-    parcelas_pagas_no_mes = FinanciamentoParcela.query.filter(
-        FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
-        FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        FinanciamentoParcela.financiamento.has(usuario_id=user_id),
-    ).all()
+    parcelas_pagas_no_mes = (
+        FinanciamentoParcela.query.options(
+            joinedload(FinanciamentoParcela.financiamento),
+            joinedload(FinanciamentoParcela.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
+            FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
+            FinanciamentoParcela.financiamento.has(usuario_id=user_id),
+        )
+        .all()
+    )
 
-    # Agrupamento para Financiamentos
     financiamentos_pagos = {}
     for p in parcelas_pagas_no_mes:
         key = (p.financiamento_id, p.status)
+        conta_info = (
+            f"{p.movimento_bancario.conta.nome_banco} ({p.movimento_bancario.conta.tipo})"
+            if p.movimento_bancario
+            else "N/A"
+        )
         if key not in financiamentos_pagos:
-            tipo = "Amortização" if p.status == "Amortizado" else "Financiamento"
+            tipo = "Amortização" if p.status == STATUS_AMORTIZADO else "Financiamento"
             financiamentos_pagos[key] = {
                 "data": p.data_pagamento,
                 "origem": f"{tipo}: {p.financiamento.nome_financiamento}",
                 "categoria": tipo,
                 "valor": Decimal("0.00"),
+                "conta": conta_info,
             }
         financiamentos_pagos[key]["valor"] += p.valor_pago
 
     movimentacoes_consolidadas.extend(financiamentos_pagos.values())
-
     movimentacoes_consolidadas.sort(key=lambda x: x["data"])
 
     return movimentacoes_consolidadas
@@ -241,77 +316,145 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
 
     movimentacoes = []
 
-    # 1. Busca Despesas e Receitas pagas/recebidas no mês
-    desp_rec = DespRecMovimento.query.filter(
-        DespRecMovimento.usuario_id == user_id,
-        DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRecMovimento.status.in_([STATUS_PAGO, STATUS_RECEBIDO]),
-    ).all()
+    # 1. Busca Despesas e Receitas
+    desp_rec = (
+        DespRecMovimento.query.options(
+            joinedload(DespRecMovimento.despesa_receita),
+            joinedload(DespRecMovimento.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            DespRecMovimento.usuario_id == user_id,
+            DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
+            DespRecMovimento.status.in_([STATUS_PAGO, STATUS_RECEBIDO]),
+        )
+        .all()
+    )
     for item in desp_rec:
+        conta_info = (
+            f"{item.movimento_bancario.conta.nome_banco} ({item.movimento_bancario.conta.tipo})"
+            if item.movimento_bancario
+            else "N/A"
+        )
         movimentacoes.append(
             {
                 "data": item.data_pagamento,
                 "origem": item.despesa_receita.nome,
                 "categoria": item.despesa_receita.natureza,
                 "valor": item.valor_realizado,
+                "conta": conta_info,
             }
         )
 
-    # 2. Busca Faturas de Crediário pagas no mês
-    faturas = CrediarioFatura.query.filter(
-        CrediarioFatura.usuario_id == user_id,
-        CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
-    ).all()
+    # 2. Busca Faturas de Crediário
+    faturas = (
+        CrediarioFatura.query.options(
+            joinedload(CrediarioFatura.crediario),
+            joinedload(CrediarioFatura.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            CrediarioFatura.usuario_id == user_id,
+            CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        )
+        .all()
+    )
     for fatura in faturas:
+        conta_info = (
+            f"{fatura.movimento_bancario.conta.nome_banco} ({fatura.movimento_bancario.conta.tipo})"
+            if fatura.movimento_bancario
+            else "N/A"
+        )
         movimentacoes.append(
             {
                 "data": fatura.data_pagamento,
                 "origem": f"Fatura {fatura.crediario.nome_crediario}",
                 "categoria": "Crediário",
                 "valor": fatura.valor_pago_fatura,
+                "conta": conta_info,
             }
         )
 
-    # 3. Busca Parcelas de Financiamento pagas no mês
-    parcelas = FinanciamentoParcela.query.filter(
-        FinanciamentoParcela.financiamento.has(usuario_id=user_id),
-        FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
-    ).all()
+    # 3. Busca Parcelas de Financiamento
+    parcelas = (
+        FinanciamentoParcela.query.options(
+            joinedload(FinanciamentoParcela.financiamento),
+            joinedload(FinanciamentoParcela.movimento_bancario).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            FinanciamentoParcela.financiamento.has(usuario_id=user_id),
+            FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
+            FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
+        )
+        .all()
+    )
     for parcela in parcelas:
         descricao = f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})"
-        tipo = "Amortização" if parcela.status == "Amortizado" else "Financiamento"
+        tipo = "Amortização" if parcela.status == STATUS_AMORTIZADO else "Financiamento"
+        conta_info = (
+            f"{parcela.movimento_bancario.conta.nome_banco} ({parcela.movimento_bancario.conta.tipo})"
+            if parcela.movimento_bancario
+            else "N/A"
+        )
         movimentacoes.append(
             {
                 "data": parcela.data_pagamento,
                 "origem": descricao,
                 "categoria": tipo,
                 "valor": parcela.valor_pago,
+                "conta": conta_info,
             }
         )
 
-    # 4. Busca Salários e Benefícios recebidos no mês
-    salarios = SalarioMovimento.query.filter(
-        SalarioMovimento.usuario_id == user_id,
-        SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
-    ).all()
+    # 4. Busca Salários e Benefícios
+    salarios = (
+        SalarioMovimento.query.options(
+            joinedload(SalarioMovimento.movimento_bancario_salario).joinedload(
+                ContaMovimento.conta
+            ),
+            joinedload(SalarioMovimento.movimento_bancario_beneficio).joinedload(
+                ContaMovimento.conta
+            ),
+        )
+        .filter(
+            SalarioMovimento.usuario_id == user_id,
+            SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
+        )
+        .all()
+    )
     for salario in salarios:
         if salario.movimento_bancario_salario_id:
+            conta_info = (
+                f"{salario.movimento_bancario_salario.conta.nome_banco} ({salario.movimento_bancario_salario.conta.tipo})"
+                if salario.movimento_bancario_salario
+                else "N/A"
+            )
             movimentacoes.append(
                 {
                     "data": salario.data_recebimento,
                     "origem": f"Salário (Ref: {salario.mes_referencia})",
                     "categoria": "Salário",
                     "valor": salario.salario_liquido,
+                    "conta": conta_info,
                 }
             )
         if salario.movimento_bancario_beneficio_id:
+            conta_info = (
+                f"{salario.movimento_bancario_beneficio.conta.nome_banco} ({salario.movimento_bancario_beneficio.conta.tipo})"
+                if salario.movimento_bancario_beneficio
+                else "N/A"
+            )
             movimentacoes.append(
                 {
                     "data": salario.data_recebimento,
                     "origem": f"Benefícios (Ref: {salario.mes_referencia})",
                     "categoria": "Benefício",
                     "valor": salario.total_beneficios,
+                    "conta": conta_info,
                 }
             )
 

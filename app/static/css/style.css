@@ -123,6 +123,35 @@ h6,
     color: var(--wf-text-light)
 }
 
+#sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.sidebar-menu-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar-track {
+    background: var(--wf-grey);
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar-thumb {
+    background: var(--wf-border);
+    border-radius: 2px;
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--wf-light);
+}
+
 /* ==========================================================================
    4. ESTILOS DE COMPONENTES
    ========================================================================== */

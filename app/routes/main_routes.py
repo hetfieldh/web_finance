@@ -40,7 +40,7 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
-    # --- Lógica de KPIs e buscas gerais (permanece igual) ---
+    # --- Lógica de KPIs e buscas gerais ---
     balance_kpis = conta_service.get_account_balance_kpis(current_user.id)
     hoje = date.today()
     balanco_do_mes = relatorios_service.get_balanco_mensal(
@@ -67,7 +67,7 @@ def dashboard():
         usuario_id=current_user.id, ativa=True
     ).all()
 
-    # --- LÓGICA PARA MOVIMENTOS DO MÊS (COM FILTROS CORRIGIDOS) ---
+    # --- LÓGICA PARA MOVIMENTOS DO MÊS ---
     form = FluxoCaixaForm(request.args)
     mes_ano_selecionado = form.mes_ano.data
     if not mes_ano_selecionado:

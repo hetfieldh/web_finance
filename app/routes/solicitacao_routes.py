@@ -59,13 +59,11 @@ def solicitar_acesso():
             "O número máximo de solicitações pendentes foi atingido. O envio de novas solicitações está temporariamente desabilitado.",
             "warning",
         )
-        # Impede o processamento do formulário e renderiza a página com o aviso
         form = SolicitacaoAcessoForm()
         return render_template(
             "solicitacoes/solicitar_acesso.html", form=form, limite_atingido=True
         )
 
-    # O resto da lógica só é executado se o limite não for atingido
     form = SolicitacaoAcessoForm()
     if form.validate_on_submit():
         email_solicitado = form.email.data.strip().lower()
