@@ -14,6 +14,13 @@ from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.utils import (
+    STATUS_AMORTIZADO,
+    STATUS_ATRASADO,
+    STATUS_PAGO,
+    STATUS_PENDENTE,
+    TIPO_DEBITO,
+)
 
 
 def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
@@ -21,9 +28,9 @@ def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
     Função auxiliar para determinar o status da parcela de forma clara e eficiente.
     """
     if data_vencimento < hoje:
-        return "Paga" if valor_pago else "Atrasada"
+        return STATUS_PAGO if valor_pago else STATUS_ATRASADO
     else:
-        return "Amortizada" if valor_pago else "Pendente"
+        return STATUS_AMORTIZADO if valor_pago else STATUS_PENDENTE
 
 
 import csv
@@ -47,9 +54,9 @@ def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
     Função auxiliar para determinar o status da parcela de forma clara e eficiente.
     """
     if data_vencimento < hoje:
-        return "Paga" if valor_pago else "Atrasada"
+        return STATUS_PAGO if valor_pago else STATUS_ATRASADO
     else:
-        return "Amortizada" if valor_pago else "Pendente"
+        return STATUS_AMORTIZADO if valor_pago else STATUS_PENDENTE
 
 
 def importar_e_processar_csv(financiamento, csv_file):
@@ -114,7 +121,7 @@ def importar_e_processar_csv(financiamento, csv_file):
             valor_pago = Decimal(valor_pago_str) if valor_pago_str.strip() else None
 
             status = _determinar_status_parcela(valor_pago, data_vencimento_obj, hoje)
-            pago = status in ["Paga", "Amortizada"]
+            pago = status in [STATUS_PAGO, STATUS_AMORTIZADO]
 
             parcelas_temporarias.append(
                 {
@@ -165,7 +172,7 @@ def importar_e_processar_csv(financiamento, csv_file):
             func.sum(FinanciamentoParcela.valor_principal)
         ).filter(
             FinanciamentoParcela.financiamento_id == financiamento.id,
-            FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
+            FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
         ).scalar() or Decimal(
             "0.00"
         )
@@ -219,7 +226,7 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
             )
 
         tipo_transacao = ContaTransacao.query.filter_by(
-            usuario_id=current_user.id, transacao_tipo="AMORTIZAÇÃO", tipo="Débito"
+            usuario_id=current_user.id, transacao_tipo="AMORTIZAÇÃO", tipo=TIPO_DEBITO
         ).first()
         if not tipo_transacao:
             return (
@@ -247,7 +254,7 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
         ).all()
 
         for parcela in parcelas:
-            parcela.status = "Amortizada"
+            parcela.status = STATUS_AMORTIZADO
             parcela.data_pagamento = data_pagamento
             parcela.valor_pago = valor_por_parcela
             parcela.movimento_bancario_id = novo_movimento.id
@@ -258,7 +265,7 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
             func.sum(FinanciamentoParcela.valor_principal)
         ).filter(
             FinanciamentoParcela.financiamento_id == financiamento.id,
-            FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
+            FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
         ).scalar() or Decimal(
             "0.00"
         )

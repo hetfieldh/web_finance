@@ -48,11 +48,11 @@
           <div class="col-md-3">
             <p>
               <strong>Status:</strong>
-              {% if fatura.status == 'Paga' %}
+              {% if fatura.status == 'Pago' %}
               <span class="badge bg-success">{{ fatura.status }}</span>
-              {% elif fatura.status == 'Atrasada' %}
+              {% elif fatura.status == 'Atrasado' %}
               <span class="badge bg-danger">{{ fatura.status }}</span>
-              {% elif fatura.status == 'Parcialmente Paga' %}
+              {% elif fatura.status == 'Parcialmente Pago' %}
               <span class="badge bg-warning">{{ fatura.status }}</span>
               {% else %}
               <span class="badge bg-secondary">{{ fatura.status }}</span>

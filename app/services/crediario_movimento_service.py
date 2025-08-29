@@ -12,6 +12,7 @@ from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_grupo_model import CrediarioGrupo
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
+from app.utils import STATUS_PAGO, STATUS_PARCIAL_PAGO
 
 
 def adicionar_movimento(form):
@@ -30,8 +31,8 @@ def adicionar_movimento(form):
         ).first()
 
         if fatura_existente and fatura_existente.status in [
-            "Paga",
-            "Parcialmente Paga",
+            STATUS_PAGO,
+            STATUS_PARCIAL_PAGO,
         ]:
             msg = f"Não é possível adicionar uma compra cuja primeira parcela vence em {mes_ano_referencia.split('-')[1]}/{mes_ano_referencia.split('-')[0]}, pois a fatura para este período já foi paga."
             return False, msg
@@ -97,8 +98,8 @@ def editar_movimento(movimento, form):
                 mes_referencia=mes_ano_referencia,
             ).first()
             if fatura_existente and fatura_existente.status in [
-                "Paga",
-                "Parcialmente Paga",
+                STATUS_PAGO,
+                STATUS_PARCIAL_PAGO,
             ]:
                 msg = f"Não é possível mover a primeira parcela para {mes_ano_referencia.split('-')[1]}/{mes_ano_referencia.split('-')[0]}, pois a fatura para este período já foi paga."
                 return False, msg

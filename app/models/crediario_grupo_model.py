@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, UniqueConstraint
 
 from app import db
+from app.utils import FormChoices
 
 
 class CrediarioGrupo(db.Model):
@@ -14,7 +15,10 @@ class CrediarioGrupo(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     grupo_crediario = db.Column(db.String(100), nullable=False)
     tipo_grupo_crediario = db.Column(
-        Enum("Compra", "Estorno", "Ajuste", name="tipo_grupo_crediario_enum"),
+        db.Enum(
+            *(item.value for item in FormChoices.TiposCrediarioGrupo),
+            name="tipo_grupo_crediario_enum",
+        ),
         nullable=False,
     )
     data_criacao = db.Column(

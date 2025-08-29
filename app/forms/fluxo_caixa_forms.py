@@ -4,8 +4,6 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
-from app.utils import gerar_opcoes_mes_ano
-
 
 class FluxoCaixaForm(FlaskForm):
     mes_ano = StringField(

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum
 
 from app import db
+from app.utils import STATUS_PENDENTE, FormChoices
 
 
 class SolicitacaoAcesso(db.Model):
@@ -16,9 +17,12 @@ class SolicitacaoAcesso(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     justificativa = db.Column(db.Text, nullable=True)
     status = db.Column(
-        Enum("Pendente", "Aprovada", "Rejeitada", name="status_solicitacao_enum"),
+        db.Enum(
+            *(item.value for item in FormChoices.StatusSolicitacao),
+            name="status_solicitacao_enum",
+        ),
         nullable=False,
-        default="Pendente",
+        default=FormChoices.StatusSolicitacao.PENDENTE.value,
     )
     data_solicitacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)

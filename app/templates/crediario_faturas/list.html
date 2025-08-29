@@ -43,7 +43,7 @@
               {% for item in faturas %}
               <tr>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-info{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-info{% endif %}"
                 >
                   {% if item.desatualizada %}
                   <i
@@ -62,26 +62,26 @@
                   {% endif %}
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
                   {{ item.fatura.id }}
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
                   {{ item.fatura.crediario.nome_crediario }} ({{
                   item.fatura.crediario.tipo_crediario }})
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
                   {% set partes = item.fatura.mes_referencia.split('-') %} {{
                   partes[1] }}-{{ partes[0] }}
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
-                  {% if item.destaque_status == 'atrasada' %}
+                  {% if item.destaque_status == 'Atrasado' %}
                   <i
                     class="fas fa-exclamation-circle me-1"
                     title="FATURA ATRASADA!"
@@ -92,19 +92,19 @@
                   item.fatura.data_vencimento_fatura.strftime('%d/%m/%Y') }}
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
                   R$ {{ "%.2f"|format(item.fatura.valor_total_fatura) }}
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
                   R$ {{ "%.2f"|format(item.fatura.valor_pago_fatura) }}
                 </td>
                 <td>
-                  {% if item.fatura.status == 'Paga' %}
+                  {% if item.fatura.status == 'Pago' %}
                   <span class="badge bg-success">{{ item.fatura.status }}</span>
-                  {% elif item.fatura.status == 'Atrasada' %}
+                  {% elif item.fatura.status == 'Atrasado' %}
                   <span class="badge bg-danger">{{ item.fatura.status }}</span>
                   {% elif item.fatura.status == 'Parcialmente Paga' %}
                   <span class="badge bg-warning">{{ item.fatura.status }}</span>
@@ -115,7 +115,7 @@
                   {% endif %}
                 </td>
                 <td
-                  class="{% if item.destaque_status == 'atrasada' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
+                  class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
                   {{ item.fatura.data_criacao.strftime('%d/%m/%Y %H:%M') }}
                 </td>

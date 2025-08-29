@@ -7,8 +7,7 @@ from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 from app import db
 from app.models.conta_transacao_model import ContaTransacao
-
-TIPOS_MOVIMENTO = [("Crédito", "Crédito"), ("Débito", "Débito")]
+from app.utils import TIPO_CORRENTE, TIPO_DIGITAL, FormChoices
 
 
 class CadastroContaTransacaoForm(FlaskForm):
@@ -29,7 +28,7 @@ class CadastroContaTransacaoForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo de Movimento",
-        choices=[("", "Selecione...")] + TIPOS_MOVIMENTO,
+        choices=FormChoices.get_choices(FormChoices.TipoTransacao),
         validators=[DataRequired("O tipo de movimento é obrigatório.")],
     )
     submit = SubmitField("Adicionar")
@@ -50,7 +49,7 @@ class CadastroContaTransacaoForm(FlaskForm):
         return super().validate(extra_validators)
 
     def validate_limite(self, field):
-        tipos_com_limite = ["Corrente", "Digital"]
+        tipos_com_limite = [TIPO_CORRENTE, TIPO_DIGITAL]
 
         if self.tipo.data not in tipos_com_limite:
             if field.data is not None and field.data > 0:
@@ -78,7 +77,7 @@ class EditarContaTransacaoForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo de Movimento",
-        choices=TIPOS_MOVIMENTO,
+        choices=FormChoices.get_choices(FormChoices.TipoTransacao),
         validators=[Optional()],
         render_kw={"disabled": True},
     )
@@ -119,7 +118,7 @@ class EditarContaTransacaoForm(FlaskForm):
         return True
 
     def validate_limite(self, field):
-        tipos_com_limite = ["Corrente", "Digital"]
+        tipos_com_limite = [TIPO_CORRENTE, TIPO_DIGITAL]
 
         tipo_da_conta = self.tipo.data if self.tipo.data else self.original_tipo
 

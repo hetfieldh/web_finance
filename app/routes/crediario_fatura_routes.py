@@ -22,6 +22,7 @@ from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
 from app.services import fatura_service
+from app.utils import STATUS_ATRASADO, STATUS_PAGO, STATUS_PARCIAL_PAGO, STATUS_PENDENTE
 
 crediario_fatura_bp = Blueprint(
     "crediario_fatura", __name__, url_prefix="/faturas_crediario"
@@ -68,9 +69,9 @@ def listar_faturas():
         desatualizada = fatura.valor_total_fatura != soma_real_parcelas
 
         destaque_status = ""
-        if fatura.status in ["Pendente", "Atrasada", "Parcialmente Paga"]:
+        if fatura.status in [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]:
             if fatura.data_vencimento_fatura < hoje:
-                destaque_status = "atrasada"
+                destaque_status = STATUS_ATRASADO
             elif (
                 fatura.data_vencimento_fatura.year == hoje.year
                 and fatura.data_vencimento_fatura.month == hoje.month
@@ -140,7 +141,7 @@ def excluir_fatura(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    if fatura.status in ["Paga", "Parcialmente Paga"]:
+    if fatura.status in [STATUS_PAGO, STATUS_PARCIAL_PAGO]:
         flash(
             "Não é possível excluir uma fatura que já está paga ou parcialmente paga.",
             "danger",

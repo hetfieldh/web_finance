@@ -28,14 +28,7 @@ from wtforms.validators import (
 from app import db
 from app.models.conta_model import Conta
 from app.models.financiamento_model import Financiamento
-
-TIPOS_AMORTIZACAO = [
-    ("", "Selecione..."),
-    ("SAC", "SAC"),
-    ("PRICE", "PRICE"),
-    ("Outro", "Outro"),
-]
-
+from app.utils import FormChoices
 
 class CadastroFinanciamentoForm(FlaskForm):
     nome_financiamento = StringField(
@@ -94,7 +87,7 @@ class CadastroFinanciamentoForm(FlaskForm):
 
     tipo_amortizacao = SelectField(
         "Amortização",
-        choices=TIPOS_AMORTIZACAO,
+        choices=FormChoices.get_choices(FormChoices.TipoAmortizacao),
         validators=[DataRequired("O tipo de amortização é obrigatório.")],
     )
 
@@ -155,7 +148,7 @@ class EditarFinanciamentoForm(FlaskForm):
     )
     tipo_amortizacao = SelectField(
         "Tipo de Amortização",
-        choices=TIPOS_AMORTIZACAO,
+        choices=FormChoices.get_choices(FormChoices.TipoAmortizacao),
         validators=[Optional()],
         render_kw={"disabled": True},
     )

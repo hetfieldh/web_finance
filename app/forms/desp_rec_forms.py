@@ -25,6 +25,7 @@ from wtforms.validators import (
 )
 
 from app.models.desp_rec_model import DespRec
+from app.utils import FormChoices
 
 
 class CadastroDespRecForm(FlaskForm):
@@ -41,12 +42,12 @@ class CadastroDespRecForm(FlaskForm):
     )
     natureza = SelectField(
         "Natureza",
-        choices=[("", "Selecione..."), ("Despesa", "Despesa"), ("Receita", "Receita")],
+        choices=FormChoices.get_choices(FormChoices.NaturezaDespRec),
         validators=[DataRequired("A natureza é obrigatória.")],
     )
     tipo = SelectField(
         "Tipo",
-        choices=[("", "Selecione..."), ("Fixa", "Fixa"), ("Variável", "Variável")],
+        choices=FormChoices.get_choices(FormChoices.TipoCadastroDespRec),
         validators=[DataRequired("O tipo é obrigatório.")],
     )
     dia_vencimento = IntegerField(
@@ -88,12 +89,12 @@ class EditarDespRecForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo",
-        choices=[("Fixa", "Fixa"), ("Variável", "Variável")],
+        choices=FormChoices.get_choices(FormChoices.TipoCadastroDespRec),
         render_kw={"disabled": True, "class": "form-select"},
     )
     natureza = SelectField(
         "Natureza",
-        choices=[("Despesa", "Despesa"), ("Receita", "Receita")],
+        choices=FormChoices.get_choices(FormChoices.NaturezaDespRec),
         render_kw={"disabled": True, "class": "form-select"},
     )
     dia_vencimento = IntegerField(

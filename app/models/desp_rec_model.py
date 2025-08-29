@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, UniqueConstraint
 
 from app import db
+from app.utils import FormChoices
 
 
 class DespRec(db.Model):
@@ -14,10 +15,17 @@ class DespRec(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     nome = db.Column(db.String(100), nullable=False)
     natureza = db.Column(
-        Enum("Receita", "Despesa", name="natureza_enum"), nullable=False
+        db.Enum(
+            *(item.value for item in FormChoices.NaturezaDespRec), name="natureza_enum"
+        ),
+        nullable=False,
     )
     tipo = db.Column(
-        Enum("Variável", "Fixa", name="tipo_desp_rec_enum"), nullable=False
+        db.Enum(
+            *(item.value for item in FormChoices.TipoCadastroDespRec),
+            name="tipo_desp_rec_enum",
+        ),
+        nullable=False,
     )
     dia_vencimento = db.Column(db.Integer, nullable=True)
     ativo = db.Column(db.Boolean, nullable=False, default=True)

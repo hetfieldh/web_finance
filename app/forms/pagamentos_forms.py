@@ -15,7 +15,6 @@ from wtforms import (
 from wtforms.validators import DataRequired, InputRequired, NumberRange
 
 from app.models.conta_model import Conta
-from app.utils import gerar_opcoes_mes_ano
 
 
 class PainelPagamentosForm(FlaskForm):

@@ -466,6 +466,7 @@ body.login-body {
     padding-bottom: 0.1rem;
     margin: 0rem;
     background-color: var(--wf-box-bg) !important;
+    width: 100px;
 }
 
 .input-maior {
@@ -477,4 +478,5 @@ body.login-body {
     padding-bottom: 0.1rem;
     margin: 0rem;
     background-color: var(--wf-box-bg) !important;
+    width: 100px;
 }

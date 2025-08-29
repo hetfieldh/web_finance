@@ -24,6 +24,15 @@ from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 from app.models.solicitacao_acesso_model import SolicitacaoAcesso
 from app.services import conta_service, relatorios_service
+from app.utils import (
+    NATUREZA_DESPESA,
+    STATUS_ATRASADO,
+    STATUS_PARCIAL_PAGO,
+    STATUS_PARCIAL_RECEBIDO,
+    STATUS_PENDENTE,
+    TIPO_ENTRADA,
+    TIPO_SAIDA,
+)
 
 main_bp = Blueprint("main", __name__)
 
@@ -79,9 +88,7 @@ def dashboard():
         .filter(
             DespRecMovimento.usuario_id == current_user.id,
             DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
-            DespRecMovimento.status.in_(
-                ["Pendente", "Atrasado"]
-            ),  # <-- FILTRO ADICIONADO
+            DespRecMovimento.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
         )
         .options(joinedload(DespRecMovimento.despesa_receita))
         .all()
@@ -93,7 +100,9 @@ def dashboard():
                 "descricao": item.despesa_receita.nome,
                 "valor": item.valor_previsto,
                 "tipo": (
-                    "saida" if item.despesa_receita.natureza == "Despesa" else "entrada"
+                    TIPO_SAIDA
+                    if item.despesa_receita.natureza == NATUREZA_DESPESA
+                    else TIPO_ENTRADA
                 ),
             }
         )
@@ -106,8 +115,8 @@ def dashboard():
                 data_inicio_mes, data_fim_mes
             ),
             CrediarioFatura.status.in_(
-                ["Pendente", "Atrasada", "Parcialmente Paga"]
-            ),  # <-- FILTRO ADICIONADO
+                [STATUS_ATRASADO, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]
+            ),
         )
         .options(joinedload(CrediarioFatura.crediario))
         .all()
@@ -118,7 +127,7 @@ def dashboard():
                 "data": fatura.data_vencimento_fatura,
                 "descricao": f"Fatura {fatura.crediario.nome_crediario}",
                 "valor": fatura.valor_total_fatura - fatura.valor_pago_fatura,
-                "tipo": "saida",
+                "tipo": TIPO_SAIDA,
             }
         )
 
@@ -128,9 +137,7 @@ def dashboard():
         .filter(
             Financiamento.usuario_id == current_user.id,
             FinanciamentoParcela.data_vencimento.between(data_inicio_mes, data_fim_mes),
-            FinanciamentoParcela.status.in_(
-                ["Pendente", "Atrasada"]
-            ),  # <-- FILTRO ADICIONADO
+            FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
         )
         .options(joinedload(FinanciamentoParcela.financiamento))
         .all()
@@ -141,7 +148,7 @@ def dashboard():
                 "data": parcela.data_vencimento,
                 "descricao": f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})",
                 "valor": parcela.valor_total_previsto,
-                "tipo": "saida",
+                "tipo": TIPO_SAIDA,
             }
         )
 
@@ -149,9 +156,7 @@ def dashboard():
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == current_user.id,
         SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
-        SalarioMovimento.status.in_(
-            ["Pendente", "Parcialmente Recebido"]
-        ),  # <-- FILTRO ADICIONADO
+        SalarioMovimento.status.in_([STATUS_PENDENTE, STATUS_PARCIAL_RECEBIDO]),
     ).all()
     for salario in salarios_mes:
         if not salario.movimento_bancario_salario_id and salario.salario_liquido > 0:
@@ -160,7 +165,7 @@ def dashboard():
                     "data": salario.data_recebimento,
                     "descricao": f"Salário Líquido (Ref: {salario.mes_referencia})",
                     "valor": salario.salario_liquido,
-                    "tipo": "entrada",
+                    "tipo": TIPO_ENTRADA,
                 }
             )
         if not salario.movimento_bancario_beneficio_id and salario.total_beneficios > 0:
@@ -169,14 +174,14 @@ def dashboard():
                     "data": salario.data_recebimento,
                     "descricao": f"Benefícios (Ref: {salario.mes_referencia})",
                     "valor": salario.total_beneficios,
-                    "tipo": "entrada",
+                    "tipo": TIPO_ENTRADA,
                 }
             )
 
     proximos_movimentos.sort(key=lambda x: x["data"])
 
     pending_requests_count = (
-        SolicitacaoAcesso.query.filter_by(status="Pendente").count()
+        SolicitacaoAcesso.query.filter_by(status=STATUS_PENDENTE).count()
         if current_user.is_admin
         else 0
     )

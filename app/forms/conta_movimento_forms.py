@@ -28,16 +28,25 @@ from app import db
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
+from app.utils import (
+    TIPO_DEBITO,
+    TIPO_MOVIMENTACAO_SIMPLES,
+    TIPO_MOVIMENTACAO_TRANSFERENCIA,
+    FormChoices,
+)
 
 
 class CadastroContaMovimentoForm(FlaskForm):
     tipo_operacao = RadioField(
         "Tipo de Operação",
         choices=[
-            ("simples", "Tradicional"),
-            ("transferencia", "Transferência Inter Contas"),
+            (FormChoices.TiposMovimentacaoBancaria.SIMPLES.value, "Tradicional"),
+            (
+                FormChoices.TiposMovimentacaoBancaria.TRANSFERENCIA.value,
+                "Transferência Inter Contas",
+            ),
         ],
-        default="simples",
+        default=FormChoices.TiposMovimentacaoBancaria.SIMPLES.value,
         validators=[DataRequired()],
     )
 
@@ -111,7 +120,7 @@ class CadastroContaMovimentoForm(FlaskForm):
         self.transferencia_tipo_id.choices = [("", "Selecione...")] + [
             (ct.id, f"{ct.transacao_tipo}")
             for ct in ContaTransacao.query.filter_by(
-                usuario_id=current_user.id, tipo="Débito"
+                usuario_id=current_user.id, tipo=TIPO_DEBITO
             )
             .order_by(ContaTransacao.transacao_tipo.asc())
             .all()
@@ -122,14 +131,14 @@ class CadastroContaMovimentoForm(FlaskForm):
         if not initial_validation:
             return False
 
-        if self.tipo_operacao.data == "simples":
+        if self.tipo_operacao.data == TIPO_MOVIMENTACAO_SIMPLES:
             if not self.conta_transacao_id.data:
                 self.conta_transacao_id.errors.append(
                     "O tipo de transação é obrigatório."
                 )
                 return False
 
-        elif self.tipo_operacao.data == "transferencia":
+        elif self.tipo_operacao.data == TIPO_MOVIMENTACAO_TRANSFERENCIA:
             if not self.conta_destino_id.data:
                 self.conta_destino_id.errors.append("A conta de destino é obrigatória.")
                 return False

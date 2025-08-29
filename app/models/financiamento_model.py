@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
+from app.utils import FormChoices
 
 
 class Financiamento(db.Model):
@@ -20,7 +21,11 @@ class Financiamento(db.Model):
     data_inicio = db.Column(db.Date, nullable=False)
     prazo_meses = db.Column(db.Integer, nullable=False)
     tipo_amortizacao = db.Column(
-        Enum("SAC", "PRICE", "Outro", name="tipo_amortizacao_enum"), nullable=False
+        db.Enum(
+            *(item.value for item in FormChoices.TipoAmortizacao),
+            name="tipo_amortizacao_enum",
+        ),
+        nullable=False,
     )
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)

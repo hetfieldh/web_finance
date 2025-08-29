@@ -12,6 +12,12 @@ from app.models.conta_transacao_model import ContaTransacao
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.salario_movimento_model import SalarioMovimento
 from app.services import conta_service
+from app.utils import (
+    NATUREZA_RECEITA,
+    STATUS_PARCIAL_RECEBIDO,
+    STATUS_PENDENTE,
+    STATUS_RECEBIDO,
+)
 
 
 def registrar_recebimento(form):
@@ -48,9 +54,9 @@ def registrar_recebimento(form):
         conta_credito.saldo_atual += valor_recebido
         db.session.flush()
 
-        if item_tipo == "Receita":
+        if item_tipo == NATUREZA_RECEITA:
             item = DespRecMovimento.query.get(item_id)
-            item.status = "Recebido"
+            item.status = STATUS_RECEBIDO
             item.valor_realizado = valor_recebido
             item.data_pagamento = form.data_recebimento.data
             item.movimento_bancario_id = novo_movimento.id
@@ -67,9 +73,9 @@ def registrar_recebimento(form):
             if item.movimento_bancario_salario_id and (
                 not has_beneficios or item.movimento_bancario_beneficio_id
             ):
-                item.status = "Recebido"
+                item.status = STATUS_RECEBIDO
             else:
-                item.status = "Parcialmente Recebido"
+                item.status = STATUS_PARCIAL_RECEBIDO
 
         db.session.commit()
         return True, "Recebimento registrado com sucesso!"
@@ -118,7 +124,7 @@ def estornar_recebimento(item_id, item_tipo):
             return False, message
 
         if item_tipo == "Receita":
-            item_a_atualizar.status = "Pendente"
+            item_a_atualizar.status = STATUS_PENDENTE
             item_a_atualizar.valor_realizado = None
             item_a_atualizar.data_pagamento = None
             item_a_atualizar.movimento_bancario_id = None
@@ -132,9 +138,9 @@ def estornar_recebimento(item_id, item_tipo):
                 item_a_atualizar.movimento_bancario_salario_id
                 or item_a_atualizar.movimento_bancario_beneficio_id
             ):
-                item_a_atualizar.status = "Parcialmente Recebido"
+                item_a_atualizar.status = STATUS_PARCIAL_RECEBIDO
             else:
-                item_a_atualizar.status = "Pendente"
+                item_a_atualizar.status = STATUS_PENDENTE
 
         conta_bancaria.saldo_atual -= valor_a_debitar
         db.session.delete(movimento_a_estornar)

@@ -20,7 +20,7 @@
             Mês/Ano:
           </label>
           {{ form.mes_ano(class="form-control form-control-sm input-normal",
-          id="mes_ano_pagamentos", style="width: 100px;") }}
+          id="mes_ano_pagamentos") }}
         </form>
         <div
           class="d-flex align-items-center text-muted fs-7 gap-3 flex-wrap justify-content-center"
@@ -94,17 +94,16 @@
                   {% set status_text = conta.status %}{% set status_class =
                   'bg-warning text-dark' %}{% if conta.status in ['Aberta',
                   'Fechada', 'A Pagar'] %}{% set status_text = 'Pendente' %}{%
-                  elif conta.status in ['Paga', 'Pago'] %}{% set status_text =
-                  'Pago' %}{% set status_class = 'bg-success' %}{% elif
-                  conta.status == 'Atrasada' %}{% set status_class = 'bg-danger'
-                  %}{% elif conta.status == 'Parcialmente Paga' %}{% set
-                  status_class = 'bg-info' %}{% endif %}<span
-                    class="badge {{ status_class }}"
+                  elif conta.status == 'Pago' %}{% set status_text = 'Pago' %}{%
+                  set status_class = 'bg-success' %}{% elif conta.status ==
+                  'Atrasado' %}{% set status_class = 'bg-danger' %}{% elif
+                  conta.status == 'Parcialmente Paga' %}{% set status_class =
+                  'bg-info' %}{% endif %}<span class="badge {{ status_class }}"
                     >{{ status_text }}</span
                   >
                 </td>
                 <td class="text-center">
-                  {% if conta.status not in ['Paga', 'Pago'] %}
+                  {% if conta.status != 'Pago' %}
                   <button
                     type="button"
                     class="btn btn-link text-success p-0 pagar-btn"

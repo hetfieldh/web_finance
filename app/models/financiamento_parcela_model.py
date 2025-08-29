@@ -6,6 +6,7 @@ from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
+from app.utils import STATUS_PENDENTE, FormChoices
 
 
 class FinanciamentoParcela(db.Model):
@@ -38,9 +39,12 @@ class FinanciamentoParcela(db.Model):
     )
     movimento_bancario = db.relationship("ContaMovimento")
     status = db.Column(
-        Enum("Pendente", "Paga", "Atrasada", "Amortizada", name="status_parcela_enum"),
+        db.Enum(
+            *(item.value for item in FormChoices.StatusFinanciamento),
+            name="status_parcela_enum",
+        ),
         nullable=False,
-        default="Pendente",
+        default=FormChoices.StatusFinanciamento.PENDENTE.value,
     )
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)

@@ -31,19 +31,19 @@
           <div class="col border-end">
             <small class="text-muted">Pago</small>
             <p class="h5 fw-semibold text-success mb-0">
-              {{ resumo_fluxo_caixa.pago | format_currency }}
+              {{ resumo_fluxo_caixa.Pago | format_currency }}
             </p>
           </div>
           <div class="col border-end">
             <small class="text-muted">Amortizado</small>
             <p class="h5 fw-semibold text-info mb-0">
-              {{ resumo_fluxo_caixa.amortizado | format_currency }}
+              {{ resumo_fluxo_caixa.Amortizado | format_currency }}
             </p>
           </div>
           <div class="col">
             <small class="text-muted">Pendente</small>
             <p class="h5 fw-semibold text-warning mb-0">
-              {{ resumo_fluxo_caixa.pendente | format_currency }}
+              {{ resumo_fluxo_caixa.Pendente | format_currency }}
             </p>
           </div>
           <div class="col">
@@ -75,19 +75,19 @@
           <div class="col border-end">
             <small class="text-muted">Pago (Principal)</small>
             <p class="h5 fw-semibold text-success mb-0">
-              {{ resumo_principal.pago | format_currency }}
+              {{ resumo_principal.Pago | format_currency }}
             </p>
           </div>
           <div class="col border-end">
             <small class="text-muted">Amortizado</small>
             <p class="h5 fw-semibold text-info mb-0">
-              {{ resumo_principal.amortizado | format_currency }}
+              {{ resumo_principal.Amortizado | format_currency }}
             </p>
           </div>
           <div class="col border-end">
             <small class="text-muted">Pendente (Principal)</small>
             <p class="h5 fw-semibold text-warning mb-0">
-              {{ resumo_principal.pendente | format_currency }}
+              {{ resumo_principal.Pendente | format_currency }}
             </p>
           </div>
           <div class="col">
@@ -145,22 +145,22 @@
                   format_currency }} {% else %} - {% endif %}
                 </td>
                 <td
-                  class="fw-bold text-end {{ 'text-secondary' if item.parcela.status in ['Paga', 'Amortizada'] else 'text-danger' }}"
+                  class="fw-bold text-end {{ 'text-secondary' if item.parcela.status in ['Pago', 'Amortizado'] else 'text-danger' }}"
                 >
-                  {% if item.parcela.status in ['Paga', 'Amortizada'] %} - {%
+                  {% if item.parcela.status in ['Pago', 'Amortizado'] %} - {%
                   else %} {{ item.saldo_devedor_dinamico | format_currency }} {%
                   endif %}
                 </td>
                 <td class="text-center">
-                  {% if item.parcela.status == 'Paga' %}<span
+                  {% if item.parcela.status == 'Pago' %}<span
                     class="badge bg-success"
                     >{{ item.parcela.status }}</span
                   >
-                  {% elif item.parcela.status == 'Atrasada' %}<span
+                  {% elif item.parcela.status == 'Atrasado' %}<span
                     class="badge bg-danger"
                     >{{ item.parcela.status }}</span
                   >
-                  {% elif item.parcela.status == 'Amortizada' %}<span
+                  {% elif item.parcela.status == 'Amortizado' %}<span
                     class="badge bg-info"
                     >{{ item.parcela.status }}</span
                   >

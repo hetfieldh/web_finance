@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, UniqueConstraint
 
 from app import db
+from app.utils import FormChoices
 
 
 class SalarioItem(db.Model):
@@ -14,11 +15,8 @@ class SalarioItem(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     nome = db.Column(db.String(100), nullable=False)
     tipo = db.Column(
-        Enum(
-            "Provento",
-            "Benefício",
-            "Imposto",
-            "Desconto",
+        db.Enum(
+            *(item.value for item in FormChoices.TipoSalarioItem),
             name="tipo_salario_item_enum",
         ),
         nullable=False,

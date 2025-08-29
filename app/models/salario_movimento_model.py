@@ -6,6 +6,14 @@ from decimal import Decimal
 from sqlalchemy import Enum, UniqueConstraint
 
 from app import db
+from app.utils import (
+    STATUS_PENDENTE,
+    TIPO_BENEFICIO,
+    TIPO_DESCONTO,
+    TIPO_IMPOSTO,
+    TIPO_PROVENTO,
+    FormChoices,
+)
 
 
 class SalarioMovimento(db.Model):
@@ -23,12 +31,13 @@ class SalarioMovimento(db.Model):
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True, unique=True
     )
     status = db.Column(
-        Enum(
-            "Pendente", "Parcialmente Recebido", "Recebido", name="status_salario_enum"
+        db.Enum(
+            *(item.value for item in FormChoices.SalarioMovimento),
+            name="status_salario_enum",
         ),
         nullable=False,
-        default="Pendente",
-        server_default="Pendente",
+        default=FormChoices.SalarioMovimento.PENDENTE.value,
+        server_default=FormChoices.SalarioMovimento.PENDENTE.value,
     )
 
     data_criacao = db.Column(
@@ -65,16 +74,16 @@ class SalarioMovimento(db.Model):
     def salario_liquido(self):
         """Calcula o salário líquido (Proventos - Impostos - Descontos)."""
         proventos = sum(
-            i.valor for i in self.itens if i.salario_item.tipo == "Provento"
+            i.valor for i in self.itens if i.salario_item.tipo == TIPO_PROVENTO
         )
         descontos_impostos = sum(
             i.valor
             for i in self.itens
-            if i.salario_item.tipo in ["Imposto", "Desconto"]
+            if i.salario_item.tipo in [TIPO_IMPOSTO, TIPO_DESCONTO]
         )
         return proventos - descontos_impostos
 
     @property
     def total_beneficios(self):
         """Calcula o total de benefícios."""
-        return sum(i.valor for i in self.itens if i.salario_item.tipo == "Benefício")
+        return sum(i.valor for i in self.itens if i.salario_item.tipo == TIPO_BENEFICIO)

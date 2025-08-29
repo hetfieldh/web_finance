@@ -12,6 +12,15 @@ from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_model import SalarioMovimento
+from app.utils import (
+    NATUREZA_DESPESA,
+    NATUREZA_RECEITA,
+    STATUS_AMORTIZADO,
+    STATUS_PAGO,
+    STATUS_PARCIAL_PAGO,
+    STATUS_PARCIAL_RECEBIDO,
+    STATUS_RECEBIDO,
+)
 
 
 def get_balanco_mensal(user_id, ano, mes):
@@ -30,7 +39,7 @@ def get_balanco_mensal(user_id, ano, mes):
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
         SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
-        SalarioMovimento.status.in_(["Recebido", "Parcialmente Recebido"]),
+        SalarioMovimento.status.in_([STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]),
     ).all()
 
     for s in salarios_mes:
@@ -43,9 +52,9 @@ def get_balanco_mensal(user_id, ano, mes):
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
-        DespRecMovimento.status == "Recebido",
+        DespRecMovimento.status == STATUS_RECEBIDO,
         DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRec.natureza == "Receita",
+        DespRec.natureza == NATUREZA_RECEITA,
     ).scalar() or Decimal(
         "0.00"
     )
@@ -57,9 +66,9 @@ def get_balanco_mensal(user_id, ano, mes):
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
-        DespRecMovimento.status == "Pago",
+        DespRecMovimento.status == STATUS_PAGO,
         DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRec.natureza == "Despesa",
+        DespRec.natureza == NATUREZA_DESPESA,
     ).scalar() or Decimal(
         "0.00"
     )
@@ -69,7 +78,7 @@ def get_balanco_mensal(user_id, ano, mes):
         func.sum(CrediarioFatura.valor_pago_fatura)
     ).filter(
         CrediarioFatura.usuario_id == user_id,
-        CrediarioFatura.status.in_(["Paga", "Parcialmente Paga"]),
+        CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
         CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
     ).scalar() or Decimal(
         "0.00"
@@ -77,23 +86,21 @@ def get_balanco_mensal(user_id, ano, mes):
     total_despesas += faturas_pagas
 
     parcelas_pagas = db.session.query(func.sum(FinanciamentoParcela.valor_pago)).filter(
-        FinanciamentoParcela.status.in_(["Paga", "Amortizada"]),
+        FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
         FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
     ).scalar() or Decimal("0.00")
     total_despesas += parcelas_pagas
 
-    # --- LÓGICA DO COMPROMETIMENTO ADICIONADA AQUI ---
     comprometimento = 0
     if total_receitas > 0:
-        # Arredonda para 2 casas decimais
         comprometimento = round((total_despesas / total_receitas) * 100, 2)
 
     return {
         "receitas": total_receitas,
         "despesas": total_despesas,
         "balanco": total_receitas - total_despesas,
-        "comprometimento": comprometimento,  # <-- Adicionado ao retorno
+        "comprometimento": comprometimento,
     }
 
 
@@ -114,7 +121,7 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
         SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
-        SalarioMovimento.status.in_(["Recebido", "Parcialmente Recebido"]),
+        SalarioMovimento.status.in_([STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]),
     ).all()
     for s in salarios_mes:
         if s.movimento_bancario_salario_id:
@@ -140,9 +147,9 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
         DespRecMovimento.query.join(DespRec)
         .filter(
             DespRecMovimento.usuario_id == user_id,
-            DespRecMovimento.status == "Recebido",
+            DespRecMovimento.status == STATUS_RECEBIDO,
             DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-            DespRec.natureza == "Receita",
+            DespRec.natureza == NATUREZA_RECEITA,
         )
         .all()
     )
@@ -161,9 +168,9 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
         DespRecMovimento.query.join(DespRec)
         .filter(
             DespRecMovimento.usuario_id == user_id,
-            DespRecMovimento.status == "Pago",
+            DespRecMovimento.status == STATUS_PAGO,
             DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-            DespRec.natureza == "Despesa",
+            DespRec.natureza == NATUREZA_DESPESA,
         )
         .all()
     )
@@ -180,7 +187,7 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
     # Faturas de Crediário Pagas
     faturas_pagas = CrediarioFatura.query.filter(
         CrediarioFatura.usuario_id == user_id,
-        CrediarioFatura.status.in_(["Paga", "Parcialmente Paga"]),
+        CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
         CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
     ).all()
     for fatura in faturas_pagas:
@@ -195,7 +202,7 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
 
     # Parcelas de Financiamento Pagas
     parcelas_pagas_no_mes = FinanciamentoParcela.query.filter(
-        FinanciamentoParcela.status.in_(["Paga", "Amortizada"]),
+        FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
         FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
     ).all()
@@ -205,7 +212,7 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
     for p in parcelas_pagas_no_mes:
         key = (p.financiamento_id, p.status)
         if key not in financiamentos_pagos:
-            tipo = "Amortização" if p.status == "Amortizada" else "Financiamento"
+            tipo = "Amortização" if p.status == "Amortizado" else "Financiamento"
             financiamentos_pagos[key] = {
                 "data": p.data_pagamento,
                 "origem": f"{tipo}: {p.financiamento.nome_financiamento}",
@@ -238,7 +245,7 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
     desp_rec = DespRecMovimento.query.filter(
         DespRecMovimento.usuario_id == user_id,
         DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRecMovimento.status.in_(["Pago", "Recebido"]),
+        DespRecMovimento.status.in_([STATUS_PAGO, STATUS_RECEBIDO]),
     ).all()
     for item in desp_rec:
         movimentacoes.append(
@@ -269,11 +276,11 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
     parcelas = FinanciamentoParcela.query.filter(
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
         FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        FinanciamentoParcela.status.in_(["Paga", "Amortizada"]),
+        FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
     ).all()
     for parcela in parcelas:
         descricao = f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})"
-        tipo = "Amortização" if parcela.status == "Amortizada" else "Financiamento"
+        tipo = "Amortização" if parcela.status == "Amortizado" else "Financiamento"
         movimentacoes.append(
             {
                 "data": parcela.data_pagamento,

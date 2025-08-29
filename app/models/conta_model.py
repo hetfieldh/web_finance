@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
+from app.utils import FormChoices
 
 
 class Conta(db.Model):
@@ -17,16 +18,8 @@ class Conta(db.Model):
     conta = db.Column(db.String(50), nullable=False)
 
     tipo = db.Column(
-        Enum(
-            "Corrente",
-            "Poupança",
-            "Digital",
-            "Investimento",
-            "Caixinha",
-            "Dinheiro",
-            "Benefício",
-            "FGTS",
-            name="tipo_conta_enum",
+        db.Enum(
+            *(item.value for item in FormChoices.TipoConta), name="tipo_conta_enum"
         ),
         nullable=False,
     )

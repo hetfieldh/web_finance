@@ -1,8 +1,8 @@
 """Criação do BD
 
-Revision ID: c8ccf5f9a9c6
+Revision ID: 8e1eeb0f81d0
 Revises: 
-Create Date: 2025-08-27 20:29:56.291055
+Create Date: 2025-08-29 14:13:35.475525
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c8ccf5f9a9c6'
+revision = '8e1eeb0f81d0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -53,7 +53,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('transacao_tipo', sa.String(length=100), nullable=False),
-    sa.Column('tipo', sa.Enum('Crédito', 'Débito', name='tipo_movimento_enum'), nullable=False),
+    sa.Column('tipo', sa.Enum('Crédito', 'Débito', name='tipo_transacao_enum'), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -100,7 +100,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
-    sa.Column('tipo', sa.Enum('Provento', 'Benefício', 'Imposto', 'Desconto', name='tipo_salario_item_enum'), nullable=False),
+    sa.Column('tipo', sa.Enum('Provento', 'Desconto', 'Imposto', 'Benefício', name='tipo_salario_item_enum'), nullable=False),
     sa.Column('ativo', sa.Boolean(), nullable=False),
     sa.Column('descricao', sa.String(length=255), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
@@ -114,7 +114,7 @@ def upgrade():
     sa.Column('sobrenome', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('justificativa', sa.Text(), nullable=True),
-    sa.Column('status', sa.Enum('Pendente', 'Aprovada', 'Rejeitada', name='status_solicitacao_enum'), nullable=False),
+    sa.Column('status', sa.Enum('Pendente', 'Aprovado', 'Rejeitado', name='status_solicitacao_enum'), nullable=False),
     sa.Column('data_solicitacao', sa.DateTime(), nullable=False),
     sa.Column('admin_id', sa.Integer(), nullable=True),
     sa.Column('data_decisao', sa.DateTime(), nullable=True),
@@ -166,7 +166,7 @@ def upgrade():
     sa.Column('taxa_juros_anual', sa.Numeric(precision=5, scale=4), nullable=False),
     sa.Column('data_inicio', sa.Date(), nullable=False),
     sa.Column('prazo_meses', sa.Integer(), nullable=False),
-    sa.Column('tipo_amortizacao', sa.Enum('SAC', 'PRICE', 'Outro', name='tipo_amortizacao_enum'), nullable=False),
+    sa.Column('tipo_amortizacao', sa.Enum('SAC', 'Price', 'Outro', name='tipo_amortizacao_enum'), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.Column('descricao', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['conta_id'], ['conta.id'], ),
@@ -183,7 +183,7 @@ def upgrade():
     sa.Column('valor_pago_fatura', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('data_fechamento', sa.Date(), nullable=True),
     sa.Column('data_vencimento_fatura', sa.Date(), nullable=False),
-    sa.Column('status', sa.Enum('Pendente', 'Paga', 'Atrasada', 'Parcialmente Paga', name='status_fatura_enum'), nullable=False),
+    sa.Column('status', sa.Enum('Pendente', 'Pago', 'Atrasado', 'Parcialmente Pago', name='status_fatura_enum'), nullable=False),
     sa.Column('data_pagamento', sa.Date(), nullable=True),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
@@ -246,7 +246,7 @@ def upgrade():
     sa.Column('valor_pago', sa.Numeric(precision=12, scale=2), nullable=True),
     sa.Column('observacoes', sa.String(length=255), nullable=True),
     sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
-    sa.Column('status', sa.Enum('Pendente', 'Paga', 'Atrasada', 'Amortizada', name='status_parcela_enum'), nullable=False),
+    sa.Column('status', sa.Enum('Pendente', 'Pago', 'Atrasado', 'Amortizado', name='status_parcela_enum'), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['financiamento_id'], ['financiamento.id'], ),
     sa.ForeignKeyConstraint(['movimento_bancario_id'], ['conta_movimento.id'], ),

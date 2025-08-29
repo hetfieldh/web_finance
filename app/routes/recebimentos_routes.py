@@ -27,6 +27,12 @@ from app.services.recebimento_service import (
 from app.services.recebimento_service import (
     registrar_recebimento as registrar_recebimento_service,
 )
+from app.utils import (
+    NATUREZA_RECEITA,
+    STATUS_PENDENTE,
+    STATUS_PREVISTO,
+    STATUS_RECEBIDO,
+)
 
 recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos")
 
@@ -45,9 +51,9 @@ def painel():
 
     contas_a_receber = []
     totais = {
-        "previsto": Decimal("0.00"),
-        "recebido": Decimal("0.00"),
-        "pendente": Decimal("0.00"),
+        "Previsto": Decimal("0.00"),
+        "Recebido": Decimal("0.00"),
+        "Pendente": Decimal("0.00"),
     }
 
     if mes_ano_str:
@@ -87,7 +93,7 @@ def painel():
             .filter(
                 DespRecMovimento.usuario_id == current_user.id,
                 DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
-                DespRecMovimento.despesa_receita.has(natureza="Receita"),
+                DespRecMovimento.despesa_receita.has(natureza=NATUREZA_RECEITA),
             )
             .options(
                 joinedload(DespRecMovimento.despesa_receita),
@@ -117,7 +123,7 @@ def painel():
                         "valor_recebido": (
                             salario_liquido if is_recebido else Decimal("0.00")
                         ),
-                        "status": "Recebido" if is_recebido else "Pendente",
+                        "status": STATUS_RECEBIDO if is_recebido else STATUS_PENDENTE,
                         "data_pagamento": (
                             movimento.movimento_bancario_salario.data_movimento
                             if is_recebido
@@ -144,7 +150,7 @@ def painel():
                         "valor_recebido": (
                             total_beneficios if is_recebido else Decimal("0.00")
                         ),
-                        "status": "Recebido" if is_recebido else "Pendente",
+                        "status": STATUS_RECEBIDO if is_recebido else STATUS_PENDENTE,
                         "data_pagamento": (
                             movimento.movimento_bancario_beneficio.data_movimento
                             if is_recebido
@@ -170,18 +176,18 @@ def painel():
                     "valor_recebido": receita.valor_realizado or Decimal("0.00"),
                     "status": receita.status,
                     "data_pagamento": receita.data_pagamento,
-                    "tipo": "Receita",
+                    "tipo": NATUREZA_RECEITA,
                     "id_original": receita.id,
                     "recebido_em": recebido_em,
                 }
             )
 
         for conta in contas_a_receber:
-            totais["previsto"] += conta["valor_previsto"]
-            totais["recebido"] += conta["valor_recebido"]
+            totais[STATUS_PREVISTO] += conta["valor_previsto"]
+            totais[STATUS_RECEBIDO] += conta["valor_recebido"]
 
         contas_a_receber.sort(key=lambda x: x["vencimento"])
-        totais["pendente"] = totais["previsto"] - totais["recebido"]
+        totais[STATUS_PENDENTE] = totais[STATUS_PREVISTO] - totais[STATUS_RECEBIDO]
 
     return render_template(
         "recebimentos/painel.html",

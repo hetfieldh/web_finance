@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.utils import STATUS_PENDENTE
 
 
 def gerar_previsoes(form):
@@ -48,7 +49,7 @@ def gerar_previsoes(form):
             ano=data_vencimento_final.year,
             valor_previsto=valor_previsto,
             descricao=descricao,
-            status="Pendente",
+            status=STATUS_PENDENTE,
         )
         novos_lancamentos.append(novo_movimento)
 

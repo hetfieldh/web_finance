@@ -15,16 +15,7 @@ from wtforms.validators import (
 
 from app import db
 from app.models.crediario_model import Crediario
-
-TIPOS_CREDIARIO = [
-    ("", "Selecione..."),
-    ("Cartão Físico", "Cartão Físico"),
-    ("Cartão VR", "Cartão VR"),
-    ("Cartão VT", "Cartão VT"),
-    ("Boleto", "Boleto"),
-    ("Cheque", "Cheque"),
-    ("Outro", "Outro"),
-]
+from app.utils import FormChoices
 
 
 class CadastroCrediarioForm(FlaskForm):
@@ -44,8 +35,8 @@ class CadastroCrediarioForm(FlaskForm):
         ],
     )
     tipo_crediario = SelectField(
-        "Tipo de Crediário",
-        choices=TIPOS_CREDIARIO,
+        "Tipo",
+        choices=FormChoices.get_choices(FormChoices.TipoCrediario),
         validators=[DataRequired("O tipo de crediário é obrigatório.")],
     )
     identificador_final = StringField(
@@ -118,7 +109,7 @@ class EditarCrediarioForm(FlaskForm):
     )
     tipo_crediario = SelectField(
         "Tipo de Crediário",
-        choices=TIPOS_CREDIARIO,
+        choices=FormChoices.get_choices(FormChoices.TipoCrediario),
         validators=[Optional()],
         render_kw={"disabled": True},
     )

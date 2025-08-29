@@ -13,18 +13,7 @@ from wtforms.validators import (
 )
 
 from app.models.conta_model import Conta
-
-TIPOS_CONTA = [
-    ("", "Selecione..."),
-    ("Corrente", "Corrente"),
-    ("Poupança", "Poupança"),
-    ("Digital", "Digital"),
-    ("Investimento", "Investimento"),
-    ("Caixinha", "Caixinha"),
-    ("Dinheiro", "Dinheiro"),
-    ("Benefício", "Benefício"),
-    ("FGTS", "FGTS"),
-]
+from app.utils import FormChoices
 
 
 class CadastroContaForm(FlaskForm):
@@ -64,9 +53,7 @@ class CadastroContaForm(FlaskForm):
         ],
     )
     tipo = SelectField(
-        "Tipo de Conta",
-        choices=TIPOS_CONTA,
-        validators=[DataRequired("O tipo de conta é obrigatório.")],
+        "Tipo de Conta", choices=FormChoices.get_choices(FormChoices.TipoConta)
     )
     saldo_inicial = DecimalField(
         "Saldo Inicial",
@@ -123,7 +110,7 @@ class EditarContaForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo de Conta",
-        choices=TIPOS_CONTA,
+        choices=FormChoices.get_choices(FormChoices.TipoConta),
         validators=[Optional()],
         render_kw={"disabled": True},
     )

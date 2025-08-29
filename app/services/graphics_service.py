@@ -16,6 +16,17 @@ from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_model import SalarioMovimento
 from app.services import relatorios_service
+from app.utils import (
+    NATUREZA_DESPESA,
+    NATUREZA_RECEITA,
+    STATUS_AMORTIZADO,
+    STATUS_PAGO,
+    STATUS_PARCIAL_PAGO,
+    STATUS_PENDENTE,
+    STATUS_RECEBIDO,
+    TIPO_FIXA,
+    TIPO_VARIAVEL,
+)
 
 
 def get_monthly_graphics_data(user_id, year, month):
@@ -34,7 +45,7 @@ def get_monthly_graphics_data(user_id, year, month):
         .filter(
             DespRecMovimento.usuario_id == user_id,
             DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
-            DespRec.natureza == "Despesa",
+            DespRec.natureza == NATUREZA_DESPESA,
         )
         .all()
     )
@@ -59,7 +70,7 @@ def get_monthly_graphics_data(user_id, year, month):
     valor_custos_extras = Decimal("0.00")
     valor_previsto_dos_itens_pagos = Decimal("0.00")
 
-    for item in filter(lambda d: d.status == "Pago", despesas_vencimento):
+    for item in filter(lambda d: d.status == STATUS_PAGO, despesas_vencimento):
         valor_pago_real += item.valor_realizado
         valor_previsto_dos_itens_pagos += item.valor_previsto
         diferenca = item.valor_previsto - item.valor_realizado
@@ -69,18 +80,18 @@ def get_monthly_graphics_data(user_id, year, month):
             valor_custos_extras += abs(diferenca)
 
     for item in filter(
-        lambda f: f.status in ["Paga", "Parcialmente Paga"], faturas_vencimento
+        lambda f: f.status in [STATUS_PAGO, STATUS_PARCIAL_PAGO], faturas_vencimento
     ):
         valor_pago_real += item.valor_pago_fatura
         valor_previsto_dos_itens_pagos += item.valor_total_fatura
         diferenca = item.valor_total_fatura - item.valor_pago_fatura
-        if diferenca > 0 and item.status == "Paga":
+        if diferenca > 0 and item.status == STATUS_PAGO:
             valor_descontos += diferenca
         elif diferenca < 0:
             valor_custos_extras += abs(diferenca)
 
     for item in filter(
-        lambda p: p.status in ["Paga", "Amortizada"], parcelas_vencimento
+        lambda p: p.status in [STATUS_PAGO, STATUS_AMORTIZADO], parcelas_vencimento
     ):
         if item.valor_pago is not None:
             valor_pago_real += item.valor_pago
@@ -99,7 +110,7 @@ def get_monthly_graphics_data(user_id, year, month):
         "total": float(total_previsto_mes),
     }
     if valor_pago_real > 0:
-        dados_progresso_valores["labels"].append("Pago")
+        dados_progresso_valores["labels"].append(STATUS_PAGO)
         dados_progresso_valores["valores"].append(float(valor_pago_real))
     if valor_descontos > 0:
         dados_progresso_valores["labels"].append("Descontos")
@@ -108,7 +119,7 @@ def get_monthly_graphics_data(user_id, year, month):
         dados_progresso_valores["labels"].append("Custos Extras")
         dados_progresso_valores["valores"].append(float(valor_custos_extras))
     if valor_pendente > 0:
-        dados_progresso_valores["labels"].append("Pendente")
+        dados_progresso_valores["labels"].append(STATUS_PENDENTE)
         dados_progresso_valores["valores"].append(float(valor_pendente))
 
     # --- 3. DADOS DOS OUTROS GRÁFICOS ---
@@ -117,10 +128,10 @@ def get_monthly_graphics_data(user_id, year, month):
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
-        DespRecMovimento.status == "Pago",
+        DespRecMovimento.status == STATUS_PAGO,
         DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRec.natureza == "Despesa",
-        DespRec.tipo == "Fixa",
+        DespRec.natureza == NATUREZA_DESPESA,
+        DespRec.tipo == TIPO_FIXA,
     ).scalar() or Decimal(
         "0.00"
     )
@@ -128,10 +139,10 @@ def get_monthly_graphics_data(user_id, year, month):
         func.sum(DespRecMovimento.valor_realizado)
     ).join(DespRec).filter(
         DespRecMovimento.usuario_id == user_id,
-        DespRecMovimento.status == "Pago",
+        DespRecMovimento.status == STATUS_PAGO,
         DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRec.natureza == "Despesa",
-        DespRec.tipo == "Variável",
+        DespRec.natureza == NATUREZA_DESPESA,
+        DespRec.tipo == TIPO_VARIAVEL,
     ).scalar() or Decimal(
         "0.00"
     )
@@ -140,7 +151,7 @@ def get_monthly_graphics_data(user_id, year, month):
     ).filter(
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
         FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        FinanciamentoParcela.status.in_(["Paga", "Amortizada"]),
+        FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
     ).scalar() or Decimal(
         "0.00"
     )
@@ -149,7 +160,7 @@ def get_monthly_graphics_data(user_id, year, month):
     ).filter(
         CrediarioFatura.usuario_id == user_id,
         CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        CrediarioFatura.status.in_(["Paga", "Parcialmente Paga"]),
+        CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
     ).scalar() or Decimal(
         "0.00"
     )
@@ -182,9 +193,9 @@ def get_monthly_graphics_data(user_id, year, month):
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
-        DespRecMovimento.status == "Recebido",
+        DespRecMovimento.status == STATUS_RECEBIDO,
         DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
-        DespRec.natureza == "Receita",
+        DespRec.natureza == NATUREZA_RECEITA,
     ).scalar() or Decimal(
         "0.00"
     )
@@ -295,7 +306,7 @@ def get_financing_progress_data(user_id, year, financiamento_id):
             db.session.query(func.sum(FinanciamentoParcela.valor_pago))
             .filter(
                 FinanciamentoParcela.financiamento_id == financiamento.id,
-                FinanciamentoParcela.status == "Paga",
+                FinanciamentoParcela.status == STATUS_PAGO,
                 FinanciamentoParcela.data_pagamento.between(
                     data_inicio_mes, data_fim_mes
                 ),

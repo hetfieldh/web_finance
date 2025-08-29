@@ -6,6 +6,7 @@ from sqlalchemy import Enum, Numeric, UniqueConstraint, event, text
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
+from app.utils import STATUS_PENDENTE, FormChoices
 
 from .desp_rec_model import DespRec
 
@@ -23,9 +24,12 @@ class DespRecMovimento(db.Model):
     data_pagamento = db.Column(db.Date, nullable=True)
     valor_realizado = db.Column(db.Numeric(12, 2), nullable=True)
     status = db.Column(
-        Enum("Pendente", "Pago", "Recebido", "Atrasado", name="status_lancamento_enum"),
+        db.Enum(
+            *(item.value for item in FormChoices.StatusDespesaReceita),
+            name="status_lancamento_enum",
+        ),
         nullable=False,
-        default="Pendente",
+        default=FormChoices.StatusDespesaReceita.PENDENTE.value,
     )
     descricao = db.Column(db.String(255), nullable=True)
     movimento_bancario_id = db.Column(

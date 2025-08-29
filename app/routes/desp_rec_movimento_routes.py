@@ -28,10 +28,7 @@ from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.services import desp_rec_service
 from app.services.desp_rec_service import gerar_previsoes
-
-desp_rec_movimento_bp = Blueprint(
-    "desp_rec_movimento", __name__, url_prefix="/despesas_receitas/movimentos"
-)
+from app.utils import STATUS_PAGO, STATUS_PENDENTE, STATUS_RECEBIDO
 
 desp_rec_movimento_bp = Blueprint(
     "desp_rec_movimento", __name__, url_prefix="/despesas_receitas/movimentos"
@@ -103,7 +100,7 @@ def adicionar_lancamento_unico():
                 data_vencimento=form.data_vencimento.data,
                 valor_previsto=form.valor_previsto.data,
                 descricao=form.descricao.data.strip() if form.descricao.data else None,
-                status="Pendente",
+                status=STATUS_PENDENTE,
             )
             db.session.add(novo_movimento)
             db.session.commit()
@@ -140,7 +137,7 @@ def editar_movimento(id):
     ).first_or_404()
     form = EditarMovimentoForm(obj=movimento)
 
-    is_locked = movimento.status in ["Pago", "Recebido"]
+    is_locked = movimento.status in [STATUS_PAGO, STATUS_RECEBIDO]
 
     if is_locked:
         form.data_vencimento.render_kw = {"readonly": True}
@@ -194,7 +191,7 @@ def excluir_movimento(id):
         id=id, usuario_id=current_user.id
     ).first_or_404()
 
-    if movimento.status == "Pago":
+    if movimento.status == STATUS_PAGO:
         flash("Não é possível excluir um lançamento que já foi pago.", "danger")
         return redirect(url_for("desp_rec_movimento.listar_movimentos"))
 

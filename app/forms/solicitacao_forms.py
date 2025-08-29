@@ -70,7 +70,6 @@ class AprovacaoForm(FlaskForm):
         validators=[Length(max=500)],
         render_kw={
             "rows": 4,
-            "placeholder": "Ex: O login criado foi 'douglas.f'. A senha inicial é 'mudar123'.",
         },
     )
     solicitacao_id = HiddenField()

@@ -35,6 +35,7 @@ from app.services.financiamento_service import (
     amortizar_parcelas,
     importar_e_processar_csv,
 )
+from app.utils import STATUS_AMORTIZADO, STATUS_ATRASADO, STATUS_PAGO, STATUS_PENDENTE
 
 financiamento_bp = Blueprint("financiamento", __name__, url_prefix="/financiamentos")
 
@@ -87,7 +88,7 @@ def editar_financiamento(id):
     financiamento = Financiamento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    if any(p.status == "Paga" for p in financiamento.parcelas):
+    if any(p.status == STATUS_PAGO for p in financiamento.parcelas):
         flash(
             "Não é possível editar um financiamento que já possui parcelas pagas.",
             "danger",
@@ -117,7 +118,7 @@ def excluir_financiamento(id):
     financiamento = Financiamento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    if any(p.status == "Paga" for p in financiamento.parcelas):
+    if any(p.status == STATUS_PAGO for p in financiamento.parcelas):
         flash(
             "Não é possível excluir um financiamento que já possui parcelas pagas.",
             "danger",
@@ -159,24 +160,22 @@ def visualizar_parcelas(id):
     financiamento = Financiamento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-
     parcelas = (
         FinanciamentoParcela.query.filter(FinanciamentoParcela.financiamento_id == id)
         .order_by(FinanciamentoParcela.numero_parcela.asc())
         .all()
     )
-
     resumo_fluxo_caixa = {
         "total_previsto": Decimal("0.00"),
-        "pago": Decimal("0.00"),
-        "amortizado": Decimal("0.00"),
-        "pendente": Decimal("0.00"),
+        "Pago": Decimal("0.00"),
+        "Amortizado": Decimal("0.00"),
+        "Pendente": Decimal("0.00"),
     }
     resumo_principal = {
         "total_contrato": financiamento.valor_total_financiado,
-        "pago": Decimal("0.00"),
-        "amortizado": Decimal("0.00"),
-        "pendente": Decimal("0.00"),
+        "Pago": Decimal("0.00"),
+        "Amortizado": Decimal("0.00"),
+        "Pendente": Decimal("0.00"),
         "saldo_devedor": financiamento.saldo_devedor_atual,
     }
 
@@ -184,22 +183,22 @@ def visualizar_parcelas(id):
     for p in parcelas:
         # Lógica para Fluxo de Caixa (valores totais e pagos)
         resumo_fluxo_caixa["total_previsto"] += p.valor_total_previsto
-        if p.status == "Paga":
-            resumo_fluxo_caixa["pago"] += p.valor_pago or Decimal("0.00")
-        elif p.status == "Amortizada":
-            resumo_fluxo_caixa["amortizado"] += p.valor_pago or Decimal("0.00")
-        elif p.status in ["Pendente", "Atrasada"]:
-            resumo_fluxo_caixa["pendente"] += p.valor_total_previsto
+        if p.status == STATUS_PAGO:
+            resumo_fluxo_caixa[STATUS_PAGO] += p.valor_pago or Decimal("0.00")
+        elif p.status == STATUS_AMORTIZADO:
+            resumo_fluxo_caixa[STATUS_AMORTIZADO] += p.valor_pago or Decimal("0.00")
+        elif p.status in [STATUS_PENDENTE, STATUS_ATRASADO]:
+            resumo_fluxo_caixa[STATUS_PENDENTE] += p.valor_total_previsto
 
         # Lógica para Balanço do Principal
-        if p.status == "Paga":
-            resumo_principal["pago"] += p.valor_principal
-        elif p.status == "Amortizada":
-            resumo_principal["amortizado"] += p.valor_principal
-        elif p.status == "Atrasada" or (
-            p.status == "Pendente" and p.data_vencimento < hoje
+        if p.status == STATUS_PAGO:
+            resumo_principal[STATUS_PAGO] += p.valor_principal
+        elif p.status == STATUS_AMORTIZADO:
+            resumo_principal[STATUS_AMORTIZADO] += p.valor_principal
+        elif p.status == STATUS_ATRASADO or (
+            p.status == STATUS_PENDENTE and p.data_vencimento < hoje
         ):
-            resumo_principal["pendente"] += p.valor_principal
+            resumo_principal[STATUS_PENDENTE] += p.valor_principal
             if "atrasado_valor" not in resumo_principal:
                 resumo_principal["atrasado_valor"] = Decimal("0.00")
             if "atrasado_qtd" not in resumo_principal:
@@ -207,13 +206,13 @@ def visualizar_parcelas(id):
             resumo_principal["atrasado_valor"] += p.valor_principal
             resumo_principal["atrasado_qtd"] += 1
 
-        elif p.status == "Pendente":
-            resumo_principal["pendente"] += p.valor_principal
+        elif p.status == STATUS_PENDENTE:
+            resumo_principal[STATUS_PENDENTE] += p.valor_principal
 
     resumo_fluxo_caixa["diferenca"] = resumo_fluxo_caixa["total_previsto"] - (
-        resumo_fluxo_caixa["pago"]
-        + resumo_fluxo_caixa["amortizado"]
-        + resumo_fluxo_caixa["pendente"]
+        resumo_fluxo_caixa[STATUS_PAGO]
+        + resumo_fluxo_caixa[STATUS_AMORTIZADO]
+        + resumo_fluxo_caixa[STATUS_PENDENTE]
     )
 
     parcelas_com_saldo_dinamico = []
@@ -221,7 +220,7 @@ def visualizar_parcelas(id):
 
     for parcela in parcelas:
         saldo_para_exibir = Decimal("0.00")
-        if parcela.status in ["Pendente", "Atrasada"]:
+        if parcela.status in [STATUS_PENDENTE, STATUS_ATRASADO]:
             saldo_para_exibir = saldo_devedor_corrente
             saldo_devedor_corrente -= parcela.valor_principal
         parcelas_com_saldo_dinamico.append(
@@ -276,7 +275,7 @@ def amortizar_financiamento(id):
     parcelas_pendentes = (
         FinanciamentoParcela.query.filter(
             FinanciamentoParcela.financiamento_id == id,
-            FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
+            FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
         )
         .order_by(FinanciamentoParcela.numero_parcela.desc())
         .all()

@@ -26,6 +26,7 @@ from app.services.pagamento_service import (
     estornar_pagamento as estornar_pagamento_service,
 )
 from app.services.pagamento_service import registrar_pagamento
+from app.utils import STATUS_PAGO, STATUS_PENDENTE, STATUS_PREVISTO
 
 pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 
@@ -44,9 +45,9 @@ def painel():
 
     contas_a_pagar = []
     totais = {
-        "previsto": Decimal("0.00"),
-        "pago": Decimal("0.00"),
-        "pendente": Decimal("0.00"),
+        "Previsto": Decimal("0.00"),
+        "Pago": Decimal("0.00"),
+        "Pendente": Decimal("0.00"),
     }
 
     if mes_ano_str:
@@ -163,8 +164,8 @@ def painel():
             )
 
             contas_a_pagar.append(item_dict)
-            totais["previsto"] += item_dict["valor_display"]
-            totais["pago"] += item_dict["valor_pago"]
+            totais[STATUS_PREVISTO] += item_dict["valor_display"]
+            totais[STATUS_PAGO] += item_dict["valor_pago"]
 
         for fatura in faturas:
             adicionar_conta_a_pagar(fatura, "Crediário")
@@ -174,7 +175,7 @@ def painel():
             adicionar_conta_a_pagar(despesa, "Despesa")
 
         contas_a_pagar.sort(key=lambda x: x["vencimento"])
-        totais["pendente"] = totais["previsto"] - totais["pago"]
+        totais[STATUS_PENDENTE] = totais[STATUS_PREVISTO] - totais[STATUS_PAGO]
 
     return render_template(
         "pagamentos/painel.html",

@@ -7,13 +7,7 @@ from wtforms.validators import DataRequired, Length, Optional, Regexp, Validatio
 
 from app import db
 from app.models.crediario_grupo_model import CrediarioGrupo
-
-TIPOS_GRUPO_CREDIARIO = [
-    ("", "Selecione..."),
-    ("Compra", "Compra"),
-    ("Estorno", "Estorno"),
-    ("Ajuste", "Ajuste"),
-]
+from app.utils import FormChoices
 
 
 class CadastroCrediarioGrupoForm(FlaskForm):
@@ -34,7 +28,7 @@ class CadastroCrediarioGrupoForm(FlaskForm):
     )
     tipo_grupo_crediario = SelectField(
         "Tipo",
-        choices=TIPOS_GRUPO_CREDIARIO,
+        choices=FormChoices.get_choices(FormChoices.TiposCrediarioGrupo),
         validators=[DataRequired("O tipo de grupo é obrigatório.")],
     )
     descricao = TextAreaField(
@@ -85,7 +79,7 @@ class EditarCrediarioGrupoForm(FlaskForm):
     )
     tipo_grupo_crediario = SelectField(
         "Tipo",
-        choices=TIPOS_GRUPO_CREDIARIO,
+        choices=FormChoices.get_choices(FormChoices.TiposCrediarioGrupo),
         validators=[Optional()],
         render_kw={"disabled": True},
     )

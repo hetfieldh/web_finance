@@ -6,6 +6,7 @@ from decimal import Decimal
 from sqlalchemy import Enum, Numeric, UniqueConstraint, func
 
 from app import db
+from app.utils import FormChoices
 
 from .crediario_movimento_model import CrediarioMovimento
 from .crediario_parcela_model import CrediarioParcela
@@ -18,13 +19,8 @@ class Crediario(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     nome_crediario = db.Column(db.String(100), nullable=False)
     tipo_crediario = db.Column(
-        Enum(
-            "Cartão Físico",
-            "Cartão VR",
-            "Cartão VT",
-            "Boleto",
-            "Cheque",
-            "Outro",
+        db.Enum(
+            *(item.value for item in FormChoices.TipoCrediario),
             name="tipo_crediario_enum",
         ),
         nullable=False,

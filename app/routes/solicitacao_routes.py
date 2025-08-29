@@ -21,6 +21,7 @@ from app.models.solicitacao_acesso_model import SolicitacaoAcesso
 from app.models.usuario_model import Usuario
 from app.routes.usuario_routes import admin_required
 from app.services.usuario_service import criar_novo_usuario
+from app.utils import STATUS_APROVADO, STATUS_PENDENTE, STATUS_REJEITADO
 
 solicitacao_bp = Blueprint("solicitacao", __name__, url_prefix="/solicitacao")
 
@@ -48,9 +49,8 @@ def gerar_senha_segura(tamanho=12):
 
 @solicitacao_bp.route("/acesso", methods=["GET", "POST"])
 def solicitar_acesso():
-    # --- CORREÇÃO: Mover a verificação de limite para o início ---
     solicitacoes_pendentes = SolicitacaoAcesso.query.filter_by(
-        status="Pendente"
+        status=STATUS_PENDENTE
     ).count()
     limite_atingido = solicitacoes_pendentes >= 10
 
@@ -178,7 +178,7 @@ def gerenciar_solicitacoes():
 @admin_required
 def aprovar_solicitacao(id):
     solicitacao = SolicitacaoAcesso.query.get_or_404(id)
-    if solicitacao.status != "Pendente":
+    if solicitacao.status != STATUS_PENDENTE:
         flash("Esta solicitação já foi processada.", "info")
         return redirect(url_for("usuario.listar_usuarios"))
 
@@ -204,7 +204,7 @@ def aprovar_solicitacao(id):
             flash(message, "danger")
             return redirect(url_for("solicitacao.gerenciar_solicitacoes"))
 
-        solicitacao.status = "Aprovada"
+        solicitacao.status = STATUS_APROVADO
         solicitacao.admin_id = current_user.id
         solicitacao.data_decisao = datetime.now(timezone.utc)
         solicitacao.login_criado = novo_usuario.login
@@ -236,8 +236,8 @@ def rejeitar_solicitacao():
     form = RejeicaoForm()
     if form.validate_on_submit():
         solicitacao = SolicitacaoAcesso.query.get_or_404(form.solicitacao_id.data)
-        if solicitacao.status == "Pendente":
-            solicitacao.status = "Rejeitada"
+        if solicitacao.status == STATUS_PENDENTE:
+            solicitacao.status = STATUS_REJEITADO
             solicitacao.admin_id = current_user.id
             solicitacao.data_decisao = datetime.now(timezone.utc)
             solicitacao.motivo_decisao = form.motivo.data

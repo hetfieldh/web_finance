@@ -6,9 +6,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import DateField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Optional
-
 from app.models.desp_rec_model import DespRec
-from app.utils import gerar_opcoes_mes_ano
 
 
 class ExtratoBancarioForm(FlaskForm):

@@ -6,6 +6,7 @@ from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
+from app.utils import STATUS_PENDENTE, FormChoices
 
 
 class CrediarioFatura(db.Model):
@@ -23,15 +24,12 @@ class CrediarioFatura(db.Model):
     data_vencimento_fatura = db.Column(db.Date, nullable=False)
 
     status = db.Column(
-        Enum(
-            "Pendente",
-            "Paga",
-            "Atrasada",
-            "Parcialmente Paga",
+        db.Enum(
+            *(item.value for item in FormChoices.StatusFatura),
             name="status_fatura_enum",
         ),
         nullable=False,
-        default="Pendente",
+        default=FormChoices.StatusFatura.PENDENTE.value,
     )
     data_pagamento = db.Column(db.Date, nullable=True)
 

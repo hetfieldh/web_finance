@@ -16,12 +16,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-STATUS_FATURA = [
-    ("Pendente", "Pendente"),
-    ("Paga", "Paga"),
-    ("Atrasada", "Atrasada"),
-    ("Parcialmente Paga", "Parcialmente Paga"),
-]
+from app.utils import STATUS_PAGO, FormChoices
 
 
 class EditarFaturaForm(FlaskForm):
@@ -74,7 +69,7 @@ class EditarFaturaForm(FlaskForm):
 
     status = SelectField(
         "Status da Fatura",
-        choices=STATUS_FATURA,
+        choices=FormChoices.get_choices(FormChoices.StatusFatura),
         validators=[DataRequired("O status é obrigatório.")],
     )
 
@@ -90,9 +85,9 @@ class EditarFaturaForm(FlaskForm):
         self.crediario_id.choices = crediario_choices
 
     def validate_status(self, field):
-        if field.data == "Paga" and not self.data_pagamento.data:
+        if field.data == STATUS_PAGO and not self.data_pagamento.data:
             raise ValidationError(
-                'A data de pagamento é obrigatória se o status for "Paga".'
+                'A data de pagamento é obrigatória se o status for "Pago".'
             )
-        if field.data != "Paga" and self.data_pagamento.data:
+        if field.data != STATUS_PAGO and self.data_pagamento.data:
             self.data_pagamento.data = None

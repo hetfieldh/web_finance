@@ -25,15 +25,7 @@ from wtforms.validators import (
 )
 
 from app.models.salario_item_model import SalarioItem
-from app.utils import gerar_opcoes_mes_ano
-
-TIPOS_SALARIO_ITEM = [
-    ("", "Selecione..."),
-    ("Provento", "Provento"),
-    ("Benefício", "Benefício"),
-    ("Imposto", "Imposto"),
-    ("Desconto", "Desconto"),
-]
+from app.utils import FormChoices
 
 
 class CadastroSalarioItemForm(FlaskForm):
@@ -50,7 +42,7 @@ class CadastroSalarioItemForm(FlaskForm):
     )
     tipo = SelectField(
         "Tipo",
-        choices=TIPOS_SALARIO_ITEM,
+        choices=FormChoices.get_choices(FormChoices.TipoSalarioItem),
         validators=[DataRequired("O tipo é obrigatório.")],
     )
     descricao = TextAreaField(
@@ -75,7 +67,11 @@ class CadastroSalarioItemForm(FlaskForm):
 
 class EditarSalarioItemForm(FlaskForm):
     nome = StringField("Verba", render_kw={"readonly": True})
-    tipo = SelectField("Tipo", choices=TIPOS_SALARIO_ITEM, render_kw={"disabled": True})
+    tipo = SelectField(
+        "Tipo",
+        choices=FormChoices.get_choices(FormChoices.TipoSalarioItem),
+        render_kw={"disabled": True},
+    )
 
     descricao = TextAreaField(
         "Descrição (opcional)",

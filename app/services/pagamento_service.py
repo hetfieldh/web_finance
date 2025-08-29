@@ -16,6 +16,13 @@ from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.utils import (
+    NATUREZA_DESPESA,
+    STATUS_ATRASADO,
+    STATUS_PAGO,
+    STATUS_PARCIAL_PAGO,
+    STATUS_PENDENTE,
+)
 
 
 def registrar_pagamento(form):
@@ -61,16 +68,16 @@ def registrar_pagamento(form):
         item_id = form.item_id.data
         item_tipo = form.item_tipo.data
 
-        if item_tipo == "Despesa":
+        if item_tipo == NATUREZA_DESPESA:
             item = DespRecMovimento.query.get(item_id)
-            item.status = "Pago"
+            item.status = STATUS_PAGO
             item.valor_realizado = valor_pago
             item.data_pagamento = form.data_pagamento.data
             item.movimento_bancario_id = novo_movimento.id
 
         elif item_tipo == "Financiamento":
             item = FinanciamentoParcela.query.get(item_id)
-            item.status = "Paga"
+            item.status = STATUS_PAGO
             item.pago = True
             item.data_pagamento = form.data_pagamento.data
             item.movimento_bancario_id = novo_movimento.id
@@ -83,7 +90,7 @@ def registrar_pagamento(form):
                 func.sum(FinanciamentoParcela.valor_principal)
             ).filter(
                 FinanciamentoParcela.financiamento_id == financiamento_pai.id,
-                FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
+                FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
             ).scalar() or Decimal(
                 "0.00"
             )
@@ -96,9 +103,9 @@ def registrar_pagamento(form):
             item.data_pagamento = form.data_pagamento.data
             item.movimento_bancario_id = novo_movimento.id
             if item.valor_pago_fatura >= item.valor_total_fatura:
-                item.status = "Paga"
+                item.status = STATUS_PAGO
             else:
-                item.status = "Parcialmente Paga"
+                item.status = STATUS_PARCIAL_PAGO
 
             ano, mes = map(int, item.mes_referencia.split("-"))
             data_inicio_mes = date(ano, mes, 1)
@@ -159,13 +166,13 @@ def estornar_pagamento(item_id, item_tipo):
             return False, "Movimentação bancária para estorno não existe mais."
 
         if item_tipo == "Despesa":
-            item_a_atualizar.status = "Pendente"
+            item_a_atualizar.status = STATUS_PENDENTE
             item_a_atualizar.valor_realizado = None
             item_a_atualizar.data_pagamento = None
             item_a_atualizar.movimento_bancario_id = None
 
         elif item_tipo == "Financiamento":
-            item_a_atualizar.status = "Pendente"
+            item_a_atualizar.status = STATUS_PENDENTE
             item_a_atualizar.data_pagamento = None
             item_a_atualizar.pago = False
             item_a_atualizar.movimento_bancario_id = None
@@ -177,7 +184,7 @@ def estornar_pagamento(item_id, item_tipo):
                 func.sum(FinanciamentoParcela.valor_principal)
             ).filter(
                 FinanciamentoParcela.financiamento_id == financiamento_pai.id,
-                FinanciamentoParcela.status.in_(["Pendente", "Atrasada"]),
+                FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
             ).scalar() or Decimal(
                 "0.00"
             )
@@ -185,7 +192,7 @@ def estornar_pagamento(item_id, item_tipo):
 
         elif item_tipo == "Crediário":
             item_a_atualizar.valor_pago_fatura = Decimal("0.00")
-            item_a_atualizar.status = "Pendente"
+            item_a_atualizar.status = STATUS_PENDENTE
             item_a_atualizar.data_pagamento = None
             item_a_atualizar.movimento_bancario_id = None
 

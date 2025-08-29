@@ -13,6 +13,7 @@ from app import db
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
+from app.utils import STATUS_ATRASADO, STATUS_PENDENTE
 
 
 def automatizar_geracao_e_atualizacao_faturas(user_id):
@@ -57,7 +58,7 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
         # 2. Obter todas as faturas pendentes existentes para consulta rápida
         faturas_pendentes_existentes = CrediarioFatura.query.filter(
             CrediarioFatura.usuario_id == user_id,
-            CrediarioFatura.status.in_(["Pendente", "Atrasada"]),
+            CrediarioFatura.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
         ).all()
         lookup_faturas = {
             (f.crediario_id, f.mes_referencia): f for f in faturas_pendentes_existentes
@@ -104,7 +105,7 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
                     mes_referencia=mes_ano_str,
                     valor_total_fatura=valor_total_real,
                     data_vencimento_fatura=data_fim_mes,
-                    status="Pendente",
+                    status=STATUS_PENDENTE,
                 )
                 db.session.add(nova_fatura)
                 faturas_criadas += 1
