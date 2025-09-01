@@ -46,3 +46,4 @@ Dockerfile*.tmp
 docker-compose*.yml
 
 add_adm.py
+docs/

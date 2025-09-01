@@ -1,8 +1,8 @@
-"""Criação do BD
+"""Criação da versão beta do sistema
 
-Revision ID: 349fd8c416b3
+Revision ID: 1945da411608
 Revises: 
-Create Date: 2025-08-29 19:10:26.578791
+Create Date: 2025-08-31 17:35:23.323197
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '349fd8c416b3'
+revision = '1945da411608'
 down_revision = None
 branch_labels = None
 depends_on = None
