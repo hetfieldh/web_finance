@@ -16,10 +16,6 @@ from app.utils import STATUS_PAGO, STATUS_PARCIAL_PAGO
 
 
 def adicionar_movimento(form):
-    """
-    Processa a lógica de negócio para adicionar um movimento de crediário e suas parcelas.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         crediario_id = form.crediario_id.data
         data_primeira_parcela_obj = form.data_primeira_parcela.data
@@ -84,10 +80,6 @@ def adicionar_movimento(form):
 
 
 def editar_movimento(movimento, form):
-    """
-    Processa a lógica de negócio para editar um movimento de crediário e suas parcelas.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         nova_data_primeira_parcela = form.data_primeira_parcela.data
         if nova_data_primeira_parcela != movimento.data_primeira_parcela:
@@ -151,10 +143,6 @@ def editar_movimento(movimento, form):
 
 
 def excluir_movimento(movimento_id):
-    """
-    Processa a lógica de negócio para excluir um movimento de crediário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     movimento = CrediarioMovimento.query.filter_by(
         id=movimento_id, usuario_id=current_user.id
     ).first_or_404()

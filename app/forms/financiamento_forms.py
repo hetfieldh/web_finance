@@ -30,6 +30,7 @@ from app.models.conta_model import Conta
 from app.models.financiamento_model import Financiamento
 from app.utils import FormChoices
 
+
 class CadastroFinanciamentoForm(FlaskForm):
     nome_financiamento = StringField(
         "Nome do Financiamento",
@@ -124,11 +125,6 @@ class CadastroFinanciamentoForm(FlaskForm):
 
 
 class EditarFinanciamentoForm(FlaskForm):
-    """
-    Formulário para editar um financiamento.
-    Apenas a descrição é editável. Os outros campos são exibidos como somente leitura.
-    """
-
     nome_financiamento = StringField(
         "Nome do Financiamento",
         validators=[DataRequired()],

@@ -2,7 +2,7 @@
 
 import csv
 import io
-from datetime import datetime
+from datetime import date, datetime
 from decimal import ROUND_DOWN, Decimal
 
 from flask import current_app
@@ -24,35 +24,6 @@ from app.utils import (
 
 
 def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
-    """
-    Função auxiliar para determinar o status da parcela de forma clara e eficiente.
-    """
-    if data_vencimento < hoje:
-        return STATUS_PAGO if valor_pago else STATUS_ATRASADO
-    else:
-        return STATUS_AMORTIZADO if valor_pago else STATUS_PENDENTE
-
-
-import csv
-import io
-from datetime import date, datetime
-from decimal import ROUND_DOWN, Decimal
-
-from flask import current_app
-from flask_login import current_user
-from sqlalchemy import func
-
-from app import db
-from app.models.conta_model import Conta
-from app.models.conta_movimento_model import ContaMovimento
-from app.models.conta_transacao_model import ContaTransacao
-from app.models.financiamento_parcela_model import FinanciamentoParcela
-
-
-def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
-    """
-    Função auxiliar para determinar o status da parcela de forma clara e eficiente.
-    """
     if data_vencimento < hoje:
         return STATUS_PAGO if valor_pago else STATUS_ATRASADO
     else:
@@ -60,9 +31,6 @@ def _determinar_status_parcela(valor_pago, data_vencimento, hoje):
 
 
 def importar_e_processar_csv(financiamento, csv_file):
-    """
-    Processa um arquivo CSV de parcelas para um financiamento, calculando o saldo devedor dinamicamente.
-    """
     try:
         FinanciamentoParcela.query.filter_by(financiamento_id=financiamento.id).delete()
         db.session.flush()
@@ -204,10 +172,6 @@ def importar_e_processar_csv(financiamento, csv_file):
 
 
 def amortizar_parcelas(financiamento, form, ids_parcelas):
-    """
-    Processa a lógica de negócio para amortizar parcelas de um financiamento.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         valor_total_amortizado = form.valor_amortizacao.data
         conta_debito = Conta.query.get(form.conta_id.data)

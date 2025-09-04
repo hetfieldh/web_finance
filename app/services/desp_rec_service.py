@@ -15,10 +15,6 @@ from app.utils import STATUS_PENDENTE
 
 
 def gerar_previsoes(form):
-    """
-    Processa a criação em lote de lançamentos de despesas/receitas fixas,
-    confiando na UniqueConstraint do banco de dados para evitar duplicatas.
-    """
     desp_rec_id = form.desp_rec_id.data
     valor_previsto = form.valor_previsto.data
     data_inicio = form.data_inicio.data
@@ -71,11 +67,6 @@ def gerar_previsoes(form):
 
 
 def criar_cadastro(form):
-    """
-    Processa a criação de um novo cadastro de Despesa/Receita.
-    A validação de duplicidade já é feita no formulário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         novo_cadastro = DespRec(
             usuario_id=current_user.id,
@@ -98,10 +89,6 @@ def criar_cadastro(form):
 
 
 def atualizar_cadastro(cadastro, form):
-    """
-    Processa a atualização de um cadastro de Despesa/Receita.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         cadastro.dia_vencimento = form.dia_vencimento.data
         cadastro.ativo = form.ativo.data
@@ -119,10 +106,6 @@ def atualizar_cadastro(cadastro, form):
 
 
 def excluir_cadastro_por_id(cadastro_id):
-    """
-    Processa a exclusão de um cadastro de Despesa/Receita.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     cadastro = DespRec.query.filter_by(
         id=cadastro_id, usuario_id=current_user.id
     ).first_or_404()
@@ -149,9 +132,6 @@ def excluir_cadastro_por_id(cadastro_id):
 
 
 def get_fixed_desp_rec_for_user_choices():
-    """
-    Busca os cadastros de Desp/Rec do tipo 'Fixa' e formata como choices.
-    """
     contas_fixas = (
         DespRec.query.filter_by(usuario_id=current_user.id, tipo="Fixa", ativo=True)
         .order_by(DespRec.nome.asc())
@@ -162,9 +142,6 @@ def get_fixed_desp_rec_for_user_choices():
 
 
 def get_variable_desp_rec_for_user_choices():
-    """
-    Busca os cadastros de Desp/Rec do tipo 'Variável' e formata como choices.
-    """
     contas_variaveis = (
         DespRec.query.filter_by(usuario_id=current_user.id, tipo="Variável", ativo=True)
         .order_by(DespRec.nome.asc())
@@ -175,9 +152,6 @@ def get_variable_desp_rec_for_user_choices():
 
 
 def get_all_desp_rec_for_user_choices():
-    """
-    Busca todos os cadastros de Desp/Rec ativos do usuário e formata como choices.
-    """
     cadastros = (
         DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
         .order_by(DespRec.nome.asc())
@@ -188,10 +162,6 @@ def get_all_desp_rec_for_user_choices():
 
 
 def get_all_active_desp_rec_for_user_choices():
-    """
-    Busca todos os cadastros de Desp/Rec ativos do usuário (Fixa e Variável)
-    e formata como choices para um SelectField.
-    """
     cadastros = (
         DespRec.query.filter_by(usuario_id=current_user.id, ativo=True)
         .order_by(DespRec.nome.asc())

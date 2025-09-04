@@ -25,9 +25,13 @@ except locale.Error:
     print("Locale pt_BR.UTF-8 não encontrado, usando o padrão do sistema.")
 
 
-def create_app(config_class=Config):
+def create_app(config_class=Config, config_overrides=None):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Aplica as configurações de override, se foram passadas
+    if config_overrides:
+        app.config.update(config_overrides)
 
     try:
         locale.setlocale(locale.LC_TIME, "pt_BR.UTF-8")

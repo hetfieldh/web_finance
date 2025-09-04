@@ -17,16 +17,11 @@ from app.utils import STATUS_ATRASADO, STATUS_PENDENTE
 
 
 def automatizar_geracao_e_atualizacao_faturas(user_id):
-    """
-    Usa o SQLAlchemy ORM para analisar todas as parcelas de crediário não pagas e,
-    para cada combinação de (crediário, mês), cria ou atualiza a fatura correspondente.
-    """
     try:
         current_app.logger.info(
             f"Iniciando sincronização (ORM) para user ID: {user_id}"
         )
 
-        # 1. Encontrar todas as combinações únicas de (crediário, mês) com parcelas pendentes.
         tarefas = (
             db.session.query(
                 CrediarioMovimento.crediario_id,
@@ -55,7 +50,6 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
                 "Não foram encontradas novas parcelas para gerar ou atualizar faturas.",
             )
 
-        # 2. Obter todas as faturas pendentes existentes para consulta rápida
         faturas_pendentes_existentes = CrediarioFatura.query.filter(
             CrediarioFatura.usuario_id == user_id,
             CrediarioFatura.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
@@ -67,7 +61,6 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
         faturas_criadas = 0
         faturas_atualizadas = 0
 
-        # 3. Iterar sobre cada tarefa encontrada
         for tarefa in tarefas:
             crediario_id = tarefa.crediario_id
             mes_ano_str = tarefa.mes_referencia
@@ -77,7 +70,6 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
                 day=1
             ) - timedelta(days=1)
 
-            # 4. Calcular o valor total real das parcelas para aquele mês/crediário
             valor_total_real = (
                 db.session.query(func.sum(CrediarioParcela.valor_parcela))
                 .join(CrediarioMovimento)
@@ -91,7 +83,6 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
                 .scalar()
             ) or Decimal("0.00")
 
-            # 5. Decidir se cria uma nova fatura ou atualiza uma existente
             fatura_existente = lookup_faturas.get((crediario_id, mes_ano_str))
 
             if fatura_existente:

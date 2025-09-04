@@ -8,11 +8,6 @@ from app.models.crediario_model import Crediario
 
 
 def criar_crediario(form):
-    """
-    Processa a criação de um novo crediário.
-    A validação de duplicidade já é feita no formulário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         novo_crediario = Crediario(
             usuario_id=current_user.id,
@@ -39,11 +34,6 @@ def criar_crediario(form):
 
 
 def atualizar_crediario(crediario, form):
-    """
-    Processa a atualização de um crediário.
-    A validação de duplicidade já é feita no formulário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         crediario.nome_crediario = form.nome_crediario.data.strip().upper()
         crediario.identificador_final = (
@@ -67,10 +57,6 @@ def atualizar_crediario(crediario, form):
 
 
 def excluir_crediario_por_id(crediario_id):
-    """
-    Processa a exclusão de um crediário, validando as regras de negócio.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     crediario = Crediario.query.filter_by(
         id=crediario_id, usuario_id=current_user.id
     ).first_or_404()
@@ -97,9 +83,6 @@ def excluir_crediario_por_id(crediario_id):
 
 
 def get_active_crediarios_for_user_choices():
-    """
-    Busca os crediários ativos do usuário e formata como choices para um SelectField.
-    """
     crediarios = (
         Crediario.query.filter_by(usuario_id=current_user.id, ativa=True)
         .order_by(Crediario.nome_crediario.asc())

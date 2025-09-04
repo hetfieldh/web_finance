@@ -6,12 +6,11 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import DateField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Optional
+
 from app.models.desp_rec_model import DespRec
 
 
 class ExtratoBancarioForm(FlaskForm):
-    """Formulário para filtrar o extrato bancário por conta e mês/ano."""
-
     conta_id = SelectField(
         "Conta Bancária",
         validators=[DataRequired("Selecione uma conta.")],
@@ -39,8 +38,6 @@ class ExtratoBancarioForm(FlaskForm):
 
 
 class ExtratoConsolidadoForm(FlaskForm):
-    """Formulário para filtrar o extrato consolidado por mês/ano."""
-
     mes_ano = StringField(
         "Mês/Ano de Referência",
         validators=[DataRequired("O mês e ano são obrigatórios.")],

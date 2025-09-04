@@ -72,7 +72,6 @@ class SalarioMovimento(db.Model):
 
     @property
     def salario_liquido(self):
-        """Calcula o salário líquido (Proventos - Impostos - Descontos)."""
         proventos = sum(
             i.valor for i in self.itens if i.salario_item.tipo == TIPO_PROVENTO
         )
@@ -85,5 +84,4 @@ class SalarioMovimento(db.Model):
 
     @property
     def total_beneficios(self):
-        """Calcula o total de benefícios."""
         return sum(i.valor for i in self.itens if i.salario_item.tipo == TIPO_BENEFICIO)

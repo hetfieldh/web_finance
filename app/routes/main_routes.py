@@ -67,7 +67,6 @@ def dashboard():
         usuario_id=current_user.id, ativa=True
     ).all()
 
-    # --- LÓGICA PARA MOVIMENTOS DO MÊS ---
     form = FluxoCaixaForm(request.args)
     mes_ano_selecionado = form.mes_ano.data
     if not mes_ano_selecionado:
@@ -82,7 +81,6 @@ def dashboard():
 
     proximos_movimentos = []
 
-    # Busca Despesas e Receitas PENDENTES com vencimento no mês
     desp_rec_mes = (
         DespRecMovimento.query.join(DespRec)
         .filter(
@@ -107,7 +105,6 @@ def dashboard():
             }
         )
 
-    # Busca Faturas PENDENTES com vencimento no mês
     faturas_mes = (
         CrediarioFatura.query.filter(
             CrediarioFatura.usuario_id == current_user.id,
@@ -131,7 +128,6 @@ def dashboard():
             }
         )
 
-    # Busca Parcelas de Financiamento PENDENTES com vencimento no mês
     parcelas_mes = (
         FinanciamentoParcela.query.join(Financiamento)
         .filter(
@@ -152,7 +148,6 @@ def dashboard():
             }
         )
 
-    # Busca Salários PENDENTES com data de recebimento no mês
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == current_user.id,
         SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),

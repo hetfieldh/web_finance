@@ -117,9 +117,6 @@ def excluir_movimento_crediario(id):
 @crediario_movimento_bp.route("/detalhes/<int:id>")
 @login_required
 def detalhes_movimento(id):
-    """
-    Exibe os detalhes de um movimento de crediário e todas as suas parcelas.
-    """
     movimento = (
         CrediarioMovimento.query.options(
             joinedload(CrediarioMovimento.parcelas),

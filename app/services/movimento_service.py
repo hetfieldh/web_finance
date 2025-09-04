@@ -16,10 +16,6 @@ from app.models.salario_movimento_model import SalarioMovimento
 
 
 def registrar_movimento(form):
-    """
-    Processa a lógica de negócio para registrar uma movimentação bancária.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         tipo_operacao = form.tipo_operacao.data
         conta_origem_id = form.conta_id.data
@@ -32,7 +28,6 @@ def registrar_movimento(form):
         if valor <= 0:
             return False, "O valor da movimentação deve ser maior que zero."
 
-        # Validação de Saldo
         is_debit_operation = False
         if tipo_operacao == "simples":
             tipo_transacao = db.session.get(
@@ -53,7 +48,6 @@ def registrar_movimento(form):
                     f"Saldo e limite insuficientes na conta {conta_origem.nome_banco}. Saldo disponível: R$ {saldo_disponivel:.2f}",
                 )
 
-        # Lógica de Criação dos Registros
         if tipo_operacao == "simples":
             tipo_transacao = db.session.get(
                 ContaTransacao, form.conta_transacao_id.data
@@ -134,10 +128,6 @@ def registrar_movimento(form):
 
 
 def excluir_movimento(movimento_id):
-    """
-    Processa a lógica de negócio para excluir uma movimentação bancária.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     movimento = ContaMovimento.query.filter_by(
         id=movimento_id, usuario_id=current_user.id
     ).first_or_404()
@@ -185,13 +175,11 @@ def excluir_movimento(movimento_id):
                 ContaMovimento, movimento.id_movimento_relacionado
             )
 
-        # Quebrar a dependência circular ANTES de qualquer outra coisa
         if movimento_relacionado:
             movimento.id_movimento_relacionado = None
             movimento_relacionado.id_movimento_relacionado = None
             db.session.flush()
 
-        # Reverter o saldo da conta principal
         conta_afetada = db.session.get(Conta, movimento.conta_id)
         if conta_afetada:
             if movimento.tipo_transacao.tipo == "Débito":
@@ -199,7 +187,6 @@ def excluir_movimento(movimento_id):
             else:
                 conta_afetada.saldo_atual -= movimento.valor
 
-        # Se houver movimento relacionado, reverter o saldo da outra conta e deletá-lo
         if movimento_relacionado:
             conta_destino = db.session.get(Conta, movimento_relacionado.conta_id)
             if conta_destino:
@@ -209,7 +196,6 @@ def excluir_movimento(movimento_id):
                     conta_destino.saldo_atual -= movimento_relacionado.valor
             db.session.delete(movimento_relacionado)
 
-        # Deletar o movimento principal
         db.session.delete(movimento)
 
         db.session.commit()

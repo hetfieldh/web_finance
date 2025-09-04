@@ -181,7 +181,6 @@ def visualizar_parcelas(id):
 
     hoje = date.today()
     for p in parcelas:
-        # Lógica para Fluxo de Caixa (valores totais e pagos)
         resumo_fluxo_caixa["total_previsto"] += p.valor_total_previsto
         if p.status == STATUS_PAGO:
             resumo_fluxo_caixa[STATUS_PAGO] += p.valor_pago or Decimal("0.00")
@@ -190,7 +189,6 @@ def visualizar_parcelas(id):
         elif p.status in [STATUS_PENDENTE, STATUS_ATRASADO]:
             resumo_fluxo_caixa[STATUS_PENDENTE] += p.valor_total_previsto
 
-        # Lógica para Balanço do Principal
         if p.status == STATUS_PAGO:
             resumo_principal[STATUS_PAGO] += p.valor_principal
         elif p.status == STATUS_AMORTIZADO:

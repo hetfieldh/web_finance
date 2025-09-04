@@ -21,25 +21,21 @@ graphics_bp = Blueprint("graphics", __name__, url_prefix="/graficos")
 def view_graphics():
     hoje = date.today()
 
-    # 1. Buscar todos os financiamentos do usuário para a caixa de seleção
     todos_financiamentos = (
         Financiamento.query.filter_by(usuario_id=current_user.id)
         .order_by(Financiamento.nome_financiamento.asc())
         .all()
     )
 
-    # 2. Verificar qual financiamento foi selecionado (ou usar o primeiro como padrão)
     selected_finan_id = request.args.get("financiamento_id", type=int)
     if not selected_finan_id and todos_financiamentos:
         selected_finan_id = todos_financiamentos[0].id
 
-    # 3. Buscar os dados dos gráficos
     dados_mensais = get_monthly_graphics_data(
         user_id=current_user.id, year=hoje.year, month=hoje.month
     )
     dados_anuais = get_annual_evolution_data(user_id=current_user.id, year=hoje.year)
 
-    # 4. Chamar o serviço com o ID do financiamento selecionado
     dados_financiamento = get_financing_progress_data(
         user_id=current_user.id, year=hoje.year, financiamento_id=selected_finan_id
     )
@@ -55,7 +51,6 @@ def view_graphics():
         dados_graficos=dados_graficos,
         mes_referencia=hoje.strftime("%B/%Y").capitalize(),
         ano_atual=hoje.year,
-        # 5. Enviar a lista e o ID selecionado para o template
         todos_financiamentos=todos_financiamentos,
         selected_finan_id=selected_finan_id,
     )
@@ -64,23 +59,23 @@ def view_graphics():
 @graphics_bp.route("/resumo-financiamentos")
 @login_required
 def resumo_financiamentos():
-    # 1. Buscar todos os financiamentos para a caixa de seleção
-    todos_financiamentos = Financiamento.query.filter_by(
-        usuario_id=current_user.id
-    ).order_by(Financiamento.nome_financiamento.asc()).all()
+    todos_financiamentos = (
+        Financiamento.query.filter_by(usuario_id=current_user.id)
+        .order_by(Financiamento.nome_financiamento.asc())
+        .all()
+    )
 
-    # 2. Verificar qual financiamento foi selecionado (ou usar o primeiro como padrão)
-    selected_finan_id = request.args.get('financiamento_id', type=int)
+    selected_finan_id = request.args.get("financiamento_id", type=int)
     if not selected_finan_id and todos_financiamentos:
         selected_finan_id = todos_financiamentos[0].id
 
-    # 3. Chamar o serviço com o ID do financiamento selecionado
-    summary_data = get_financing_summary_data(current_user.id, financiamento_id=selected_finan_id)
+    summary_data = get_financing_summary_data(
+        current_user.id, financiamento_id=selected_finan_id
+    )
 
-    # 4. Enviar tudo para o template
     return render_template(
         "graphics_2.html",
         summary_data=summary_data,
         todos_financiamentos=todos_financiamentos,
-        selected_finan_id=selected_finan_id
+        selected_finan_id=selected_finan_id,
     )

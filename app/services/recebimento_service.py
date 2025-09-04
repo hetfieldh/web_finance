@@ -21,10 +21,6 @@ from app.utils import (
 
 
 def registrar_recebimento(form):
-    """
-    Processa a lógica de negócio para registrar um recebimento.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         conta_credito = Conta.query.get(form.conta_id.data)
         valor_recebido = form.valor_recebido.data
@@ -86,10 +82,6 @@ def registrar_recebimento(form):
 
 
 def estornar_recebimento(item_id, item_tipo):
-    """
-    Processa a lógica de negócio para estornar um recebimento,
-    validando o impacto no saldo atual.
-    """
     try:
         movimento_bancario_id = None
         item_a_atualizar = None

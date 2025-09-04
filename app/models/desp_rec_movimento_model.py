@@ -54,21 +54,6 @@ class DespRecMovimento(db.Model):
         return f"<DespRecMovimento ID: {self.id} | Venc: {self.data_vencimento} | Valor: {self.valor_previsto}>"
 
 
-@event.listens_for(DespRecMovimento.__table__, "after_create")
-def create_partial_unique_constraint(target, connection, **kw):
-    connection.execute(
-        text(
-            """
-        CREATE UNIQUE INDEX ix_unique_fixed_desprec_movimento
-        ON desp_rec_movimento (usuario_id, desp_rec_id, ano, mes)
-        WHERE (
-            SELECT tipo FROM desp_rec WHERE id = desp_rec_id
-        ) = 'Fixa'
-    """
-        )
-    )
-
-
 @event.listens_for(DespRecMovimento, "before_insert")
 @event.listens_for(DespRecMovimento, "before_update")
 def popular_mes_ano(mapper, connection, target):

@@ -26,10 +26,6 @@ from app.utils import (
 
 
 def registrar_pagamento(form):
-    """
-    Processa a lógica de negócio para registrar um pagamento.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         conta_debito = Conta.query.get(form.conta_id.data)
         valor_pago = form.valor_pago.data
@@ -138,9 +134,6 @@ def registrar_pagamento(form):
 
 
 def estornar_pagamento(item_id, item_tipo):
-    """
-    Processa a lógica de negócio para estornar um pagamento.
-    """
     try:
         movimento_bancario_id = None
         item_a_atualizar = None

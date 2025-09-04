@@ -26,17 +26,12 @@ from app.utils import (
 
 
 def get_balanco_mensal(user_id, ano, mes):
-    """
-    Calcula o balanço consolidado de receitas e despesas realizadas para um
-    determinado mês, incluindo o percentual de comprometimento da renda.
-    """
     data_inicio_mes = date(ano, mes, 1)
     if mes == 12:
         data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
     else:
         data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
 
-    # --- CÁLCULO DE RECEITAS ---
     total_receitas = Decimal("0.00")
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
@@ -62,7 +57,6 @@ def get_balanco_mensal(user_id, ano, mes):
     )
     total_receitas += outras_receitas
 
-    # --- CÁLCULO DE DESPESAS ---
     total_despesas = Decimal("0.00")
     despesas_gerais = db.session.query(func.sum(DespRecMovimento.valor_realizado)).join(
         DespRec
@@ -107,10 +101,6 @@ def get_balanco_mensal(user_id, ano, mes):
 
 
 def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
-    """
-    Busca e consolida todas as entradas e saídas de caixa realizadas em um mês,
-    agrupadas por sua origem e incluindo a conta bancária.
-    """
     data_inicio_mes = date(ano, mes, 1)
     if mes == 12:
         data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
@@ -119,7 +109,6 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
 
     movimentacoes_consolidadas = []
 
-    # Receitas (Salários e Outras)
     salarios_mes = (
         SalarioMovimento.query.options(
             joinedload(SalarioMovimento.movimento_bancario_salario).joinedload(
@@ -199,7 +188,6 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
             }
         )
 
-    # Despesas (Gerais)
     despesas_gerais = (
         DespRecMovimento.query.options(
             joinedload(DespRecMovimento.despesa_receita),
@@ -231,7 +219,6 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
             }
         )
 
-    # Faturas de Crediário Pagas
     faturas_pagas = (
         CrediarioFatura.query.options(
             joinedload(CrediarioFatura.crediario),
@@ -262,7 +249,6 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
             }
         )
 
-    # Parcelas de Financiamento Pagas
     parcelas_pagas_no_mes = (
         FinanciamentoParcela.query.options(
             joinedload(FinanciamentoParcela.financiamento),
@@ -304,10 +290,6 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
 
 
 def get_extrato_detalhado_mensal(user_id, ano, mes):
-    """
-    Busca todas as transações individuais (entradas e saídas) realizadas
-    em um determinado mês para montar um extrato cronológico.
-    """
     data_inicio_mes = date(ano, mes, 1)
     if mes == 12:
         data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
@@ -316,7 +298,6 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
 
     movimentacoes = []
 
-    # 1. Busca Despesas e Receitas
     desp_rec = (
         DespRecMovimento.query.options(
             joinedload(DespRecMovimento.despesa_receita),
@@ -347,7 +328,6 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
             }
         )
 
-    # 2. Busca Faturas de Crediário
     faturas = (
         CrediarioFatura.query.options(
             joinedload(CrediarioFatura.crediario),
@@ -377,7 +357,6 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
             }
         )
 
-    # 3. Busca Parcelas de Financiamento
     parcelas = (
         FinanciamentoParcela.query.options(
             joinedload(FinanciamentoParcela.financiamento),
@@ -410,7 +389,6 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
             }
         )
 
-    # 4. Busca Salários e Benefícios
     salarios = (
         SalarioMovimento.query.options(
             joinedload(SalarioMovimento.movimento_bancario_salario).joinedload(

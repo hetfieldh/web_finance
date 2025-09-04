@@ -8,10 +8,6 @@ from app.models.conta_transacao_model import ContaTransacao
 
 
 def criar_tipo_transacao(form):
-    """
-    Processa a criação de um novo tipo de transação.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         novo_tipo_transacao = ContaTransacao(
             usuario_id=current_user.id,
@@ -31,10 +27,6 @@ def criar_tipo_transacao(form):
 
 
 def atualizar_tipo_transacao(tipo_transacao, form):
-    """
-    Processa a atualização de um tipo de transação.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         tipo_transacao.transacao_tipo = form.transacao_tipo.data.strip().upper()
         db.session.commit()
@@ -52,10 +44,6 @@ def atualizar_tipo_transacao(tipo_transacao, form):
 
 
 def excluir_tipo_transacao_por_id(tipo_transacao_id):
-    """
-    Processa a exclusão de um tipo de transação, validando as regras de negócio.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     tipo_transacao = ContaTransacao.query.filter_by(
         id=tipo_transacao_id, usuario_id=current_user.id
     ).first_or_404()
@@ -84,9 +72,6 @@ def excluir_tipo_transacao_por_id(tipo_transacao_id):
 
 
 def get_all_transaction_types_for_user_choices():
-    """
-    Busca todos os tipos de transação de um usuário e formata como choices.
-    """
     transacoes = (
         ContaTransacao.query.filter_by(usuario_id=current_user.id)
         .order_by(ContaTransacao.transacao_tipo.asc())
@@ -99,9 +84,6 @@ def get_all_transaction_types_for_user_choices():
 
 
 def get_debit_transaction_types_for_user_choices():
-    """
-    Busca os tipos de transação de débito de um usuário e formata como choices.
-    """
     transacoes_debito = (
         ContaTransacao.query.filter_by(usuario_id=current_user.id, tipo="Débito")
         .order_by(ContaTransacao.transacao_tipo.asc())

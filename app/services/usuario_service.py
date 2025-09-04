@@ -10,9 +10,6 @@ from app.models.usuario_model import Usuario
 
 
 def _criar_transacoes_padrao(novo_usuario):
-    """
-    Cria um conjunto de tipos de transação padrão para um novo usuário.
-    """
     transacoes_padrao = [
         {"transacao_tipo": "PAGAMENTO", "tipo": "Débito"},
         {"transacao_tipo": "RECEBIMENTO", "tipo": "Crédito"},

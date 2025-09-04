@@ -12,10 +12,6 @@ from app.models.conta_movimento_model import ContaMovimento
 
 
 def criar_conta(form):
-    """
-    Processa a lógica de negócio para criar uma nova conta bancária.
-    Retorna uma tupla (sucesso, mensagem_ou_dicionario_de_erros).
-    """
     try:
         nome_banco = form.nome_banco.data.strip().upper()
         agencia = form.agencia.data.strip()
@@ -63,10 +59,6 @@ def criar_conta(form):
 
 
 def atualizar_conta(conta, form):
-    """
-    Processa a lógica de negócio para atualizar uma conta bancária.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         if not form.ativa.data and Decimal(str(conta.saldo_atual)) != Decimal("0.00"):
             return (
@@ -91,10 +83,6 @@ def atualizar_conta(conta, form):
 
 
 def excluir_conta_por_id(conta_id):
-    """
-    Processa a lógica de negócio para excluir uma conta bancária.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     conta = Conta.query.filter_by(
         id=conta_id, usuario_id=current_user.id
     ).first_or_404()
@@ -124,9 +112,6 @@ def excluir_conta_por_id(conta_id):
 
 
 def get_active_accounts_for_user_choices():
-    """
-    Busca contas ativas de um usuário e formata como choices para um SelectField.
-    """
     contas_ativas = (
         Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
         .order_by(Conta.nome_banco.asc())
@@ -140,9 +125,6 @@ def get_active_accounts_for_user_choices():
 
 
 def get_active_accounts_for_user_choices_simple():
-    """
-    Busca contas ativas de um usuário e formata como choices (versão simples).
-    """
     contas_ativas = (
         Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
         .order_by(Conta.nome_banco.asc())
@@ -155,10 +137,6 @@ def get_active_accounts_for_user_choices_simple():
 
 
 def get_account_balance_kpis(user_id):
-    """
-    Calcula os KPIs de saldo (operacional, investimentos, etc.) com uma única
-    consulta consolidada ao banco de dados.
-    """
     saldos = (
         db.session.query(
             func.sum(
@@ -199,16 +177,6 @@ def get_account_balance_kpis(user_id):
 
 
 def validar_estorno_saldo(conta, valor_a_debitar):
-    """
-    Verifica se o estorno de um valor de uma conta é seguro.
-
-    Um estorno é seguro se o saldo atual da conta, mais qualquer limite,
-    for maior ou igual ao valor que será debitado.
-
-    :param conta: O objeto da Conta a ser verificado.
-    :param valor_a_debitar: O valor (Decimal) que será retirado da conta.
-    :return: (bool, str) Tupla indicando sucesso e uma mensagem.
-    """
     saldo_disponivel = conta.saldo_atual
     if conta.tipo in ["Corrente", "Digital"] and conta.limite:
         saldo_disponivel += conta.limite

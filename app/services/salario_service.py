@@ -10,10 +10,6 @@ from app.models.salario_movimento_model import SalarioMovimento
 
 
 def criar_folha_pagamento(mes_referencia, data_recebimento):
-    """
-    Processa a criação de uma nova folha de pagamento, verificando duplicatas.
-    Retorna (sucesso, mensagem, objeto_movimento).
-    """
     movimento_existente = SalarioMovimento.query.filter_by(
         usuario_id=current_user.id, mes_referencia=mes_referencia
     ).first()
@@ -42,10 +38,6 @@ def criar_folha_pagamento(mes_referencia, data_recebimento):
 
 
 def adicionar_item_folha(movimento_id, form):
-    """
-    Adiciona uma verba a uma folha de pagamento existente.
-    Retorna (sucesso, mensagem, dados_do_item).
-    """
     movimento = db.session.get(SalarioMovimento, movimento_id)
     if not movimento or movimento.usuario_id != current_user.id:
         return False, "Folha de pagamento não encontrada.", None
@@ -84,10 +76,6 @@ def adicionar_item_folha(movimento_id, form):
 
 
 def excluir_item_folha(item_id):
-    """
-    Exclui uma verba de uma folha de pagamento.
-    Retorna (sucesso, mensagem, id_do_item_excluido).
-    """
     item = db.session.get(SalarioMovimentoItem, item_id)
     if not item or item.movimento_pai.usuario_id != current_user.id:
         return False, "Item não encontrado.", None
@@ -116,10 +104,6 @@ def excluir_item_folha(item_id):
 
 
 def excluir_folha_pagamento(movimento_id):
-    """
-    Exclui uma folha de pagamento inteira.
-    Retorna (sucesso, mensagem).
-    """
     movimento = SalarioMovimento.query.filter_by(
         id=movimento_id, usuario_id=current_user.id
     ).first_or_404()
@@ -149,9 +133,6 @@ def excluir_folha_pagamento(movimento_id):
 
 
 def get_active_salario_items_for_user_choices():
-    """
-    Busca os itens de salário ativos do usuário e formata como choices.
-    """
     itens = (
         SalarioItem.query.filter_by(usuario_id=current_user.id, ativo=True)
         .order_by(SalarioItem.tipo, SalarioItem.nome)

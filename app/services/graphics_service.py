@@ -30,16 +30,11 @@ from app.utils import (
 
 
 def get_monthly_graphics_data(user_id, year, month):
-    """
-    Busca e calcula todos os dados para os gráficos mensais, com lógica detalhada
-    para o gráfico de progresso (incluindo descontos e custos extras).
-    """
     data_inicio_mes = date(year, month, 1)
     data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(day=1) - timedelta(
         days=1
     )
 
-    # --- 1. CÁLCULO DO VALOR TOTAL PREVISTO PARA O MÊS (O NOSSO 100%) ---
     despesas_vencimento = (
         DespRecMovimento.query.join(DespRec)
         .filter(
@@ -64,7 +59,6 @@ def get_monthly_graphics_data(user_id, year, month):
         + sum(p.valor_total_previsto for p in parcelas_vencimento)
     )
 
-    # --- 2. CÁLCULO DETALHADO DAS FATIAS DO GRÁFICO ---
     valor_pago_real = Decimal("0.00")
     valor_descontos = Decimal("0.00")
     valor_custos_extras = Decimal("0.00")
@@ -122,7 +116,6 @@ def get_monthly_graphics_data(user_id, year, month):
         dados_progresso_valores["labels"].append(STATUS_PENDENTE)
         dados_progresso_valores["valores"].append(float(valor_pendente))
 
-    # --- 3. DADOS DOS OUTROS GRÁFICOS ---
     balanco = relatorios_service.get_balanco_mensal(user_id, year, month)
     saidas_fixas = db.session.query(func.sum(DespRecMovimento.valor_realizado)).join(
         DespRec
@@ -216,10 +209,6 @@ def get_monthly_graphics_data(user_id, year, month):
 
 
 def get_annual_evolution_data(user_id, year):
-    """
-    Busca e calcula os dados de evolução de receitas e despesas para um ano inteiro
-    utilizando o serviço de relatórios centralizado.
-    """
     labels = [
         "Jan",
         "Fev",
@@ -253,9 +242,6 @@ def get_annual_evolution_data(user_id, year):
 
 
 def get_financing_progress_data(user_id, year, financiamento_id):
-    """
-    Busca os dados para o gráfico de progresso de um financiamento específico.
-    """
     if not financiamento_id:
         return None
 
@@ -325,10 +311,6 @@ def get_financing_progress_data(user_id, year, financiamento_id):
 
 
 def get_financing_summary_data(user_id, financiamento_id=None):
-    """
-    Busca a contagem de parcelas de financiamento por status.
-    Se um financiamento_id for fornecido, filtra para apenas esse financiamento.
-    """
     query = (
         db.session.query(
             FinanciamentoParcela.status,

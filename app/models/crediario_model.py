@@ -49,7 +49,6 @@ class Crediario(db.Model):
 
     @property
     def saldo_devedor(self):
-        """Calcula o saldo devedor somando as parcelas não pagas."""
         saldo = (
             db.session.query(func.sum(CrediarioParcela.valor_parcela))
             .join(CrediarioMovimento)

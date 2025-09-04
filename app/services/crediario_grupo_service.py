@@ -8,10 +8,6 @@ from app.models.crediario_grupo_model import CrediarioGrupo
 
 
 def criar_grupo(form):
-    """
-    Processa a criação de um novo grupo de crediário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         novo_grupo = CrediarioGrupo(
             usuario_id=current_user.id,
@@ -34,10 +30,6 @@ def criar_grupo(form):
 
 
 def atualizar_grupo(grupo, form):
-    """
-    Processa a atualização de um grupo de crediário.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     try:
         grupo.grupo_crediario = form.grupo_crediario.data.strip().upper()
         grupo.descricao = form.descricao.data.strip() if form.descricao.data else None
@@ -55,10 +47,6 @@ def atualizar_grupo(grupo, form):
 
 
 def excluir_grupo_por_id(grupo_id):
-    """
-    Processa a exclusão de um grupo, validando as regras de negócio.
-    Retorna uma tupla (sucesso, mensagem).
-    """
     grupo = CrediarioGrupo.query.filter_by(
         id=grupo_id, usuario_id=current_user.id
     ).first_or_404()
@@ -84,9 +72,6 @@ def excluir_grupo_por_id(grupo_id):
 
 
 def get_all_crediario_grupos_for_user_choices():
-    """
-    Busca todos os grupos de crediário do usuário e formata como choices.
-    """
     grupos = (
         CrediarioGrupo.query.filter_by(usuario_id=current_user.id)
         .order_by(CrediarioGrupo.grupo_crediario.asc())
