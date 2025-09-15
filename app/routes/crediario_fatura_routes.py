@@ -14,7 +14,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -34,24 +34,38 @@ crediario_fatura_bp = Blueprint(
 def listar_faturas():
     form = FlaskForm()
 
+    mes_str = request.args.get("mes")
+    ano_str = request.args.get("ano")
+
+    hoje = date.today()
+    mes = int(mes_str) if mes_str else hoje.month
+    ano = int(ano_str) if ano_str else hoje.year
+
+    data_inicio = date(ano, mes, 1)
+    if mes == 12:
+        data_fim = date(ano + 1, 1, 1) - timedelta(days=1)
+    else:
+        data_fim = date(ano, mes + 1, 1) - timedelta(days=1)
+
     faturas = (
         CrediarioFatura.query.filter_by(usuario_id=current_user.id)
         .options(joinedload(CrediarioFatura.crediario))
+        .filter(CrediarioFatura.data_vencimento_fatura.between(data_inicio, data_fim))
         .order_by(CrediarioFatura.data_vencimento_fatura.asc())
         .all()
     )
 
     faturas_com_status = []
-    hoje = date.today()
 
     for fatura in faturas:
-        ano = int(fatura.mes_referencia.split("-")[0])
-        mes = int(fatura.mes_referencia.split("-")[1])
-        data_inicio_mes = date(ano, mes, 1)
-        if mes == 12:
-            data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
+        ano_ref = int(fatura.mes_referencia.split("-")[0])
+        mes_ref = int(fatura.mes_referencia.split("-")[1])
+        data_inicio_mes = date(ano_ref, mes_ref, 1)
+        if mes_ref == 12:
+            data_fim_mes = date(ano_ref + 1, 1, 1) - timedelta(days=1)
         else:
-            data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
+            data_fim_mes = date(ano_ref, mes_ref + 1, 1) - timedelta(days=1)
+
         soma_real_parcelas = (
             db.session.query(
                 func.coalesce(func.sum(CrediarioParcela.valor_parcela), Decimal("0.00"))
@@ -66,6 +80,7 @@ def listar_faturas():
             )
             .scalar()
         )
+
         desatualizada = fatura.valor_total_fatura != soma_real_parcelas
 
         destaque_status = ""
@@ -90,6 +105,8 @@ def listar_faturas():
         "crediario_faturas/list.html",
         faturas=faturas_com_status,
         form=form,
+        mes=str(mes),
+        ano=str(ano),
     )
 
 

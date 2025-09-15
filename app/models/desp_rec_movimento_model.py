@@ -6,7 +6,7 @@ from sqlalchemy import Enum, Numeric, UniqueConstraint, event, text
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
-from app.utils import STATUS_PENDENTE, FormChoices
+from app.utils import FormChoices
 
 from .desp_rec_model import DespRec
 

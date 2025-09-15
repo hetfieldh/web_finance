@@ -1,5 +1,8 @@
 # app/routes/conta_movimento_routes.py
 
+import calendar
+from datetime import date
+
 from flask import (
     Blueprint,
     flash,
@@ -9,6 +12,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -29,15 +33,47 @@ conta_movimento_bp = Blueprint("conta_movimento", __name__, url_prefix="/movimen
 @conta_movimento_bp.route("/")
 @login_required
 def listar_movimentacoes():
-    movimentacoes = (
-        ContaMovimento.query.filter_by(usuario_id=current_user.id)
-        .options(
-            joinedload(ContaMovimento.conta), joinedload(ContaMovimento.tipo_transacao)
+
+    data_inicial_str = request.args.get("data_inicial")
+    data_final_str = request.args.get("data_final")
+
+    hoje = date.today()
+
+    if not data_inicial_str and not data_final_str:
+        primeiro_dia = date(hoje.year, hoje.month, 1)
+        ultimo_dia = date(
+            hoje.year, hoje.month, calendar.monthrange(hoje.year, hoje.month)[1]
         )
-        .order_by(ContaMovimento.data_movimento.desc(), ContaMovimento.id.desc())
-        .all()
+        data_inicial_str = primeiro_dia.isoformat()
+        data_final_str = ultimo_dia.isoformat()
+
+    query = ContaMovimento.query.filter_by(usuario_id=current_user.id).options(
+        joinedload(ContaMovimento.conta),
+        joinedload(ContaMovimento.tipo_transacao),
     )
-    return render_template("conta_movimentos/list.html", movimentacoes=movimentacoes)
+
+    try:
+        if data_inicial_str:
+            data_inicial = date.fromisoformat(data_inicial_str)
+            query = query.filter(ContaMovimento.data_movimento >= data_inicial)
+        if data_final_str:
+            data_final = date.fromisoformat(data_final_str)
+            query = query.filter(ContaMovimento.data_movimento <= data_final)
+    except ValueError:
+        flash("Formato de data inválido. Use AAAA-MM-DD.", "danger")
+        return redirect(url_for("conta_movimento.listar_movimentacoes"))
+
+    movimentacoes = query.order_by(
+        ContaMovimento.data_movimento.desc(),
+        ContaMovimento.id.desc(),
+    ).all()
+
+    return render_template(
+        "conta_movimentos/list.html",
+        movimentacoes=movimentacoes,
+        data_inicial=data_inicial_str,
+        data_final=data_final_str,
+    )
 
 
 @conta_movimento_bp.route("/adicionar", methods=["GET", "POST"])

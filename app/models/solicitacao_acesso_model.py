@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum
 
 from app import db
-from app.utils import STATUS_PENDENTE, FormChoices
+from app.utils import FormChoices
 
 
 class SolicitacaoAcesso(db.Model):

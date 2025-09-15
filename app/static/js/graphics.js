@@ -386,7 +386,13 @@ document.addEventListener("DOMContentLoaded", function () {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { position: "top" },
+              legend: { position: "left" },
+              title: {
+                display: true,
+                text: "Distribuição de " + summaryData.total + " Parcelas por Status",
+                font: { size: 16, weight: "bold" },
+                position: "top",
+              },
               tooltip: {
                 callbacks: {
                   label: function (context) {

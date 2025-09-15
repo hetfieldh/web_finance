@@ -1,6 +1,7 @@
 # app/services/recebimento_service.py
 
 from datetime import date, timedelta
+from decimal import Decimal
 
 from flask import current_app
 from flask_login import current_user
@@ -63,6 +64,53 @@ def registrar_recebimento(form):
 
             if item_tipo == "Salário":
                 item.movimento_bancario_salario_id = novo_movimento.id
+
+                fgts_valor = item.total_fgts
+                if fgts_valor and fgts_valor > 0:
+                    print(
+                        f"Tentando encontrar conta FGTS para o usuário: {current_user.id}"
+                    )
+                    conta_fgts = Conta.query.filter(
+                        Conta.usuario_id == current_user.id,
+                        Conta.nome_banco.ilike("%fgts%"),
+                    ).first()
+
+                    if conta_fgts:
+                        print(
+                            f"Conta FGTS encontrada: {conta_fgts.nome_banco} (ID: {conta_fgts.id})"
+                        )
+                        tipo_transacao_fgts = ContaTransacao.query.filter_by(
+                            usuario_id=current_user.id,
+                            transacao_tipo="RECEBIMENTO_FGTS",
+                            tipo="Crédito",
+                        ).first()
+
+                        if not tipo_transacao_fgts:
+                            tipo_transacao_fgts = tipo_transacao_credito
+
+                        novo_movimento_fgts = ContaMovimento(
+                            usuario_id=current_user.id,
+                            conta_id=conta_fgts.id,
+                            conta_transacao_id=tipo_transacao_fgts.id,
+                            data_movimento=form.data_recebimento.data,
+                            valor=fgts_valor,
+                            descricao=f"Crédito de FGTS - Ref: {item.mes_referencia}",
+                        )
+                        db.session.add(novo_movimento_fgts)
+
+                        db.session.flush()
+
+                        conta_fgts.saldo_atual += fgts_valor
+                        item.movimento_bancario_fgts_id = novo_movimento_fgts.id
+                        print(
+                            f"ID do movimento de FGTS registrado: {item.movimento_bancario_fgts_id}"
+                        )
+                    else:
+                        current_app.logger.warning(
+                            "Conta bancária do FGTS não encontrada."
+                        )
+                        print("ALERTA: Conta bancária do FGTS não encontrada!")
+
             else:
                 item.movimento_bancario_beneficio_id = novo_movimento.id
 
@@ -93,11 +141,14 @@ def estornar_recebimento(item_id, item_tipo):
         elif item_tipo in ["Salário", "Benefício"]:
             item_a_atualizar = SalarioMovimento.query.get(item_id)
             if item_a_atualizar:
-                movimento_bancario_id = (
-                    item_a_atualizar.movimento_bancario_salario_id
-                    if item_tipo == "Salário"
-                    else item_a_atualizar.movimento_bancario_beneficio_id
-                )
+                if item_tipo == "Salário":
+                    movimento_bancario_id = (
+                        item_a_atualizar.movimento_bancario_salario_id
+                    )
+                else:
+                    movimento_bancario_id = (
+                        item_a_atualizar.movimento_bancario_beneficio_id
+                    )
 
         if not movimento_bancario_id:
             return False, "Movimentação bancária associada não encontrada para estorno."
@@ -122,6 +173,34 @@ def estornar_recebimento(item_id, item_tipo):
             item_a_atualizar.movimento_bancario_id = None
         elif item_tipo in ["Salário", "Benefício"]:
             if item_tipo == "Salário":
+                print(
+                    f"Iniciando estorno. ID do item de salário: {item_a_atualizar.id}"
+                )
+                print(
+                    f"ID do movimento de FGTS associado: {item_a_atualizar.movimento_bancario_fgts_id}"
+                )
+                if item_a_atualizar.movimento_bancario_fgts_id:
+                    movimento_fgts_a_estornar = ContaMovimento.query.get(
+                        item_a_atualizar.movimento_bancario_fgts_id
+                    )
+
+                    if movimento_fgts_a_estornar:
+                        print(
+                            f"Movimento de FGTS encontrado. Estornando R$ {movimento_fgts_a_estornar.valor} da conta {movimento_fgts_a_estornar.conta.nome_banco}."
+                        )
+                        movimento_fgts_a_estornar.conta.saldo_atual -= (
+                            movimento_fgts_a_estornar.valor
+                        )
+                        db.session.delete(movimento_fgts_a_estornar)
+                    else:
+                        print(
+                            f"AVISO: Movimento de FGTS com ID {item_a_atualizar.movimento_bancario_fgts_id} não foi encontrado no banco de dados para estorno."
+                        )
+                    item_a_atualizar.movimento_bancario_fgts_id = None
+                else:
+                    print(
+                        "Nenhum ID de movimento de FGTS encontrado para este item de salário. Estorno do FGTS será ignorado."
+                    )
                 item_a_atualizar.movimento_bancario_salario_id = None
             else:
                 item_a_atualizar.movimento_bancario_beneficio_id = None

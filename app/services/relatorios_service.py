@@ -35,22 +35,20 @@ def get_balanco_mensal(user_id, ano, mes):
     total_receitas = Decimal("0.00")
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
-        SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
+        SalarioMovimento.data_criacao.between(data_inicio_mes, data_fim_mes),
         SalarioMovimento.status.in_([STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]),
     ).all()
 
     for s in salarios_mes:
         if s.movimento_bancario_salario_id:
             total_receitas += s.salario_liquido
-        if s.movimento_bancario_beneficio_id:
-            total_receitas += s.total_beneficios
 
     outras_receitas = db.session.query(func.sum(DespRecMovimento.valor_realizado)).join(
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
         DespRecMovimento.status == STATUS_RECEBIDO,
-        DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
         DespRec.natureza == NATUREZA_RECEITA,
     ).scalar() or Decimal(
         "0.00"
@@ -63,7 +61,7 @@ def get_balanco_mensal(user_id, ano, mes):
     ).filter(
         DespRecMovimento.usuario_id == user_id,
         DespRecMovimento.status == STATUS_PAGO,
-        DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
         DespRec.natureza == NATUREZA_DESPESA,
     ).scalar() or Decimal(
         "0.00"
@@ -75,7 +73,7 @@ def get_balanco_mensal(user_id, ano, mes):
     ).filter(
         CrediarioFatura.usuario_id == user_id,
         CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
-        CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        CrediarioFatura.data_vencimento_fatura.between(data_inicio_mes, data_fim_mes),
     ).scalar() or Decimal(
         "0.00"
     )
@@ -83,7 +81,7 @@ def get_balanco_mensal(user_id, ano, mes):
 
     parcelas_pagas = db.session.query(func.sum(FinanciamentoParcela.valor_pago)).filter(
         FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
-        FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        FinanciamentoParcela.data_vencimento.between(data_inicio_mes, data_fim_mes),
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
     ).scalar() or Decimal("0.00")
     total_despesas += parcelas_pagas

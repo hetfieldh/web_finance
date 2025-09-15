@@ -40,7 +40,6 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
-    # --- Lógica de KPIs e buscas gerais ---
     balance_kpis = conta_service.get_account_balance_kpis(current_user.id)
     hoje = date.today()
     balanco_do_mes = relatorios_service.get_balanco_mensal(
@@ -112,7 +111,7 @@ def dashboard():
                 data_inicio_mes, data_fim_mes
             ),
             CrediarioFatura.status.in_(
-                [STATUS_ATRASADO, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]
+                [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]
             ),
         )
         .options(joinedload(CrediarioFatura.crediario))

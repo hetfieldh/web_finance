@@ -43,15 +43,15 @@
                 <td>{{ grupo.grupo_crediario }}</td>
                 <td>
                   {% if grupo.tipo_grupo_crediario == 'Compra' %}
-                  <span class="badge bg-primary"
+                  <span class="badge bg-danger"
                     >{{ grupo.tipo_grupo_crediario }}</span
                   >
                   {% elif grupo.tipo_grupo_crediario == 'Estorno' %}
-                  <span class="badge bg-warning"
+                  <span class="badge bg-success"
                     >{{ grupo.tipo_grupo_crediario }}</span
                   >
                   {% elif grupo.tipo_grupo_crediario == 'Ajuste' %}
-                  <span class="badge bg-info"
+                  <span class="badge bg-secondary"
                     >{{ grupo.tipo_grupo_crediario }}</span
                   >
                   {% else %} {{ grupo.tipo_grupo_crediario }} {% endif %}

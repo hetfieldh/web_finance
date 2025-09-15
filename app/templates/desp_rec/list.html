@@ -1,6 +1,6 @@
 <!-- app/templates/desp_rec/list.html -->
 
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block content %}
 <div class="row">
   <div class="col-12">
@@ -47,7 +47,7 @@
                 </td>
                 <td>
                   {% if cadastro.tipo == 'Fixa' %}
-                  <span class="badge bg-primary">{{ cadastro.tipo }}</span>
+                  <span class="badge bg-warning">{{ cadastro.tipo }}</span>
                   {% else %}
                   <span class="badge bg-info">{{ cadastro.tipo }}</span>
                   {% endif %}

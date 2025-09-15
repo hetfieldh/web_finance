@@ -19,6 +19,7 @@ def _criar_transacoes_padrao(novo_usuario):
         {"transacao_tipo": "SALÁRIO", "tipo": "Crédito"},
         {"transacao_tipo": "DEPÓSITO", "tipo": "Crédito"},
         {"transacao_tipo": "SAQUE", "tipo": "Débito"},
+        {"transacao_tipo": "SAQUE", "tipo": "Crédito"},
         {"transacao_tipo": "APORTE", "tipo": "Débito"},
         {"transacao_tipo": "APORTE", "tipo": "Crédito"},
         {"transacao_tipo": "RESGATE", "tipo": "Crédito"},

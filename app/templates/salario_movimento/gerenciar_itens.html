@@ -86,6 +86,10 @@
                     class="badge bg-danger"
                     >{{ item.salario_item.tipo }}</span
                   >
+                  {% elif item.salario_item.tipo == 'FGTS' %}<span
+                    class="badge bg-secondary"
+                    >{{ item.salario_item.tipo }}</span
+                  >
                   {% endif %}
                 </td>
                 <td class="text-end">R$ {{ "%.2f"|format(item.valor) }}</td>

@@ -29,12 +29,15 @@ from app.utils import (
 )
 
 
+# Gráfico(1) --> Progresso do Mês (gráfico de rosca)
 def get_monthly_graphics_data(user_id, year, month):
     data_inicio_mes = date(year, month, 1)
     data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(day=1) - timedelta(
         days=1
     )
+    # Valores previstos
 
+    # DESPESAS
     despesas_vencimento = (
         DespRecMovimento.query.join(DespRec)
         .filter(
@@ -44,10 +47,13 @@ def get_monthly_graphics_data(user_id, year, month):
         )
         .all()
     )
+    # FATURAS CREDIÁRIO
     faturas_vencimento = CrediarioFatura.query.filter(
         CrediarioFatura.usuario_id == user_id,
         CrediarioFatura.data_vencimento_fatura.between(data_inicio_mes, data_fim_mes),
     ).all()
+
+    # FINANCIAMENTO
     parcelas_vencimento = FinanciamentoParcela.query.filter(
         FinanciamentoParcela.data_vencimento.between(data_inicio_mes, data_fim_mes),
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
@@ -59,6 +65,7 @@ def get_monthly_graphics_data(user_id, year, month):
         + sum(p.valor_total_previsto for p in parcelas_vencimento)
     )
 
+    # Valores pagos
     valor_pago_real = Decimal("0.00")
     valor_descontos = Decimal("0.00")
     valor_custos_extras = Decimal("0.00")
@@ -117,42 +124,48 @@ def get_monthly_graphics_data(user_id, year, month):
         dados_progresso_valores["valores"].append(float(valor_pendente))
 
     balanco = relatorios_service.get_balanco_mensal(user_id, year, month)
+
+    # Gráfico(1) --> Saídas do Mês
+    # Despesas FIXAS
     saidas_fixas = db.session.query(func.sum(DespRecMovimento.valor_realizado)).join(
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
         DespRecMovimento.status == STATUS_PAGO,
-        DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
         DespRec.natureza == NATUREZA_DESPESA,
         DespRec.tipo == TIPO_FIXA,
     ).scalar() or Decimal(
         "0.00"
     )
+    # Despesas VARIÁVEIS
     saidas_variaveis = db.session.query(
         func.sum(DespRecMovimento.valor_realizado)
     ).join(DespRec).filter(
         DespRecMovimento.usuario_id == user_id,
         DespRecMovimento.status == STATUS_PAGO,
-        DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
         DespRec.natureza == NATUREZA_DESPESA,
         DespRec.tipo == TIPO_VARIAVEL,
     ).scalar() or Decimal(
         "0.00"
     )
+    # FINANCIAMENTOS
     saidas_financiamento = db.session.query(
         func.sum(FinanciamentoParcela.valor_pago)
     ).filter(
         FinanciamentoParcela.financiamento.has(usuario_id=user_id),
-        FinanciamentoParcela.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        FinanciamentoParcela.data_vencimento.between(data_inicio_mes, data_fim_mes),
         FinanciamentoParcela.status.in_([STATUS_PAGO, STATUS_AMORTIZADO]),
     ).scalar() or Decimal(
         "0.00"
     )
+    # CREDIÁRIO
     saidas_crediario = db.session.query(
         func.sum(CrediarioFatura.valor_pago_fatura)
     ).filter(
         CrediarioFatura.usuario_id == user_id,
-        CrediarioFatura.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        CrediarioFatura.data_vencimento_fatura.between(data_inicio_mes, data_fim_mes),
         CrediarioFatura.status.in_([STATUS_PAGO, STATUS_PARCIAL_PAGO]),
     ).scalar() or Decimal(
         "0.00"
@@ -171,23 +184,27 @@ def get_monthly_graphics_data(user_id, year, month):
             float(saidas_crediario),
         ],
     }
+
+    # Gráfico das Entradas do Mês
     entradas_salario = Decimal("0.00")
     entradas_beneficios = Decimal("0.00")
+    # SALÁRIOS e BENEFÍCIOS
     salarios_recebidos = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
-        SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
+        SalarioMovimento.data_criacao.between(data_inicio_mes, data_fim_mes),
     ).all()
     for salario in salarios_recebidos:
         if salario.movimento_bancario_salario_id:
-            entradas_salario += salario.salario_liquido
+            entradas_salario += salario.salario_liquido  # Salário
         if salario.movimento_bancario_beneficio_id:
-            entradas_beneficios += salario.total_beneficios
+            entradas_beneficios += salario.total_beneficios  # Benefício
+    # OUTRAS RECEITAS
     outras_receitas = db.session.query(func.sum(DespRecMovimento.valor_realizado)).join(
         DespRec
     ).filter(
         DespRecMovimento.usuario_id == user_id,
         DespRecMovimento.status == STATUS_RECEBIDO,
-        DespRecMovimento.data_pagamento.between(data_inicio_mes, data_fim_mes),
+        DespRecMovimento.data_vencimento.between(data_inicio_mes, data_fim_mes),
         DespRec.natureza == NATUREZA_RECEITA,
     ).scalar() or Decimal(
         "0.00"
@@ -208,6 +225,7 @@ def get_monthly_graphics_data(user_id, year, month):
     }
 
 
+# Cálculo da evolução do mês (Receitas x Despesas)
 def get_annual_evolution_data(user_id, year):
     labels = [
         "Jan",
@@ -241,6 +259,7 @@ def get_annual_evolution_data(user_id, year):
     }
 
 
+# Gráfico(1) --> Progresso de Financiamento
 def get_financing_progress_data(user_id, year, financiamento_id):
     if not financiamento_id:
         return None
@@ -274,7 +293,7 @@ def get_financing_progress_data(user_id, year, financiamento_id):
         data_fim_mes = (data_inicio_mes + timedelta(days=32)).replace(
             day=1
         ) - timedelta(days=1)
-
+        # PREVISTOS
         previsto_mes = (
             db.session.query(func.sum(FinanciamentoParcela.valor_total_previsto))
             .filter(
@@ -287,13 +306,13 @@ def get_financing_progress_data(user_id, year, financiamento_id):
             or 0
         )
         valores_previstos[month - 1] = float(previsto_mes)
-
+        # REALIZADOS
         realizado_mes = (
             db.session.query(func.sum(FinanciamentoParcela.valor_pago))
             .filter(
                 FinanciamentoParcela.financiamento_id == financiamento.id,
                 FinanciamentoParcela.status == STATUS_PAGO,
-                FinanciamentoParcela.data_pagamento.between(
+                FinanciamentoParcela.data_vencimento.between(
                     data_inicio_mes, data_fim_mes
                 ),
             )
@@ -310,6 +329,7 @@ def get_financing_progress_data(user_id, year, financiamento_id):
     }
 
 
+# Gráfico(2) --> Resumo do Financiamento (PIZZA)
 def get_financing_summary_data(user_id, financiamento_id=None):
     query = (
         db.session.query(
@@ -335,4 +355,5 @@ def get_financing_summary_data(user_id, financiamento_id=None):
     labels = [item.status for item in counts]
     valores = [item.total for item in counts]
 
-    return {"labels": labels, "valores": valores}
+    total = sum(valores)
+    return {"labels": labels, "valores": valores, "total": total}

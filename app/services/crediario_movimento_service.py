@@ -1,4 +1,4 @@
-# app/services/crediario_movimento_service.py (FICHEIRO COMPLETO E CORRIGIDO)
+# app/services/crediario_movimento_service.py
 
 from datetime import date
 from decimal import Decimal

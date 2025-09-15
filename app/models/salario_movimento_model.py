@@ -7,11 +7,6 @@ from sqlalchemy import Enum, UniqueConstraint
 
 from app import db
 from app.utils import (
-    STATUS_PENDENTE,
-    TIPO_BENEFICIO,
-    TIPO_DESCONTO,
-    TIPO_IMPOSTO,
-    TIPO_PROVENTO,
     FormChoices,
 )
 
@@ -28,6 +23,9 @@ class SalarioMovimento(db.Model):
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True, unique=True
     )
     movimento_bancario_beneficio_id = db.Column(
+        db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True, unique=True
+    )
+    movimento_bancario_fgts_id = db.Column(
         db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True, unique=True
     )
     status = db.Column(
@@ -60,6 +58,9 @@ class SalarioMovimento(db.Model):
     movimento_bancario_beneficio = db.relationship(
         "ContaMovimento", foreign_keys=[movimento_bancario_beneficio_id]
     )
+    movimento_bancario_fgts = db.relationship(
+        "ContaMovimento", foreign_keys=[movimento_bancario_fgts_id]
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -73,15 +74,33 @@ class SalarioMovimento(db.Model):
     @property
     def salario_liquido(self):
         proventos = sum(
-            i.valor for i in self.itens if i.salario_item.tipo == TIPO_PROVENTO
+            i.valor
+            for i in self.itens
+            if i.salario_item.tipo == FormChoices.TipoSalarioItem.PROVENTO.value
         )
         descontos_impostos = sum(
             i.valor
             for i in self.itens
-            if i.salario_item.tipo in [TIPO_IMPOSTO, TIPO_DESCONTO]
+            if i.salario_item.tipo
+            in [
+                FormChoices.TipoSalarioItem.IMPOSTO.value,
+                FormChoices.TipoSalarioItem.DESCONTO.value,
+            ]
         )
         return proventos - descontos_impostos
 
     @property
     def total_beneficios(self):
-        return sum(i.valor for i in self.itens if i.salario_item.tipo == TIPO_BENEFICIO)
+        return sum(
+            i.valor
+            for i in self.itens
+            if i.salario_item.tipo == FormChoices.TipoSalarioItem.BENEFICIO.value
+        )
+
+    @property
+    def total_fgts(self):
+        return sum(
+            i.valor
+            for i in self.itens
+            if i.salario_item.tipo == FormChoices.TipoSalarioItem.FGTS.value
+        )

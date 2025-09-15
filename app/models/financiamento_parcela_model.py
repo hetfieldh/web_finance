@@ -6,7 +6,7 @@ from sqlalchemy import Enum, Numeric, UniqueConstraint
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
-from app.utils import STATUS_PENDENTE, FormChoices
+from app.utils import FormChoices
 
 
 class FinanciamentoParcela(db.Model):

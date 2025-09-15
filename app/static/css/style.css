@@ -23,6 +23,7 @@
     --wf-borda-negativo: #dc3545;
     --wf-shadow: rgba(0, 0, 0, 0.1);
     --wf-box-bg: #ffffa6cf;
+    --wf-box-bg2: #ffffc180;
 }
 
 
@@ -344,6 +345,28 @@ h6,
     line-height: 1;
 }
 
+
+/* Efeito no hover de cada conta */
+.card.conta-hover {
+    transition: all 0.2s ease-in-out;
+    /* suavidade */
+}
+
+.card.conta-hover:hover {
+    background-color: var(--wf-box-bg2);
+    /* muda o fundo levemente */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    /* sombra */
+}
+
+.itens-lista .list-group-item {
+    transition: all 0.2s ease-in-out;
+}
+
+.itens-lista .list-group-item:hover {
+    background-color: var(--wf-box-bg2);
+    /* leve destaque */
+}
 
 /* ==========================================================================
    5. CLASSES UTILITÁRIAS

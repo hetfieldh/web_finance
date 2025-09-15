@@ -1,8 +1,8 @@
-"""Criação da versão beta do sistema
+"""Criação inicial do BD
 
-Revision ID: 1945da411608
+Revision ID: 5ef15b8537bc
 Revises: 
-Create Date: 2025-08-31 17:35:23.323197
+Create Date: 2025-09-05 18:41:24.007532
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1945da411608'
+revision = '5ef15b8537bc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -100,7 +100,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
-    sa.Column('tipo', sa.Enum('Provento', 'Desconto', 'Imposto', 'Benefício', name='tipo_salario_item_enum'), nullable=False),
+    sa.Column('tipo', sa.Enum('Provento', 'Desconto', 'Imposto', 'Benefício', 'FGTS', name='tipo_salario_item_enum'), nullable=False),
     sa.Column('ativo', sa.Boolean(), nullable=False),
     sa.Column('descricao', sa.String(length=255), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
@@ -260,13 +260,16 @@ def upgrade():
     sa.Column('data_recebimento', sa.Date(), nullable=False),
     sa.Column('movimento_bancario_salario_id', sa.Integer(), nullable=True),
     sa.Column('movimento_bancario_beneficio_id', sa.Integer(), nullable=True),
+    sa.Column('movimento_bancario_fgts_id', sa.Integer(), nullable=True),
     sa.Column('status', sa.Enum('Pendente', 'Parcialmente Recebido', 'Recebido', name='status_salario_enum'), server_default='Pendente', nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['movimento_bancario_beneficio_id'], ['conta_movimento.id'], ),
+    sa.ForeignKeyConstraint(['movimento_bancario_fgts_id'], ['conta_movimento.id'], ),
     sa.ForeignKeyConstraint(['movimento_bancario_salario_id'], ['conta_movimento.id'], ),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('movimento_bancario_beneficio_id'),
+    sa.UniqueConstraint('movimento_bancario_fgts_id'),
     sa.UniqueConstraint('movimento_bancario_salario_id'),
     sa.UniqueConstraint('usuario_id', 'mes_referencia', name='_usuario_mes_referencia_uc')
     )
