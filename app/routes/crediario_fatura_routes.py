@@ -1,5 +1,6 @@
 # app/routes/crediario_fatura_routes.py
 
+import calendar
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -32,28 +33,35 @@ crediario_fatura_bp = Blueprint(
 @crediario_fatura_bp.route("/")
 @login_required
 def listar_faturas():
-    form = FlaskForm()
-
-    mes_str = request.args.get("mes")
-    ano_str = request.args.get("ano")
+    data_inicial_str = request.args.get("data_inicial")
+    data_final_str = request.args.get("data_final")
 
     hoje = date.today()
-    mes = int(mes_str) if mes_str else hoje.month
-    ano = int(ano_str) if ano_str else hoje.year
 
-    data_inicio = date(ano, mes, 1)
-    if mes == 12:
-        data_fim = date(ano + 1, 1, 1) - timedelta(days=1)
-    else:
-        data_fim = date(ano, mes + 1, 1) - timedelta(days=1)
+    if not data_inicial_str and not data_final_str:
+        primeiro_dia = date(hoje.year, hoje.month, 1)
+        ultimo_dia = date(
+            hoje.year, hoje.month, calendar.monthrange(hoje.year, hoje.month)[1]
+        )
+        data_inicial_str = primeiro_dia.isoformat()
+        data_final_str = ultimo_dia.isoformat()
 
-    faturas = (
-        CrediarioFatura.query.filter_by(usuario_id=current_user.id)
-        .options(joinedload(CrediarioFatura.crediario))
-        .filter(CrediarioFatura.data_vencimento_fatura.between(data_inicio, data_fim))
-        .order_by(CrediarioFatura.data_vencimento_fatura.asc())
-        .all()
+    query = CrediarioFatura.query.filter_by(usuario_id=current_user.id).options(
+        joinedload(CrediarioFatura.crediario)
     )
+
+    try:
+        if data_inicial_str:
+            data_inicial = date.fromisoformat(data_inicial_str)
+            query = query.filter(CrediarioFatura.data_vencimento_fatura >= data_inicial)
+        if data_final_str:
+            data_final = date.fromisoformat(data_final_str)
+            query = query.filter(CrediarioFatura.data_vencimento_fatura <= data_final)
+    except ValueError:
+        flash("Formato de data inválido. Use AAAA-MM-DD.", "danger")
+        return redirect(url_for("crediario_fatura.listar_faturas"))
+
+    faturas = query.order_by(CrediarioFatura.data_vencimento_fatura.asc()).all()
 
     faturas_com_status = []
 
@@ -104,9 +112,8 @@ def listar_faturas():
     return render_template(
         "crediario_faturas/list.html",
         faturas=faturas_com_status,
-        form=form,
-        mes=str(mes),
-        ano=str(ano),
+        data_inicial=data_inicial_str,
+        data_final=data_final_str,
     )
 
 

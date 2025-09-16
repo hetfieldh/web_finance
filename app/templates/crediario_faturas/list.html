@@ -12,7 +12,6 @@
           onsubmit="return confirm('Isto irá procurar por todas as compras futuras e irá criar ou atualizar as faturas pendentes. Deseja continuar?');"
           style="display: inline"
         >
-          {{ form.csrf_token }}
           <button type="submit" class="btn btn-success btn-add">
             <i class="fas fa-sync-alt"></i> Sincronizar Faturas
           </button>
@@ -21,41 +20,52 @@
     </div>
 
     <div class="card shadow-sm border-1 mb-2">
-      <div class="card-body p-1 d-flex align-items-center">
+      <div class="card-body p-1">
         <form
-          method="get"
           action="{{ url_for('crediario_fatura.listar_faturas') }}"
-          class="d-flex align-items-center"
+          method="get"
+          class="d-flex align-items-end gap-2 flex-wrap"
         >
-          <label class="me-2">Mês:</label>
-          <select name="mes" class="form-select form-select-sm me-2" style="height: 30px;">
-            {% for m in range(1, 13) %}
-              <option value="{{ m }}" {{ 'selected' if mes|int == m else '' }}>
-                {{ "%02d"|format(m) }}
-              </option>
-            {% endfor %}
-          </select>
-
-          <label class="me-2">Ano:</label>
-          <input
-            type="number"
-            name="ano"
-            value="{{ ano }}"
-            min="2000"
-            max="2300"
-            class="form-control form-control-sm me-2"
-            style="height: 30px; width: 75px;"
-          />
-
-          <button type="submit" class="btn btn-info btn-sm me-2" title="Pesquisar">
-            <i class="fas fa-search"></i>
-          </button>
-          <a href="{{ url_for('crediario_fatura.listar_faturas') }}"
-            class="btn btn-outline-secondary btn-sm"
-            title="Limpar">
-            <i class="fas fa-eraser"></i>
-          </a>
+          <div class="d-flex flex-column">
+            <label for="data_inicial" class="form-label small text-muted mb-0"
+              >Inicial</label
+            >
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              id="data_inicial"
+              name="data_inicial"
+              value="{{ data_inicial if data_inicial else '' }}"
+            />
+          </div>
+          <div class="d-flex flex-column">
+            <label for="data_final" class="form-label small text-muted mb-0"
+              >Final</label
+            >
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              id="data_final"
+              name="data_final"
+              value="{{ data_final if data_final else '' }}"
+            />
+          </div>
+          <div class="d-flex gap-1 align-items-end">
+            <button type="submit" class="btn btn-info btn-sm">
+              <i class="fas fa-search"></i>
+            </button>
+            <a
+              href="{{ url_for('crediario_fatura.listar_faturas') }}"
+              class="btn btn-outline-secondary btn-sm"
+            >
+              <i class="fas fa-eraser"></i>
+            </a>
+          </div>
         </form>
+        <p class="text-muted small mt-1 mb-0">
+          <i class="fas fa-calendar-alt me-1"></i> Selecione o intervalo das
+          datas de vencimento para filtrar
+        </p>
       </div>
     </div>
 
