@@ -19,6 +19,7 @@ def criar_crediario(form):
                 else None
             ),
             limite_total=form.limite_total.data,
+            dia_vencimento = form.dia_vencimento.data,
             ativa=form.ativa.data,
         )
         db.session.add(novo_crediario)
@@ -42,6 +43,7 @@ def atualizar_crediario(crediario, form):
             else None
         )
         crediario.limite_total = form.limite_total.data
+        crediario.dia_vencimento = form.dia_vencimento.data
         crediario.ativa = form.ativa.data
         db.session.commit()
         current_app.logger.info(

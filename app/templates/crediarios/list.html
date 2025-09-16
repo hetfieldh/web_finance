@@ -33,6 +33,7 @@
                 <th>Tipo</th>
                 <th>Final</th>
                 <th>Limite Total</th>
+                <th>Dia Venc.</th>
                 <th>Ativo</th>
                 <th>Criação</th>
                 <th>Ações</th>
@@ -49,6 +50,7 @@
                   'N/A' }}
                 </td>
                 <td>R$ {{ "%.2f"|format(cred.limite_total) }}</td>
+                <td>{{ cred.dia_vencimento }}</td>
                 <td>
                   {% if cred.ativa %}
                   <span class="badge bg-success">Sim</span>

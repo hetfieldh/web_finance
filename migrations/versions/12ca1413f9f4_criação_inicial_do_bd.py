@@ -1,8 +1,8 @@
 """Criação inicial do BD
 
-Revision ID: 5ef15b8537bc
+Revision ID: 12ca1413f9f4
 Revises: 
-Create Date: 2025-09-05 18:41:24.007532
+Create Date: 2025-09-16 11:53:10.512446
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5ef15b8537bc'
+revision = '12ca1413f9f4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -66,6 +66,7 @@ def upgrade():
     sa.Column('tipo_crediario', sa.Enum('Cartão Físico', 'Cartão VR', 'Cartão VT', 'Boleto', 'Cheque', 'Outro', name='tipo_crediario_enum'), nullable=False),
     sa.Column('identificador_final', sa.String(length=50), nullable=True),
     sa.Column('limite_total', sa.Numeric(precision=12, scale=2), nullable=True),
+    sa.Column('dia_vencimento', sa.Integer(), nullable=False),
     sa.Column('ativa', sa.Boolean(), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),

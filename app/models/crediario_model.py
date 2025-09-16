@@ -27,6 +27,7 @@ class Crediario(db.Model):
     )
     identificador_final = db.Column(db.String(50), nullable=True)
     limite_total = db.Column(Numeric(12, 2), nullable=True)
+    dia_vencimento = db.Column(db.Integer, nullable=False, default=30)
     ativa = db.Column(db.Boolean, nullable=False, default=True)
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)

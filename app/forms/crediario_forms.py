@@ -2,7 +2,14 @@
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, DecimalField, SelectField, StringField, SubmitField
+from wtforms import (
+    BooleanField,
+    DecimalField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+)
 from wtforms.validators import (
     DataRequired,
     InputRequired,
@@ -58,6 +65,14 @@ class CadastroCrediarioForm(FlaskForm):
         ],
         places=2,
         default=0.00,
+    )
+    dia_vencimento = IntegerField(
+        "Dia de Vencimento",
+        validators=[
+            DataRequired("O dia de vencimento é obrigatório."),
+            NumberRange(min=1, max=31, message="O dia deve estar entre 1 e 31."),
+        ],
+        default=30,
     )
     ativa = BooleanField("Crediário Ativo", default=True)
     submit = SubmitField("Adicionar")
@@ -132,6 +147,13 @@ class EditarCrediarioForm(FlaskForm):
             ),
         ],
         places=2,
+    )
+    dia_vencimento = IntegerField(
+        "Dia de Vencimento",
+        validators=[
+            DataRequired("O dia de vencimento é obrigatório."),
+            NumberRange(min=1, max=31, message="O dia deve estar entre 1 e 31."),
+        ],
     )
     ativa = BooleanField("Crediário Ativo")
     submit = SubmitField("Atualizar")

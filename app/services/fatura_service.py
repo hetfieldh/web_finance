@@ -1,5 +1,6 @@
 # app/services/fatura_service.py
 
+from calendar import monthrange
 from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
@@ -11,6 +12,7 @@ from sqlalchemy.orm import joinedload
 
 from app import db
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
 from app.utils import STATUS_ATRASADO, STATUS_PENDENTE
@@ -85,9 +87,20 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
 
             fatura_existente = lookup_faturas.get((crediario_id, mes_ano_str))
 
+            crediario = db.session.get(Crediario, crediario_id)
+            dia_venc = (
+                crediario.dia_vencimento
+                if crediario and crediario.dia_vencimento
+                else 30
+            )
+            ultimo_dia_mes = monthrange(ano, mes)[1]
+            data_vencimento = date(ano, mes, min(dia_venc, ultimo_dia_mes))
+
             if fatura_existente:
                 if fatura_existente.valor_total_fatura != valor_total_real:
                     fatura_existente.valor_total_fatura = valor_total_real
+                    if fatura_existente.data_vencimento_fatura != data_vencimento:
+                        fatura_existente.data_vencimento_fatura = data_vencimento
                     faturas_atualizadas += 1
             else:
                 nova_fatura = CrediarioFatura(
@@ -95,7 +108,7 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
                     crediario_id=crediario_id,
                     mes_referencia=mes_ano_str,
                     valor_total_fatura=valor_total_real,
-                    data_vencimento_fatura=data_fim_mes,
+                    data_vencimento_fatura=data_vencimento,
                     status=STATUS_PENDENTE,
                 )
                 db.session.add(nova_fatura)
