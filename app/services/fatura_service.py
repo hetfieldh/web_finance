@@ -27,7 +27,7 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
         tarefas = (
             db.session.query(
                 CrediarioMovimento.crediario_id,
-                func.to_char(CrediarioParcela.data_vencimento, "YYYY-MM").label(
+                func.date_format(CrediarioParcela.data_vencimento, "%Y-%m").label(
                     "mes_referencia"
                 ),
             )

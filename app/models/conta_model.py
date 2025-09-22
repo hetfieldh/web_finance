@@ -36,11 +36,7 @@ class Conta(db.Model):
 
     __table_args__ = (
         UniqueConstraint(
-            "usuario_id",
-            "nome_banco",
-            "agencia",
-            "conta",
-            "tipo",
+            "usuario_id", "nome_banco", "agencia", "conta", "tipo",
             name="_usuario_conta_uc",
         ),
     )

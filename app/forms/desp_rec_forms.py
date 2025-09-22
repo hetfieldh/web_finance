@@ -123,7 +123,7 @@ class GerarPrevisaoForm(FlaskForm):
         places=2,
     )
     data_inicio = DateField(
-        "Mês/Ano da Primeira Parcela",
+        "1ª Parcela",
         format="%Y-%m-%d",
         validators=[DataRequired("A data de início é obrigatória.")],
         default=date.today,
