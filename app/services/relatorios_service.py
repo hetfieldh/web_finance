@@ -262,6 +262,7 @@ def get_fluxo_caixa_mensal_consolidado(user_id, ano, mes):
         .all()
     )
 
+
     financiamentos_pagos = {}
     for p in parcelas_pagas_no_mes:
         key = (p.financiamento_id, p.status)

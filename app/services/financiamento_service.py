@@ -180,6 +180,25 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
         if not ids_parcelas:
             return False, "Nenhuma parcela foi selecionada para amortização."
 
+        # validação de saldo devedor antes de amortizar
+        saldo_devedor_maximo = financiamento.saldo_devedor_atual
+        if valor_total_amortizado > saldo_devedor_maximo:
+            saldo_formatado = (
+                f"R$ {saldo_devedor_maximo:,.2f}".replace(",", "X")
+                .replace(".", ",")
+                .replace("X", ".")
+            )
+            valor_formatado = (
+                f"R$ {valor_total_amortizado:,.2f}".replace(",", "X")
+                .replace(".", ",")
+                .replace("X", ".")
+            )
+            return (
+                False,
+                f"Erro de Validação: O valor da amortização ({valor_formatado}) "
+                f"não pode exceder o saldo devedor restante do financiamento ({saldo_formatado}).",
+            )
+
         saldo_disponivel = conta_debito.saldo_atual
         if conta_debito.tipo in ["Corrente", "Digital"] and conta_debito.limite:
             saldo_disponivel += conta_debito.limite

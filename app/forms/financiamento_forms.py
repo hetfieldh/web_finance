@@ -119,8 +119,10 @@ class CadastroFinanciamentoForm(FlaskForm):
         ).first()
 
         if existing_financiamento:
-            raise ValidationError("Você já possui um financiamento com este nome.")
-
+            self.nome_financiamento.errors.append(
+                "Você já possui um financiamento com este nome."
+            )
+            return False
         return True
 
 

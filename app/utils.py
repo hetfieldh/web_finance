@@ -323,8 +323,8 @@ PAGE_CONFIG = {
         "header": "Contas Bancárias",
     },
     "extrato_consolidado.extrato_consolidado": {
-        "title": "Extrato Detalhado",
-        "header": "Extrato Detalhado",
+        "title": "Fluxo de Caixa Detalhado por Parcelas",
+        "header": "Fluxo de Caixa Detalhado por Parcelas",
     },
     "fluxo_caixa.painel": {
         "title": "Fluxo de Caixa",

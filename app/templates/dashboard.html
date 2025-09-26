@@ -244,28 +244,32 @@
       </div>
       <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
         <div class="d-flex flex-column gap-1">
-          {% if financiamentos %} {% for financ in financiamentos %}
-          <div class="card border-1 conta-hover">
-            <div
-              class="card-body p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="d-flex align-items-center">
-                <i
-                  class="fas fa-file-invoice-dollar fa-lg text-secondary opacity-50 me-2"
-                ></i>
-                <div>
-                  <div class="fw-semibold small">
-                    {{ financ.nome_financiamento }}
+          {% if financiamentos %}
+            {% for financ in financiamentos %}
+              {% if financ.saldo_devedor_atual > 0 %}
+                <div class="card border-1 conta-hover">
+                  <div
+                    class="card-body p-1 d-flex justify-content-between align-items-center"
+                  >
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-file-invoice-dollar fa-lg text-secondary opacity-50 me-2"
+                      ></i>
+                      <div>
+                        <div class="fw-semibold small">
+                          {{ financ.nome_financiamento }}
+                        </div>
+                        <div class="text-muted extra-small">Financiamento</div>
+                      </div>
+                    </div>
+                    <span class="fw-semibold h5 mb-0 text-danger"
+                      >{{ financ.saldo_devedor_atual | format_currency }}</span
+                    >
                   </div>
-                  <div class="text-muted extra-small">Financiamento</div>
                 </div>
-              </div>
-              <span class="fw-semibold h5 mb-0 text-danger"
-                >{{ financ.saldo_devedor_atual | format_currency }}</span
-              >
-            </div>
-          </div>
-          {% endfor %} {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
           {% if crediarios %}
             {% for cred in crediarios %}
               {% if cred.saldo_devedor > 0 %}  <div class="card border-1 conta-hover">

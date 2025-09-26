@@ -55,8 +55,10 @@ class CadastroCrediarioGrupoForm(FlaskForm):
         ).first()
 
         if existing_grupo:
-            raise ValidationError("Você já possui um grupo com este nome e tipo.")
-
+            self.grupo_crediario.errors.append(
+                "Você já possui um grupo com este nome e tipo."
+            )
+            return False
         return True
 
 
@@ -123,8 +125,9 @@ class EditarCrediarioGrupoForm(FlaskForm):
                 or existing_grupo.tipo_grupo_crediario
                 != self.original_tipo_grupo_crediario
             ):
-                raise ValidationError(
-                    "Você já possui outro grupo com este nome e tipo."
+                self.grupo_crediario.errors.append(
+                    "Você já possui um grupo com este nome e tipo."
                 )
+            return False
 
         return True

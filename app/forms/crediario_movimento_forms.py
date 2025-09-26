@@ -156,6 +156,7 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Data da Compra",
         format="%Y-%m-%d",
         validators=[DataRequired("A data da compra é obrigatória.")],
+        render_kw={"readonly": True},
     )
 
     valor_total_compra = DecimalField(
@@ -165,6 +166,7 @@ class EditarCrediarioMovimentoForm(FlaskForm):
             NumberRange(min=0.01, message="O valor deve ser maior que zero."),
         ],
         places=2,
+        render_kw={"readonly": True},
     )
 
     descricao = TextAreaField(
@@ -179,6 +181,7 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Mês/Ano da 1ª Parcela",
         validators=[DataRequired("A data da primeira parcela é obrigatória.")],
         coerce=coerce_month_year_to_date,
+        render_kw={"disabled": True},
     )
 
     numero_parcelas = IntegerField(
@@ -187,13 +190,14 @@ class EditarCrediarioMovimentoForm(FlaskForm):
             DataRequired("O número de parcelas é obrigatório."),
             NumberRange(min=1, message="O número de parcelas deve ser no mínimo 1."),
         ],
+        render_kw={"readonly": True},
     )
 
     submit = SubmitField("Atualizar")
 
     def __init__(self, *args, **kwargs):
-        crediario_choices = kwargs.pop('crediario_choices', [])
-        grupo_choices = kwargs.pop('grupo_choices', [])
+        crediario_choices = kwargs.pop("crediario_choices", [])
+        grupo_choices = kwargs.pop("grupo_choices", [])
 
         super().__init__(*args, **kwargs)
 

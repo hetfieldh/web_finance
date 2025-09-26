@@ -98,9 +98,10 @@ class CadastroCrediarioForm(FlaskForm):
         ).first()
 
         if existing_crediario:
-            raise ValidationError(
+            self.nome_crediario.errors.append(
                 "Você já possui um crediário com este nome, tipo e identificador final."
             )
+            return False
 
         return True
 
@@ -213,8 +214,9 @@ class EditarCrediarioForm(FlaskForm):
                     else None
                 )
             ):
-                raise ValidationError(
-                    "Você já possui outro crediário com este nome, tipo e identificador final."
+                self.nome_crediario.errors.append(
+                    "Você já possui um crediário com este nome, tipo e identificador final."
                 )
+            return False
 
         return True

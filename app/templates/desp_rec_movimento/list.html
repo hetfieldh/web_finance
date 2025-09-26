@@ -83,6 +83,7 @@
                     <th>Natureza</th>
                     <th>Valor Previsto</th>
                     <th>Valor Realizado</th>
+                    <th>Descrição</th>
                     <th>Status</th>
                     <th>Ações</th>
                   </tr>
@@ -110,6 +111,7 @@
                       R$ {{ "%.2f"|format(movimento.valor_realizado) if
                       movimento.valor_realizado is not none else 'N/A' }}
                     </td>
+                    <td>{{ movimento.descricao}}</td>
                     <td>
                       {% if movimento.status == 'Pago' %}
                       <span class="badge bg-success"
