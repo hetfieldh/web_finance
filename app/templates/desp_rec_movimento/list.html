@@ -106,10 +106,10 @@
                       >
                       {% endif %}
                     </td>
-                    <td>R$ {{ "%.2f"|format(movimento.valor_previsto) }}</td>
+                    <td>{{movimento.valor_previsto | format_currency }}</td>
                     <td>
-                      R$ {{ "%.2f"|format(movimento.valor_realizado) if
-                      movimento.valor_realizado is not none else 'N/A' }}
+                      {{movimento.valor_realizado | format_currency if
+                      movimento.valor_realizado is not none else "N/A" }}
                     </td>
                     <td>{{ movimento.descricao}}</td>
                     <td>

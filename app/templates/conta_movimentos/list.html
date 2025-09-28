@@ -102,7 +102,7 @@
                   {% else %} {{ mov.tipo_transacao.tipo }} {% endif %}
                 </td>
                 <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
-                <td>R$ {{ "%.2f"|format(mov.valor) }}</td>
+                <td>{{mov.valor | format_currency }}</td>
                 <td>{{ mov.descricao if mov.descricao else 'N/A' }}</td>
                 <td>
                   {% if mov.id_movimento_relacionado is not none %}

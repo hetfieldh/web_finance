@@ -108,13 +108,13 @@
                   class="text-end {% if mov.tipo_movimento == 'Débito' %}text-danger{% else %}text-success{% endif %}"
                 >
                   {% if mov.tipo_movimento == 'Débito' %}-{% else %}+{% endif
-                  %}R$ {{ "%.2f"|format(mov.valor) }}
+                  %}{{mov.valor | format_currency }}
                 </td>
                 <td>{{ mov.descricao if mov.descricao else 'N/A'}}</td>
                 <td
                   class="text-end fw-bold {% if mov.saldo_acumulado < 0 %}text-danger{% endif %}"
                 >
-                  R$ {{ "%.2f"|format(mov.saldo_acumulado) }}
+                  {{mov.saldo_acumulado | format_currency }}
                 </td>
               </tr>
               {% endfor %}

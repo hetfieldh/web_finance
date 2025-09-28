@@ -100,7 +100,7 @@
                 <td
                   class="text-end fw-bold {% if salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
                 >
-                  R$ {{ "%.2f"|format(salario_liquido) }}
+                  {{ salario_liquido | format_currency }}
                 </td>
                 <td class="text-center">
                   {% if movimento.status == 'Recebido' %}
@@ -142,7 +142,7 @@
                 <td>{{ movimento.data_recebimento.strftime('%d/%m/%Y') }}</td>
                 <td>Benefícios</td>
                 <td class="text-end fw-bold text-primary">
-                  R$ {{ "%.2f"|format(total_beneficios) }}
+                  {{ total_beneficios | format_currency }}
                 </td>
                 <td class="text-center">
                   {% if movimento.status == 'Recebido' %}
@@ -184,7 +184,7 @@
                 <td>{{ movimento.data_recebimento.strftime('%d/%m/%Y') }}</td>
                 <td>FGTS</td>
                 <td class="text-end fw-bold text-secondary">
-                  R$ {{ "%.2f"|format(total_fgts) }}
+                  {{ total_fgts | format_currency}}
                 </td>
                 <td class="text-center">
                   {% if movimento.status == 'Recebido' %}

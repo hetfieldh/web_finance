@@ -49,7 +49,7 @@
                   {{ cred.identificador_final if cred.identificador_final else
                   'N/A' }}
                 </td>
-                <td>R$ {{ "%.2f"|format(cred.limite_total) }}</td>
+                <td>{{cred.limite_total | format_currency }}</td>
                 <td>{{ cred.dia_vencimento }}</td>
                 <td>
                   {% if cred.ativa %}

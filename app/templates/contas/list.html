@@ -49,10 +49,10 @@
                 <td>{{ conta.agencia }}</td>
                 <td>{{ conta.conta }}</td>
                 <td>{{ conta.tipo }}</td>
-                <td>R$ {{ "%.2f"|format(conta.saldo_inicial) }}</td>
-                <td>R$ {{ "%.2f"|format(conta.saldo_atual) }}</td>
+                <td>{{conta.saldo_inicial | format_currency }}</td>
+                <td>{{conta.saldo_atual | format_currency }}</td>
                 <td>
-                  R$ {{ "%.2f"|format(conta.limite) if conta.limite is not none
+                  {{ conta.limite | format_currency if conta.limite is not none
                   else 'N/A' }}
                 </td>
                 <td>

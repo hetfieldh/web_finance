@@ -143,12 +143,12 @@
                 <td
                   class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
-                  R$ {{ "%.2f"|format(item.fatura.valor_total_fatura) }}
+                  {{item.fatura.valor_total_fatura | format_currency }}
                 </td>
                 <td
                   class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
-                  R$ {{ "%.2f"|format(item.fatura.valor_pago_fatura) }}
+                  {{item.fatura.valor_pago_fatura | format_currency }}
                 </td>
                 <td>
                   {% if item.fatura.status == 'Pago' %}
