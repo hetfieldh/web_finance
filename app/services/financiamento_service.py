@@ -180,7 +180,6 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
         if not ids_parcelas:
             return False, "Nenhuma parcela foi selecionada para amortização."
 
-        # validação de saldo devedor antes de amortizar
         saldo_devedor_maximo = financiamento.saldo_devedor_atual
         if valor_total_amortizado > saldo_devedor_maximo:
             saldo_formatado = (

@@ -264,7 +264,6 @@ def gerenciar_itens_folha(id):
             flash(message, "warning")
         return redirect(url_for("salario.gerenciar_itens_folha", id=id))
 
-    # Lógica de "trancado" atualizada
     salario_pago = movimento.movimento_bancario_salario_id is not None
     algum_beneficio_pago = any(
         item.movimento_bancario_id is not None

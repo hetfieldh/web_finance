@@ -2,6 +2,13 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
+
+<!-- Passamos os dados de forma segura em um bloco de dados separado -->
+<script id="contas-data" type="application/json">
+  {{ contas_para_js | tojson | safe }}
+</script>
+
+<!-- A div 'row' não precisa mais do atributo data-contas -->
 <div class="row">
   <div class="col-12">
     <div class="card shadow-sm mb-2">
@@ -11,10 +18,11 @@
         <form
           id="form-recebimentos-mes"
           method="GET"
+          action="{{ url_for('recebimentos.painel') }}"
           class="d-flex align-items-center"
         >
           <label
-            for="mes_ano_pagamentos"
+            for="mes_ano_recebimentos"
             class="form-label mb-0 me-2 fw-semibold text-secondary"
           >
             Mês/Ano:
@@ -67,7 +75,7 @@
                 <th class="text-end">Valor Previsto</th>
                 <th class="text-end">Valor Recebido</th>
                 <th class="text-center">Data Recebimento</th>
-                <th class="text-start">Recebido por</th>
+                <th class="text-start">Recebido em</th>
                 <th class="text-center">Status</th>
                 <th class="text-center">Ações</th>
               </tr>
@@ -78,7 +86,7 @@
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
                 <td><span class="badge bg-primary">{{ conta.tipo }}</span></td>
-                <td class="text-end text-muted">
+                <td class="text-end text-dark">
                   {{ conta.valor_previsto | format_currency }}
                 </td>
                 <td class="text-end fw-bold text-success">
@@ -91,14 +99,13 @@
                 </td>
                 <td class="text-start">{{ conta.recebido_em or '-' }}</td>
                 <td class="text-center">
-                  {% set status_text = conta.status %}{% set status_class =
-                  'bg-warning text-dark' %}{% if conta.status in ['Recebido',
-                  'Pago'] %}{% set status_text = 'Recebido' %}{% set
-                  status_class = 'bg-success' %}{% elif conta.status ==
-                  'Parcialmente Recebido' %}{% set status_class = 'bg-info' %}{%
-                  endif %}<span class="badge {{ status_class }}"
-                    >{{ status_text }}</span
-                  >
+                  {% if conta.status == 'Recebido' or conta.status == 'Pago' %}
+                  <span class="badge bg-success">Recebido</span>
+                  {% elif conta.status == 'Parcialmente Recebido' %}
+                  <span class="badge bg-info">Parcial</span>
+                  {% else %}
+                  <span class="badge bg-warning text-dark">Pendente</span>
+                  {% endif %}
                 </td>
                 <td class="text-center">
                   {% if conta.status not in ['Recebido', 'Pago'] %}
@@ -204,16 +211,16 @@
               no lançamento original.
             </div>
           </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            {{ recebimento_form.submit(class="btn btn-success") }}
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          {{ recebimento_form.submit(class="btn btn-success") }}
         </div>
       </form>
     </div>

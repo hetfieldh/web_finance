@@ -1,5 +1,6 @@
 # app/routes/recebimentos_routes.py
 
+import json
 from datetime import date
 from decimal import Decimal
 
@@ -15,6 +16,7 @@ from flask_login import current_user, login_required
 
 from app import db
 from app.forms.recebimentos_forms import PainelRecebimentosForm, RecebimentoForm
+from app.models.conta_model import Conta
 from app.services import conta_service, recebimento_service
 from app.services.recebimento_service import (
     estornar_recebimento as estornar_recebimento_service,
@@ -30,8 +32,20 @@ recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos"
 @login_required
 def painel():
     form = PainelRecebimentosForm(request.args)
+
     account_choices = conta_service.get_active_accounts_for_user_choices()
     recebimento_form = RecebimentoForm(account_choices=account_choices)
+
+    contas_ativas = Conta.query.filter_by(usuario_id=current_user.id, ativa=True).all()
+    contas_para_js = [
+        {
+            "id": conta.id,
+            "nome": conta.nome_banco,
+            "tipo": conta.tipo,
+            "saldo_atual": float(conta.saldo_atual),
+        }
+        for conta in contas_ativas
+    ]
 
     mes_ano_str = form.mes_ano.data
     if not mes_ano_str:
@@ -65,6 +79,7 @@ def painel():
         recebimento_form=recebimento_form,
         contas=contas_a_receber,
         totais=totais,
+        contas_para_js=contas_para_js,
         title="Painel de Recebimentos",
     )
 
