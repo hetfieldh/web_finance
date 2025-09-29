@@ -45,6 +45,11 @@ class CadastroSalarioItemForm(FlaskForm):
         choices=FormChoices.get_choices(FormChoices.TipoSalarioItem),
         validators=[DataRequired("O tipo é obrigatório.")],
     )
+    conta_destino_id = SelectField(
+        "Conta de Destino (para Benefícios)",
+        coerce=lambda x: int(x) if x else None,
+        validators=[Optional()],
+    )
     descricao = TextAreaField(
         "Descrição (opcional)",
         validators=[
@@ -67,12 +72,11 @@ class CadastroSalarioItemForm(FlaskForm):
 
 class EditarSalarioItemForm(FlaskForm):
     nome = StringField("Verba", render_kw={"readonly": True})
-    tipo = SelectField(
-        "Tipo",
-        choices=FormChoices.get_choices(FormChoices.TipoSalarioItem),
-        render_kw={"disabled": True},
+    conta_destino_id = SelectField(
+        "Conta de Destino (para Benefícios)",
+        coerce=lambda x: int(x) if x else None,
+        validators=[Optional()],
     )
-
     descricao = TextAreaField(
         "Descrição (opcional)",
         validators=[

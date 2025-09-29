@@ -47,7 +47,7 @@
                 <td>{{ cred.tipo_crediario }}</td>
                 <td>
                   {{ cred.identificador_final if cred.identificador_final else
-                  'N/A' }}
+                  '-' }}
                 </td>
                 <td>{{cred.limite_total | format_currency }}</td>
                 <td>{{ cred.dia_vencimento }}</td>

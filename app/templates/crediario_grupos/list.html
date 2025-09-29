@@ -56,7 +56,7 @@
                   >
                   {% else %} {{ grupo.tipo_grupo_crediario }} {% endif %}
                 </td>
-                <td>{{ grupo.descricao if grupo.descricao else 'N/A' }}</td>
+                <td>{{ grupo.descricao if grupo.descricao else '-' }}</td>
                 <td>{{ grupo.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td class="table-actions">
                   <a

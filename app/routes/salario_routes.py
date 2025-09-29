@@ -1,6 +1,7 @@
 # app/routes/salario_routes.py
 
 import calendar
+import json
 from datetime import date, datetime
 from operator import and_
 
@@ -24,6 +25,7 @@ from app.forms.salario_forms import (
     CadastroSalarioItemForm,
     EditarSalarioItemForm,
 )
+from app.models.conta_model import Conta
 from app.models.salario_item_model import SalarioItem
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
@@ -59,6 +61,15 @@ def listar_itens():
 @login_required
 def adicionar_item():
     form = CadastroSalarioItemForm()
+    contas_usuario = (
+        Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+        .order_by(Conta.nome_banco)
+        .all()
+    )
+    form.conta_destino_id.choices = [("", "Nenhuma")] + [
+        (c.id, c.nome_banco) for c in contas_usuario
+    ]
+
     if form.validate_on_submit():
         try:
             novo_item = SalarioItem(
@@ -67,13 +78,15 @@ def adicionar_item():
                 tipo=form.tipo.data,
                 descricao=form.descricao.data.strip() if form.descricao.data else None,
                 ativo=form.ativo.data,
+                id_conta_destino=(
+                    form.conta_destino_id.data
+                    if form.tipo.data == "Benefício"
+                    else None
+                ),
             )
             db.session.add(novo_item)
             db.session.commit()
             flash("Item da folha adicionado com sucesso!", "success")
-            current_app.logger.info(
-                f"Item de salário '{novo_item.nome}' criado por {current_user.login}."
-            )
             return redirect(url_for("salario.listar_itens"))
         except Exception as e:
             db.session.rollback()
@@ -93,6 +106,18 @@ def editar_item(id):
     item = SalarioItem.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
     form = EditarSalarioItemForm(obj=item)
 
+    contas_usuario = (
+        Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+        .order_by(Conta.nome_banco)
+        .all()
+    )
+    form.conta_destino_id.choices = [("", "Nenhuma")] + [
+        (c.id, c.nome_banco) for c in contas_usuario
+    ]
+
+    if request.method == "GET":
+        form.conta_destino_id.data = item.id_conta_destino
+
     if form.validate_on_submit():
         try:
             item.nome = form.nome.data.strip().upper()
@@ -100,11 +125,11 @@ def editar_item(id):
                 form.descricao.data.strip() if form.descricao.data else None
             )
             item.ativo = form.ativo.data
+            item.id_conta_destino = (
+                form.conta_destino_id.data if item.tipo == "Benefício" else None
+            )
             db.session.commit()
             flash("Item da folha atualizado com sucesso!", "success")
-            current_app.logger.info(
-                f"Item de salário ID {id} atualizado por {current_user.login}."
-            )
             return redirect(url_for("salario.listar_itens"))
         except Exception as e:
             db.session.rollback()
@@ -134,9 +159,6 @@ def excluir_item(id):
         db.session.delete(item)
         db.session.commit()
         flash("Item da folha excluído com sucesso!", "success")
-        current_app.logger.info(
-            f"Item de salário ID {id} ('{item.nome}') excluído por {current_user.login}."
-        )
     except Exception as e:
         db.session.rollback()
         flash("Erro ao excluir o item.", "danger")
@@ -154,7 +176,6 @@ def listar_movimentos():
     data_final_str = request.args.get("data_final")
 
     hoje = date.today()
-
     if not data_inicial_str and not data_final_str:
         primeiro_dia = date(hoje.year, hoje.month, 1)
         ultimo_dia = date(
@@ -163,9 +184,6 @@ def listar_movimentos():
         data_inicial_str = primeiro_dia.isoformat()
         data_final_str = ultimo_dia.isoformat()
 
-    # query = SalarioMovimento.query.filter_by(usuario_id=current_user.id).options(
-    #     joinedload(SalarioMovimento.itens).joinedload(SalarioMovimentoItem.salario_item)
-    # )
     query = (
         db.session.query(SalarioMovimento)
         .outerjoin(SalarioMovimento.itens)
@@ -190,8 +208,7 @@ def listar_movimentos():
         return redirect(url_for("salario.listar_movimentos"))
 
     movimentos = query.order_by(
-        SalarioMovimento.data_recebimento.asc(),
-        SalarioMovimento.id.desc(),
+        SalarioMovimento.data_recebimento.asc(), SalarioMovimento.id.desc()
     ).all()
 
     return render_template(
@@ -210,17 +227,15 @@ def novo_lancamento_folha():
         data_recebimento_obj = datetime.strptime(
             form.data_recebimento.data, "%Y-%m-%d"
         ).date()
-
         success, message, movimento = criar_folha_pagamento(
             form.mes_referencia.data, data_recebimento_obj
         )
-
         if success:
             flash(message, "success")
+            return redirect(url_for("salario.gerenciar_itens_folha", id=movimento.id))
         else:
             flash(message, "warning")
-
-        return redirect(url_for("salario.gerenciar_itens_folha", id=movimento.id))
+            return redirect(url_for("salario.listar_movimentos"))
 
     return render_template(
         "salario_movimento/add.html", form=form, title="Nova Folha de Pagamento"
@@ -238,49 +253,48 @@ def gerenciar_itens_folha(id):
 
     if form.validate_on_submit():
         success, message, item_data = salario_service.adicionar_item_folha(id, form)
-
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             if success:
                 return jsonify({"success": True, "message": message, "item": item_data})
             else:
                 return jsonify({"success": False, "message": message}), 400
-
         if success:
             flash(message, "success")
         else:
             flash(message, "warning")
         return redirect(url_for("salario.gerenciar_itens_folha", id=id))
 
-    is_locked = (
-        movimento.movimento_bancario_salario_id is not None
-        or movimento.movimento_bancario_beneficio_id is not None
+    # Lógica de "trancado" atualizada
+    salario_pago = movimento.movimento_bancario_salario_id is not None
+    algum_beneficio_pago = any(
+        item.movimento_bancario_id is not None
+        for item in movimento.itens
+        if item.salario_item.tipo == "Benefício"
     )
+    is_locked = salario_pago or algum_beneficio_pago
+
+    beneficios_individuais = [
+        item for item in movimento.itens if item.salario_item.tipo == "Benefício"
+    ]
+    outros_itens = [
+        item for item in movimento.itens if item.salario_item.tipo != "Benefício"
+    ]
 
     totais = {
         "proventos": sum(
-            item.valor
-            for item in movimento.itens
-            if item.salario_item.tipo == "Provento"
-        ),
-        "beneficios": sum(
-            item.valor
-            for item in movimento.itens
-            if item.salario_item.tipo == "Benefício"
+            item.valor for item in outros_itens if item.salario_item.tipo == "Provento"
         ),
         "impostos": sum(
-            item.valor
-            for item in movimento.itens
-            if item.salario_item.tipo == "Imposto"
+            item.valor for item in outros_itens if item.salario_item.tipo == "Imposto"
         ),
         "descontos": sum(
-            item.valor
-            for item in movimento.itens
-            if item.salario_item.tipo == "Desconto"
+            item.valor for item in outros_itens if item.salario_item.tipo == "Desconto"
         ),
         "fgts": sum(
-            item.valor for item in movimento.itens if item.salario_item.tipo == "FGTS"
+            item.valor for item in outros_itens if item.salario_item.tipo == "FGTS"
         ),
     }
+
     totais["salario_bruto"] = totais["proventos"]
     totais["total_descontos_impostos"] = totais["descontos"] + totais["impostos"]
     totais["salario_liquido"] = (
@@ -293,6 +307,7 @@ def gerenciar_itens_folha(id):
         movimento=movimento,
         form=form,
         totais=totais,
+        beneficios_individuais=beneficios_individuais,
         is_locked=is_locked,
         title=f"Gerenciar Folha de {movimento.mes_referencia}",
     )
@@ -302,9 +317,7 @@ def gerenciar_itens_folha(id):
 @login_required
 def excluir_item_folha(item_id):
     movimento_id = SalarioMovimentoItem.query.get_or_404(item_id).salario_movimento_id
-
     success, message, deleted_item_id = excluir_item_folha_service(item_id)
-
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         if success:
             return jsonify(
@@ -316,12 +329,10 @@ def excluir_item_folha(item_id):
             )
         else:
             return jsonify({"success": False, "message": message}), 400
-
     if success:
         flash(message, "success")
     else:
         flash(message, "warning")
-
     return redirect(url_for("salario.gerenciar_itens_folha", id=movimento_id))
 
 
@@ -333,5 +344,4 @@ def excluir_movimento(id):
         flash(message, "success")
     else:
         flash(message, "danger")
-
     return redirect(url_for("salario.listar_movimentos"))

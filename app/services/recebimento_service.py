@@ -5,12 +5,14 @@ from decimal import Decimal
 
 from flask import current_app
 from flask_login import current_user
+from sqlalchemy import and_
 
 from app import db
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 from app.services import conta_service
 from app.utils import (
@@ -19,6 +21,132 @@ from app.utils import (
     STATUS_PENDENTE,
     STATUS_RECEBIDO,
 )
+
+
+def get_contas_a_receber_por_mes(ano, mes):
+    primeiro_dia = date(ano, mes, 1)
+    ultimo_dia = date(ano, mes, 28) + timedelta(days=4)
+    ultimo_dia = ultimo_dia - timedelta(days=ultimo_dia.day)
+
+    query_filter = and_(
+        DespRecMovimento.usuario_id == current_user.id,
+        DespRecMovimento.despesa_receita.has(natureza=NATUREZA_RECEITA),
+        DespRecMovimento.data_vencimento.between(primeiro_dia, ultimo_dia),
+    )
+    receitas_recorrentes = DespRecMovimento.query.filter(query_filter).all()
+
+    lista_contas = []
+    for receita in receitas_recorrentes:
+        recebido_em = None
+        if receita.movimento_bancario and receita.movimento_bancario.conta:
+            recebido_em = receita.movimento_bancario.conta.nome_banco
+
+        lista_contas.append(
+            {
+                "id_original": receita.id,
+                "origem": receita.despesa_receita.nome,
+                "tipo": NATUREZA_RECEITA,
+                "vencimento": receita.data_vencimento,
+                "valor_previsto": receita.valor_previsto,
+                "valor_recebido": receita.valor_realizado or Decimal(0),
+                "data_pagamento": receita.data_pagamento,
+                "recebido_em": recebido_em,
+                "status": receita.status,
+                "conta_sugerida_id": None,
+            }
+        )
+
+    salarios = SalarioMovimento.query.filter(
+        SalarioMovimento.usuario_id == current_user.id,
+        SalarioMovimento.data_recebimento.between(primeiro_dia, ultimo_dia),
+    ).all()
+
+    for salario in salarios:
+        salario_liquido = salario.salario_liquido
+        if salario_liquido > 0:
+            is_pago = salario.movimento_bancario_salario_id is not None
+            recebido_em_salario = None
+            if is_pago and salario.movimento_bancario_salario:
+                recebido_em_salario = (
+                    salario.movimento_bancario_salario.conta.nome_banco
+                )
+
+            lista_contas.append(
+                {
+                    "id_original": salario.id,
+                    "origem": f"SALÁRIO REF. {salario.mes_referencia}",
+                    "tipo": "Salário",
+                    "vencimento": salario.data_recebimento,
+                    "valor_previsto": salario_liquido,
+                    "valor_recebido": salario_liquido if is_pago else Decimal(0),
+                    "data_pagamento": (
+                        salario.movimento_bancario_salario.data_movimento
+                        if is_pago and salario.movimento_bancario_salario
+                        else None
+                    ),
+                    "recebido_em": recebido_em_salario,
+                    "status": STATUS_RECEBIDO if is_pago else STATUS_PENDENTE,
+                    "conta_sugerida_id": None,
+                }
+            )
+
+        beneficios_itens = [
+            item for item in salario.itens if item.salario_item.tipo == "Benefício"
+        ]
+        for item_beneficio in beneficios_itens:
+            is_beneficio_pago = item_beneficio.movimento_bancario_id is not None
+            recebido_em_beneficio = None
+            if is_beneficio_pago and item_beneficio.movimento_bancario:
+                recebido_em_beneficio = (
+                    item_beneficio.movimento_bancario.conta.nome_banco
+                )
+
+            lista_contas.append(
+                {
+                    "id_original": item_beneficio.id,
+                    "origem": item_beneficio.salario_item.nome,
+                    "tipo": "Benefício",
+                    "vencimento": salario.data_recebimento,
+                    "valor_previsto": item_beneficio.valor,
+                    "valor_recebido": (
+                        item_beneficio.valor if is_beneficio_pago else Decimal(0)
+                    ),
+                    "data_pagamento": (
+                        item_beneficio.movimento_bancario.data_movimento
+                        if is_beneficio_pago and item_beneficio.movimento_bancario
+                        else None
+                    ),
+                    "recebido_em": recebido_em_beneficio,
+                    "status": STATUS_RECEBIDO if is_beneficio_pago else STATUS_PENDENTE,
+                    "conta_sugerida_id": item_beneficio.salario_item.id_conta_destino,
+                }
+            )
+
+    lista_contas.sort(key=lambda x: x["vencimento"])
+    return lista_contas
+
+
+def _atualizar_status_folha(salario_movimento):
+    salario_pago = salario_movimento.movimento_bancario_salario_id is not None
+    beneficios_itens = [
+        item
+        for item in salario_movimento.itens
+        if item.salario_item.tipo == "Benefício"
+    ]
+
+    beneficios_pagos = all(
+        item.movimento_bancario_id is not None for item in beneficios_itens
+    )
+
+    if not beneficios_itens:
+        beneficios_pagos = True
+
+    if salario_pago and beneficios_pagos:
+        salario_movimento.status = STATUS_RECEBIDO
+    elif salario_pago or any(item.movimento_bancario_id for item in beneficios_itens):
+        salario_movimento.status = STATUS_PARCIAL_RECEBIDO
+    else:
+        salario_movimento.status = STATUS_PENDENTE
 
 
 def registrar_recebimento(form):
@@ -57,69 +185,19 @@ def registrar_recebimento(form):
             item.valor_realizado = valor_recebido
             item.data_pagamento = form.data_recebimento.data
             item.movimento_bancario_id = novo_movimento.id
-        elif item_tipo in ["Salário", "Benefício"]:
+
+        elif item_tipo == "Salário":
             item = SalarioMovimento.query.get(item_id)
+            item.movimento_bancario_salario_id = novo_movimento.id
+            _processar_fgts(item, form.data_recebimento.data, tipo_transacao_credito)
+            _atualizar_status_folha(item)
 
-            has_beneficios = any(i.salario_item.tipo == "Benefício" for i in item.itens)
-
-            if item_tipo == "Salário":
-                item.movimento_bancario_salario_id = novo_movimento.id
-
-                fgts_valor = item.total_fgts
-                if fgts_valor and fgts_valor > 0:
-                    print(
-                        f"Tentando encontrar conta FGTS para o usuário: {current_user.id}"
-                    )
-                    conta_fgts = Conta.query.filter(
-                        Conta.usuario_id == current_user.id,
-                        Conta.nome_banco.ilike("%fgts%"),
-                    ).first()
-
-                    if conta_fgts:
-                        print(
-                            f"Conta FGTS encontrada: {conta_fgts.nome_banco} (ID: {conta_fgts.id})"
-                        )
-                        tipo_transacao_fgts = ContaTransacao.query.filter_by(
-                            usuario_id=current_user.id,
-                            transacao_tipo="RECEBIMENTO_FGTS",
-                            tipo="Crédito",
-                        ).first()
-
-                        if not tipo_transacao_fgts:
-                            tipo_transacao_fgts = tipo_transacao_credito
-
-                        novo_movimento_fgts = ContaMovimento(
-                            usuario_id=current_user.id,
-                            conta_id=conta_fgts.id,
-                            conta_transacao_id=tipo_transacao_fgts.id,
-                            data_movimento=form.data_recebimento.data,
-                            valor=fgts_valor,
-                            descricao=f"Crédito de FGTS - Ref: {item.mes_referencia}",
-                        )
-                        db.session.add(novo_movimento_fgts)
-
-                        db.session.flush()
-
-                        conta_fgts.saldo_atual += fgts_valor
-                        item.movimento_bancario_fgts_id = novo_movimento_fgts.id
-                        print(
-                            f"ID do movimento de FGTS registrado: {item.movimento_bancario_fgts_id}"
-                        )
-                    else:
-                        current_app.logger.warning(
-                            "Conta bancária do FGTS não encontrada."
-                        )
-                        print("ALERTA: Conta bancária do FGTS não encontrada!")
-
-            else:
-                item.movimento_bancario_beneficio_id = novo_movimento.id
-
-            if item.movimento_bancario_salario_id and (
-                not has_beneficios or item.movimento_bancario_beneficio_id
-            ):
-                item.status = STATUS_RECEBIDO
-            else:
-                item.status = STATUS_PARCIAL_RECEBIDO
+        elif item_tipo == "Benefício":
+            item = SalarioMovimentoItem.query.get(item_id)
+            if not item:
+                raise ValueError("Item de benefício não encontrado.")
+            item.movimento_bancario_id = novo_movimento.id
+            _atualizar_status_folha(item.movimento_pai)
 
         db.session.commit()
         return True, "Recebimento registrado com sucesso!"
@@ -131,24 +209,32 @@ def registrar_recebimento(form):
 
 def estornar_recebimento(item_id, item_tipo):
     try:
-        movimento_bancario_id = None
         item_a_atualizar = None
+        movimento_bancario_id = None
 
         if item_tipo == "Receita":
             item_a_atualizar = DespRecMovimento.query.get(item_id)
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_id
-        elif item_tipo in ["Salário", "Benefício"]:
+                item_a_atualizar.status = STATUS_PENDENTE
+                item_a_atualizar.valor_realizado = None
+                item_a_atualizar.data_pagamento = None
+                item_a_atualizar.movimento_bancario_id = None
+
+        elif item_tipo == "Salário":
             item_a_atualizar = SalarioMovimento.query.get(item_id)
             if item_a_atualizar:
-                if item_tipo == "Salário":
-                    movimento_bancario_id = (
-                        item_a_atualizar.movimento_bancario_salario_id
-                    )
-                else:
-                    movimento_bancario_id = (
-                        item_a_atualizar.movimento_bancario_beneficio_id
-                    )
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_salario_id
+                item_a_atualizar.movimento_bancario_salario_id = None
+                _estornar_fgts(item_a_atualizar)
+                _atualizar_status_folha(item_a_atualizar)
+
+        elif item_tipo == "Benefício":
+            item_a_atualizar = SalarioMovimentoItem.query.get(item_id)
+            if item_a_atualizar:
+                movimento_bancario_id = item_a_atualizar.movimento_bancario_id
+                item_a_atualizar.movimento_bancario_id = None
+                _atualizar_status_folha(item_a_atualizar.movimento_pai)
 
         if not movimento_bancario_id:
             return False, "Movimentação bancária associada não encontrada para estorno."
@@ -159,60 +245,6 @@ def estornar_recebimento(item_id, item_tipo):
 
         valor_a_debitar = movimento_a_estornar.valor
         conta_bancaria = movimento_a_estornar.conta
-
-        is_safe, message = conta_service.validar_estorno_saldo(
-            conta_bancaria, valor_a_debitar
-        )
-        if not is_safe:
-            return False, message
-
-        if item_tipo == "Receita":
-            item_a_atualizar.status = STATUS_PENDENTE
-            item_a_atualizar.valor_realizado = None
-            item_a_atualizar.data_pagamento = None
-            item_a_atualizar.movimento_bancario_id = None
-        elif item_tipo in ["Salário", "Benefício"]:
-            if item_tipo == "Salário":
-                print(
-                    f"Iniciando estorno. ID do item de salário: {item_a_atualizar.id}"
-                )
-                print(
-                    f"ID do movimento de FGTS associado: {item_a_atualizar.movimento_bancario_fgts_id}"
-                )
-                if item_a_atualizar.movimento_bancario_fgts_id:
-                    movimento_fgts_a_estornar = ContaMovimento.query.get(
-                        item_a_atualizar.movimento_bancario_fgts_id
-                    )
-
-                    if movimento_fgts_a_estornar:
-                        print(
-                            f"Movimento de FGTS encontrado. Estornando R$ {movimento_fgts_a_estornar.valor} da conta {movimento_fgts_a_estornar.conta.nome_banco}."
-                        )
-                        movimento_fgts_a_estornar.conta.saldo_atual -= (
-                            movimento_fgts_a_estornar.valor
-                        )
-                        db.session.delete(movimento_fgts_a_estornar)
-                    else:
-                        print(
-                            f"AVISO: Movimento de FGTS com ID {item_a_atualizar.movimento_bancario_fgts_id} não foi encontrado no banco de dados para estorno."
-                        )
-                    item_a_atualizar.movimento_bancario_fgts_id = None
-                else:
-                    print(
-                        "Nenhum ID de movimento de FGTS encontrado para este item de salário. Estorno do FGTS será ignorado."
-                    )
-                item_a_atualizar.movimento_bancario_salario_id = None
-            else:
-                item_a_atualizar.movimento_bancario_beneficio_id = None
-
-            if (
-                item_a_atualizar.movimento_bancario_salario_id
-                or item_a_atualizar.movimento_bancario_beneficio_id
-            ):
-                item_a_atualizar.status = STATUS_PARCIAL_RECEBIDO
-            else:
-                item_a_atualizar.status = STATUS_PENDENTE
-
         conta_bancaria.saldo_atual -= valor_a_debitar
         db.session.delete(movimento_a_estornar)
 
@@ -222,3 +254,54 @@ def estornar_recebimento(item_id, item_tipo):
         db.session.rollback()
         current_app.logger.error(f"Erro ao estornar recebimento: {e}", exc_info=True)
         return False, "Ocorreu um erro ao estornar o recebimento."
+
+
+def _processar_fgts(salario_movimento, data_movimento, transacao_fallback):
+    fgts_valor = salario_movimento.total_fgts
+    if not (fgts_valor and fgts_valor > 0):
+        return
+
+    conta_fgts = Conta.query.filter(
+        Conta.usuario_id == current_user.id,
+        Conta.nome_banco.ilike("%fgts%"),
+    ).first()
+
+    if conta_fgts:
+        tipo_transacao_fgts = (
+            ContaTransacao.query.filter_by(
+                usuario_id=current_user.id,
+                transacao_tipo="RECEBIMENTO_FGTS",
+                tipo="Crédito",
+            ).first()
+            or transacao_fallback
+        )
+
+        novo_movimento_fgts = ContaMovimento(
+            usuario_id=current_user.id,
+            conta_id=conta_fgts.id,
+            conta_transacao_id=tipo_transacao_fgts.id,
+            data_movimento=data_movimento,
+            valor=fgts_valor,
+            descricao=f"Crédito de FGTS - Ref: {salario_movimento.mes_referencia}",
+        )
+        db.session.add(novo_movimento_fgts)
+        db.session.flush()
+        conta_fgts.saldo_atual += fgts_valor
+        salario_movimento.movimento_bancario_fgts_id = novo_movimento_fgts.id
+    else:
+        current_app.logger.warning("Conta bancária do FGTS não encontrada.")
+
+
+def _estornar_fgts(salario_movimento):
+    if not salario_movimento.movimento_bancario_fgts_id:
+        return
+
+    movimento_fgts_a_estornar = ContaMovimento.query.get(
+        salario_movimento.movimento_bancario_fgts_id
+    )
+
+    if movimento_fgts_a_estornar:
+        movimento_fgts_a_estornar.conta.saldo_atual -= movimento_fgts_a_estornar.valor
+        db.session.delete(movimento_fgts_a_estornar)
+
+    salario_movimento.movimento_bancario_fgts_id = None

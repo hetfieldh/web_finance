@@ -17,7 +17,13 @@ class SalarioMovimentoItem(db.Model):
     )
     valor = db.Column(Numeric(12, 2), nullable=False)
 
+    movimento_bancario_id = db.Column(
+        db.Integer, db.ForeignKey("conta_movimento.id"), nullable=True
+    )
+
     salario_item = db.relationship("SalarioItem")
+    movimento_pai = db.relationship("SalarioMovimento", back_populates="itens")
+    movimento_bancario = db.relationship("ContaMovimento")
 
     def __repr__(self):
         return f"<SalarioMovimentoItem ID: {self.id} | Valor: {self.valor}>"

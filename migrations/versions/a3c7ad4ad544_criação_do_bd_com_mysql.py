@@ -1,8 +1,8 @@
-"""Criação do BD em MySql
+"""Criação do BD com MySql
 
-Revision ID: 7d74e531efcb
+Revision ID: a3c7ad4ad544
 Revises: 
-Create Date: 2025-09-28 23:27:15.594332
+Create Date: 2025-09-29 14:59:27.781807
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7d74e531efcb'
+revision = 'a3c7ad4ad544'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -97,18 +97,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('usuario_id', 'nome', 'natureza', 'tipo', name='_usuario_desp_rec_uc')
     )
-    op.create_table('salario_item',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('usuario_id', sa.Integer(), nullable=False),
-    sa.Column('nome', sa.String(length=100), nullable=False),
-    sa.Column('tipo', sa.Enum('Provento', 'Desconto', 'Imposto', 'Benefício', 'FGTS', name='tipo_salario_item_enum'), nullable=False),
-    sa.Column('ativo', sa.Boolean(), nullable=False),
-    sa.Column('descricao', sa.String(length=255), nullable=True),
-    sa.Column('data_criacao', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('usuario_id', 'nome', 'tipo', name='_usuario_salario_item_uc')
-    )
     op.create_table('solicitacao_acesso',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
@@ -174,6 +162,20 @@ def upgrade():
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('usuario_id', 'nome_financiamento', name='_usuario_financiamento_uc')
+    )
+    op.create_table('salario_item',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=False),
+    sa.Column('id_conta_destino', sa.Integer(), nullable=True),
+    sa.Column('nome', sa.String(length=100), nullable=False),
+    sa.Column('tipo', sa.Enum('Provento', 'Desconto', 'Imposto', 'Benefício', 'FGTS', name='tipo_salario_item_enum'), nullable=False),
+    sa.Column('ativo', sa.Boolean(), nullable=False),
+    sa.Column('descricao', sa.String(length=255), nullable=True),
+    sa.Column('data_criacao', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['id_conta_destino'], ['conta.id'], ),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('usuario_id', 'nome', 'tipo', name='_usuario_salario_item_uc')
     )
     op.create_table('crediario_fatura',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -279,6 +281,8 @@ def upgrade():
     sa.Column('salario_movimento_id', sa.Integer(), nullable=False),
     sa.Column('salario_item_id', sa.Integer(), nullable=False),
     sa.Column('valor', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('movimento_bancario_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['movimento_bancario_id'], ['conta_movimento.id'], ),
     sa.ForeignKeyConstraint(['salario_item_id'], ['salario_item.id'], ),
     sa.ForeignKeyConstraint(['salario_movimento_id'], ['salario_movimento.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -294,11 +298,11 @@ def downgrade():
     op.drop_table('desp_rec_movimento')
     op.drop_table('crediario_parcela')
     op.drop_table('crediario_fatura')
+    op.drop_table('salario_item')
     op.drop_table('financiamento')
     op.drop_table('crediario_movimento')
     op.drop_table('conta_movimento')
     op.drop_table('solicitacao_acesso')
-    op.drop_table('salario_item')
     op.drop_table('desp_rec')
     op.drop_table('crediario_grupo')
     op.drop_table('crediario')

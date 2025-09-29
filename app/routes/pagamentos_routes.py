@@ -121,7 +121,7 @@ def painel():
                 item_dict.update(
                     {
                         "vencimento": item.data_vencimento_fatura,
-                        "origem": f"Fatura {item.crediario.nome_crediario}",
+                        "origem": f"FATURA {item.crediario.nome_crediario}",
                         "valor_display": item.valor_total_fatura,
                         "valor_pago": item.valor_pago_fatura or Decimal("0.00"),
                         "status": item.status,

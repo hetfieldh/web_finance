@@ -45,10 +45,10 @@ class SalarioMovimento(db.Model):
     usuario = db.relationship(
         "Usuario", backref=db.backref("salario_movimentos", lazy=True)
     )
+
     itens = db.relationship(
         "SalarioMovimentoItem",
-        backref="movimento_pai",
-        lazy=True,
+        back_populates="movimento_pai",
         cascade="all, delete-orphan",
     )
 

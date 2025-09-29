@@ -112,6 +112,7 @@
                     data-item-tipo="{{ conta.tipo }}"
                     data-item-valor="{{ '%.2f'|format(conta.valor_previsto) }}"
                     data-item-descricao="{{ conta.origem }}"
+                    data-conta-sugerida-id="{{ conta.conta_sugerida_id or '' }}"
                   >
                     <i class="fas fa-check-double fa-sm"></i>
                   </button>
@@ -199,7 +200,8 @@
           <div class="mb-3">
             {{ render_field(recebimento_form.valor_recebido) }}
             <div class="form-text">
-              O valor a ser recebido não pode ser alterado. Caso necessite, faça no lançamento original.
+              O valor a ser recebido não pode ser alterado. Caso necessite, faça
+              no lançamento original.
             </div>
           </div>
           <div class="modal-footer">

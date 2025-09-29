@@ -13,6 +13,7 @@ class SalarioItem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
+    id_conta_destino = db.Column(db.Integer, db.ForeignKey("conta.id"), nullable=True)
     nome = db.Column(db.String(100), nullable=False)
     tipo = db.Column(
         db.Enum(
@@ -28,6 +29,9 @@ class SalarioItem(db.Model):
     )
 
     usuario = db.relationship("Usuario", backref=db.backref("salario_itens", lazy=True))
+    conta_destino = db.relationship(
+        "Conta", backref=db.backref("salario_itens_destino", lazy=True)
+    )
 
     __table_args__ = (
         UniqueConstraint("usuario_id", "nome", "tipo", name="_usuario_salario_item_uc"),

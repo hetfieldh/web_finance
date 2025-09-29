@@ -108,13 +108,18 @@ def excluir_folha_pagamento(movimento_id):
         id=movimento_id, usuario_id=current_user.id
     ).first_or_404()
 
-    if (
-        movimento.movimento_bancario_salario_id
-        or movimento.movimento_bancario_beneficio_id
-    ):
+    salario_pago = movimento.movimento_bancario_salario_id is not None
+
+    algum_beneficio_pago = any(
+        item.movimento_bancario_id is not None
+        for item in movimento.itens
+        if item.salario_item.tipo == "Benefício"
+    )
+
+    if salario_pago or algum_beneficio_pago:
         return (
             False,
-            "Não é possível excluir uma folha de pagamento que já foi conciliada com uma movimentação bancária.",
+            "Não é possível excluir uma folha com itens já recebidos. Estorne todos os recebimentos primeiro.",
         )
 
     try:
