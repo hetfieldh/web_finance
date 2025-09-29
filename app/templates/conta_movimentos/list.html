@@ -103,7 +103,7 @@
                 </td>
                 <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{mov.valor | format_currency }}</td>
-                <td>{{ mov.descricao if mov.descricao else 'N/A' }}</td>
+                <td>{{ mov.descricao if mov.descricao else '-' }}</td>
                 <td>
                   {% if mov.id_movimento_relacionado is not none %}
                   <i

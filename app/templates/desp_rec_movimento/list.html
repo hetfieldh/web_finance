@@ -109,9 +109,9 @@
                     <td>{{movimento.valor_previsto | format_currency }}</td>
                     <td>
                       {{movimento.valor_realizado | format_currency if
-                      movimento.valor_realizado is not none else "N/A" }}
+                      movimento.valor_realizado is not none else "-" }}
                     </td>
-                    <td>{{ movimento.descricao}}</td>
+                    <td>{{ movimento.descricao if movimento.descricao else '-' }}</td>
                     <td>
                       {% if movimento.status == 'Pago' %}
                       <span class="badge bg-success"

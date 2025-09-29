@@ -55,7 +55,7 @@
                   <span class="badge bg-danger">Não</span>
                   {% endif %}
                 </td>
-                <td>{{ item.descricao if item.descricao else '' }}</td>
+                <td>{{ item.descricao if item.descricao else '-' }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('salario.editar_item', id=item.id) }}"
