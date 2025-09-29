@@ -1,20 +1,20 @@
-# app\services\pagamento_service.py
+# app/services/pagamento_service.py
 
 from datetime import date, timedelta
 from decimal import Decimal
 
 from flask import current_app
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import and_, func
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.crediario_fatura_model import CrediarioFatura
-from app.models.crediario_movimento_model import CrediarioMovimento
-from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
+from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.utils import (
     NATUREZA_DESPESA,
@@ -23,6 +23,100 @@ from app.utils import (
     STATUS_PARCIAL_PAGO,
     STATUS_PENDENTE,
 )
+
+
+def get_contas_a_pagar_por_mes(ano, mes):
+    primeiro_dia = date(ano, mes, 1)
+    ultimo_dia = (primeiro_dia + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+
+    contas_a_pagar = []
+
+    faturas = CrediarioFatura.query.filter(
+        CrediarioFatura.usuario_id == current_user.id,
+        CrediarioFatura.data_vencimento_fatura.between(primeiro_dia, ultimo_dia),
+    ).all()
+    for fatura in faturas:
+        pago_com = None
+        if fatura.movimento_bancario and fatura.movimento_bancario.conta:
+            pago_com = f"{fatura.movimento_bancario.conta.nome_banco} ({fatura.movimento_bancario.conta.tipo})"
+
+        contas_a_pagar.append(
+            {
+                "vencimento": fatura.data_vencimento_fatura,
+                "origem": f"FATURA {fatura.crediario.nome_crediario}",
+                "valor_display": fatura.valor_total_fatura,
+                "valor_pago": fatura.valor_pago_fatura or Decimal("0.00"),
+                "status": fatura.status,
+                "data_pagamento": fatura.data_pagamento,
+                "id_original": fatura.id,
+                "tipo": "Crediário",
+                "pago_com": pago_com,
+                "valor_pendente": fatura.valor_total_fatura
+                - (fatura.valor_pago_fatura or 0),
+            }
+        )
+
+    parcelas = (
+        FinanciamentoParcela.query.join(FinanciamentoParcela.financiamento)
+        .filter(
+            FinanciamentoParcela.data_vencimento.between(primeiro_dia, ultimo_dia),
+            Financiamento.usuario_id == current_user.id,
+        )
+        .all()
+    )
+    for parcela in parcelas:
+        pago_com = None
+        if parcela.movimento_bancario and parcela.movimento_bancario.conta:
+            pago_com = f"{parcela.movimento_bancario.conta.nome_banco} ({parcela.movimento_bancario.conta.tipo})"
+
+        contas_a_pagar.append(
+            {
+                "vencimento": parcela.data_vencimento,
+                "origem": f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})",
+                "valor_display": parcela.valor_total_previsto,
+                "valor_pago": parcela.valor_pago or Decimal("0.00"),
+                "status": parcela.status,
+                "data_pagamento": parcela.data_pagamento,
+                "id_original": parcela.id,
+                "tipo": "Financiamento",
+                "pago_com": pago_com,
+                "valor_pendente": parcela.valor_total_previsto
+                - (parcela.valor_pago or 0),
+            }
+        )
+
+    despesas = (
+        DespRecMovimento.query.join(DespRecMovimento.despesa_receita)
+        .filter(
+            DespRecMovimento.usuario_id == current_user.id,
+            DespRecMovimento.data_vencimento.between(primeiro_dia, ultimo_dia),
+            DespRecMovimento.despesa_receita.has(natureza="Despesa"),
+        )
+        .all()
+    )
+    for despesa in despesas:
+        pago_com = None
+        if despesa.movimento_bancario and despesa.movimento_bancario.conta:
+            pago_com = f"{despesa.movimento_bancario.conta.nome_banco} ({despesa.movimento_bancario.conta.tipo})"
+
+        contas_a_pagar.append(
+            {
+                "vencimento": despesa.data_vencimento,
+                "origem": despesa.despesa_receita.nome,
+                "valor_display": despesa.valor_previsto,
+                "valor_pago": despesa.valor_realizado or Decimal("0.00"),
+                "status": despesa.status,
+                "data_pagamento": despesa.data_pagamento,
+                "id_original": despesa.id,
+                "tipo": "Despesa",
+                "pago_com": pago_com,
+                "valor_pendente": despesa.valor_previsto
+                - (despesa.valor_realizado or 0),
+            }
+        )
+
+    contas_a_pagar.sort(key=lambda x: x["vencimento"])
+    return contas_a_pagar
 
 
 def registrar_pagamento(form):
@@ -64,7 +158,7 @@ def registrar_pagamento(form):
         item_id = form.item_id.data
         item_tipo = form.item_tipo.data
 
-        if item_tipo == NATUREZA_DESPESA:
+        if item_tipo == "Despesa":
             item = DespRecMovimento.query.get(item_id)
             item.status = STATUS_PAGO
             item.valor_realizado = valor_pago
@@ -95,35 +189,13 @@ def registrar_pagamento(form):
 
         elif item_tipo == "Crediário":
             item = CrediarioFatura.query.get(item_id)
-            item.valor_pago_fatura += valor_pago
+            item.valor_pago_fatura = (item.valor_pago_fatura or 0) + valor_pago
             item.data_pagamento = form.data_pagamento.data
             item.movimento_bancario_id = novo_movimento.id
             if item.valor_pago_fatura >= item.valor_total_fatura:
                 item.status = STATUS_PAGO
             else:
                 item.status = STATUS_PARCIAL_PAGO
-
-            ano, mes = map(int, item.mes_referencia.split("-"))
-            data_inicio_mes = date(ano, mes, 1)
-            if mes == 12:
-                data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
-            else:
-                data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
-
-            parcelas_da_fatura = (
-                CrediarioParcela.query.join(CrediarioMovimento)
-                .filter(
-                    CrediarioMovimento.crediario_id == item.crediario_id,
-                    CrediarioParcela.data_vencimento.between(
-                        data_inicio_mes, data_fim_mes
-                    ),
-                )
-                .all()
-            )
-
-            for parcela in parcelas_da_fatura:
-                parcela.pago = True
-                parcela.data_pagamento = form.data_pagamento.data
 
         db.session.commit()
         return True, "Pagamento registrado com sucesso!"
@@ -158,6 +230,11 @@ def estornar_pagamento(item_id, item_tipo):
         if not movimento_a_estornar:
             return False, "Movimentação bancária para estorno não existe mais."
 
+        valor_a_creditar = abs(movimento_a_estornar.valor)
+        conta_bancaria = movimento_a_estornar.conta
+        conta_bancaria.saldo_atual += valor_a_creditar
+        db.session.delete(movimento_a_estornar)
+
         if item_tipo == "Despesa":
             item_a_atualizar.status = STATUS_PENDENTE
             item_a_atualizar.valor_realizado = None
@@ -181,37 +258,15 @@ def estornar_pagamento(item_id, item_tipo):
             ).scalar() or Decimal(
                 "0.00"
             )
-            financiamento_pai.saldo_devedor_atual = novo_saldo_devedor
+            financiamento_pai.saldo_devedor_atual = (
+                novo_saldo_devedor + item_a_atualizar.valor_principal
+            )
 
         elif item_tipo == "Crediário":
             item_a_atualizar.valor_pago_fatura = Decimal("0.00")
             item_a_atualizar.status = STATUS_PENDENTE
             item_a_atualizar.data_pagamento = None
             item_a_atualizar.movimento_bancario_id = None
-
-            ano, mes = map(int, item_a_atualizar.mes_referencia.split("-"))
-            data_inicio_mes = date(ano, mes, 1)
-            if mes == 12:
-                data_fim_mes = date(ano + 1, 1, 1) - timedelta(days=1)
-            else:
-                data_fim_mes = date(ano, mes + 1, 1) - timedelta(days=1)
-            parcelas_da_fatura = (
-                CrediarioParcela.query.join(CrediarioMovimento)
-                .filter(
-                    CrediarioMovimento.crediario_id == item_a_atualizar.crediario_id,
-                    CrediarioParcela.data_vencimento.between(
-                        data_inicio_mes, data_fim_mes
-                    ),
-                )
-                .all()
-            )
-            for parcela in parcelas_da_fatura:
-                parcela.pago = False
-                parcela.data_pagamento = None
-
-        conta_bancaria = Conta.query.get(movimento_a_estornar.conta_id)
-        conta_bancaria.saldo_atual += movimento_a_estornar.valor
-        db.session.delete(movimento_a_estornar)
 
         db.session.commit()
         return True, "Pagamento estornado com sucesso!"

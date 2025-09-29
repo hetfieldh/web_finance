@@ -50,10 +50,12 @@
                 <td>{{ conta.conta }}</td>
                 <td>{{ conta.tipo }}</td>
                 <td>{{conta.saldo_inicial | format_currency }}</td>
-                <td>{{conta.saldo_atual | format_currency }}</td>
+                <td class="{% if conta.saldo_atual < 0 %}text-danger fw-bold{% endif %}">
+                  {{ conta.saldo_atual | format_currency }}
+                </td>
                 <td>
                   {{ conta.limite | format_currency if conta.limite is not none
-                  else 'N/A' }}
+                  else '-' }}
                 </td>
                 <td>
                   {% if conta.ativa %}

@@ -66,7 +66,17 @@ def atualizar_conta(conta, form):
                 "Não é possível inativar a conta. O saldo atual deve ser zero.",
             )
 
-        conta.limite = form.limite.data
+        novo_limite = Decimal(str(form.limite.data or 0))
+        saldo_atual = Decimal(str(conta.saldo_atual))
+
+        if saldo_atual < 0 and novo_limite < abs(saldo_atual):
+            return (
+                False,
+                f"O limite não pode ser menor que R$ {abs(saldo_atual):.2f}, "
+                f"pois a conta já está negativa em R$ {saldo_atual:.2f}.",
+            )
+
+        conta.limite = novo_limite
         conta.ativa = form.ativa.data
         db.session.commit()
 

@@ -3,7 +3,6 @@
 console.log("ajax-forms.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {
-  // --- 1. Lógica AJAX para Gerenciar Folha de Pagamento ---
   const formAdicionarVerba = document.getElementById("form-adicionar-verba");
   const tabelaVerbasCorpo = document.getElementById("tabela-verbas-corpo");
   if (formAdicionarVerba) {
@@ -62,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  // --- 2. Verificação de Disponibilidade de Login/Email com AJAX ---
   const loginInput = document.getElementById("login");
   const emailInput = document.getElementById("email");
 

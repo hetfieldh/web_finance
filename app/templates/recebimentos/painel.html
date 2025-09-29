@@ -3,11 +3,6 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 
-<!-- Passamos os dados de forma segura em um bloco de dados separado -->
-<script id="contas-data" type="application/json">
-  {{ contas_para_js | tojson | safe }}
-</script>
-
 <!-- A div 'row' não precisa mais do atributo data-contas -->
 <div class="row">
   <div class="col-12">
@@ -227,6 +222,9 @@
   </div>
 </div>
 {% endblock %} {% block scripts %}
+<script id="contas-data" type="application/json">
+  {{ contas_para_js | tojson | safe }}
+</script>
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/recebimentos.js') }}"></script>
 {% endblock %}

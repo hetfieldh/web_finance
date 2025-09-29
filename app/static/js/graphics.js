@@ -3,7 +3,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   console.log("graphics.js carregado com sucesso!");
 
-  // --- PLUGIN CUSTOMIZADO PARA TEXTO NO CENTRO ---
   const centerTextPlugin = {
     id: "centerText",
     afterDraw: function (chart) {
@@ -35,12 +34,10 @@ document.addEventListener("DOMContentLoaded", function () {
   };
   Chart.register(ChartDataLabels, centerTextPlugin);
 
-  // --- LÓGICA PARA A PÁGINA PRINCIPAL DE GRÁFICOS (graphics.html) ---
   const graphicsDataElement = document.getElementById("graphics-data");
   if (graphicsDataElement) {
     const chartData = JSON.parse(graphicsDataElement.textContent);
 
-    // GRÁFICO 1: Progresso das Obrigações (Rosca)
     const progressoCanvas = document.getElementById("progressoChart");
     if (progressoCanvas && chartData.dados_progresso_valores) {
       const dados = chartData.dados_progresso_valores;
@@ -79,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // GRÁFICO 2: Composição das Saídas (Barras Horizontais)
     const saidasCanvas = document.getElementById("saidasChart");
     if (saidasCanvas && chartData.dados_saidas) {
       new Chart(saidasCanvas, {
@@ -152,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // GRÁFICO 3: Evolução Anual (Barras e Linha)
     const evolucaoCanvas = document.getElementById("evolucaoAnualChart");
     if (evolucaoCanvas && chartData.evolucao_anual) {
       const dadosEvolucao = chartData.evolucao_anual;
@@ -224,7 +219,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // GRÁFICO 4: Composição das Entradas (Barras Horizontais)
     const entradasCanvas = document.getElementById("entradasChart");
     if (entradasCanvas && chartData.dados_entradas) {
       new Chart(entradasCanvas, {
@@ -292,7 +286,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // GRÁFICO 5: Progresso do Financiamento (Barras)
     const financiamentoCanvas = document.getElementById(
       "financiamentoProgressChart"
     );
@@ -347,7 +340,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // Lógica do seletor de financiamento para graphics.html
     const selectFinan = document.getElementById("financiamento_id");
     if (selectFinan) {
       selectFinan.addEventListener("change", function () {
@@ -356,7 +348,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // --- GRÁFICO 6: Pizza para status do financiamento ---
   const summaryCanvas = document.getElementById("financiamentoSummaryChart");
   if (summaryCanvas) {
     const summaryDataElement = document.getElementById("summary-data");
@@ -389,7 +380,10 @@ document.addEventListener("DOMContentLoaded", function () {
               legend: { position: "left" },
               title: {
                 display: true,
-                text: "Distribuição de " + summaryData.total + " Parcelas por Status",
+                text:
+                  "Distribuição de " +
+                  summaryData.total +
+                  " Parcelas por Status",
                 font: { size: 16, weight: "bold" },
                 position: "top",
               },

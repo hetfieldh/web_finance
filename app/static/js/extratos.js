@@ -3,7 +3,6 @@
 console.log("extratos.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", function () {
-  // --- LÓGICA PARA A PÁGINA DE EXTRATO BANCÁRIO ---
   const formExtratoBancario = document.getElementById("form-extrato-bancario");
 
   if (formExtratoBancario) {
@@ -32,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // --- LÓGICA PARA A PÁGINA DE EXTRATO CONSOLIDADO ---
   const formExtratoConsolidado = document.getElementById(
     "form-extrato-consolidado"
   );

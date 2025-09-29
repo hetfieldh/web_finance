@@ -4,7 +4,6 @@ console.log("financiamento.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // --- LÓGICA PARA A PÁGINA DE IMPORTAÇÃO DE CSV ---
     const formImportar = document.getElementById("form-importar-csv");
     if (formImportar) {
         formImportar.addEventListener("submit", function () {
@@ -20,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- LÓGICA PARA A PÁGINA DE AMORTIZAÇÃO ---
     const formAmortizacao = document.getElementById("form-amortizacao");
     if (formAmortizacao) {
         const valorAmortizacaoInput = document.getElementById("valor_amortizacao");
@@ -60,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Atualiza o resumo quando a página carrega
         atualizarResumo();
     }
 });

@@ -42,7 +42,7 @@ render_checkbox %} {% block content %}
               <label for="saldo_atual" class="form-label">Saldo Atual</label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control {% if conta.saldo_atual < 0 %}text-danger fw-bold{% endif %}"
                 value="{{ conta.saldo_atual | format_currency }}"
                 readonly
               />

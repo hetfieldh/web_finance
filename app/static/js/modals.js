@@ -2,7 +2,6 @@
 console.log("modals.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Script para Modal de Pagamento ---
   const pagamentoModal = document.getElementById("pagamentoModal");
   if (pagamentoModal) {
     pagamentoModal.addEventListener("show.bs.modal", function (event) {
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Script para Modal de Recebimento ---
   const recebimentoModal = document.getElementById("recebimentoModal");
   if (recebimentoModal) {
     recebimentoModal.addEventListener("show.bs.modal", function (event) {
@@ -42,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Lógica para Modal de Rejeição de Solicitação ---
   const rejeicaoModal = document.getElementById("rejeicaoModal");
   if (rejeicaoModal) {
     rejeicaoModal.addEventListener("show.bs.modal", function (event) {

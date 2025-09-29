@@ -3,7 +3,6 @@
 console.log("forms.js carregado com sucesso!");
 
 document.addEventListener("DOMContentLoaded", () => {
-  // --- 1. Lógica para formulário de ADIÇÃO de contas ---
   const tipoContaSelect = document.getElementById("tipo-conta-select");
   const limiteContainer = document.getElementById("limite-container");
 
@@ -25,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleLimiteField();
   }
 
-  // --- 2. Lógica para formulário de EDIÇÃO de contas ---
   const tipoContaSelectEdit = document.getElementById("tipo-conta-select-edit");
   const limiteContainerEdit = document.getElementById("limite-container-edit");
 
@@ -37,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 3. Lógica para formulário dinâmico de Lançamento Bancário ---
   const formMovimentacao = document.getElementById("form-movimentacao");
   if (formMovimentacao) {
     const contaId = document.getElementById("container-conta_id");
@@ -99,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
     moverCampos();
   }
 
-  // --- 4. Lógica para o formulário de transferência ---
   const contaOrigemSelect = document.querySelector("select#conta_id");
   const contaDestinoSelect = document.querySelector(
     "#transferencia_fields select[name='conta_destino_id']"
@@ -121,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarContaDestino();
   }
 
-  // --- 5. Lógica para filtros dinâmicos do Extrato Desp/Rec ---
   const tipoRelatorioSelect = document.getElementById("tipo_relatorio");
   if (tipoRelatorioSelect) {
     const filtroMensal = document.getElementById("filtro_mensal");
@@ -145,7 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleFilters();
   }
 
-  // --- 6. Lógica para preenchimento automático da data de vencimento no Lançamento Único ---
   const formLancamentoUnico = document.getElementById("form-lancamento-unico");
   if (formLancamentoUnico) {
     const vencimentosDataElement = document.getElementById("vencimentos-data");
@@ -177,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 7. Lógica para preenchimento automático da data na Geração de Previsão ---
   const formGerarPrevisao = document.getElementById("form-gerar-previsao");
   if (formGerarPrevisao) {
     const vencimentosDataElement = document.getElementById(
@@ -211,7 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 8. Lógica para Melhorias de UX para Cadastro de Usuário ---
   const senhaInput = document.getElementById("senha");
   if (senhaInput) {
     const confirmarSenhaInput = document.getElementById("confirmar_senha");
@@ -290,7 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 9. Lógica para a tela de Amortização de Financiamento ---
   const formAmortizacao = document.getElementById("form-amortizacao");
   if (formAmortizacao) {
     const valorAmortizacaoInput = document.getElementById("valor_amortizacao");
