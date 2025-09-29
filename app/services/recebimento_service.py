@@ -3,7 +3,7 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
-from flask import current_app
+from flask import current_app, url_for
 from flask_login import current_user
 from sqlalchemy import and_
 
@@ -155,6 +155,19 @@ def registrar_recebimento(form):
         valor_recebido = form.valor_recebido.data
         item_id = form.item_id.data
         item_tipo = form.item_tipo.data
+
+        if item_tipo == "Salário":
+            salario_movimento = SalarioMovimento.query.get(item_id)
+            if salario_movimento and salario_movimento.total_fgts > 0:
+                conta_fgts_existente = Conta.query.filter(
+                    Conta.usuario_id == current_user.id,
+                    Conta.nome_banco.ilike("%fgts%"),
+                ).first()
+                if not conta_fgts_existente:
+                    return (
+                        False,
+                        "Para registrar o recebimento de salário, é necessário cadastrar uma conta do tipo FGTS primeiro.",
+                    )
 
         tipo_transacao_credito = ContaTransacao.query.filter_by(
             usuario_id=current_user.id,

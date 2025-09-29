@@ -18,6 +18,26 @@ def criar_conta(form):
         conta_num = form.conta.data.strip()
         tipo = form.tipo.data
 
+        if tipo == "FGTS":
+            if nome_banco != "FGTS":
+                erros = {
+                    "form": [
+                        "Para contas do tipo FGTS, o nome do banco deve ser 'FGTS'."
+                    ]
+                }
+                return False, erros
+
+            conta_fgts_existente = Conta.query.filter_by(
+                usuario_id=current_user.id, tipo="FGTS"
+            ).first()
+            if conta_fgts_existente:
+                erros = {
+                    "form": [
+                        "Não é permitido cadastrar mais de uma conta do tipo FGTS."
+                    ]
+                }
+                return False, erros
+
         existing_account = Conta.query.filter_by(
             usuario_id=current_user.id,
             nome_banco=nome_banco,
