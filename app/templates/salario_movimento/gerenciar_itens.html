@@ -6,9 +6,9 @@
   <div class="col-12">
     <div class="card shadow-sm mb-2">
       <div
-        class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"
+        class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="mb-0">Resumo da Folha de {{ movimento.mes_referencia }}</h5>
+        <h5 class="mb-0">Salário de {{ movimento.mes_referencia }}</h5>
         <a
           href="{{ url_for('salario.listar_movimentos') }}"
           class="btn btn-light btn-sm"
@@ -16,11 +16,63 @@
           <i class="fas fa-arrow-left"></i> Voltar
         </a>
       </div>
-      <div class="card-body py-2"></div>
+    </div>
+
+    <div class="card shadow-sm mb-2">
+      <div class="card-body">
+        {% set salario_liquido =
+        (movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'Provento')|sum(attribute='valor')) -
+        ((movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'Imposto')|sum(attribute='valor')) +
+        (movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'Desconto')|sum(attribute='valor'))) %} {% set total_beneficios =
+        movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'Benefício')|sum(attribute='valor') %} {% set total_fgts =
+        movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'FGTS')|sum(attribute='valor') %} {% set has_salario_items =
+        (movimento.itens|selectattr('salario_item.tipo', 'in', ['Provento',
+        'Imposto', 'Desconto'])|list|length) > 0 %} {% set has_beneficio_items =
+        (movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'Benefício')|list|length) > 0 %} {% set has_fgts_items =
+        (movimento.itens|selectattr('salario_item.tipo', 'equalto',
+        'FGTS')|list|length) > 0 %}
+
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              {% if has_salario_items %}
+              <tr>
+                <td>Salário Líquido</td>
+                <td
+                  class="text-end fw-bold {% if salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
+                >
+                  {{ salario_liquido | format_currency }}
+                </td>
+              </tr>
+              {% endif %} {% if has_beneficio_items %}
+              <tr>
+                <td>Benefícios</td>
+                <td class="text-end fw-bold text-primary">
+                  {{ total_beneficios | format_currency }}
+                </td>
+              </tr>
+              {% endif %} {% if has_fgts_items %}
+              <tr>
+                <td>FGTS</td>
+                <td class="text-end fw-bold text-secondary">
+                  {{ total_fgts | format_currency}}
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header bg-secondary text-white">
         <h5 class="mb-0">Adicionar e Gerenciar Verbas</h5>
       </div>
       <div class="card-body">

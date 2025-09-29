@@ -68,51 +68,14 @@
               <tr>
                 <th>Mês/Ano</th>
                 <th>Data Previsão</th>
-                <th>Descrição</th>
-                <th class="text-end">Valor</th>
-                <th class="text-center">Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {% for movimento in movimentos %} {% set salario_liquido =
-              (movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'Provento')|sum(attribute='valor')) -
-              ((movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'Imposto')|sum(attribute='valor')) +
-              (movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'Desconto')|sum(attribute='valor'))) %} {% set total_beneficios =
-              movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'Benefício')|sum(attribute='valor') %} {% set total_fgts =
-              movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'FGTS')|sum(attribute='valor') %} {% set has_salario_items =
-              (movimento.itens|selectattr('salario_item.tipo', 'in',
-              ['Provento', 'Imposto', 'Desconto'])|list|length) > 0 %} {% set
-              has_beneficio_items =
-              (movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'Benefício')|list|length) > 0 %} {% set has_fgts_items =
-              (movimento.itens|selectattr('salario_item.tipo', 'equalto',
-              'FGTS')|list|length) > 0 %}{% if has_salario_items %}
+              {% for movimento in movimentos %}
               <tr>
                 <td>{{ movimento.mes_referencia }}</td>
                 <td>{{ movimento.data_recebimento.strftime('%d/%m/%Y') }}</td>
-                <td>Salário Líquido</td>
-                <td
-                  class="text-end fw-bold {% if salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
-                >
-                  {{ salario_liquido | format_currency }}
-                </td>
-                <td class="text-center">
-                  {% if movimento.status == 'Recebido' %}
-                  <span class="badge bg-success">{{ movimento.status }}</span>
-                  {% elif movimento.status == 'Parcialmente Recebido' %}
-                  <span class="badge bg-info">{{ movimento.status }}</span>
-                  {% else %}
-                  <span class="badge bg-warning text-dark"
-                    >{{ movimento.status }}</span
-                  >
-                  {% endif %}
-                </td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
@@ -136,91 +99,7 @@
                   </form>
                 </td>
               </tr>
-              {% endif %} {% if has_beneficio_items %}
-              <tr>
-                <td>{{ movimento.mes_referencia }}</td>
-                <td>{{ movimento.data_recebimento.strftime('%d/%m/%Y') }}</td>
-                <td>Benefícios</td>
-                <td class="text-end fw-bold text-primary">
-                  {{ total_beneficios | format_currency }}
-                </td>
-                <td class="text-center">
-                  {% if movimento.status == 'Recebido' %}
-                  <span class="badge bg-success">{{ movimento.status }}</span>
-                  {% elif movimento.status == 'Parcialmente Recebido' %}
-                  <span class="badge bg-info">{{ movimento.status }}</span>
-                  {% else %}
-                  <span class="badge bg-warning text-dark"
-                    >{{ movimento.status }}</span
-                  >
-                  {% endif %}
-                </td>
-                <td class="table-actions">
-                  <a
-                    href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
-                    class="btn btn-info me-2"
-                    title="Visualizar/Gerenciar"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <form
-                    action="{{ url_for('salario.excluir_movimento', id=movimento.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir esta folha de pagamento?');"
-                  >
-                    <button
-                      type="submit"
-                      class="btn btn-danger"
-                      title="Excluir"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endif %} {% if has_fgts_items %}
-              <tr>
-                <td>{{ movimento.mes_referencia }}</td>
-                <td>{{ movimento.data_recebimento.strftime('%d/%m/%Y') }}</td>
-                <td>FGTS</td>
-                <td class="text-end fw-bold text-secondary">
-                  {{ total_fgts | format_currency}}
-                </td>
-                <td class="text-center">
-                  {% if movimento.status == 'Recebido' %}
-                  <span class="badge bg-success">{{ movimento.status }}</span>
-                  {% elif movimento.status == 'Parcialmente Recebido' %}
-                  <span class="badge bg-info">{{ movimento.status }}</span>
-                  {% else %}
-                  <span class="badge bg-warning text-dark"
-                    >{{ movimento.status }}</span
-                  >
-                  {% endif %}
-                </td>
-                <td class="table-actions">
-                  <a
-                    href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
-                    class="btn btn-info me-2"
-                    title="Visualizar/Gerenciar"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <form
-                    action="{{ url_for('salario.excluir_movimento', id=movimento.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir esta folha de pagamento?');"
-                  >
-                    <button
-                      type="submit"
-                      class="btn btn-danger"
-                      title="Excluir"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endif %} {% endfor %}
+              {% endfor %}
             </tbody>
           </table>
         </div>

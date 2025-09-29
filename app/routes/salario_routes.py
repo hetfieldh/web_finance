@@ -163,8 +163,19 @@ def listar_movimentos():
         data_inicial_str = primeiro_dia.isoformat()
         data_final_str = ultimo_dia.isoformat()
 
-    query = SalarioMovimento.query.filter_by(usuario_id=current_user.id).options(
-        joinedload(SalarioMovimento.itens).joinedload(SalarioMovimentoItem.salario_item)
+    # query = SalarioMovimento.query.filter_by(usuario_id=current_user.id).options(
+    #     joinedload(SalarioMovimento.itens).joinedload(SalarioMovimentoItem.salario_item)
+    # )
+    query = (
+        db.session.query(SalarioMovimento)
+        .outerjoin(SalarioMovimento.itens)
+        .filter(SalarioMovimento.usuario_id == current_user.id)
+        .options(
+            joinedload(SalarioMovimento.itens).joinedload(
+                SalarioMovimentoItem.salario_item
+            )
+        )
+        .distinct()
     )
 
     try:
