@@ -19,8 +19,10 @@
     --wf-secondary: #6c757d;
     --wf-box-positivo: #d4edda;
     --wf-borda-positivo: #28a745;
+    --wf-texto-positivo: #126a27;
     --wf-box-negativo: #f8d7da;
     --wf-borda-negativo: #dc3545;
+    --wf-texto-negativo: #76141e;
     --wf-shadow: rgba(0, 0, 0, 0.1);
     --wf-box-bg: #ffffa6cf;
     --wf-box-bg2: #ffffc180;

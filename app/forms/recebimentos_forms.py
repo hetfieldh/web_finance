@@ -31,7 +31,7 @@ class PainelRecebimentosForm(FlaskForm):
 
 class RecebimentoForm(FlaskForm):
     conta_id = SelectField(
-        "Receber na Conta",
+        "Selecione a conta para recebimento",
         coerce=lambda x: int(x) if x else None,
         validators=[DataRequired("Selecione a conta para o recebimento.")],
     )
@@ -42,8 +42,12 @@ class RecebimentoForm(FlaskForm):
         default=date.today,
     )
     valor_recebido = DecimalField(
-        "Valor Recebido",
+        "Valor a Receber",
         places=2,
+        render_kw={
+            'readonly': True,
+            'style': 'color: var(--wf-texto-positivo); font-weight: bold; background-color: var(--wf-box-positivo);'
+        },
         validators=[
             InputRequired("O valor é obrigatório."),
             NumberRange(min=0.01, message="O valor recebido deve ser maior que zero."),

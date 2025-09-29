@@ -31,7 +31,7 @@ class PainelPagamentosForm(FlaskForm):
 
 class PagamentoForm(FlaskForm):
     conta_id = SelectField(
-        "Pagar com a Conta",
+        "Selecione a conta para pagamento",
         coerce=lambda x: int(x) if x else None,
         validators=[DataRequired("Selecione a conta para o pagamento.")],
     )
@@ -42,8 +42,12 @@ class PagamentoForm(FlaskForm):
         default=date.today,
     )
     valor_pago = DecimalField(
-        "Valor Pago",
+        "Valor a Pagar",
         places=2,
+        render_kw={
+            'readonly': True,
+            'style': 'color: var(--wf-texto-negativo); font-weight: bold; background-color: var(--wf-box-negativo);'
+        },
         validators=[
             InputRequired("O valor é obrigatório."),
             NumberRange(min=0.01, message="O valor pago deve ser maior que zero."),

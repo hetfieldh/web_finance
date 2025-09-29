@@ -190,20 +190,28 @@
           pagamento_form.item_descricao(class="d-none") }}
           <input type="hidden" name="mes_ano" value="{{ form.mes_ano.data }}" />
 
-          {{ render_field(pagamento_form.conta_id) }} {{
-          render_field(pagamento_form.data_pagamento, attrs={'type': 'date'}) }}
-          {{ render_field(pagamento_form.valor_pago, attrs={'type': 'number',
-          'step': '0.01'}) }}
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancelar
-          </button>
-          {{ pagamento_form.submit(class="btn btn-success") }}
+          <div class="mb-3">{{ render_field(pagamento_form.conta_id) }}</div>
+          <div class="mb-3">
+            {{ render_field(pagamento_form.data_pagamento, attrs={'type':
+            'date'}) }}
+          </div>
+          <div class="mb-3">
+            {{ render_field(pagamento_form.valor_pago, attrs={'type': 'number',
+            'step': '0.01'}) }}
+            <div class="form-text">
+              O valor a ser pago não pode ser alterado. Caso necessite, faça no lançamento original.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            {{ pagamento_form.submit(class="btn btn-success") }}
+          </div>
         </div>
       </form>
     </div>
