@@ -156,19 +156,6 @@ def registrar_recebimento(form):
         item_id = form.item_id.data
         item_tipo = form.item_tipo.data
 
-        if item_tipo == "Salário":
-            salario_movimento = SalarioMovimento.query.get(item_id)
-            if salario_movimento and salario_movimento.total_fgts > 0:
-                conta_fgts_existente = Conta.query.filter(
-                    Conta.usuario_id == current_user.id,
-                    Conta.nome_banco.ilike("%fgts%"),
-                ).first()
-                if not conta_fgts_existente:
-                    return (
-                        False,
-                        "Para registrar o recebimento de salário, é necessário cadastrar uma conta do tipo FGTS primeiro.",
-                    )
-
         tipo_transacao_credito = ContaTransacao.query.filter_by(
             usuario_id=current_user.id,
             transacao_tipo="RECEBIMENTO",

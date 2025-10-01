@@ -315,4 +315,41 @@ document.addEventListener("DOMContentLoaded", () => {
     checkboxes.forEach((cb) => cb.addEventListener("change", atualizarResumo));
     atualizarResumo();
   }
+
+  const transacaoSelect = document.getElementById("conta_transacao_id");
+  function styleSelectedTransacao() {
+    if (!transacaoSelect) return;
+
+    const selectedOption =
+      transacaoSelect.options[transacaoSelect.selectedIndex];
+
+    resetSelectStyle();
+
+    if (selectedOption && selectedOption.value) {
+      const text = selectedOption.textContent;
+
+      if (text.includes("(+)")) {
+        transacaoSelect.style.backgroundColor = "var(--wf-box-positivo)";
+        transacaoSelect.style.color = "var(--wf-texto-positivo)";
+        transacaoSelect.style.fontWeight = "bold";
+      } else if (text.includes("(-)")) {
+        transacaoSelect.style.backgroundColor = "var(--wf-box-negativo)";
+        transacaoSelect.style.color = "var(--wf-texto-negativo)";
+        transacaoSelect.style.fontWeight = "bold";
+      }
+    }
+  }
+
+  function resetSelectStyle() {
+    if (!transacaoSelect) return;
+    transacaoSelect.style.backgroundColor = "";
+    transacaoSelect.style.color = "";
+    transacaoSelect.style.fontWeight = "";
+  }
+
+  if (transacaoSelect) {
+    styleSelectedTransacao();
+    transacaoSelect.addEventListener("mousedown", resetSelectStyle);
+    transacaoSelect.addEventListener("change", styleSelectedTransacao);
+  }
 });

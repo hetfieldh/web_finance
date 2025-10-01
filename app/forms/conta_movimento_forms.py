@@ -110,9 +110,10 @@ class CadastroContaMovimentoForm(FlaskForm):
         self.conta_destino_id.choices = self.conta_id.choices
 
         self.conta_transacao_id.choices = [("", "Selecione...")] + [
-            (ct.id, f"{ct.transacao_tipo} ({ct.tipo})")
+            (ct.id, f"{ct.transacao_tipo} ({'+' if ct.tipo == 'Crédito' else '-'})")
             for ct in ContaTransacao.query.filter_by(usuario_id=current_user.id)
             .order_by(ContaTransacao.transacao_tipo.asc())
+            .order_by(ContaTransacao.tipo.desc())
             .all()
         ]
 
@@ -198,7 +199,7 @@ class EditarContaMovimentoForm(FlaskForm):
             .all()
         ]
         self.conta_transacao_id.choices = [("", "Selecione...")] + [
-            (str(ct.id), f"{ct.transacao_tipo} ({ct.tipo})")
+            (ct.id, f"{ct.transacao_tipo} ({'+' if ct.tipo == 'Crédito' else '-'})")
             for ct in ContaTransacao.query.filter_by(usuario_id=current_user.id)
             .order_by(ContaTransacao.transacao_tipo.asc())
             .all()
