@@ -3,7 +3,7 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
-from flask import current_app, url_for
+from flask import current_app
 from flask_login import current_user
 from sqlalchemy import and_
 
@@ -75,7 +75,7 @@ def get_contas_a_receber_por_mes(ano, mes):
                 {
                     "id_original": salario.id,
                     "origem": f"SALÁRIO REF. {salario.mes_referencia}",
-                    "tipo": "Salário",
+                    "tipo": "Salário Líquido",
                     "vencimento": salario.data_recebimento,
                     "valor_previsto": salario_liquido,
                     "valor_recebido": salario_liquido if is_pago else Decimal(0),
@@ -89,7 +89,6 @@ def get_contas_a_receber_por_mes(ano, mes):
                     "conta_sugerida_id": None,
                 }
             )
-
         beneficios_itens = [
             item for item in salario.itens if item.salario_item.tipo == "Benefício"
         ]
@@ -186,7 +185,7 @@ def registrar_recebimento(form):
             item.data_pagamento = form.data_recebimento.data
             item.movimento_bancario_id = novo_movimento.id
 
-        elif item_tipo == "Salário":
+        elif item_tipo == "Salário Líquido":
             item = SalarioMovimento.query.get(item_id)
             item.movimento_bancario_salario_id = novo_movimento.id
             _processar_fgts(item, form.data_recebimento.data, tipo_transacao_credito)
@@ -221,14 +220,13 @@ def estornar_recebimento(item_id, item_tipo):
                 item_a_atualizar.data_pagamento = None
                 item_a_atualizar.movimento_bancario_id = None
 
-        elif item_tipo == "Salário":
+        elif item_tipo == "Salário Líquido":
             item_a_atualizar = SalarioMovimento.query.get(item_id)
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_salario_id
                 item_a_atualizar.movimento_bancario_salario_id = None
                 _estornar_fgts(item_a_atualizar)
                 _atualizar_status_folha(item_a_atualizar)
-
         elif item_tipo == "Benefício":
             item_a_atualizar = SalarioMovimentoItem.query.get(item_id)
             if item_a_atualizar:
@@ -263,7 +261,7 @@ def _processar_fgts(salario_movimento, data_movimento, transacao_fallback):
 
     conta_fgts = Conta.query.filter(
         Conta.usuario_id == current_user.id,
-        Conta.nome_banco.ilike("%fgts%"),
+        Conta.tipo == "FGTS",
     ).first()
 
     if conta_fgts:

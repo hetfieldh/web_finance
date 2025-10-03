@@ -76,7 +76,7 @@
             </thead>
             <tbody>
               {% for conta in contas %}
-              <tr>
+              <tr data-item-tipo="{{ conta.tipo }}">
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
                 <td><span class="badge bg-primary">{{ conta.tipo }}</span></td>
@@ -224,6 +224,10 @@
 <script id="contas-data" type="application/json">
   {{ contas_para_js | tojson | safe }}
 </script>
+<script id="fgts-info-data" type="application/json">
+  {{ fgts_info_json | safe }}
+</script>
+
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/recebimentos.js') }}"></script>
 {% endblock %}

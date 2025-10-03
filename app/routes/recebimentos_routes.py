@@ -17,7 +17,7 @@ from flask_login import current_user, login_required
 from app import db
 from app.forms.recebimentos_forms import PainelRecebimentosForm, RecebimentoForm
 from app.models.conta_model import Conta
-from app.services import conta_service, recebimento_service
+from app.services import conta_service, recebimento_service, salario_service
 from app.services.recebimento_service import (
     estornar_recebimento as estornar_recebimento_service,
 )
@@ -73,6 +73,11 @@ def painel():
     }
     totais["pendente"] = totais["previsto"] - totais["recebido"]
 
+    fgts_info = {
+        "has_account": conta_service.has_fgts_account(),
+        "has_item": salario_service.has_fgts_salario_item(),
+    }
+
     return render_template(
         "recebimentos/painel.html",
         form=form,
@@ -81,6 +86,7 @@ def painel():
         totais=totais,
         contas_para_js=contas_para_js,
         title="Painel de Recebimentos",
+        fgts_info_json=json.dumps(fgts_info),
     )
 
 

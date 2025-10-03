@@ -92,7 +92,7 @@ class CabecalhoFolhaForm(FlaskForm):
     mes_referencia = StringField(
         "Mês de Referência",
         validators=[DataRequired("O mês de referência é obrigatório.")],
-        render_kw={"placeholder": "Selecione...", "readonly": True},
+        render_kw={"placeholder": "Selecione..."},
     )
     data_recebimento = HiddenField()
     submit = SubmitField("Adicionar Verbas")

@@ -219,3 +219,12 @@ def validar_estorno_saldo(conta, valor_a_debitar):
         return False, mensagem
 
     return True, "Validação de saldo para estorno bem-sucedida."
+
+
+def has_fgts_account():
+    return (
+        Conta.query.filter_by(
+            usuario_id=current_user.id, tipo="FGTS", ativa=True
+        ).first()
+        is not None
+    )

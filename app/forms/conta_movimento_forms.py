@@ -79,18 +79,18 @@ class CadastroContaMovimentoForm(FlaskForm):
 
     conta_transacao_id = SelectField(
         "Tipo de Transação",
-        validators=[Optional()],
+        validators=[DataRequired("O Tipo de Transação é obrigatório.")],
         coerce=lambda x: int(x) if x else None,
     )
 
     conta_destino_id = SelectField(
         "Conta Destino",
-        validators=[Optional()],
+        validators=[DataRequired("A Conta Destino é obrigatória.")],
         coerce=lambda x: int(x) if x else None,
     )
     transferencia_tipo_id = SelectField(
         "Tipo de Transferência",
-        validators=[Optional()],
+        validators=[DataRequired("O Tipo de Transferência é obrigatório.")],
         coerce=lambda x: int(x) if x else None,
     )
 

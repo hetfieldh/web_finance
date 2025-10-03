@@ -12,6 +12,34 @@ function formatCurrencyJS(value) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  const fgtsInfoElement = document.getElementById("fgts-info-data");
+  if (fgtsInfoElement) {
+    const fgtsInfo = JSON.parse(fgtsInfoElement.textContent);
+    const isFgtsConfigured = fgtsInfo.has_account && fgtsInfo.has_item;
+
+    if (!isFgtsConfigured) {
+      const salarioRow = document.querySelector(
+        "tr[data-item-tipo='Salário Líquido']"
+      );
+      if (salarioRow) {
+        const actionsCell = salarioRow.querySelector("td:last-child");
+        if (actionsCell) {
+          const lockHtml = `
+            <i class="fas fa-lock text-muted" data-bs-toggle="tooltip" title="Cadastre uma conta e um item de salário do tipo FGTS para habilitar."></i>
+          `;
+          actionsCell.innerHTML = lockHtml;
+        }
+      }
+    }
+  }
+
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
   $("#mes_ano_recebimentos").datepicker({
     format: "mm-yyyy",
     startView: "months",
@@ -45,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const todasAsContas = JSON.parse(contasDataElement.textContent);
 
   const regrasDeFiltro = {
-    Salário: [
+    "Salário Líquido": [
       "Corrente",
       "Poupança",
       "Digital",

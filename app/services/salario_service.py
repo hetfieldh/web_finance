@@ -147,3 +147,12 @@ def get_active_salario_items_for_user_choices():
         (item.id, f"{item.nome} ({item.tipo})") for item in itens
     ]
     return choices
+
+
+def has_fgts_salario_item():
+    return (
+        SalarioItem.query.filter_by(
+            usuario_id=current_user.id, tipo="FGTS", ativo=True
+        ).first()
+        is not None
+    )

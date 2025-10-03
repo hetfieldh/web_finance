@@ -1,7 +1,7 @@
 # app/services/crediario_movimento_service.py
 
 from datetime import date
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
@@ -57,13 +57,24 @@ def adicionar_movimento(form):
         )
         db.session.add(novo_movimento)
 
-        valor_por_parcela = valor_total_compra / Decimal(str(numero_parcelas))
+        valor_por_parcela = (valor_total_compra / Decimal(numero_parcelas)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+        soma_parcelas = Decimal("0.00")
+
         for i in range(numero_parcelas):
             data_vencimento = data_primeira_parcela_obj + relativedelta(months=i)
+
+            if i < numero_parcelas - 1:
+                valor = valor_por_parcela
+                soma_parcelas += valor
+            else:
+                valor = valor_total_compra - soma_parcelas
+
             nova_parcela = CrediarioParcela(
                 numero_parcela=i + 1,
                 data_vencimento=data_vencimento,
-                valor_parcela=valor_por_parcela,
+                valor_parcela=valor,
                 pago=False,
             )
             novo_movimento.parcelas.append(nova_parcela)
@@ -120,13 +131,25 @@ def editar_movimento(movimento, form):
         CrediarioParcela.query.filter_by(crediario_movimento_id=movimento.id).delete()
         db.session.flush()
 
-        valor_por_parcela = valor_total_compra / Decimal(str(form.numero_parcelas.data))
-        for i in range(form.numero_parcelas.data):
+        numero_parcelas = form.numero_parcelas.data
+        valor_por_parcela = (valor_total_compra / Decimal(numero_parcelas)).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+        soma_parcelas = Decimal("0.00")
+
+        for i in range(numero_parcelas):
             data_vencimento = form.data_primeira_parcela.data + relativedelta(months=i)
+
+            if i < numero_parcelas - 1:
+                valor = valor_por_parcela
+                soma_parcelas += valor
+            else:
+                valor = valor_total_compra - soma_parcelas
+
             nova_parcela = CrediarioParcela(
                 numero_parcela=i + 1,
                 data_vencimento=data_vencimento,
-                valor_parcela=valor_por_parcela,
+                valor_parcela=valor,
                 pago=False,
             )
             movimento.parcelas.append(nova_parcela)

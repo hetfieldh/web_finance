@@ -50,7 +50,7 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
 
     crediario_grupo_id = SelectField(
         "Grupo de Crediário",
-        validators=[Optional()],
+        validators=[DataRequired("O grupo de crediário é obrigatório.")],
         coerce=lambda x: int(x) if x else None,
     )
 

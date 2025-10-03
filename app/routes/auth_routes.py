@@ -56,7 +56,7 @@ def login():
             return redirect(next_page or url_for("main.dashboard"))
 
         else:
-            flash("Login ou senha incorretos. Tente novamente.", "danger")
+            flash("Login ou senha incorretos.", "danger")
             current_app.logger.warning(
                 f'Tentativa de login falha: Credenciais inválidas para "{login_str}" (IP: {request.remote_addr})'
             )
