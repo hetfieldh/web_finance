@@ -62,9 +62,38 @@ def dashboard():
     financiamentos_ativos = Financiamento.query.filter_by(
         usuario_id=current_user.id
     ).all()
+
     crediarios_ativos = Crediario.query.filter_by(
         usuario_id=current_user.id, ativa=True
     ).all()
+    crediario_ids = [c.id for c in crediarios_ativos]
+
+    if crediario_ids:
+        compras_por_crediario = dict(
+            db.session.query(
+                CrediarioMovimento.crediario_id,
+                func.sum(CrediarioMovimento.valor_total_compra),
+            )
+            .filter(CrediarioMovimento.crediario_id.in_(crediario_ids))
+            .group_by(CrediarioMovimento.crediario_id)
+            .all()
+        )
+        pagos_por_crediario = dict(
+            db.session.query(
+                CrediarioFatura.crediario_id,
+                func.sum(CrediarioFatura.valor_pago_fatura),
+            )
+            .filter(CrediarioFatura.crediario_id.in_(crediario_ids))
+            .group_by(CrediarioFatura.crediario_id)
+            .all()
+        )
+        for cred in crediarios_ativos:
+            total_compras = compras_por_crediario.get(cred.id, Decimal("0.0"))
+            total_pago = pagos_por_crediario.get(cred.id, Decimal("0.0"))
+            cred.saldo_devedor = total_compras - total_pago
+    else:
+        for cred in crediarios_ativos:
+            cred.saldo_devedor = Decimal("0.0")
 
     form = FluxoCaixaForm(request.args)
     mes_ano_selecionado = form.mes_ano.data

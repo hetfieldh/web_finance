@@ -1,8 +1,8 @@
 """Criação do BD em MySql
 
-Revision ID: c925a5796d5e
+Revision ID: 16bbb6ef9a20
 Revises: 
-Create Date: 2025-10-02 23:18:15.224866
+Create Date: 2025-10-03 10:12:21.517216
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c925a5796d5e'
+revision = '16bbb6ef9a20'
 down_revision = None
 branch_labels = None
 depends_on = None

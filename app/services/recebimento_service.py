@@ -71,6 +71,11 @@ def get_contas_a_receber_por_mes(ano, mes):
                     salario.movimento_bancario_salario.conta.nome_banco
                 )
 
+            folha_tem_fgts = any(
+                item.salario_item.tipo == "FGTS" and item.valor > 0
+                for item in salario.itens
+            )
+
             lista_contas.append(
                 {
                     "id_original": salario.id,
@@ -87,6 +92,7 @@ def get_contas_a_receber_por_mes(ano, mes):
                     "recebido_em": recebido_em_salario,
                     "status": STATUS_RECEBIDO if is_pago else STATUS_PENDENTE,
                     "conta_sugerida_id": None,
+                    "folha_tem_fgts": folha_tem_fgts,
                 }
             )
         beneficios_itens = [

@@ -6,6 +6,7 @@ from decimal import Decimal
 from sqlalchemy import Enum, Numeric, UniqueConstraint, func
 
 from app import db
+from app.models.crediario_fatura_model import CrediarioFatura
 from app.utils import FormChoices
 
 from .crediario_movimento_model import CrediarioMovimento
@@ -14,7 +15,6 @@ from .crediario_parcela_model import CrediarioParcela
 
 class Crediario(db.Model):
     __tablename__ = "crediario"
-
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     nome_crediario = db.Column(db.String(100), nullable=False)
@@ -48,15 +48,3 @@ class Crediario(db.Model):
     def __repr__(self):
         return f"<Crediario {self.nome_crediario} ({self.tipo_crediario})>"
 
-    @property
-    def saldo_devedor(self):
-        saldo = (
-            db.session.query(func.sum(CrediarioParcela.valor_parcela))
-            .join(CrediarioMovimento)
-            .filter(
-                CrediarioMovimento.crediario_id == self.id,
-                CrediarioParcela.pago.is_(False),
-            )
-            .scalar()
-        )
-        return saldo or Decimal("0.00")

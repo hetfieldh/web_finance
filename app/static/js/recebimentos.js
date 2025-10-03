@@ -12,34 +12,48 @@ function formatCurrencyJS(value) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  // --- ALTERAÇÃO INICIADA ---
   const fgtsInfoElement = document.getElementById("fgts-info-data");
   if (fgtsInfoElement) {
     const fgtsInfo = JSON.parse(fgtsInfoElement.textContent);
-    const isFgtsConfigured = fgtsInfo.has_account && fgtsInfo.has_item;
+    const hasFgtsAccount = fgtsInfo.has_account;
 
-    if (!isFgtsConfigured) {
-      const salarioRow = document.querySelector(
-        "tr[data-item-tipo='Salário Líquido']"
-      );
-      if (salarioRow) {
+    const salarioRow = document.querySelector(
+      "tr[data-item-tipo='Salário Líquido']"
+    );
+
+    if (salarioRow) {
+      const folhaTemFgts =
+        salarioRow.getAttribute("data-folha-tem-fgts") === "true";
+
+      // A baixa é bloqueada se a conta FGTS não existir OU se a folha não tiver o item de FGTS
+      if (!hasFgtsAccount || !folhaTemFgts) {
         const actionsCell = salarioRow.querySelector("td:last-child");
         if (actionsCell) {
-          const lockHtml = `
-            <i class="fas fa-lock text-muted" data-bs-toggle="tooltip" title="Cadastre uma conta e um item de salário do tipo FGTS para habilitar."></i>
-          `;
-          actionsCell.innerHTML = lockHtml;
+          // Cria uma mensagem de erro específica para o tooltip
+          let title = "Recebimento bloqueado.";
+          if (!hasFgtsAccount) {
+            title +=
+              " Motivo: Nenhuma conta bancária do tipo FGTS foi cadastrada.";
+          } else if (!folhaTemFgts) {
+            title +=
+              " Motivo: A folha de pagamento não possui um item de FGTS com valor.";
+          }
+
+          actionsCell.innerHTML = `<i class="fas fa-lock text-muted" data-bs-toggle="tooltip" title="${title}"></i>`;
         }
       }
     }
   }
 
+  // Inicializa os tooltips para que a nova mensagem apareça
   var tooltipTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="tooltip"]')
   );
   tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
-
+  // --- ALTERAÇÃO FINALIZADA ---
   $("#mes_ano_recebimentos").datepicker({
     format: "mm-yyyy",
     startView: "months",

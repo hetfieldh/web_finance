@@ -73,10 +73,7 @@ def painel():
     }
     totais["pendente"] = totais["previsto"] - totais["recebido"]
 
-    fgts_info = {
-        "has_account": conta_service.has_fgts_account(),
-        "has_item": salario_service.has_fgts_salario_item(),
-    }
+    fgts_info = {"has_account": conta_service.has_fgts_account()}
 
     return render_template(
         "recebimentos/painel.html",

@@ -75,8 +75,12 @@
               </tr>
             </thead>
             <tbody>
-              {% for conta in contas %}
-              <tr data-item-tipo="{{ conta.tipo }}">
+              {% for conta in contas %} {% set attrs = {} %} {% if conta.tipo ==
+              'Salário Líquido' %} {% set _ =
+              attrs.update({'data-folha-tem-fgts': 'true' if
+              conta.folha_tem_fgts else 'false'}) %} {% endif %}
+
+              <tr data-item-tipo="{{ conta.tipo }}" {{ attrs|xmlattr }}>
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
                 <td><span class="badge bg-primary">{{ conta.tipo }}</span></td>
@@ -93,13 +97,17 @@
                 </td>
                 <td class="text-start">{{ conta.recebido_em or '-' }}</td>
                 <td class="text-center">
-                  {% if conta.status == 'Recebido' or conta.status == 'Pago' %}
-                  <span class="badge bg-success">Recebido</span>
-                  {% elif conta.status == 'Parcialmente Recebido' %}
-                  <span class="badge bg-info">Parcial</span>
-                  {% else %}
-                  <span class="badge bg-warning text-dark">Pendente</span>
-                  {% endif %}
+                  {% if conta.status in ['Recebido', 'Pago'] %}<span
+                    class="badge bg-success"
+                    >Recebido</span
+                  >
+                  {% elif conta.status == 'Parcialmente Recebido' %}<span
+                    class="badge bg-info"
+                    >Parcial</span
+                  >
+                  {% else %}<span class="badge bg-warning text-dark"
+                    >Pendente</span
+                  >{% endif %}
                 </td>
                 <td class="text-center">
                   {% if conta.status not in ['Recebido', 'Pago'] %}
@@ -128,11 +136,13 @@
                       type="hidden"
                       name="item_id"
                       value="{{ conta.id_original }}"
-                    /><input
+                    />
+                    <input
                       type="hidden"
                       name="item_tipo"
                       value="{{ conta.tipo }}"
-                    /><input
+                    />
+                    <input
                       type="hidden"
                       name="mes_ano"
                       value="{{ form.mes_ano.data }}"
@@ -162,24 +172,15 @@
   </div>
 </div>
 
-<div
-  class="modal fade"
-  id="recebimentoModal"
-  tabindex="-1"
-  aria-labelledby="recebimentoModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="recebimentoModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="recebimentoModalLabel">
-          Registrar Recebimento
-        </h5>
+        <h5 class="modal-title">Registrar Recebimento</h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
         ></button>
       </div>
       <form
@@ -192,7 +193,6 @@
           recebimento_form.item_tipo(class="d-none") }} {{
           recebimento_form.item_descricao(class="d-none") }}
           <input type="hidden" name="mes_ano" value="{{ form.mes_ano.data }}" />
-
           <div class="mb-3">{{ render_field(recebimento_form.conta_id) }}</div>
           <div class="mb-3">
             {{ render_field(recebimento_form.data_recebimento, attrs={'type':
@@ -201,8 +201,7 @@
           <div class="mb-3">
             {{ render_field(recebimento_form.valor_recebido) }}
             <div class="form-text">
-              O valor a ser recebido não pode ser alterado. Caso necessite, faça
-              no lançamento original.
+              O valor a ser recebido não pode ser alterado.
             </div>
           </div>
         </div>
@@ -227,7 +226,6 @@
 <script id="fgts-info-data" type="application/json">
   {{ fgts_info_json | safe }}
 </script>
-
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/recebimentos.js') }}"></script>
 {% endblock %}
