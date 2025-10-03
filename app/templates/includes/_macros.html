@@ -24,3 +24,102 @@ default_class = 'form-select' if field.type == 'SelectField' else 'form-control'
   </small>
 </div>
 {% endif %} {% endmacro %}
+
+<!-- MACRO PARA MODAL DE CONFIRMAÇÃO -->
+{% macro render_confirm_modal(modal_id, title, body_text,
+confirm_button_text='Confirmar') %}
+<div
+  class="modal fade"
+  id="{{ modal_id }}"
+  tabindex="-1"
+  aria-labelledby="{{ modal_id }}Label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="{{ modal_id }}Label">
+          <i class="fas fa-exclamation-triangle me-2"></i>{{ title }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">{{ body_text }}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <form id="confirm-form-{{ modal_id }}" method="POST" action="">
+          <button type="submit" class="btn btn-danger">
+            {{ confirm_button_text }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+<!--- MACRO PARA CONFIRMAÇÃO DE ESTORNO -->
+{% macro render_estornar_modal(modal_id, form_action, title, body_text,
+confirm_button_text) -%}
+<div
+  class="modal fade"
+  id="{{ modal_id }}"
+  tabindex="-1"
+  aria-labelledby="{{ modal_id }}Label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="{{ modal_id }}Label">{{ title }}</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">{{ body_text }}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <form
+          id="form-{{ modal_id }}"
+          method="POST"
+          action="{{ form_action }}"
+          style="display: inline"
+        >
+          <input
+            type="hidden"
+            id="{{ modal_id }}-item-id"
+            name="item_id"
+            value=""
+          />
+          <input
+            type="hidden"
+            id="{{ modal_id }}-item-tipo"
+            name="item_tipo"
+            value=""
+          />
+          <input
+            type="hidden"
+            id="{{ modal_id }}-mes-ano"
+            name="mes_ano"
+            value=""
+          />
+          <button type="submit" class="btn btn-danger">
+            {{ confirm_button_text }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endmacro %}

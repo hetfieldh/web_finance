@@ -1,7 +1,7 @@
 <!--- app\templates\pagamentos\painel.html -->
 
-{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field,
+render_estornar_modal%} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="card shadow-sm mb-2">
@@ -119,33 +119,19 @@
                     <i class="fas fa-check-double fa-sm"></i>
                   </button>
                   {% else %}
-                  <form
-                    method="POST"
-                    action="{{ url_for('pagamentos.estornar_pagamento') }}"
-                    onsubmit="return confirm('Tem certeza que deseja estornar este pagamento?');"
-                    style="display: inline"
+                  <!-- BOTÃO DE ESTORNO PADRONIZADO -->
+                  <button
+                    type="button"
+                    class="btn btn-link text-danger p-0"
+                    title="Estornar Recebimento"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmEstornarModal"
+                    data-item-id="{{ conta.id_original }}"
+                    data-item-tipo="{{ conta.tipo }}"
+                    data-mes-ano="{{ form.mes_ano.data }}"
                   >
-                    <input
-                      type="hidden"
-                      name="item_id"
-                      value="{{ conta.id_original }}"
-                    /><input
-                      type="hidden"
-                      name="item_tipo"
-                      value="{{ conta.tipo }}"
-                    /><input
-                      type="hidden"
-                      name="mes_ano"
-                      value="{{ form.mes_ano.data }}"
-                    />
-                    <button
-                      type="submit"
-                      class="btn btn-link text-danger p-0"
-                      title="Estornar Pagamento"
-                    >
-                      <i class="fas fa-history fa-sm"></i>
-                    </button>
-                  </form>
+                    <i class="fas fa-history fa-sm"></i>
+                  </button>
                   {% endif %}
                 </td>
               </tr>
@@ -218,9 +204,15 @@
     </div>
   </div>
 </div>
-{% endblock %} {% block scripts %}
+
+{{ render_estornar_modal( modal_id='confirmEstornarModal',
+form_action=url_for('recebimentos.estornar_recebimento'), title='Confirmar
+Estorno', body_text='Você tem certeza que deseja estornar este recebimento? Esta
+ação não pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {%
+endblock %}
+{% block scripts %}
 <script id="json-data-pagamentos" type="application/json">
-    {{ contas_json | tojson | safe }}
+  {{ contas_json | tojson | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pagamentos.js') }}"></script>

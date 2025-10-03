@@ -72,6 +72,7 @@ class CadastroSalarioItemForm(FlaskForm):
 
 class EditarSalarioItemForm(FlaskForm):
     nome = StringField("Verba", render_kw={"readonly": True})
+    tipo = StringField("Tipo", render_kw={"readonly": True})
     conta_destino_id = SelectField(
         "Conta de Destino (para Benefícios)",
         coerce=lambda x: int(x) if x else None,

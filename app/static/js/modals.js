@@ -51,3 +51,55 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Lógica para o modal de confirmação de exclusão ou outras ações
+  const confirmModal = document.getElementById("confirmDeleteModal");
+  if (confirmModal) {
+    confirmModal.addEventListener("show.bs.modal", function (event) {
+      // Botão que acionou o modal
+      const button = event.relatedTarget;
+
+      // Extrai a URL da ação do atributo data-form-action do botão
+      const formAction = button.getAttribute("data-form-action");
+
+      // Encontra o formulário dentro do modal
+      const form = confirmModal.querySelector(
+        "#confirm-form-confirmDeleteModal"
+      );
+
+      // Define o atributo 'action' do formulário com a URL correta
+      if (form && formAction) {
+        form.setAttribute("action", formAction);
+      }
+    });
+  }
+  // NOVA LÓGICA PARA O MODAL DE ESTORNO GENÉRICO
+  const confirmEstornarModal = document.getElementById("confirmEstornarModal");
+  if (confirmEstornarModal) {
+    confirmEstornarModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+
+      // Extrai as informações dos atributos data-* do botão
+      const itemId = button.getAttribute("data-item-id");
+      const itemTipo = button.getAttribute("data-item-tipo");
+      const mesAno = button.getAttribute("data-mes-ano");
+
+      // Encontra os inputs hidden dentro do modal de estorno
+      const modalItemIdInput = confirmEstornarModal.querySelector(
+        "#confirmEstornarModal-item-id"
+      );
+      const modalItemTipoInput = confirmEstornarModal.querySelector(
+        "#confirmEstornarModal-item-tipo"
+      );
+      const modalMesAnoInput = confirmEstornarModal.querySelector(
+        "#confirmEstornarModal-mes-ano"
+      );
+
+      // Atualiza os valores dos inputs
+      if (modalItemIdInput) modalItemIdInput.value = itemId;
+      if (modalItemTipoInput) modalItemTipoInput.value = itemTipo;
+      if (modalMesAnoInput) modalMesAnoInput.value = mesAno;
+    });
+  }
+});

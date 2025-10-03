@@ -120,7 +120,6 @@ def editar_item(id):
 
     if form.validate_on_submit():
         try:
-            item.nome = form.nome.data.strip().upper()
             item.descricao = (
                 form.descricao.data.strip() if form.descricao.data else None
             )
@@ -137,6 +136,13 @@ def editar_item(id):
             current_app.logger.error(
                 f"Erro ao editar SalarioItem ID {id}: {e}", exc_info=True
             )
+
+    if request.method == "GET":
+        form.nome.data = item.nome
+        form.tipo.data = item.tipo
+        form.conta_destino_id.data = item.id_conta_destino
+        form.descricao.data = item.descricao
+        form.ativo.data = item.ativo
 
     return render_template(
         "salario_item/edit.html", form=form, item=item, title="Editar Item da Folha"

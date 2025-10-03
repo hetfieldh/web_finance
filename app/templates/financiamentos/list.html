@@ -1,6 +1,7 @@
 <!--- app\templates\financiamentos\list.html -->
 
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import
+render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -68,20 +69,16 @@
                   >
                     <i class="fas fa-edit"></i>
                   </a>
-                  <form
-                    action="{{ url_for('financiamento.excluir_financiamento', id=financiamento.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir este financiamento e todas as suas parcelas?');"
-                    class="d-inline"
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteModal"
+                    data-form-action="{{ url_for('financiamento.excluir_financiamento', id=financiamento.id) }}"
+                    title="Excluir"
                   >
-                    <button
-                      type="submit"
-                      class="btn btn-danger"
-                      title="Excluir"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
                 </td>
               </tr>
               {% endfor %}
@@ -95,4 +92,6 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
+Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
+não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}

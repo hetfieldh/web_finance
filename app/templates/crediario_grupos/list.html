@@ -1,6 +1,7 @@
 <!-- app/templates/crediario_grupos/list.html -->
 
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import
+render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -66,19 +67,16 @@
                   >
                     <i class="fas fa-edit"></i>
                   </a>
-                  <form
-                    action="{{ url_for('crediario_grupo.excluir_grupo_crediario', id=grupo.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir este grupo?');"
-                  >
                     <button
-                      type="submit"
-                      class="btn btn-danger"
-                      title="Excluir"
+                        type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-form-action="{{ url_for('crediario_grupo.excluir_grupo_crediario', id=grupo.id) }}"
+                        title="Excluir"
                     >
-                      <i class="fas fa-trash-alt"></i>
+                        <i class="fas fa-trash-alt"></i>
                     </button>
-                  </form>
                 </td>
               </tr>
               {% endfor %}
@@ -92,4 +90,6 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
+Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
+não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}

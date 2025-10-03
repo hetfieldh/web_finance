@@ -1,7 +1,7 @@
 <!-- app/templates/desp_rec/list.html -->
 
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import
+render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -53,8 +53,8 @@
                   {% endif %}
                 </td>
                 <td>
-                  {{ cadastro.dia_vencimento if cadastro.dia_vencimento else
-                  '-' }}
+                  {{ cadastro.dia_vencimento if cadastro.dia_vencimento else '-'
+                  }}
                 </td>
                 <td>
                   {% if cadastro.ativo %}
@@ -72,19 +72,16 @@
                   >
                     <i class="fas fa-edit"></i>
                   </a>
-                  <form
-                    action="{{ url_for('desp_rec.excluir_cadastro', id=cadastro.id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja excluir este cadastro?');"
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteModal"
+                    data-form-action="{{ url_for('desp_rec.excluir_cadastro', id=cadastro.id) }}"
+                    title="Excluir"
                   >
-                    <button
-                      type="submit"
-                      class="btn btn-danger"
-                      title="Excluir"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
                 </td>
               </tr>
               {% endfor %}
@@ -100,4 +97,6 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
+Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
+não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}
