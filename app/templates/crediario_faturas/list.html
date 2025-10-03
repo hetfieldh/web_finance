@@ -6,16 +6,58 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Faturas de Crediário</h4>
       <div>
-        <form
-          action="{{ url_for('crediario_fatura.automatizar_faturas') }}"
-          method="POST"
-          onsubmit="return confirm('Isto irá procurar por todas as compras futuras e irá criar ou atualizar as faturas pendentes. Deseja continuar?');"
-          style="display: inline"
+        <button
+          type="button"
+          class="btn btn-success btn-add"
+          data-bs-toggle="modal"
+          data-bs-target="#confirmFaturasModal"
         >
-          <button type="submit" class="btn btn-success btn-add">
-            <i class="fas fa-sync-alt"></i> Sincronizar Faturas
-          </button>
-        </form>
+          <i class="fas fa-sync-alt"></i> Sincronizar Faturas
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="confirmFaturasModal"
+      tabindex="-1"
+      aria-labelledby="confirmFaturasLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-warning text-dark">
+            <h5 class="modal-title" id="confirmFaturasLabel">Confirmar Ação</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Fechar"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Vamos sincronizar todas as compras nas faturas que ainda não foram
+            pagas. Gostaria de continuar?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <form
+              action="{{ url_for('crediario_fatura.automatizar_faturas') }}"
+              method="POST"
+              style="display: inline"
+            >
+              <button type="submit" class="btn btn-danger">
+                Sim, continuar
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -22,6 +22,7 @@ from app.utils import (
     STATUS_AMORTIZADO,
     STATUS_PAGO,
     STATUS_PARCIAL_PAGO,
+    STATUS_PARCIAL_RECEBIDO,
     STATUS_PENDENTE,
     STATUS_RECEBIDO,
     TIPO_FIXA,
@@ -194,10 +195,10 @@ def get_monthly_graphics_data(user_id, year, month):
         SalarioMovimento.data_criacao.between(data_inicio_mes, data_fim_mes),
     ).all()
     for salario in salarios_recebidos:
-        if salario.movimento_bancario_salario_id:
-            entradas_salario += salario.salario_liquido  # Salário
-        if salario.movimento_bancario_beneficio_id:
-            entradas_beneficios += salario.total_beneficios  # Benefício
+        if salario.status in [STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]:
+            entradas_salario += salario.salario_liquido
+            entradas_beneficios += salario.total_beneficios
+
     # OUTRAS RECEITAS
     outras_receitas = db.session.query(func.sum(DespRecMovimento.valor_realizado)).join(
         DespRec
