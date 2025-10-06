@@ -184,10 +184,14 @@ render_estornar_modal%} {% block content %}
           </div>
           <div class="mb-3">
             {{ render_field(pagamento_form.valor_pago) }}
-            <div class="form-text">
+            <div id="valor-pago-help" class="form-text">
               O valor a ser pago não pode ser alterado. Caso necessite, faça no
               lançamento original.
             </div>
+            <!-- <div class="form-text">
+              O valor a ser pago não pode ser alterado. Caso necessite, faça no
+              lançamento original.
+            </div> -->
           </div>
         </div>
         <div class="modal-footer">

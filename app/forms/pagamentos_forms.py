@@ -44,10 +44,10 @@ class PagamentoForm(FlaskForm):
     valor_pago = DecimalField(
         "Valor a Pagar",
         places=2,
-        render_kw={
-            'readonly': True,
-            'style': 'color: var(--wf-texto-negativo); font-weight: bold; background-color: var(--wf-box-negativo);'
-        },
+        # render_kw={
+        #     'readonly': True,
+        #     'style': 'color: var(--wf-texto-negativo); font-weight: bold; background-color: var(--wf-box-negativo);'
+        # },
         validators=[
             InputRequired("O valor é obrigatório."),
             NumberRange(min=0.01, message="O valor pago deve ser maior que zero."),
