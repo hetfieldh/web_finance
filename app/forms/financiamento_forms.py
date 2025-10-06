@@ -8,7 +8,6 @@ from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (
     DateField,
     DecimalField,
-    FieldList,
     IntegerField,
     SelectField,
     StringField,
@@ -75,7 +74,7 @@ class CadastroFinanciamentoForm(FlaskForm):
         "Data de Início",
         format="%Y-%m-%d",
         validators=[DataRequired("A data de início é obrigatória.")],
-        default=date.today(),
+        default=date.today,
     )
 
     prazo_meses = IntegerField(
@@ -207,6 +206,15 @@ class AmortizacaoForm(FlaskForm):
         format="%Y-%m-%d",
         validators=[DataRequired("A data do pagamento é obrigatória.")],
         default=date.today,
+    )
+    estrategia = SelectField(
+        "Estratégia de Amortização",
+        choices=[
+            ("prazo", "Reduzir o prazo (quitar as últimas parcelas)"),
+            ("parcela", "Reduzir o valor das próximas parcelas"),
+        ],
+        default="prazo",
+        validators=[DataRequired("Selecione uma estratégia.")],
     )
     submit = SubmitField("Amortizar")
 

@@ -171,71 +171,27 @@ def importar_e_processar_csv(financiamento, csv_file):
         )
 
 
-def amortizar_parcelas(financiamento, form, ids_parcelas):
+def amortizar_parcelas(financiamento, form):
     try:
-        valor_total_amortizado = form.valor_amortizacao.data
+        valor_amortizacao = form.valor_amortizacao.data
         conta_debito = Conta.query.get(form.conta_id.data)
         data_pagamento = form.data_pagamento.data
-
-        if not ids_parcelas:
-            return False, "Nenhuma parcela foi selecionada para amortização."
+        estrategia_amortizacao = form.estrategia.data
 
         saldo_devedor_maximo = financiamento.saldo_devedor_atual
-        if valor_total_amortizado > saldo_devedor_maximo:
-            saldo_formatado = (
-                f"R$ {saldo_devedor_maximo:,.2f}".replace(",", "X")
-                .replace(".", ",")
-                .replace("X", ".")
-            )
-            valor_formatado = (
-                f"R$ {valor_total_amortizado:,.2f}".replace(",", "X")
-                .replace(".", ",")
-                .replace("X", ".")
-            )
+        if valor_amortizacao > saldo_devedor_maximo:
             return (
                 False,
-                f"Erro de Validação: O valor da amortização ({valor_formatado}) "
-                f"não pode exceder o saldo devedor restante do financiamento ({saldo_formatado}).",
+                f"O valor da amortização não pode exceder o saldo devedor de R$ {saldo_devedor_maximo:,.2f}.",
             )
-
-        # --- INÍCIO DA NOVA VALIDAÇÃO ---
-
-        # 1. Calcula a soma do valor principal das parcelas selecionadas
-        soma_principal_selecionado = db.session.query(
-            func.sum(FinanciamentoParcela.valor_principal)
-        ).filter(
-            FinanciamentoParcela.id.in_(ids_parcelas)
-        ).scalar() or Decimal("0.00")
-
-        # 2. Compara o valor a ser pago com a soma do principal
-        if valor_total_amortizado != soma_principal_selecionado:
-            soma_formatada = (
-                f"R$ {soma_principal_selecionado:,.2f}"
-                .replace(",", "X")
-                .replace(".", ",")
-                .replace("X", ".")
-            )
-            valor_formatado = (
-                f"R$ {valor_total_amortizado:,.2f}"
-                .replace(",", "X")
-                .replace(".", ",")
-                .replace("X", ".")
-            )
-            return (
-                False,
-                f"O valor a amortizar ({valor_formatado}) deve ser exatamente igual à "
-                f"soma do valor principal das parcelas selecionadas ({soma_formatada}).",
-            )
-
-        # --- FIM DA NOVA VALIDAÇÃO ---
 
         saldo_disponivel = conta_debito.saldo_atual
         if conta_debito.tipo in ["Corrente", "Digital"] and conta_debito.limite:
             saldo_disponivel += conta_debito.limite
-        if valor_total_amortizado > saldo_disponivel:
+        if valor_amortizacao > saldo_disponivel:
             return (
                 False,
-                f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível: R$ {saldo_disponivel:.2f}",
+                f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível: R$ {saldo_disponivel:,.2f}",
             )
 
         tipo_transacao = ContaTransacao.query.filter_by(
@@ -244,7 +200,7 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
         if not tipo_transacao:
             return (
                 False,
-                'Tipo de transação "AMORTIZAÇÃO" (Débito) não encontrado. Por favor, cadastre-o primeiro.',
+                'Tipo de transação "AMORTIZAÇÃO" (Débito) não encontrado. Cadastre-o primeiro.',
             )
 
         novo_movimento = ContaMovimento(
@@ -252,30 +208,100 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
             conta_id=conta_debito.id,
             conta_transacao_id=tipo_transacao.id,
             data_movimento=data_pagamento,
-            valor=valor_total_amortizado,
+            valor=valor_amortizacao,
             descricao=f"Amortização do financiamento {financiamento.nome_financiamento}",
         )
         db.session.add(novo_movimento)
-        conta_debito.saldo_atual -= valor_total_amortizado
+        conta_debito.saldo_atual -= valor_amortizacao
         db.session.flush()
 
-        valor_por_parcela = (valor_total_amortizado / len(ids_parcelas)).quantize(
-            Decimal("0.01"), rounding=ROUND_DOWN
-        )
-        parcelas = FinanciamentoParcela.query.filter(
-            FinanciamentoParcela.id.in_(ids_parcelas)
-        ).all()
+        msg = ""
 
-        for parcela in parcelas:
-            parcela.status = STATUS_AMORTIZADO
-            parcela.data_pagamento = data_pagamento
-            parcela.valor_pago = valor_por_parcela
-            parcela.movimento_bancario_id = novo_movimento.id
-            data_formatada = data_pagamento.strftime("%d/%m/%Y")
-            parcela.observacoes = f"Amortização em {data_formatada}"
+        if estrategia_amortizacao == "prazo":
+            valor_restante = valor_amortizacao
+            parcelas_quitadas = 0
+            parcela_parcial = False
+
+            parcelas_pendentes = (
+                FinanciamentoParcela.query.filter(
+                    FinanciamentoParcela.financiamento_id == financiamento.id,
+                    FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
+                )
+                .order_by(FinanciamentoParcela.numero_parcela.desc())
+                .all()
+            )
+
+            for parcela in parcelas_pendentes:
+                if valor_restante <= Decimal("0.00"):
+                    break
+
+                if parcela.valor_pago is None:
+                    parcela.valor_pago = Decimal("0.00")
+                valor_necessario = parcela.valor_principal - parcela.valor_pago
+
+                if valor_restante >= valor_necessario:
+                    valor_a_aplicar = valor_necessario
+                    valor_restante -= valor_a_aplicar
+                    parcela.valor_pago += valor_a_aplicar
+                    parcela.status = STATUS_AMORTIZADO
+                    parcelas_quitadas += 1
+                else:
+                    valor_a_aplicar = valor_restante
+                    parcela.valor_pago += valor_a_aplicar
+                    valor_restante = Decimal("0.00")
+                    parcela_parcial = True
+
+                parcela.data_pagamento = data_pagamento
+                parcela.movimento_bancario_id = novo_movimento.id
+                obs = f"Amort. de R$ {valor_a_aplicar:,.2f} em {data_pagamento.strftime('%d/%m/%Y')}."
+                parcela.observacoes = (
+                    (parcela.observacoes + "; " + obs) if parcela.observacoes else obs
+                )
+
+            msg = f"Amortização de R$ {valor_amortizacao:,.2f} realizada para reduzir prazo. {parcelas_quitadas} parcelas foram quitadas."
+            if parcela_parcial:
+                msg += " Uma parcela foi parcialmente paga."
+
+        elif estrategia_amortizacao == "parcela":
+            parcelas_pendentes = (
+                FinanciamentoParcela.query.filter(
+                    FinanciamentoParcela.financiamento_id == financiamento.id,
+                    FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
+                )
+                .order_by(FinanciamentoParcela.numero_parcela.asc())
+                .all()
+            )
+
+            if not parcelas_pendentes:
+                return False, "Não há parcelas pendentes para amortizar."
+
+            qtd_parcelas = len(parcelas_pendentes)
+            reducao_por_parcela = (valor_amortizacao / qtd_parcelas).quantize(
+                Decimal("0.01"), rounding=ROUND_DOWN
+            )
+            valor_total_distribuido = reducao_por_parcela * qtd_parcelas
+            ajuste_primeira_parcela = valor_amortizacao - valor_total_distribuido
+
+            for i, parcela in enumerate(parcelas_pendentes):
+                valor_reducao = reducao_por_parcela
+                if i == 0:
+                    valor_reducao += ajuste_primeira_parcela
+
+                parcela.valor_principal -= valor_reducao
+                parcela.valor_total_previsto -= valor_reducao
+
+                obs = f"Amort. de R$ {valor_reducao:,.2f} em {data_pagamento.strftime('%d/%m/%Y')} para reduzir valor da parcela."
+                parcela.observacoes = (
+                    (parcela.observacoes + "; " + obs) if parcela.observacoes else obs
+                )
+
+            msg = f"Amortização de R$ {valor_amortizacao:,.2f} distribuída para reduzir o valor de {qtd_parcelas} parcelas futuras."
 
         novo_saldo_devedor = db.session.query(
-            func.sum(FinanciamentoParcela.valor_principal)
+            func.sum(
+                FinanciamentoParcela.valor_principal
+                - func.coalesce(FinanciamentoParcela.valor_pago, 0)
+            )
         ).filter(
             FinanciamentoParcela.financiamento_id == financiamento.id,
             FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
@@ -285,7 +311,8 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
         financiamento.saldo_devedor_atual = novo_saldo_devedor
 
         db.session.commit()
-        return True, f"{len(ids_parcelas)} parcelas amortizadas com sucesso!"
+        return True, msg.strip()
+
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Erro ao amortizar parcelas: {e}", exc_info=True)

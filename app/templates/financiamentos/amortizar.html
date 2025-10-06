@@ -6,10 +6,11 @@
   id="form-amortizacao"
   method="POST"
   action="{{ url_for('financiamento.amortizar_financiamento', id=financiamento.id) }}"
+  data-saldo-devedor-atual="{{ financiamento.saldo_devedor_atual }}"
 >
   {{ form.csrf_token }}
-  <div class="row g-2">
-    <div class="col-lg-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
           <h5 class="mb-0">
@@ -20,7 +21,8 @@
           <h6 class="card-title">1. Detalhes do Pagamento</h6>
           <div class="mb-2">
             {{ render_field(form.valor_amortizacao, attrs={'type': 'number',
-            'step': '0.01', 'id': 'valor_amortizacao'}) }}
+            'step': '0.01', 'id': 'valor_amortizacao', 'autocomplete': 'off'})
+            }}
           </div>
           <div class="mb-2">{{ render_field(form.conta_id) }}</div>
           <div class="mb-2">
@@ -29,27 +31,72 @@
 
           <hr class="my-3" />
 
-          <h6 class="card-title">2. Resumo da Operação</h6>
+          <h6 class="card-title">2. Estratégia</h6>
+          <div class="mb-3">
+            {{ render_field(form.estrategia, attrs={'id': 'estrategia_selecao'})
+            }}
+          </div>
+
+          <hr class="my-3" />
+
+          <h6 class="card-title">3. Resumo da Operação</h6>
           <div id="resumo-amortizacao" class="bg-light p-3 rounded">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between">
               <span class="text-muted">Total a Amortizar:</span>
               <span id="resumo-valor" class="fw-bold text-dark">R$ 0,00</span>
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-2">
-              <span class="text-muted">Parcelas Selecionadas:</span>
-              <span id="resumo-parcelas" class="fw-bold text-dark">0</span>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-2">
-              <span class="text-muted">Valor por Parcela:</span>
-              <span id="resumo-valor-parcela" class="fw-bold text-dark"
+            <div class="d-flex justify-content-between mt-2">
+              <span class="text-muted">Saldo Devedor (Depois):</span>
+              <span id="resumo-saldo-depois" class="fw-bold text-danger"
                 >R$ 0,00</span
               >
+            </div>
+            <hr class="my-2" />
+
+            <div id="resumo-prazo">
+              <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">Parcelas Quitadas:</span>
+                <span
+                  id="resumo-parcelas-quitadas-lista"
+                  class="fw-bold text-success"
+                  >Nenhuma</span
+                >
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">Amortização Parcial:</span>
+                <span
+                  id="resumo-amortizacao-parcial-detalhe"
+                  class="fw-bold text-info"
+                  >Nenhuma</span
+                >
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">Economia de Juros (Est.):</span>
+                <span id="resumo-economia-juros" class="fw-bold text-success"
+                  >R$ 0,00</span
+                >
+              </div>
+            </div>
+
+            <div id="resumo-parcela" style="display: none">
+              <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">Parcelas Afetadas:</span>
+                <span id="resumo-parcelas-afetadas" class="fw-bold text-info"
+                  >0</span
+                >
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">Redução por Parcela:</span>
+                <span id="resumo-reducao-parcela" class="fw-bold text-info"
+                  >R$ 0,00</span
+                >
+              </div>
             </div>
           </div>
 
           <hr class="my-3" />
 
-          <h6 class="card-title">3. Ação</h6>
+          <h6 class="card-title">4. Ação</h6>
           <div class="d-flex justify-content-center gap-2">
             <button type="submit" class="btn btn-success btn-add">
               <i class="fas fa-hand-holding-usd me-1"></i> {{
@@ -65,70 +112,24 @@
         </div>
       </div>
     </div>
-
-    <div class="col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-secondary text-white">
-          <h5 class="mb-0">
-            <i class="fas fa-tasks me-2"></i>Selecione as Parcelas a Amortizar
-          </h5>
-        </div>
-        <div class="card-body" style="max-height: 600px; overflow-y: auto">
-          {% if parcelas %}
-          <div class="table-responsive">
-            <table class="table table-sm table-hover">
-              <thead>
-                <tr>
-                  <th class="text-center" style="width: 5%">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="selecionar-todas"
-                      title="Selecionar/Desselecionar Todas"
-                    />
-                  </th>
-                  <th class="text-center">#</th>
-                  <th>Vencimento</th>
-                  <th class="text-end">Valor Principal</th>
-                  <th class="text-end">Valor Total da Parcela</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for parcela in parcelas %}
-                <tr>
-                  <td class="text-center">
-                    <input
-                      type="checkbox"
-                      name="parcelas_selecionadas"
-                      value="{{ parcela.id }}"
-                      class="form-check-input parcela-checkbox"
-                    />
-                  </td>
-                  <td class="text-center fw-bold text-danger">
-                    {{ parcela.numero_parcela }}
-                  </td>
-                  <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                  <td class="text-end fw-bold text-success">
-                    {{ parcela.valor_principal | format_currency }}
-                  </td>
-                  <td class="text-end">
-                    {{ parcela.valor_total_previsto | format_currency }}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}
-          <p class="text-center text-muted p-4">
-            Nenhuma parcela pendente para amortização.
-          </p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
   </div>
 </form>
 {% endblock %} {% block scripts %}
+<script id="parcelas-prazo-data" type="application/json">
+  {{ parcelas_json_prazo | tojson | safe }}
+</script>
+<script id="parcelas-parcela-data" type="application/json">
+  {{ parcelas_json_parcela | tojson | safe }}
+</script>
+
+<script>
+  const parcelasPrazo = JSON.parse(
+    document.getElementById("parcelas-prazo-data").textContent
+  );
+  const parcelasParcela = JSON.parse(
+    document.getElementById("parcelas-parcela-data").textContent
+  );
+</script>
+
 <script src="{{ url_for('static', filename='js/financiamento.js') }}"></script>
 {% endblock %}

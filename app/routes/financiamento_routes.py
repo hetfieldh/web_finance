@@ -246,31 +246,22 @@ def amortizar_financiamento(id):
         request.form, account_choices_with_balance=account_choices_with_balance
     )
 
-    if request.method == "POST":
-        ids_parcelas_selecionadas = request.form.getlist(
-            "parcelas_selecionadas", type=int
-        )
+    if form.validate_on_submit():
+        success, message = amortizar_parcelas(financiamento, form)
+        if success:
+            flash(message, "success")
+            return redirect(url_for("financiamento.listar_financiamentos"))
+        else:
+            flash(message, "danger")
+    elif request.method == "POST" and form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(
+                    f"Erro no campo '{getattr(form, field).label.text}': {error}",
+                    "danger",
+                )
 
-        if not ids_parcelas_selecionadas:
-            flash("Selecione pelo menos uma parcela para amortizar.", "danger")
-        elif form.validate():
-            success, message = amortizar_parcelas(
-                financiamento, form, ids_parcelas_selecionadas
-            )
-            if success:
-                flash(message, "success")
-                return redirect(url_for("financiamento.listar_financiamentos"))
-            else:
-                flash(message, "danger")
-        elif form.errors:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    flash(
-                        f"Erro no campo '{getattr(form, field).label.text}': {error}",
-                        "danger",
-                    )
-
-    parcelas_pendentes = (
+    parcelas_prazo = (
         FinanciamentoParcela.query.filter(
             FinanciamentoParcela.financiamento_id == id,
             FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
@@ -278,10 +269,33 @@ def amortizar_financiamento(id):
         .order_by(FinanciamentoParcela.numero_parcela.desc())
         .all()
     )
+    parcelas_json_prazo = [
+        {
+            "numero_parcela": p.numero_parcela,
+            "valor_principal": str(p.valor_principal),
+            "valor_juros": str(p.valor_juros),
+            "valor_pago": str(p.valor_pago or "0.00"),
+        }
+        for p in parcelas_prazo
+    ]
+
+    parcelas_parcela = (
+        FinanciamentoParcela.query.filter(
+            FinanciamentoParcela.financiamento_id == id,
+            FinanciamentoParcela.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
+        )
+        .order_by(FinanciamentoParcela.numero_parcela.asc())
+        .all()
+    )
+    parcelas_json_parcela = [
+        {"numero_parcela": p.numero_parcela, "valor_principal": str(p.valor_principal)}
+        for p in parcelas_parcela
+    ]
 
     return render_template(
         "financiamentos/amortizar.html",
         form=form,
         financiamento=financiamento,
-        parcelas=parcelas_pendentes,
+        parcelas_json_prazo=parcelas_json_prazo,
+        parcelas_json_parcela=parcelas_json_parcela,
     )
