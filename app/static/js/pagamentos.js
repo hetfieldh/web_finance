@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       modalForm.querySelector('input[name="item_id"]').value = itemId;
       modalForm.querySelector('input[name="item_tipo"]').value = itemTipo;
-      //modalForm.querySelector('input[name="valor_pago"]').value = itemValor;
       modalForm.querySelector('input[name="item_descricao"]').value =
         itemDescricao;
       const valorPagoInput = modalForm.querySelector(
@@ -83,23 +82,21 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       const valorPagoHelp = document.getElementById("valor-pago-help");
 
-      valorPagoInput.value = itemValor; // Define o valor inicial
+      valorPagoInput.value = itemValor;
 
       if (itemTipo === "Financiamento") {
         valorPagoInput.readOnly = false;
-        valorPagoInput.style.backgroundColor = ""; // Reseta o estilo para editável
+        valorPagoInput.style.backgroundColor = "";
         valorPagoInput.style.fontWeight = "normal";
         valorPagoInput.style.color = "";
-        if (valorPagoHelp) valorPagoHelp.style.display = "none"; // Oculta o texto de ajuda
+        if (valorPagoHelp) valorPagoHelp.style.display = "none";
       } else {
         valorPagoInput.readOnly = true;
-        // Mantém o estilo original de 'readonly'
         valorPagoInput.style.fontWeight = "bold";
         valorPagoInput.style.backgroundColor = "var(--wf-box-negativo)";
         valorPagoInput.style.color = "var(--wf-texto-negativo)";
-        if (valorPagoHelp) valorPagoHelp.style.display = "block"; // Mostra o texto de ajuda
+        if (valorPagoHelp) valorPagoHelp.style.display = "block";
       }
-      // Fim da alteração
     });
   }
 });

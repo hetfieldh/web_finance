@@ -123,7 +123,7 @@ render_estornar_modal%} {% block content %}
                   <button
                     type="button"
                     class="btn btn-link text-danger p-0"
-                    title="Estornar Recebimento"
+                    title="Estornar Pagamento"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmEstornarModal"
                     data-item-id="{{ conta.id_original }}"
@@ -188,10 +188,6 @@ render_estornar_modal%} {% block content %}
               O valor a ser pago não pode ser alterado. Caso necessite, faça no
               lançamento original.
             </div>
-            <!-- <div class="form-text">
-              O valor a ser pago não pode ser alterado. Caso necessite, faça no
-              lançamento original.
-            </div> -->
           </div>
         </div>
         <div class="modal-footer">
@@ -210,11 +206,10 @@ render_estornar_modal%} {% block content %}
 </div>
 
 {{ render_estornar_modal( modal_id='confirmEstornarModal',
-form_action=url_for('recebimentos.estornar_recebimento'), title='Confirmar
-Estorno', body_text='Você tem certeza que deseja estornar este recebimento? Esta
-ação não pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {%
-endblock %}
-{% block scripts %}
+form_action=url_for('pagamentos.estornar_pagamento'), title='Confirmar Estorno',
+body_text='Você tem certeza que deseja estornar este pagamento? Esta ação não
+pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {% endblock %} {%
+block scripts %}
 <script id="json-data-pagamentos" type="application/json">
   {{ contas_json | tojson | safe }}
 </script>
