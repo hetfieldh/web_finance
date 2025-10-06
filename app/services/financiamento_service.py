@@ -198,6 +198,37 @@ def amortizar_parcelas(financiamento, form, ids_parcelas):
                 f"não pode exceder o saldo devedor restante do financiamento ({saldo_formatado}).",
             )
 
+        # --- INÍCIO DA NOVA VALIDAÇÃO ---
+
+        # 1. Calcula a soma do valor principal das parcelas selecionadas
+        soma_principal_selecionado = db.session.query(
+            func.sum(FinanciamentoParcela.valor_principal)
+        ).filter(
+            FinanciamentoParcela.id.in_(ids_parcelas)
+        ).scalar() or Decimal("0.00")
+
+        # 2. Compara o valor a ser pago com a soma do principal
+        if valor_total_amortizado != soma_principal_selecionado:
+            soma_formatada = (
+                f"R$ {soma_principal_selecionado:,.2f}"
+                .replace(",", "X")
+                .replace(".", ",")
+                .replace("X", ".")
+            )
+            valor_formatado = (
+                f"R$ {valor_total_amortizado:,.2f}"
+                .replace(",", "X")
+                .replace(".", ",")
+                .replace("X", ".")
+            )
+            return (
+                False,
+                f"O valor a amortizar ({valor_formatado}) deve ser exatamente igual à "
+                f"soma do valor principal das parcelas selecionadas ({soma_formatada}).",
+            )
+
+        # --- FIM DA NOVA VALIDAÇÃO ---
+
         saldo_disponivel = conta_debito.saldo_atual
         if conta_debito.tipo in ["Corrente", "Digital"] and conta_debito.limite:
             saldo_disponivel += conta_debito.limite
