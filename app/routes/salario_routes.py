@@ -248,36 +248,7 @@ def novo_lancamento_folha():
     )
 
 
-@salario_bp.route("/lancamento/<int:id>/gerenciar", methods=["GET", "POST"])
-@login_required
-def gerenciar_itens_folha(id):
-    movimento = SalarioMovimento.query.filter_by(
-        id=id, usuario_id=current_user.id
-    ).first_or_404()
-    salario_item_choices = salario_service.get_active_salario_items_for_user_choices()
-    form = AdicionarItemFolhaForm(salario_item_choices=salario_item_choices)
-
-    if form.validate_on_submit():
-        success, message, item_data = salario_service.adicionar_item_folha(id, form)
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            if success:
-                return jsonify({"success": True, "message": message, "item": item_data})
-            else:
-                return jsonify({"success": False, "message": message}), 400
-        if success:
-            flash(message, "success")
-        else:
-            flash(message, "warning")
-        return redirect(url_for("salario.gerenciar_itens_folha", id=id))
-
-    salario_pago = movimento.movimento_bancario_salario_id is not None
-    algum_beneficio_pago = any(
-        item.movimento_bancario_id is not None
-        for item in movimento.itens
-        if item.salario_item.tipo == "Benefício"
-    )
-    is_locked = salario_pago or algum_beneficio_pago
-
+def _calcular_totais_folha(movimento):
     beneficios_individuais = [
         item for item in movimento.itens if item.salario_item.tipo == "Benefício"
     ]
@@ -298,6 +269,7 @@ def gerenciar_itens_folha(id):
         "fgts": sum(
             item.valor for item in outros_itens if item.salario_item.tipo == "FGTS"
         ),
+        "beneficios": sum(item.valor for item in beneficios_individuais),
     }
 
     totais["salario_bruto"] = totais["proventos"]
@@ -305,7 +277,56 @@ def gerenciar_itens_folha(id):
     totais["salario_liquido"] = (
         totais["salario_bruto"] - totais["total_descontos_impostos"]
     )
-    totais["fgts_mes"] = totais["fgts"]
+    return totais, beneficios_individuais
+
+
+@salario_bp.route("/lancamento/<int:id>/gerenciar", methods=["GET", "POST"])
+@login_required
+def gerenciar_itens_folha(id):
+    movimento = (
+        SalarioMovimento.query.options(
+            joinedload(SalarioMovimento.itens).joinedload(
+                SalarioMovimentoItem.salario_item
+            )
+        )
+        .filter_by(id=id, usuario_id=current_user.id)
+        .first_or_404()
+    )
+
+    salario_item_choices = salario_service.get_active_salario_items_for_user_choices()
+    form = AdicionarItemFolhaForm(salario_item_choices=salario_item_choices)
+
+    if form.validate_on_submit():
+        success, message, item_data = salario_service.adicionar_item_folha(id, form)
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if success:
+                totais_atualizados, _ = _calcular_totais_folha(movimento)
+                return jsonify(
+                    {
+                        "success": True,
+                        "message": message,
+                        "item": item_data,
+                        "totais": totais_atualizados,
+                    }
+                )
+            else:
+                return jsonify({"success": False, "message": message}), 400
+
+        if success:
+            flash(message, "success")
+        else:
+            flash(message, "warning")
+        return redirect(url_for("salario.gerenciar_itens_folha", id=id))
+
+    salario_pago = movimento.movimento_bancario_salario_id is not None
+    algum_beneficio_pago = any(
+        item.movimento_bancario_id is not None
+        for item in movimento.itens
+        if item.salario_item.tipo == "Benefício"
+    )
+    is_locked = salario_pago or algum_beneficio_pago
+
+    totais, beneficios_individuais = _calcular_totais_folha(movimento)
 
     return render_template(
         "salario_movimento/gerenciar_itens.html",
@@ -321,24 +342,30 @@ def gerenciar_itens_folha(id):
 @salario_bp.route("/lancamento/item/excluir/<int:item_id>", methods=["POST"])
 @login_required
 def excluir_item_folha(item_id):
-    movimento_id = SalarioMovimentoItem.query.get_or_404(item_id).salario_movimento_id
+    item = SalarioMovimentoItem.query.get_or_404(item_id)
+    movimento = item.movimento_pai
+
     success, message, deleted_item_id = excluir_item_folha_service(item_id)
+
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         if success:
+            totais_atualizados, _ = _calcular_totais_folha(movimento)
             return jsonify(
                 {
                     "success": True,
                     "message": message,
                     "deleted_item_id": deleted_item_id,
+                    "totais": totais_atualizados,
                 }
             )
         else:
             return jsonify({"success": False, "message": message}), 400
+
     if success:
         flash(message, "success")
     else:
         flash(message, "warning")
-    return redirect(url_for("salario.gerenciar_itens_folha", id=movimento_id))
+    return redirect(url_for("salario.gerenciar_itens_folha", id=movimento.id))
 
 
 @salario_bp.route("/lancamento/excluir/<int:id>", methods=["POST"])

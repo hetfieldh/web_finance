@@ -10,36 +10,70 @@
 >
   {{ form.csrf_token }}
   <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-8">
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
           <h5 class="mb-0">
-            <i class="fas fa-calculator me-2"></i>Painel de Amortização
+            <i class="fas fa-calculator me-2"></i>Amortização de Financiamento
           </h5>
         </div>
         <div class="card-body">
-          <h6 class="card-title">1. Detalhes do Pagamento</h6>
-          <div class="mb-2">
-            {{ render_field(form.valor_amortizacao, attrs={'type': 'number',
-            'step': '0.01', 'id': 'valor_amortizacao', 'autocomplete': 'off'})
-            }}
-          </div>
-          <div class="mb-2">{{ render_field(form.conta_id) }}</div>
-          <div class="mb-2">
-            {{ render_field(form.data_pagamento, attrs={'type': 'date'}) }}
+          <h6
+            class="card-title fw-semibold p-1 rounded"
+            style="
+              color: var(--wf-texto-azul);
+              background-color: var(--wf-box-azul);
+            "
+          >
+            1. Detalhes do Pagamento
+          </h6>
+
+          <div class="row g-2 mb-2 align-items-end">
+            <div class="col-12 col-md-3">
+              {{ render_field(form.valor_amortizacao, attrs={ 'type': 'number',
+              'step': '0.01', 'id': 'valor_amortizacao', 'autocomplete': 'off',
+              'class': 'form-control' }) }}
+            </div>
+
+            <div class="col-12 col-md-3">
+              {{ render_field(form.data_pagamento, attrs={'type': 'date',
+              'class': 'form-control'}) }}
+            </div>
+
+            <div class="col-12 col-md-6">
+              {{ render_field(form.conta_id, attrs={'class': 'form-control'}) }}
+            </div>
           </div>
 
-          <hr class="my-3" />
+          <hr class="my-2" />
 
-          <h6 class="card-title">2. Estratégia</h6>
+          <h6
+            class="card-title fw-semibold p-1 rounded"
+            style="
+              color: var(--wf-texto-azul);
+              background-color: var(--wf-box-azul);
+            "
+          >
+            2. Forma de Amortização
+          </h6>
+
           <div class="mb-3">
             {{ render_field(form.estrategia, attrs={'id': 'estrategia_selecao'})
             }}
           </div>
 
-          <hr class="my-3" />
+          <hr class="my-2" />
 
-          <h6 class="card-title">3. Resumo da Operação</h6>
+          <h6
+            class="card-title fw-semibold p-1 rounded"
+            style="
+              color: var(--wf-texto-azul);
+              background-color: var(--wf-box-azul);
+            "
+          >
+            3. Resumo da Operação
+          </h6>
+
           <div id="resumo-amortizacao" class="bg-light p-3 rounded">
             <div class="d-flex justify-content-between">
               <span class="text-muted">Total a Amortizar:</span>
@@ -71,7 +105,7 @@
                 >
               </div>
               <div class="d-flex justify-content-between mt-2">
-                <span class="text-muted">Economia de Juros (Est.):</span>
+                <span class="text-muted">Economia de Juros (estimado):</span>
                 <span id="resumo-economia-juros" class="fw-bold text-success"
                   >R$ 0,00</span
                 >
@@ -94,9 +128,18 @@
             </div>
           </div>
 
-          <hr class="my-3" />
+          <hr class="my-2" />
 
-          <h6 class="card-title">4. Ação</h6>
+          <h6
+            class="card-title fw-semibold p-1 rounded"
+            style="
+              color: var(--wf-texto-azul);
+              background-color: var(--wf-box-azul);
+            "
+          >
+            4. Ação
+          </h6>
+
           <div class="d-flex justify-content-center gap-2">
             <button type="submit" class="btn btn-success btn-add">
               <i class="fas fa-hand-holding-usd me-1"></i> {{

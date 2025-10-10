@@ -189,7 +189,7 @@ class ImportarParcelasForm(FlaskForm):
 
 class AmortizacaoForm(FlaskForm):
     valor_amortizacao = DecimalField(
-        "Valor Total a Amortizar",
+        "Valor Total",
         places=2,
         validators=[
             InputRequired("O valor é obrigatório."),
@@ -197,7 +197,7 @@ class AmortizacaoForm(FlaskForm):
         ],
     )
     conta_id = SelectField(
-        "Debitar da Conta",
+        "Conta para débito",
         coerce=lambda x: int(x) if x is not None and x != "" else None,
         validators=[DataRequired("Selecione a conta para o débito.")],
     )
@@ -208,13 +208,13 @@ class AmortizacaoForm(FlaskForm):
         default=date.today,
     )
     estrategia = SelectField(
-        "Estratégia de Amortização",
+        "Selecione uma estratégia",
         choices=[
-            ("prazo", "Reduzir o prazo (quitar as últimas parcelas)"),
-            ("parcela", "Reduzir o valor das próximas parcelas"),
+            ("prazo", "1. Reduzir o prazo (quitar as últimas parcelas)"),
+            ("parcela", "2. Reduzir o valor das próximas parcelas"),
         ],
         default="prazo",
-        validators=[DataRequired("Selecione uma estratégia.")],
+        validators=[DataRequired("Selecione...")],
     )
     submit = SubmitField("Amortizar")
 

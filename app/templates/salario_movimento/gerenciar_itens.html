@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="card shadow-sm mb-2">
+    <div class="card shadow-sm mb-1">
       <div
         class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
       >
@@ -18,42 +18,107 @@
       </div>
     </div>
 
-    <div class="card shadow-sm mb-2">
+    <div class="card shadow-sm mb-1">
       <div class="card-body">
-        {% set has_salario_items = totais.salario_liquido != 0 %} {% set
-        has_beneficio_items = beneficios_individuais|length > 0 %} {% set
-        has_fgts_items = totais.fgts != 0 %}
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <h5 class="mb-2 text-center">Resumo da Folha</h5>
+            <div class="table-responsive">
+              <table class="table table-sm table-borderless mb-0">
+                <tbody>
+                  <tr>
+                    <td>Total de Proventos</td>
+                    <td
+                      class="text-end fw-bold text-success"
+                      id="total-proventos"
+                    >
+                      {{ totais.proventos | format_currency }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total de Descontos</td>
+                    <td
+                      class="text-end fw-bold text-danger"
+                      id="total-descontos"
+                    >
+                      {{ totais.descontos | format_currency }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total de Impostos</td>
+                    <td
+                      class="text-end fw-bold text-danger"
+                      id="total-impostos"
+                    >
+                      {{ totais.impostos | format_currency }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total de Benefícios</td>
+                    <td
+                      class="text-end fw-bold text-primary"
+                      id="total-beneficios"
+                    >
+                      {{ totais.beneficios | format_currency }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total de FGTS</td>
+                    <td class="text-end fw-bold text-secondary" id="total-fgts">
+                      {{ totais.fgts | format_currency }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SALÁRIO LÍQUIDO</td>
+                    <td
+                      class="text-end fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
+                      id="total-salario-liquido"
+                    >
+                      {{ totais.salario_liquido | format_currency }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-        <div class="table-responsive">
-          <table class="table">
-            <tbody>
-              {% if has_salario_items %}
-              <tr>
-                <td>SALÁRIO LÍQUIDO</td>
-                <td
-                  class="text-end fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
-                >
-                  {{ totais.salario_liquido | format_currency }}
-                </td>
-              </tr>
-              {% endif %} {% if has_beneficio_items %} {% for beneficio in
-              beneficios_individuais %}
-              <tr>
-                <td>{{ beneficio.salario_item.nome }}</td>
-                <td class="text-end fw-bold text-primary">
-                  {{ beneficio.valor | format_currency }}
-                </td>
-              </tr>
-              {% endfor %} {% endif %} {% if has_fgts_items %}
-              <tr>
-                <td>FGTS</td>
-                <td class="text-end fw-bold text-secondary">
-                  {{ totais.fgts | format_currency}}
-                </td>
-              </tr>
-              {% endif %}
-            </tbody>
-          </table>
+          <div class="col-md-6 border-start">
+            <h5 class="mb-2 text-center">Resumo Financeiro</h5>
+            <div class="table-responsive">
+              <table class="table table-sm table-borderless mb-0">
+                <tbody>
+                  {% set has_salario_items = totais.salario_liquido != 0 %} {%
+                  set has_beneficio_items = beneficios_individuais|length > 0 %}
+                  {% set has_fgts_items = totais.fgts != 0 %} {% if
+                  has_salario_items %}
+                  <tr>
+                    <td>SALÁRIO LÍQUIDO</td>
+                    <td
+                      class="text-end fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
+                    >
+                      {{ totais.salario_liquido | format_currency }}
+                    </td>
+                  </tr>
+                  {% endif %} {% if has_beneficio_items %} {% for beneficio in
+                  beneficios_individuais %}
+                  <tr>
+                    <td>{{ beneficio.salario_item.nome }}</td>
+                    <td class="text-end fw-bold text-primary">
+                      {{ beneficio.valor | format_currency }}
+                    </td>
+                  </tr>
+                  {% endfor %} {% endif %} {% if has_fgts_items %}
+                  <tr>
+                    <td>FGTS</td>
+                    <td class="text-end fw-bold text-secondary">
+                      {{ totais.fgts | format_currency}}
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

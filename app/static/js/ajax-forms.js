@@ -1,10 +1,10 @@
 // app/static/js/ajax-forms.js
 
-console.log("ajax-forms.js carregado com sucesso!");
-
 document.addEventListener("DOMContentLoaded", () => {
   const formAdicionarVerba = document.getElementById("form-adicionar-verba");
   const tabelaVerbasCorpo = document.getElementById("tabela-verbas-corpo");
+
+  // --- LÓGICA PARA ADICIONAR VERBA ---
   if (formAdicionarVerba) {
     formAdicionarVerba.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -14,30 +14,37 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
         headers: { "X-Requested-With": "XMLHttpRequest" },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((err) => {
+              throw err;
+            });
+          }
+          return response.json();
+        })
         .then((data) => {
           if (data.success) {
-            const novaLinha = document.createElement("tr");
-            novaLinha.id = `verba-${data.item.id}`;
-            novaLinha.innerHTML = `<td>${data.item.nome}</td><td><span class="badge bg-secondary">${data.item.tipo}</span></td><td class="text-end">R$ ${data.item.valor.toFixed(2)}</td><td class="text-center"><button type="button" class="btn-excluir-verba p-0 border-0 bg-transparent text-danger" data-url="/salario/lancamento/item/excluir/${data.item.id}" data-id="${data.item.id}" title="Excluir"><i class="fas fa-trash-alt"></i></button></td>`;
-            const linhaVazia =
-              tabelaVerbasCorpo.querySelector('td[colspan="4"]');
-            if (linhaVazia) {
-              linhaVazia.parentElement.remove();
-            }
-            tabelaVerbasCorpo.appendChild(novaLinha);
-            formAdicionarVerba.reset();
+            location.reload();
           } else {
-            alert("Erro: " + data.message);
+            alert("Erro: " + (data.message || "Ocorreu um erro desconhecido."));
           }
         })
-        .catch((error) => console.error("Erro na requisição AJAX:", error));
+        .catch((error) => {
+          console.error("Erro na requisição AJAX:", error);
+          alert(
+            "Erro ao adicionar verba: " +
+              (error.message || "Verifique os dados e tente novamente.")
+          );
+        });
     });
   }
+
+  // --- LÓGICA PARA EXCLUIR VERBA ---
   if (tabelaVerbasCorpo) {
     tabelaVerbasCorpo.addEventListener("click", function (event) {
       const target = event.target.closest(".btn-excluir-verba");
       if (!target) return;
+
       if (confirm("Tem certeza que deseja remover esta verba?")) {
         const csrfToken = document.querySelector(
           'input[name="csrf_token"]'
@@ -52,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              document.getElementById(`verba-${data.deleted_item_id}`).remove();
+              location.reload();
             } else {
               alert("Erro: " + data.message);
             }
@@ -61,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
   const loginInput = document.getElementById("login");
   const emailInput = document.getElementById("email");
 
@@ -93,7 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(value)}`;
+        let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(
+          value
+        )}`;
         if (userIdToExclude) {
           url += `&user_id=${userIdToExclude}`;
         }
