@@ -15,6 +15,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, InputRequired, NumberRange
 
 from app.models.conta_model import Conta
+from app.utils import date_is_not_future
 
 
 class PainelRecebimentosForm(FlaskForm):
@@ -38,15 +39,18 @@ class RecebimentoForm(FlaskForm):
     data_recebimento = DateField(
         "Data do Recebimento",
         format="%Y-%m-%d",
-        validators=[DataRequired("A data do recebimento é obrigatória.")],
+        validators=[
+            DataRequired("A data do recebimento é obrigatória."),
+            date_is_not_future,
+        ],
         default=date.today,
     )
     valor_recebido = DecimalField(
         "Valor a Receber",
         places=2,
         render_kw={
-            'readonly': True,
-            'style': 'color: var(--wf-texto-positivo); font-weight: bold; background-color: var(--wf-box-positivo);'
+            "readonly": True,
+            "style": "color: var(--wf-texto-positivo); font-weight: bold; background-color: var(--wf-box-positivo);",
         },
         validators=[
             InputRequired("O valor é obrigatório."),

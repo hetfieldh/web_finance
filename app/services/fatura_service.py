@@ -15,7 +15,7 @@ from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
-from app.utils import STATUS_ATRASADO, STATUS_PENDENTE
+from app.utils import STATUS_ATRASADO, STATUS_PAGO, STATUS_PARCIAL_PAGO, STATUS_PENDENTE
 
 
 def automatizar_geracao_e_atualizacao_faturas(user_id):
@@ -52,12 +52,11 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
                 "Não foram encontradas novas parcelas para gerar ou atualizar faturas.",
             )
 
-        faturas_pendentes_existentes = CrediarioFatura.query.filter(
-            CrediarioFatura.usuario_id == user_id,
-            CrediarioFatura.status.in_([STATUS_PENDENTE, STATUS_ATRASADO]),
+        todas_as_faturas_existentes = CrediarioFatura.query.filter(
+            CrediarioFatura.usuario_id == user_id
         ).all()
         lookup_faturas = {
-            (f.crediario_id, f.mes_referencia): f for f in faturas_pendentes_existentes
+            (f.crediario_id, f.mes_referencia): f for f in todas_as_faturas_existentes
         }
 
         faturas_criadas = 0
@@ -87,22 +86,21 @@ def automatizar_geracao_e_atualizacao_faturas(user_id):
 
             fatura_existente = lookup_faturas.get((crediario_id, mes_ano_str))
 
-            crediario = db.session.get(Crediario, crediario_id)
-            dia_venc = (
-                crediario.dia_vencimento
-                if crediario and crediario.dia_vencimento
-                else 30
-            )
-            ultimo_dia_mes = monthrange(ano, mes)[1]
-            data_vencimento = date(ano, mes, min(dia_venc, ultimo_dia_mes))
-
             if fatura_existente:
-                if fatura_existente.valor_total_fatura != valor_total_real:
-                    fatura_existente.valor_total_fatura = valor_total_real
-                    if fatura_existente.data_vencimento_fatura != data_vencimento:
-                        fatura_existente.data_vencimento_fatura = data_vencimento
-                    faturas_atualizadas += 1
+                if fatura_existente.status not in [STATUS_PAGO, STATUS_PARCIAL_PAGO]:
+                    if fatura_existente.valor_total_fatura != valor_total_real:
+                        fatura_existente.valor_total_fatura = valor_total_real
+                        faturas_atualizadas += 1
             else:
+                crediario = db.session.get(Crediario, crediario_id)
+                dia_venc = (
+                    crediario.dia_vencimento
+                    if crediario and crediario.dia_vencimento
+                    else 30
+                )
+                ultimo_dia_mes = monthrange(ano, mes)[1]
+                data_vencimento = date(ano, mes, min(dia_venc, ultimo_dia_mes))
+
                 nova_fatura = CrediarioFatura(
                     usuario_id=user_id,
                     crediario_id=crediario_id,

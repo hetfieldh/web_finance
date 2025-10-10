@@ -15,6 +15,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, InputRequired, NumberRange
 
 from app.models.conta_model import Conta
+from app.utils import date_is_not_future
 
 
 class PainelPagamentosForm(FlaskForm):
@@ -38,7 +39,10 @@ class PagamentoForm(FlaskForm):
     data_pagamento = DateField(
         "Data do Pagamento",
         format="%Y-%m-%d",
-        validators=[DataRequired("A data do pagamento é obrigatória.")],
+        validators=[
+            DataRequired("A data do pagamento é obrigatória."),
+            date_is_not_future,
+        ],
         default=date.today,
     )
     valor_pago = DecimalField(

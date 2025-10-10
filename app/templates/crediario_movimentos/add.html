@@ -3,7 +3,7 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <div class="col-md-8 mx-auto">
+  <div class="col-md-10 mx-auto">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-white">
         <h5 class="mb-0">Lançamento de Crediário</h5>
@@ -16,13 +16,15 @@
           {{ form.csrf_token }}
 
           <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               {{ render_field(form.crediario_id) }}
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
               {{ render_field(form.crediario_grupo_id) }}
             </div>
+            <div class="col-md-4 mb-3">{{ render_field(form.destino) }}</div>
           </div>
+
           <div class="row">
             <div class="col-md-3 mb-3">
               {{ render_field(form.data_compra, attrs={'type': 'date'}) }}

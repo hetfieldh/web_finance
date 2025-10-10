@@ -2,9 +2,10 @@
 
 from datetime import date, datetime, timezone
 
-from sqlalchemy import Numeric
+from sqlalchemy import Enum, Numeric
 
 from app import db
+from app.utils import FormChoices
 
 
 class CrediarioMovimento(db.Model):
@@ -20,6 +21,14 @@ class CrediarioMovimento(db.Model):
     data_compra = db.Column(db.Date, nullable=False)
     valor_total_compra = db.Column(Numeric(12, 2), nullable=False)
     descricao = db.Column(db.String(255), nullable=False)
+    destino = db.Column(
+        db.Enum(
+            *(item.value for item in FormChoices.DestinoCrediario),
+            name="destino_crediario_enum",
+        ),
+        nullable=False,
+        server_default=FormChoices.DestinoCrediario.PROPRIO.value,
+    )
     data_primeira_parcela = db.Column(db.Date, nullable=False)
     numero_parcelas = db.Column(db.Integer, nullable=False, default=1)
 

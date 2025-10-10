@@ -76,6 +76,7 @@ render_confirm_modal %} {% block content %}
                 <th>ID</th>
                 <th>Crediário</th>
                 <th>Grupo</th>
+                <th>Destino</th>
                 <th>Data Compra</th>
                 <th>Valor Total</th>
                 <th>Parcelas</th>
@@ -97,6 +98,7 @@ render_confirm_modal %} {% block content %}
                   {{ mov.crediario_grupo.grupo_crediario if mov.crediario_grupo
                   else 'N/A' }}
                 </td>
+                <td>{{ mov.destino }}</td>
                 <td>{{ mov.data_compra.strftime('%d/%m/%Y') }}</td>
                 <td
                   class="{% if mov.valor_total_compra < 0 %}fw-bold text-danger{% else %}text-dark{% endif %}"

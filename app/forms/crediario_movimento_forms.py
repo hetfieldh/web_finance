@@ -27,6 +27,7 @@ from app import db
 from app.models.crediario_grupo_model import CrediarioGrupo
 from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
+from app.utils import FormChoices
 
 
 def coerce_month_year_to_date(value):
@@ -52,6 +53,13 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
         "Grupo de Crediário",
         validators=[DataRequired("O grupo de crediário é obrigatório.")],
         coerce=lambda x: int(x) if x else None,
+    )
+
+    destino = SelectField(
+        "Destino",
+        choices=FormChoices.get_choices(FormChoices.DestinoCrediario),
+        validators=[DataRequired("O destino é obrigatório.")],
+        default=FormChoices.DestinoCrediario.PROPRIO.value,
     )
 
     data_compra = DateField(
@@ -175,6 +183,12 @@ class EditarCrediarioMovimentoForm(FlaskForm):
             DataRequired("A descrição é obrigatória."),
             Length(max=255, message="A descrição não pode exceder 255 caracteres."),
         ],
+    )
+
+    destino = SelectField(
+        "Destino",
+        choices=FormChoices.get_choices(FormChoices.DestinoCrediario),
+        validators=[DataRequired("O destino é obrigatório.")],
     )
 
     data_primeira_parcela = SelectField(

@@ -17,15 +17,19 @@
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <p class="mb-1"><strong>Descrição:</strong></p>
             <p>{{ movimento.descricao }}</p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
+            <p class="mb-1"><strong>Destino:</strong></p>
+            <p>{{ movimento.destino }}</p>
+          </div>
+          <div class="col-md-3">
             <p class="mb-1"><strong>Crediário:</strong></p>
             <p>{{ movimento.crediario.nome_crediario }}</p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <p class="mb-1"><strong>Grupo:</strong></p>
             <p>
               {{ movimento.crediario_grupo.grupo_crediario if

@@ -84,6 +84,7 @@ def painel():
         contas_para_js=contas_para_js,
         title="Painel de Recebimentos",
         fgts_info_json=json.dumps(fgts_info),
+        today=date.today(),
     )
 
 

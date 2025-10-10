@@ -75,6 +75,7 @@ def painel():
         totais=totais,
         contas_json=contas_list,
         title="Painel de Pagamentos",
+        today=date.today(),
     )
 
 

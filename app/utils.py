@@ -4,6 +4,14 @@ from datetime import date
 from enum import Enum
 
 from dateutil.relativedelta import relativedelta
+from wtforms.validators import ValidationError
+
+
+# Funções de validações
+def date_is_not_future(form, field):
+    if field.data and field.data > date.today():
+        raise ValidationError("A data não pode ser no futuro.")
+
 
 # Constantes STATUS
 STATUS_PAGO = "Pago"
@@ -134,6 +142,11 @@ class FormChoices:
     class TiposMovimentacaoBancaria(Enum):
         SIMPLES = TIPO_MOVIMENTACAO_SIMPLES
         TRANSFERENCIA = TIPO_MOVIMENTACAO_TRANSFERENCIA
+
+    class DestinoCrediario(Enum):
+        PROPRIO = "Próprio"
+        OUTROS = "Outros"
+        COLETIVO = "Coletivo"
 
     @classmethod
     def get_choices(cls, enum_class):

@@ -52,6 +52,7 @@ def adicionar_movimento(form):
             data_compra=form.data_compra.data,
             valor_total_compra=valor_total_compra,
             descricao=form.descricao.data.strip(),
+            destino=form.destino.data,
             data_primeira_parcela=data_primeira_parcela_obj,
             numero_parcelas=numero_parcelas,
         )
@@ -127,6 +128,7 @@ def editar_movimento(movimento, form):
         movimento.descricao = (
             form.descricao.data.strip() if form.descricao.data else None
         )
+        movimento.destino = form.destino.data
 
         CrediarioParcela.query.filter_by(crediario_movimento_id=movimento.id).delete()
         db.session.flush()

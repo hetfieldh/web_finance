@@ -179,7 +179,7 @@ render_estornar_modal %} {% block content %}
           <div class="mb-3">{{ render_field(recebimento_form.conta_id) }}</div>
           <div class="mb-3">
             {{ render_field(recebimento_form.data_recebimento, attrs={'type':
-            'date'}) }}
+            'date', 'max': today}) }}
           </div>
           <div class="mb-3">
             {{ render_field(recebimento_form.valor_recebido) }}
