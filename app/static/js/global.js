@@ -36,8 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Inicializa o bootstrap-datepicker em um elemento para seleção de Mês/Ano.
- * @param {string} selector - O seletor jQuery para o campo de input (ex: '#meu-campo').
- * @param {function} onChangeCallback - Uma função a ser executada quando a data é alterada.
+ * @param {string} selector
+ * @param {function} onChangeCallback -
  */
 function inicializarDatepickerMesAno(selector, onChangeCallback) {
   const elemento = $(selector);

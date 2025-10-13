@@ -9,7 +9,7 @@ render_confirm_modal %} {% block content %}
       <div>
         <a
           href="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}"
-          class="btn btn-success btn-add me-2"
+          class="btn btn-azul me-2"
         >
           <i class="fas fa-plus"></i> Adicionar
         </a>
@@ -48,12 +48,12 @@ render_confirm_modal %} {% block content %}
             />
           </div>
           <div class="d-flex gap-1 align-items-end">
-            <button type="submit" class="btn btn-info btn-sm">
+            <button type="submit" class="btn btn-azul">
               <i class="fas fa-search"></i>
             </button>
             <a
               href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
-              class="btn btn-outline-secondary btn-sm"
+              class="btn btn-cinza"
             >
               <i class="fas fa-eraser"></i>
             </a>
@@ -112,7 +112,7 @@ render_confirm_modal %} {% block content %}
                 <td class="table-actions">
                   <a
                     href="{{ url_for('crediario_movimento.detalhes_movimento', id=mov.id) }}"
-                    class="btn btn-info me-2"
+                    class="btn btn-amarelo me-2"
                     title="Ver Detalhes das Parcelas"
                   >
                     <i class="fas fa-list-ul"></i>

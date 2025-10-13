@@ -30,12 +30,12 @@ render_checkbox %} {% block content %}
           <div class="mb-3">{{ render_checkbox(form.ativo) }}</div>
 
           <div class="mt-4">
-            <button type="submit" class="btn btn-success btn-add">
+            <button type="submit" class="btn btn-azul">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('desp_rec.listar_cadastros') }}"
-              class="btn btn-secondary btn-add"
+              class="btn btn-cinza"
               >Cancelar</a
             >
           </div>

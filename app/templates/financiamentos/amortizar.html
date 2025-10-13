@@ -21,8 +21,8 @@
           <h6
             class="card-title fw-semibold p-1 rounded"
             style="
-              color: var(--wf-texto-azul);
-              background-color: var(--wf-box-azul);
+              color: var(--wf-azul-destaque);
+              background-color: var(--wf-azul-claro);
             "
           >
             1. Detalhes do Pagamento
@@ -50,8 +50,8 @@
           <h6
             class="card-title fw-semibold p-1 rounded"
             style="
-              color: var(--wf-texto-azul);
-              background-color: var(--wf-box-azul);
+              color: var(--wf-azul-destaque);
+              background-color: var(--wf-azul-claro);
             "
           >
             2. Forma de Amortização
@@ -67,8 +67,8 @@
           <h6
             class="card-title fw-semibold p-1 rounded"
             style="
-              color: var(--wf-texto-azul);
-              background-color: var(--wf-box-azul);
+              color: var(--wf-azul-destaque);
+              background-color: var(--wf-azul-claro);
             "
           >
             3. Resumo da Operação
@@ -133,21 +133,21 @@
           <h6
             class="card-title fw-semibold p-1 rounded"
             style="
-              color: var(--wf-texto-azul);
-              background-color: var(--wf-box-azul);
+              color: var(--wf-azul-destaque);
+              background-color: var(--wf-azul-claro);
             "
           >
             4. Ação
           </h6>
 
           <div class="d-flex justify-content-center gap-2">
-            <button type="submit" class="btn btn-success btn-add">
+            <button type="submit" class="btn btn-azul">
               <i class="fas fa-hand-holding-usd me-1"></i> {{
               form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('financiamento.listar_financiamentos') }}"
-              class="btn btn-outline-secondary btn-add"
+              class="btn btn-cinza"
             >
               <i class="fas fa-arrow-left me-1"></i> Voltar
             </a>

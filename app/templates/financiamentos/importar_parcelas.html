@@ -101,12 +101,12 @@
           <div class="mb-3">{{ render_field(form.csv_file) }}</div>
 
           <div class="mt-4">
-            <button type="submit" class="btn btn-success btn-add">
+            <button type="submit" class="btn btn-azul">
               <i class="fas fa-upload"></i> {{ form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('financiamento.listar_financiamentos') }}"
-              class="btn btn-secondary btn-add"
+              class="btn btn-cinza"
               >Cancelar</a
             >
           </div>

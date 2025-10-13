@@ -1,8 +1,7 @@
 <!--- app/templates/errors/404.html -->
 
-{% extends "base.html" %} {% block title %}Erro 404{%
-endblock %} {% block page_title %}Erro 404 - Página Não Encontrada{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %}Erro 404{% endblock %} {% block
+page_title %}Erro 404 - Página Não Encontrada{% endblock %} {% block content %}
 <div class="d-flex align-items-center justify-content-center min-vh-90">
   <div class="error-container text-center p-5 shadow-md rounded-3">
     <div class="mb-4">
@@ -17,10 +16,7 @@ endblock %} {% block page_title %}Erro 404 - Página Não Encontrada{% endblock 
     <p class="text-muted mb-4">
       Verifique o endereço digitado e tente novamente.
     </p>
-    <a
-      href="{{ url_for('main.dashboard') }}"
-      class="btn btn-secondary btn-add mt-3"
-    >
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-cinza mt-3">
       <i class="fas fa-home me-2"></i>Ir para o Dashboard
     </a>
   </div>

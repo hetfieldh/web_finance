@@ -9,7 +9,7 @@ render_confirm_modal %} {% block content %}
       <div>
         <a
           href="{{ url_for('conta_movimento.adicionar_movimentacao') }}"
-          class="btn btn-success btn-add"
+          class="btn btn-azul"
         >
           <i class="fas fa-plus"></i> Lançamento
         </a>
@@ -48,12 +48,12 @@ render_confirm_modal %} {% block content %}
             />
           </div>
           <div class="d-flex gap-1 align-items-end">
-            <button type="submit" class="btn btn-info btn-sm">
+            <button type="submit" class="btn btn-azul ">
               <i class="fas fa-search"></i>
             </button>
             <a
               href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
-              class="btn btn-outline-secondary btn-sm"
+              class="btn btn-cinza "
             >
               <i class="fas fa-eraser"></i>
             </a>

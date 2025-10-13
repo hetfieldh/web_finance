@@ -78,10 +78,10 @@
           {% endfor %}
         </div>
         <div class="text-center">
-          <button type="submit" class="btn btn-primary me-2" {{ 'disabled' if limite_atingido }}>
+          <button type="submit" class="btn btn-azul me-2" {{ 'disabled' if limite_atingido }}>
             <i class="fas fa-paper-plane me-1"></i> {{ form.submit.label.text }}
           </button>
-          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
+          <a href="{{ url_for('auth.login') }}" class="btn btn-cinza">
             <i class="fas fa-arrow-left me-1"></i> Login
           </a>
         </div>

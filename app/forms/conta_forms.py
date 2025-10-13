@@ -55,7 +55,7 @@ class CadastroContaForm(FlaskForm):
     tipo = SelectField(
         "Tipo de Conta",
         choices=FormChoices.get_choices(FormChoices.TipoConta),
-        validators=[DataRequired("O tipo de conta é obrigatório.")]
+        validators=[DataRequired("O tipo de conta é obrigatório.")],
     )
     saldo_inicial = DecimalField(
         "Saldo Inicial",
@@ -122,6 +122,8 @@ class EditarContaForm(FlaskForm):
         places=2,
         render_kw={"readonly": True},
     )
+
+    saldo_atual = StringField("Saldo Atual", render_kw={"readonly": True})
 
     limite = DecimalField(
         "Limite (opcional)",

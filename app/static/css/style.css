@@ -17,8 +17,6 @@
     --wf-danger: #dc3545;
     --wf-primary: #0b6dff;
     --wf-secondary: #6c757d;
-    --wf-box-azul: #e9eaf8;
-    --wf-texto-azul: #396694;
     --wf-box-positivo: #d4edda;
     --wf-borda-positivo: #28a745;
     --wf-texto-positivo: #126a27;
@@ -26,8 +24,24 @@
     --wf-borda-negativo: #dc3545;
     --wf-texto-negativo: #76141e;
     --wf-shadow: rgba(0, 0, 0, 0.1);
+    --wf-shadow-50: rgba(0, 0, 0, 0.5);
+    --wf-shadow-25: rgba(0, 0, 0, 0.25);
     --wf-box-bg: #ffffa6cf;
     --wf-box-bg2: #ffffc180;
+
+    /* Botões*/
+    --wf-amarelo-claro: #ffffff;
+    --wf-amarelo-destaque: #ffc107;
+    --wf-amarelo-destaque-hover: #e0aa05;
+    --wf-azul-claro: #e9eaf8;
+    --wf-azul-destaque: #396694;
+    --wf-azul-destaque-hover: #254f79;
+    --wf-cinza-claro: #eceff1;
+    --wf-cinza-destaque: #6e6e6e;
+    --wf-cinza-destaque-hover: #444444;
+    --wf-texto-botao-hover: #e8e238;
+    --wf-texto-botao-hover-2: #396694;
+    --wf-box-transparente: rgba(64, 99, 194, 0.256);
 }
 
 
@@ -125,13 +139,12 @@ h6,
 
 .button-menu {
     background-color: var(--wf-sidebar-bg);
-    color: var(--wf-text-light)
+    color: var(--wf-ultra-light)
 }
 
-#sidebar-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+.button-menu:hover {
+    background-color: var(--wf-shadow-50);
+    color: var(--wf-amarelo-destaque)
 }
 
 .sidebar-menu-wrapper {
@@ -270,11 +283,11 @@ h6,
 .form-control,
 .form-select,
 .form-check-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .form-text {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 /* --- Cards e Alertas --- */
@@ -388,15 +401,80 @@ h6,
     font-size: 0.5rem !important;
 }
 
-.btn-add {
+.btn-azul {
     font-size: 0.9rem !important;
     padding: 0.2rem 1rem !important;
+    color: var(--wf-azul-claro);
+    background-color: var(--wf-azul-destaque);
+    border: none;
 }
 
-.btn-add i {
-    margin-right: 1px;
+.btn-azul:hover,
+.btn-azul:focus {
+    color: var(--wf-texto-botao-hover);
+    background-color: var(--wf-azul-destaque-hover);
+    opacity: 0.9;
 }
 
+.btn-cinza {
+    font-size: 0.9rem !important;
+    padding: 0.2rem 1rem !important;
+    color: var(--wf-cinza-claro);
+    background-color: var(--wf-cinza-destaque);
+    border: none;
+}
+
+.btn-cinza:hover,
+.btn-cinza:focus {
+    color: var(--wf-texto-botao-hover);
+    background-color: var(--wf-cinza-destaque-hover);
+    opacity: 0.9;
+}
+
+.btn-amarelo {
+    font-size: 0.9rem !important;
+    padding: 0.2rem 1rem !important;
+    color: var(--wf-cinza-destaque-hover);
+    background-color: var(--wf-amarelo-destaque);
+    border: none;
+}
+
+.btn-amarelo:hover,
+.btn-amarelo:focus {
+    color: var(--wf-amarelo-claro);
+    background-color: var(--wf-amarelo-destaque-hover);
+    opacity: 0.9;
+}
+
+.form-control-sm {
+    padding: 1px 3px !important;
+    font-size: 0.75rem !important;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Efeito Hover para Ícones da Barra de Navegação
+   ========================================================================== */
+
+/* 1. Prepara todos os ícones para uma transição suave */
+.navbar-nav .nav-item a>i {
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* 2. Efeito para os ícones amarelos (Gráficos) */
+
+.navbar-nav .nav-item .btn.text-warning:hover>i,
+.navbar-nav .nav-item .btn.text-warning:focus>i {
+    color: var(--wf-texto-botao-hover) !important;
+    transform: scale(1.3);
+}
+
+/* 3. Efeito para o ícone azul (Home) */
+.navbar-nav .nav-item .nav-link:hover>.fa-home,
+.navbar-nav .nav-item .nav-link:focus>.fa-home {
+    color: var(--wf-amarelo-destaque) !important;
+    transform: scale(1.3);
+}
 
 /* ==========================================================================
    6. ESTILOS DE PÁGINAS ESPECÍFICAS
@@ -510,7 +588,8 @@ body.login-body {
     padding-top: 0rem;
     padding-bottom: 0rem;
     margin: 0.01rem;
-    background-color: var(--wf-box-bg) !important;
+    background-color: var(--wf-azul-destaque) !important;
+    color: var(--wf-amarelo-claro) !important;
 }
 
 .input-normal {
@@ -521,7 +600,8 @@ body.login-body {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
     margin: 0rem;
-    background-color: var(--wf-box-bg) !important;
+    background-color: var(--wf-azul-destaque) !important;
+    color: var(--wf-amarelo-claro) !important;
     width: 100px;
 }
 
@@ -533,6 +613,113 @@ body.login-body {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
     margin: 0rem;
-    background-color: var(--wf-box-bg) !important;
+    background-color: var(--wf-azul-destaque) !important;
+    color: var(--wf-amarelo-claro) !important;
     width: 100px;
+}
+
+/* ==========================================================
+   BOOTSTRAP DATEPICKER
+   ========================================================== */
+
+.datepicker {
+    background-color: var(--wf-shadow) !important;
+    border: 1px solid var(--wf-light) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 6px 14px var(--wf-shadow-25) !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    color: var(--wf-info) !important;
+    padding: 2px !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: 9999 !important;
+    font-size: 0.7rem !important;
+}
+
+/* ====== Cabeçalho e navegação ====== */
+.datepicker .prev,
+.datepicker .next {
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--wf-cinza-destaque-hover) !important;
+    font-size: 1.5rem !important;
+    border-radius: 4px !important;
+    padding: 0px 7px !important;
+    transition: all 0.2s ease !important;
+}
+
+.datepicker .prev:hover,
+.datepicker .next:hover {
+    background-color: var(--wf-box-transparente) !important;
+    color: var(--wf-azul-destaque) !important;
+    transform: scale(1.1) !important;
+    cursor: pointer !important;
+}
+
+.datepicker .datepicker-switch {
+    font-size: 1.2rem !important;
+    background-color: transparent !important;
+    color: var(--wf-cinza-destaque-hover) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.9px !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: default !important;
+}
+
+.datepicker .datepicker-switch:hover {
+    background-color: var(--wf-box-transparente) !important;
+    color: var(--wf-azul-destaque-hover) !important;
+}
+
+/* ====== Corpo - Mês e Ano ====== */
+.datepicker-months td {
+    background: transparent !important;
+}
+
+.datepicker-months td span {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 58px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    font-size: 0.85rem !important;
+    color: var(--wf-grey) !important;
+    font-weight: 500 !important;
+    margin: 3px !important;
+    background-color: transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+.datepicker-months td span:hover {
+    background-color: var(--wf-box-transparente) !important;
+    color: var(--wf-azul-destaque-hover) !important;
+    transform: scale(1.1) !important;
+    cursor: pointer !important;
+}
+
+.datepicker-months td span.active,
+.datepicker-months td span.active:hover {
+    background-color: var(--wf-azul-destaque) !important;
+    color: var(--wf-white) !important;
+    font-weight: 600 !important;
+    box-shadow: var(--wf-shadow-25) !important;
+}
+
+/* ====== Mês atual (hoje) ====== */
+.datepicker-months td span.month.today,
+.datepicker-months td span.month.focused {
+    background-color: var(--wf-azul-destaque) !important;
+    color: var(--wf-white) !important;
+    font-weight: 600 !important;
+    border: var(--wf-border) !important;
+    box-shadow: none !important;
+}
+
+/* Hover do mês atual */
+.datepicker-months td span.month.today:hover,
+.datepicker-months td span.month.focused:hover {
+    color: var(--wf-amarelo-destaque) !important;
 }

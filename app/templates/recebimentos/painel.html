@@ -21,7 +21,7 @@ render_estornar_modal %} {% block content %}
           >
             Mês/Ano:
           </label>
-          {{ form.mes_ano(class="form-control form-control-sm input-normal",
+          {{ form.mes_ano(class="form-control form-control-sm input-compacto",
           id="mes_ano_recebimentos") }}
         </form>
         <div
@@ -191,12 +191,12 @@ render_estornar_modal %} {% block content %}
         <div class="modal-footer">
           <button
             type="button"
-            class="btn btn-secondary"
+            class="btn btn-cinza"
             data-bs-dismiss="modal"
           >
             Cancelar
           </button>
-          {{ recebimento_form.submit(class="btn btn-success") }}
+          {{ recebimento_form.submit(class="btn btn-azul") }}
         </div>
       </form>
     </div>

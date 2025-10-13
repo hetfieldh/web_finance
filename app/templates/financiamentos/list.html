@@ -8,7 +8,7 @@ render_confirm_modal %} {% block content %}
       <h4 class="mb-0">Financiamentos Cadastrados</h4>
       <a
         href="{{ url_for('financiamento.adicionar_financiamento') }}"
-        class="btn btn-success btn-add"
+        class="btn btn-azul"
       >
         <i class="fas fa-plus"></i> Financiamento
       </a>
@@ -50,7 +50,7 @@ render_confirm_modal %} {% block content %}
                 <td class="table-actions">
                   <a
                     href="{{ url_for('financiamento.visualizar_parcelas', id=financiamento.id) }}"
-                    class="btn btn-info me-2"
+                    class="btn btn-amarelo me-2"
                     title="Visualizar Parcelas"
                   >
                     <i class="fas fa-list-ol"></i>

@@ -29,12 +29,12 @@
           <div class="mb-3">{{ render_field(form.descricao) }}</div>
 
           <div class="mt-4">
-            <button type="submit" class="btn btn-info btn-add">
+            <button type="submit" class="btn btn-amarelo">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
-              class="btn btn-secondary btn-add"
+              class="btn btn-cinza"
               >Cancelar</a
             >
           </div>
