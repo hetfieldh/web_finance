@@ -5,7 +5,7 @@ render_checkbox %} {% block content %}
 <div class="row">
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header menu-primario">
         <h5 class="mb-0">
           Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}
         </h5>
@@ -38,7 +38,7 @@ render_checkbox %} {% block content %}
                 {{ form.senha(class="form-control", id="senha",
                 placeholder="Deixe em branco para manter a senha atual") }}
                 <button
-                  class="btn btn-outline-secondary"
+                  class="btn btn-cinza"
                   type="button"
                   id="toggleSenha"
                   title="Mostrar/Ocultar Senha"
@@ -73,7 +73,7 @@ render_checkbox %} {% block content %}
                 {{ form.confirmar_senha(class="form-control",
                 id="confirmar_senha", placeholder="Repita a nova senha") }}
                 <button
-                  class="btn btn-outline-secondary"
+                  class="btn btn-cinza"
                   type="button"
                   id="toggleConfirmarSenha"
                   title="Mostrar/Ocultar Senha"
@@ -104,7 +104,7 @@ render_checkbox %} {% block content %}
               administrador)</small
             >{% endif %}
           </div>
-          <div class="mt-4">
+          <div class="mt-1">
             <button type="submit" class="btn btn-amarelo">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>

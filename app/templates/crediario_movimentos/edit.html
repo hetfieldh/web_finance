@@ -3,9 +3,9 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <div class="col-md-10 mx-auto">
+  <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header menu-primario">
         <h5 class="mb-0">Editar Lançamento Crediário ID: {{ movimento.id }}</h5>
       </div>
       <div class="card-body">
@@ -17,19 +17,20 @@
 
           <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label">Crediário:</label>
+              <label class="form-label mb-1 small">Crediário:</label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control form-control-sm text-start"
                 value="{{ movimento.crediario.nome_crediario }} ({{ movimento.crediario.tipo_crediario }})"
                 readonly
               />
             </div>
+
             <div class="col-md-4 mb-3">
-              <label class="form-label">Grupo de Crediário:</label>
+              <label class="form-label mb-1 small">Grupo de Crediário:</label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control form-control-sm text-start"
                 value="{{ movimento.crediario_grupo.grupo_crediario if movimento.crediario_grupo else 'N/A' }}"
                 readonly
               />
@@ -57,7 +58,7 @@
             <div class="mb-3">{{ render_field(form.descricao) }}</div>
           </div>
 
-          <div class="mt-4">
+          <div class="mt-1">
             <button type="submit" class="btn btn-amarelo">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>

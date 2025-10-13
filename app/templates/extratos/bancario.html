@@ -3,12 +3,12 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <h5 class="mb-2">
-    <i class="fas fa-info-circle text-primary me-0"></i>
-    <span class="text-dark">Extrato Bancário:</span>
-    <span class="text-danger">Movimentações em conta no mês.</span>
-  </h5>
   <div class="col-12">
+    <div class="caixa-sombreada mb-2">
+      <span class="text-dark fw-bold">Extrato Bancário:</span>
+      <span class="text-danger">Movimentações em conta no mês.</span>
+    </div>
+
     <div class="card shadow-sm mb-2">
       <div class="card-body">
         <form
@@ -17,7 +17,7 @@
           action="{{ url_for('extrato.extrato_bancario') }}"
         >
           <div class="row align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-3">
               {{ form.conta_id(class="form-select", id="conta_id") }}
             </div>
             <div class="col-md-3">
@@ -72,7 +72,7 @@
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-secondary text-white">
+      <div class="card-header menu-primario">
         <h6 class="mb-0">
           Extrato de {{ conta_selecionada.nome_banco }} - {{
           conta_selecionada.conta }} ({{ conta_selecionada.tipo }})

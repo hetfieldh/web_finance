@@ -6,6 +6,7 @@
 
 :root {
     --wf-white: #ffffff;
+    --wf-black: #000000;
     --wf-grey: #444444;
     --wf-ultra-light: #eceff1;
     --wf-light: #bebebe;
@@ -434,9 +435,9 @@ h6,
 .btn-amarelo {
     font-size: 0.9rem !important;
     padding: 0.2rem 1rem !important;
-    color: var(--wf-cinza-destaque-hover);
-    background-color: var(--wf-amarelo-destaque);
-    border: none;
+    color: var(--wf-cinza-destaque-hover) !important;
+    background-color: var(--wf-amarelo-destaque) !important;
+    border: none !important;
 }
 
 .btn-amarelo:hover,
@@ -588,8 +589,8 @@ body.login-body {
     padding-top: 0rem;
     padding-bottom: 0rem;
     margin: 0.01rem;
-    background-color: var(--wf-azul-destaque) !important;
-    color: var(--wf-amarelo-claro) !important;
+    background-color: var(--wf-light) !important;
+    color: var(--wf-cinza-destaque-hover) !important;
 }
 
 .input-normal {
@@ -600,8 +601,8 @@ body.login-body {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
     margin: 0rem;
-    background-color: var(--wf-azul-destaque) !important;
-    color: var(--wf-amarelo-claro) !important;
+    background-color: var(--wf-light) !important;
+    color: var(--wf-cinza-destaque-hover) !important;
     width: 100px;
 }
 
@@ -613,9 +614,55 @@ body.login-body {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
     margin: 0rem;
-    background-color: var(--wf-azul-destaque) !important;
-    color: var(--wf-amarelo-claro) !important;
+    background-color: var(--wf-light) !important;
+    color: var(--wf-cinza-destaque-hover) !important;
     width: 100px;
+}
+
+.caixa-sombreada {
+    position: relative;
+    color: var(--wf-azul-destaque);
+    background-color: var(--wf-azul-claro);
+    padding: 4px 10px 4px 50px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px var(--wf-shadow-25);
+    font-weight: 600;
+    line-height: 1.5;
+    border-left: 4px solid var(--wf-azul-destaque);
+}
+
+.caixa-sombreada::before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f05a";
+    font-weight: 900;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: var(--wf-texto-positivo);
+}
+
+.caixa-sombreada-cinza {
+    color: var(--wf-cinza-destaque-hover);
+    background-color: var(--wf-cinza-claro);
+    border-radius: 5px;
+    box-shadow: 0 1px 3px var(--wf-shadow-50);
+    font-size: 1rem;
+}
+
+.menu-primario {
+    color: var(--wf-white) !important;
+    background-color: var(--wf-sidebar-bg) !important;
+    border-radius: 5px !important;
+    font-size: 0.9rem !important;
+}
+
+.menu-secundario {
+    color: var(--wf-black) !important;
+    background-color: var(--wf-amarelo-destaque) !important;
+    border-radius: 5px !important;
+    font-size: 0.9rem !important;
 }
 
 /* ==========================================================

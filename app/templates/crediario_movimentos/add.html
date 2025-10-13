@@ -3,9 +3,9 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <div class="col-md-10 mx-auto">
+  <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header menu-primario">
         <h5 class="mb-0">Lançamento de Crediário</h5>
       </div>
       <div class="card-body">
@@ -45,7 +45,7 @@
             <div class="mb-3">{{ render_field(form.descricao) }}</div>
           </div>
 
-          <div class="mt-4">
+          <div class="mt-1">
             <button type="submit" class="btn btn-azul">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>

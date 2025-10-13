@@ -189,6 +189,7 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Destino",
         choices=FormChoices.get_choices(FormChoices.DestinoCrediario),
         validators=[DataRequired("O destino é obrigatório.")],
+        render_kw={"disabled": True},
     )
 
     data_primeira_parcela = SelectField(

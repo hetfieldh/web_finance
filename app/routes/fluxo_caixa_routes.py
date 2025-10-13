@@ -37,7 +37,7 @@ def painel():
         )
 
     return render_template(
-        "fluxo_caixa/painel.html",
+        "extratos/fluxo_caixa.html",
         form=form,
         movimentacoes=movimentacoes,
         kpis=kpis,

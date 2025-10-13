@@ -41,7 +41,7 @@ def extrato_consolidado():
         )
 
     return render_template(
-        "extratos/consolidado.html",
+        "extratos/fluxo_caixa_detalhado.html",
         form=form,
         movimentacoes=movimentacoes,
         kpis=kpis,

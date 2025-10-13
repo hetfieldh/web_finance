@@ -5,7 +5,7 @@ render_checkbox %} {% block content %}
 <div class="row">
   <div class="col-md-6 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header menu-primario">
         <h5 class="mb-0">
           Editar Conta: {{ conta.nome_banco }} ({{ conta.agencia }} | {{
           conta.conta }}) {{ conta.tipo }}
@@ -50,7 +50,7 @@ render_checkbox %} {% block content %}
 
           <div class="mb-3">{{ render_checkbox(form.ativa) }}</div>
 
-          <div class="mt-4">
+          <div class="mt-1">
             <button type="submit" class="btn btn-amarelo">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>

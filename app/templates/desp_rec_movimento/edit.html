@@ -3,9 +3,9 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <div class="col-md-8 mx-auto">
+  <div class="col-md-6 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header menu-primario">
         <h5 class="mb-0">
           Editando: {{ movimento.despesa_receita.nome }} - Venc: {{
           movimento.data_vencimento.strftime('%d/%m/%Y') }}
@@ -39,7 +39,7 @@
 
           <div class="mb-3">{{ render_field(form.descricao) }}</div>
 
-          <div class="mt-4">
+          <div class="mt-1">
             <button
               type="submit"
               class="btn btn-amarelo"

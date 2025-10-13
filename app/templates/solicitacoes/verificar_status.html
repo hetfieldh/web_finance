@@ -32,7 +32,7 @@
       messages %} {% for category, message in messages %}
       <div class="alert alert-{{ category }}">{{ message }}</div>
       {% endfor %} {% endif %} {% endwith %} {% if solicitacao %}
-      <div class="mt-4">
+      <div class="mt-1">
         <div class="card">
           <div class="card-body">
             <p class="mb-1"><strong>E-mail:</strong> {{ solicitacao.email }}</p>
@@ -75,7 +75,7 @@
       </div>
       {% endif %}
 
-      <div class="text-center mt-4">
+      <div class="text-center mt-1">
         <a href="{{ url_for('auth.login') }}" class="btn btn-cinza">
           <i class="fas fa-arrow-left me-1"></i> Login
         </a>

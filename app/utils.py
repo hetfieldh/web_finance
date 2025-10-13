@@ -158,217 +158,76 @@ class FormChoices:
 # CONFIGURAÇÃO DE TÍTULOS E CABEÇALHOS DAS PÁGINAS
 PAGE_CONFIG = {
     # Main e Auth
-    "main.dashboard": {"title": "Dashboard", "header": "Dashboard"},
-    "auth.login": {"title": "Login", "header": "Acesso ao Sistema"},
+    "main.dashboard": {"title": "Dashboard"},
+    "auth.login": {"title": "Login"},
     # Usuários
-    "usuario.listar_usuarios": {"title": "Usuários", "header": "Usuários"},
-    "usuario.adicionar_usuario": {
-        "title": "Usuários",
-        "header": "Usuário",
-    },
-    "usuario.editar_usuario": {"title": "Usuários", "header": "Usuário"},
-    "usuario.perfil": {"title": "Usuários", "header": "Editar Perfil"},
+    "usuario.listar_usuarios": {"title": "Usuários"},
+    "usuario.adicionar_usuario": {"title": "Usuários"},
+    "usuario.editar_usuario": {"title": "Usuários"},
+    "usuario.perfil": {"title": "Usuários"},
     # Contas
-    "conta.listar_contas": {"title": "Contas Bancárias", "header": "Contas Bancárias"},
-    "conta.adicionar_conta": {
-        "title": "Contas Bancárias",
-        "header": "Contas Bancárias",
-    },
-    "conta.editar_conta": {"title": "Contas Bancárias", "header": "Editar Conta"},
+    "conta.listar_contas": {"title": "Contas Bancárias"},
+    "conta.adicionar_conta": {"title": "Contas Bancárias"},
+    "conta.editar_conta": {"title": "Contas Bancárias"},
     # Transações da Conta
-    "conta_transacao.listar_tipos_transacao": {
-        "title": "Contas Bancárias",
-        "header": "Contas Bancárias",
-    },
-    "conta_transacao.adicionar_tipo_transacao": {
-        "title": "Contas Bancárias",
-        "header": "Contas Bancárias",
-    },
-    "conta_transacao.editar_tipo_transacao": {
-        "title": "Contas Bancárias",
-        "header": "Contas Bancárias",
-    },
+    "conta_transacao.listar_tipos_transacao": {"title": "Contas Bancárias"},
+    "conta_transacao.adicionar_tipo_transacao": {"title": "Contas Bancárias"},
+    "conta_transacao.editar_tipo_transacao": {"title": "Contas Bancárias"},
     # Movimentos da Conta
-    "conta_movimento.listar_movimentacoes": {
-        "title": "TR Bancárias",
-        "header": "Contas Bancárias",
-    },
-    "conta_movimento.adicionar_movimentacao": {
-        "title": "TR Bancárias",
-        "header": "Contas Bancárias",
-    },
-    "conta_movimento.editar_movimentacao": {
-        "title": "TR Bancárias",
-        "header": "Contas Bancárias",
-    },
+    "conta_movimento.listar_movimentacoes": {"title": "TR Bancárias"},
+    "conta_movimento.adicionar_movimentacao": {"title": "TR Bancárias"},
+    "conta_movimento.editar_movimentacao": {"title": "TR Bancárias"},
     # Crediários
-    "crediario.listar_crediarios": {
-        "title": "Crediários",
-        "header": "Crediários",
-    },
-    "crediario.adicionar_crediario": {
-        "title": "Crediários",
-        "header": "Crediários",
-    },
-    "crediario.editar_crediario": {"title": "Crediários", "header": "Crediários"},
+    "crediario.listar_crediarios": {"title": "Crediários"},
+    "crediario.adicionar_crediario": {"title": "Crediários"},
+    "crediario.editar_crediario": {"title": "Crediários"},
     # Grupos de Crediário
-    "crediario_grupo.listar_grupos_crediario": {
-        "title": "Crediários",
-        "header": "Crediários",
-    },
-    "crediario_grupo.adicionar_grupo_crediario": {
-        "title": "Crediários",
-        "header": "Crediários",
-    },
-    "crediario_grupo.editar_grupo_crediario": {
-        "title": "Crediários",
-        "header": "Crediários",
-    },
+    "crediario_grupo.listar_grupos_crediario": {"title": "Crediários"},
+    "crediario_grupo.adicionar_grupo_crediario": {"title": "Crediários"},
+    "crediario_grupo.editar_grupo_crediario": {"title": "Crediários"},
     # Movimentos de Crediário
-    "crediario_movimento.listar_movimentos_crediario": {
-        "title": "TR Crediários",
-        "header": "Crediários",
-    },
-    "crediario_movimento.adicionar_movimento_crediario": {
-        "title": "TR Crediários",
-        "header": "Crediários",
-    },
-    "crediario_movimento.editar_movimento_crediario": {
-        "title": "TR Crediários",
-        "header": "Crediários",
-    },
-    "crediario_movimento.detalhes_movimento": {
-        "title": "TR Crediários",
-        "header": "Crediários",
-    },
+    "crediario_movimento.listar_movimentos_crediario": {"title": "TR Crediários"},
+    "crediario_movimento.adicionar_movimento_crediario": {"title": "TR Crediários"},
+    "crediario_movimento.editar_movimento_crediario": {"title": "TR Crediários"},
+    "crediario_movimento.detalhes_movimento": {"title": "TR Crediários"},
     # Faturas de Crediário
-    "crediario_fatura.listar_faturas": {
-        "title": "Fatura Crediário",
-        "header": "Crediários",
-    },
-    "crediario_fatura.visualizar_fatura": {
-        "title": "Fatura Crediário",
-        "header": "Crediários",
-    },
+    "crediario_fatura.listar_faturas": {"title": "Fatura Crediário"},
+    "crediario_fatura.visualizar_fatura": {"title": "Fatura Crediário"},
     # Financiamentos
-    "financiamento.listar_financiamentos": {
-        "title": "Financiamentos",
-        "header": "Financiamentos",
-    },
-    "financiamento.adicionar_financiamento": {
-        "title": "Financiamentos",
-        "header": "Financiamentos",
-    },
-    "financiamento.editar_financiamento": {
-        "title": "Financiamentos",
-        "header": "Financiamentos",
-    },
-    "financiamento.importar_parcelas": {
-        "title": "Financiamentos",
-        "header": "Financiamentos",
-    },
-    "financiamento.visualizar_parcelas": {
-        "title": "Financiamentos",
-        "header": "Financiamentos",
-    },
-    "financiamento.amortizar_financiamento": {
-        "title": "Financiamentos",
-        "header": "Financiamentos",
-    },
+    "financiamento.listar_financiamentos": {"title": "Financiamentos"},
+    "financiamento.adicionar_financiamento": {"title": "Financiamentos"},
+    "financiamento.editar_financiamento": {"title": "Financiamentos"},
+    "financiamento.importar_parcelas": {"title": "Financiamentos"},
+    "financiamento.visualizar_parcelas": {"title": "Financiamentos"},
+    "financiamento.amortizar_financiamento": {"title": "Financiamentos"},
     # Despesas e Receitas (Cadastros)
-    "desp_rec.listar_cadastros": {
-        "title": "Despesas e Receitas",
-        "header": "Despesas e Receitas",
-    },
-    "desp_rec.adicionar_cadastro": {
-        "title": "Despesas e Receitas",
-        "header": "Despesas e Receitas",
-    },
-    "desp_rec.editar_cadastro": {
-        "title": "Despesas e Receitas",
-        "header": "Despesas e Receitas",
-    },
+    "desp_rec.listar_cadastros": {"title": "Despesas e Receitas"},
+    "desp_rec.adicionar_cadastro": {"title": "Despesas e Receitas"},
+    "desp_rec.editar_cadastro": {"title": "Despesas e Receitas"},
     # Despesas e Receitas (Movimentos)
-    "desp_rec_movimento.listar_movimentos": {
-        "title": "TR Desp/Rec",
-        "header": "Despesas e Receitas",
-    },
-    "desp_rec_movimento.gerar_previsao": {
-        "title": "TR Desp/Rec",
-        "header": "Despesas e Receitas",
-    },
-    "desp_rec_movimento.adicionar_lancamento_unico": {
-        "title": "TR Desp/Rec",
-        "header": "Despesas e Receitas",
-    },
-    "desp_rec_movimento.editar_movimento": {
-        "title": "TR Desp/Rec",
-        "header": "Despesas e Receitas",
-    },
+    "desp_rec_movimento.listar_movimentos": {"title": "TR Desp/Rec"},
+    "desp_rec_movimento.gerar_previsao": {"title": "TR Desp/Rec"},
+    "desp_rec_movimento.adicionar_lancamento_unico": {"title": "TR Desp/Rec"},
+    "desp_rec_movimento.editar_movimento": {"title": "TR Desp/Rec"},
     # Salário
-    "salario.listar_itens": {
-        "title": "Salários",
-        "header": "Salários",
-    },
-    "salario.adicionar_item": {
-        "title": "Salários",
-        "header": "Salários",
-    },
-    "salario.editar_item": {
-        "title": "Salários",
-        "header": "Salários",
-    },
-    "salario.listar_movimentos": {
-        "title": "Salários",
-        "header": "Salários",
-    },
-    "salario.novo_lancamento_folha": {
-        "title": "Salários",
-        "header": "Salários",
-    },
-    "salario.gerenciar_itens_folha": {
-        "title": "Salários",
-        "header": "Salários",
-    },
+    "salario.listar_itens": {"title": "Salários"},
+    "salario.adicionar_item": {"title": "Salários"},
+    "salario.editar_item": {"title": "Salários"},
+    "salario.listar_movimentos": {"title": "Salários"},
+    "salario.novo_lancamento_folha": {"title": "Salários"},
+    "salario.gerenciar_itens_folha": {"title": "Salários"},
     # Relatórios
-    "extrato.extrato_bancario": {
-        "title": "Extrato Bancário",
-        "header": "Contas Bancárias",
-    },
-    "extrato_consolidado.extrato_consolidado": {
-        "title": "Fluxo de Caixa Detalhado por Parcelas",
-        "header": "Fluxo de Caixa Detalhado por Parcelas",
-    },
-    "fluxo_caixa.painel": {
-        "title": "Fluxo de Caixa",
-        "header": "Fluxo de Caixa",
-    },
+    "extrato.extrato_bancario": {"title": "Extrato Bancário"},
+    "extrato_consolidado.extrato_consolidado": {"title": "Fluxo de Caixa"},
+    "fluxo_caixa.painel": {"title": "Fluxo de Caixa"},
     # Painéis
-    "pagamentos.painel": {
-        "title": "Pagamentos",
-        "header": "Painel de Pagamentos",
-    },
-    "recebimentos.painel": {
-        "title": "Recebimentos",
-        "header": "Painel de Recebimentos",
-    },
+    "pagamentos.painel": {"title": "Pagamentos"},
+    "recebimentos.painel": {"title": "Recebimentos"},
     # Gráficos
-    "graphics.view_graphics": {"title": "Gráficos", "header": "Resumo do Mês"},
-    "graphics.resumo_financiamentos": {
-        "title": "Gráficos",
-        "header": "Resumo do Financiamento",
-    },
+    "graphics.view_graphics": {"title": "Gráficos"},
+    "graphics.resumo_financiamentos": {"title": "Gráficos"},
     # Solicitações de Acesso
-    "solicitacao.solicitar_acesso": {
-        "title": "Solicitar Acesso",
-        "header": "Solicitar Acesso ao Sistema",
-    },
-    "solicitacao.verificar_status": {
-        "title": "Status Solicitação",
-        "header": "Verificar Status da Solicitação",
-    },
-    "solicitacao.gerenciar_solicitacoes": {
-        "title": "Usuários",
-        "header": "Gerenciar Solicitações de Acesso",
-    },
+    "solicitacao.solicitar_acesso": {"title": "Solicitar Acesso"},
+    "solicitacao.verificar_status": {"title": "Status Solicitação"},
+    "solicitacao.gerenciar_solicitacoes": {"title": "Usuários"},
 }

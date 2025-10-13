@@ -24,11 +24,22 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then((data) => {
           if (data.success) {
+            const valorInput = formAdicionarVerba.querySelector(
+              'input[name="valor"]'
+            );
+            if (valorInput) valorInput.value = "";
+
+            const selectItem = formAdicionarVerba.querySelector(
+              'select[name="salario_item_id"]'
+            );
+            if (selectItem) selectItem.selectedIndex = 0;
+
             location.reload();
           } else {
             alert("Erro: " + (data.message || "Ocorreu um erro desconhecido."));
           }
         })
+
         .catch((error) => {
           console.error("Erro na requisição AJAX:", error);
           alert(

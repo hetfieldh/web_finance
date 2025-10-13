@@ -91,7 +91,7 @@ class EditarSalarioItemForm(FlaskForm):
 
 class CabecalhoFolhaForm(FlaskForm):
     mes_referencia = StringField(
-        "Mês de Referência",
+        "Mês de Referência: ",
         validators=[DataRequired("O mês de referência é obrigatório.")],
         render_kw={"placeholder": "Selecione..."},
     )

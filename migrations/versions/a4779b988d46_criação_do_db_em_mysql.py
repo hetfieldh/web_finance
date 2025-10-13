@@ -1,8 +1,8 @@
 """Criação do DB em MySql
 
-Revision ID: 1045cb2dd0b5
+Revision ID: a4779b988d46
 Revises: 
-Create Date: 2025-10-10 09:23:01.662968
+Create Date: 2025-10-13 11:46:41.580876
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1045cb2dd0b5'
+revision = 'a4779b988d46'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -137,6 +137,7 @@ def upgrade():
     sa.Column('data_compra', sa.Date(), nullable=False),
     sa.Column('valor_total_compra', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('descricao', sa.String(length=255), nullable=False),
+    sa.Column('destino', sa.Enum('Próprio', 'Outros', 'Coletivo', name='destino_crediario_enum'), server_default='Próprio', nullable=False),
     sa.Column('data_primeira_parcela', sa.Date(), nullable=False),
     sa.Column('numero_parcelas', sa.Integer(), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),

@@ -3,9 +3,9 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <div class="col-md-8 mx-auto">
+  <div class="col-md-6 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
+      <div class="card-header menu-primario">
         <h5 class="mb-0">
           Editar Tipo de Transação: {{ tipo_transacao.transacao_tipo }}
         </h5>
@@ -18,13 +18,13 @@
           {{ form.csrf_token }}
 
           <div class="row">
-            <div class="col-md-7 mb-3">
+            <div class="col-md-5 mb-3">
               {{ render_field(form.transacao_tipo) }}
             </div>
-            <div class="col-md-5 mb-3">{{ render_field(form.tipo) }}</div>
+            <div class="col-md-3 mb-3">{{ render_field(form.tipo) }}</div>
           </div>
 
-          <div class="mt-4">
+          <div class="mt-1">
             <button type="submit" class="btn btn-amarelo">
               <i class="fas fa-save"></i> {{ form.submit.label.text }}
             </button>

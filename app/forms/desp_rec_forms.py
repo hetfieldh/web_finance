@@ -115,7 +115,7 @@ class GerarPrevisaoForm(FlaskForm):
         coerce=lambda x: int(x) if x else None,
     )
     valor_previsto = DecimalField(
-        "Valor Previsto Mensal",
+        "Valor Mensal",
         validators=[
             InputRequired("O valor previsto é obrigatório."),
             NumberRange(min=0.01, message="O valor deve ser maior que zero."),
@@ -129,7 +129,7 @@ class GerarPrevisaoForm(FlaskForm):
         default=date.today,
     )
     numero_meses = IntegerField(
-        "Gerar por Quantos Meses?",
+        "Quantos Meses?",
         validators=[
             InputRequired("O número de meses é obrigatório."),
             NumberRange(
