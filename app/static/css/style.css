@@ -1,36 +1,42 @@
 /* app/static/css/style.css */
 
 /* ==========================================================================
-   1. CORES
+   1. CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
    ========================================================================== */
 
+/* --- Paleta de Cores, Sombras e Fontes --- */
 :root {
+    /* Cores Base */
     --wf-white: #ffffff;
     --wf-black: #000000;
     --wf-grey: #444444;
     --wf-ultra-light: #eceff1;
     --wf-light: #bebebe;
-    --wf-sidebar-bg: #1B4F72;
     --wf-border: #6e6e6e;
     --wf-text-light: #BDC3C7;
+
+    /* Cores Semânticas (Bootstrap-like) */
+    --wf-primary: #0b6dff;
+    --wf-secondary: #6c757d;
     --wf-info: #0753c4;
     --wf-warning: #c79c19;
     --wf-danger: #dc3545;
-    --wf-primary: #0b6dff;
-    --wf-secondary: #6c757d;
+
+    /* Cores de Feedback (Positivo/Negativo) */
     --wf-box-positivo: #d4edda;
     --wf-borda-positivo: #28a745;
     --wf-texto-positivo: #126a27;
     --wf-box-negativo: #f8d7da;
     --wf-borda-negativo: #dc3545;
     --wf-texto-negativo: #76141e;
-    --wf-shadow: rgba(0, 0, 0, 0.1);
-    --wf-shadow-50: rgba(0, 0, 0, 0.5);
-    --wf-shadow-25: rgba(0, 0, 0, 0.25);
+
+    /* Cores de Componentes Específicos */
+    --wf-sidebar-bg: #1B4F72;
     --wf-box-bg: #ffffa6cf;
     --wf-box-bg2: #ffffc180;
+    --wf-box-transparente: rgba(64, 99, 194, 0.256);
 
-    /* Botões*/
+    /* Cores para Botões */
     --wf-amarelo-claro: #ffffff;
     --wf-amarelo-destaque: #ffc107;
     --wf-amarelo-destaque-hover: #e0aa05;
@@ -42,7 +48,11 @@
     --wf-cinza-destaque-hover: #444444;
     --wf-texto-botao-hover: #e8e238;
     --wf-texto-botao-hover-2: #396694;
-    --wf-box-transparente: rgba(64, 99, 194, 0.256);
+
+    /* Sombras */
+    --wf-shadow: rgba(0, 0, 0, 0.1);
+    --wf-shadow-25: rgba(0, 0, 0, 0.25);
+    --wf-shadow-50: rgba(0, 0, 0, 0.5);
 }
 
 
@@ -50,6 +60,7 @@
    2. ESTILOS DE BASE E TIPOGRAFIA
    ========================================================================== */
 
+/* --- Reset e Padrões Globais --- */
 body,
 html {
     overflow: hidden;
@@ -61,65 +72,23 @@ body {
     line-height: 1.5;
 }
 
-h1,
-.h1 {
-    font-size: 2.2rem;
-}
+/* --- Títulos (Headings) --- */
+h1, .h1 { font-size: 2.2rem; }
+h2, .h2 { font-size: 1.8rem; }
+h3, .h3 { font-size: 1.5rem; }
+h4, .h4 { font-size: 1.3rem; }
+h5, .h5 { font-size: 1.1rem; }
+h6, .h6 { font-size: 0.9rem; }
 
-h2,
-.h2 {
-    font-size: 1.8rem;
-}
-
-h3,
-.h3 {
-    font-size: 1.5rem;
-}
-
-h4,
-.h4 {
-    font-size: 1.3rem;
-}
-
-h5,
-.h5 {
-    font-size: 1.1rem;
-}
-
-h6,
-.h6 {
-    font-size: 0.9rem;
-}
 
 /* ==========================================================================
    3. LAYOUT PRINCIPAL (SIDEBAR E CONTEÚDO)
    ========================================================================== */
 
+/* --- Estrutura Wrapper --- */
 #wrapper {
     overflow-x: hidden;
     height: 100vh;
-}
-
-#sidebar-wrapper.bg-modified {
-    background-color: var(--wf-sidebar-bg) !important;
-}
-
-#sidebar-wrapper {
-    min-height: 100vh;
-    margin-left: -15rem;
-    transition: margin .25s ease-out;
-    width: 14rem;
-    display: flex;
-    flex-direction: column;
-}
-
-#sidebar-wrapper .list-group-item {
-    border-color: var(--wf-border);
-    color: var(--wf-text-light)
-}
-
-#sidebar-wrapper .list-group-item-action:hover {
-    color: var(--wf-warning);
 }
 
 #page-content-wrapper {
@@ -134,8 +103,34 @@ h6,
     z-index: 1020;
 }
 
+/* --- Sidebar --- */
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin .25s ease-out;
+    width: 14rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar-wrapper.bg-modified {
+    background-color: var(--wf-sidebar-bg) !important;
+}
+
 #wrapper.toggled #sidebar-wrapper {
     margin-left: 0;
+}
+
+/* --- Menu da Sidebar --- */
+.sidebar-menu-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#sidebar-wrapper .list-group-item {
+    border-color: var(--wf-border);
+    color: var(--wf-text-light)
 }
 
 .button-menu {
@@ -143,38 +138,23 @@ h6,
     color: var(--wf-ultra-light)
 }
 
-.button-menu:hover {
-    background-color: var(--wf-shadow-50);
-    color: var(--wf-amarelo-destaque)
+.logged-in-user-info {
+    font-size: 0.7rem;
+    color: var(--wf-secondary);
 }
 
-.sidebar-menu-wrapper {
-    flex-grow: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
+/* --- Scrollbar da Sidebar --- */
+.sidebar-menu-wrapper::-webkit-scrollbar { width: 8px; }
+.sidebar-menu-wrapper::-webkit-scrollbar-track { background: var(--wf-grey); }
+.sidebar-menu-wrapper::-webkit-scrollbar-thumb { background: var(--wf-border); border-radius: 2px; }
+.sidebar-menu-wrapper::-webkit-scrollbar-thumb:hover { background: var(--wf-light); }
 
-.sidebar-menu-wrapper::-webkit-scrollbar {
-    width: 8px;
-}
-
-.sidebar-menu-wrapper::-webkit-scrollbar-track {
-    background: var(--wf-grey);
-}
-
-.sidebar-menu-wrapper::-webkit-scrollbar-thumb {
-    background: var(--wf-border);
-    border-radius: 2px;
-}
-
-.sidebar-menu-wrapper::-webkit-scrollbar-thumb:hover {
-    background: var(--wf-light);
-}
 
 /* ==========================================================================
-   4. ESTILOS DE COMPONENTES
+   4. COMPONENTES GENÉRICOS
    ========================================================================== */
 
+/* --- Barra de Navegação (Navbar) --- */
 .navbar.bg-dark {
     background-color: var(--wf-grey) !important;
     border-bottom-color: var(--wf-border) !important;
@@ -185,8 +165,8 @@ h6,
     transition: color 0.2s ease-in-out;
 }
 
-.navbar .nav-link:hover {
-    color: var(--wf-white);
+.navbar-nav .nav-link {
+    font-size: 0.95rem;
 }
 
 /* --- Tabelas --- */
@@ -203,23 +183,6 @@ h6,
     white-space: nowrap;
 }
 
-.table .badge {
-    padding: 0 0.25em;
-    line-height: 1rem;
-    font-size: 0.65rem;
-}
-
-.table i {
-    font-size: 0.7rem;
-    line-height: 1rem;
-}
-
-.table .btn {
-    padding: 0 !important;
-    line-height: 1rem;
-    height: auto;
-}
-
 .table form {
     margin: 0;
     padding: 0;
@@ -232,6 +195,7 @@ h6,
     padding: 0 15px;
 }
 
+/* --- Ações da Tabela (Ícones) --- */
 .table-actions {
     white-space: nowrap;
 }
@@ -256,29 +220,11 @@ h6,
     box-shadow: none !important;
 }
 
-.table-actions .btn.btn-info i {
-    color: var(--wf-info);
-}
-
-.table-actions .btn.btn-warning i {
-    color: var(--wf-warning);
-}
-
-.table-actions .btn.btn-danger i {
-    color: var(--wf-danger);
-}
-
-.table-actions .btn.btn-primary i {
-    color: var(--wf-primary);
-}
-
-.table-actions .btn.btn-secondary i {
-    color: var(--wf-secondary);
-}
-
-.table-actions .btn:hover i {
-    opacity: 0.5;
-}
+.table-actions .btn.btn-info i { color: var(--wf-info); }
+.table-actions .btn.btn-warning i { color: var(--wf-warning); }
+.table-actions .btn.btn-danger i { color: var(--wf-danger); }
+.table-actions .btn.btn-primary i { color: var(--wf-primary); }
+.table-actions .btn.btn-secondary i { color: var(--wf-secondary); }
 
 /* --- Formulários --- */
 .form-control,
@@ -305,11 +251,19 @@ h6,
     font-size: 0.85rem;
 }
 
-/* --- Navegação e Itens da Sidebar --- */
-.navbar-nav .nav-link {
-    font-size: 0.95rem;
+/* --- Badges --- */
+.badge {
+    font-size: 0.7rem;
+    padding: 0.25em 0.5em;
 }
 
+.table .badge {
+    padding: 0 0.25em;
+    line-height: 1rem;
+    font-size: 0.65rem;
+}
+
+/* --- Listas --- */
 .list-group-item {
     font-size: 0.85rem;
     color: var(--wf-text-light)
@@ -323,17 +277,12 @@ h6,
     color: var(--wf-warning) !important;
 }
 
-.logged-in-user-info {
-    font-size: 0.7rem;
-    color: var(--wf-secondary);
-}
 
-/* --- Outros Componentes --- */
-.badge {
-    font-size: 0.7rem;
-    padding: 0.25em 0.5em;
-}
+/* ==========================================================================
+   5. COMPONENTES CUSTOMIZADOS
+   ========================================================================== */
 
+/* --- Caixas de Saldo (Positivo/Negativo) --- */
 .saldo-positivo-box {
     background-color: var(--wf-box-positivo);
     border: 1px solid var(--wf-borda-positivo);
@@ -350,6 +299,55 @@ h6,
     font-weight: bold;
 }
 
+/* --- Caixas de Informação --- */
+.caixa-sombreada {
+    position: relative;
+    color: var(--wf-azul-destaque);
+    background-color: var(--wf-azul-claro);
+    padding: 4px 10px 4px 50px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px var(--wf-shadow-25);
+    font-weight: 600;
+    line-height: 1.5;
+    border-left: 4px solid var(--wf-azul-destaque);
+}
+
+.caixa-sombreada::before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f05a";
+    font-weight: 900;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: var(--wf-texto-positivo);
+}
+
+.caixa-sombreada-cinza {
+    color: var(--wf-cinza-destaque-hover);
+    background-color: var(--wf-cinza-claro);
+    border-radius: 5px;
+    box-shadow: 0 1px 3px var(--wf-shadow-50);
+    font-size: 1rem;
+}
+
+/* --- Menus Customizados --- */
+.menu-primario {
+    color: var(--wf-white) !important;
+    background-color: var(--wf-sidebar-bg) !important;
+    border-radius: 5px !important;
+    font-size: 0.9rem !important;
+}
+
+.menu-secundario {
+    color: var(--wf-black) !important;
+    background-color: var(--wf-amarelo-destaque) !important;
+    border-radius: 5px !important;
+    font-size: 0.9rem !important;
+}
+
+/* --- Botão "Voltar ao Topo" --- */
 #back-to-top-btn {
     position: fixed;
     bottom: 20px;
@@ -364,44 +362,80 @@ h6,
 }
 
 
-/* Efeito no hover de cada conta */
+/* ==========================================================================
+   6. ANIMAÇÕES E EFEITOS DE HOVER
+   ========================================================================== */
+
+/* --- Efeito Hover - Itens da Sidebar --- */
+#sidebar-wrapper .list-group-item-action:hover {
+    color: var(--wf-warning);
+}
+
+.button-menu:hover {
+    background-color: var(--wf-shadow-50);
+    color: var(--wf-amarelo-destaque)
+}
+
+/* --- Efeito Hover - Links da Navbar --- */
+.navbar .nav-link:hover {
+    color: var(--wf-white);
+}
+
+.navbar-nav .nav-item a>i {
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.navbar-nav .nav-item .btn.text-warning:hover>i,
+.navbar-nav .nav-item .btn.text-warning:focus>i {
+    color: var(--wf-texto-botao-hover) !important;
+    transform: scale(1.3);
+}
+
+.navbar-nav .nav-item .nav-link:hover>.fa-home,
+.navbar-nav .nav-item .nav-link:focus>.fa-home {
+    color: var(--wf-amarelo-destaque) !important;
+    transform: scale(1.3);
+}
+
+/* --- Efeito Hover - Ações da Tabela --- */
+.table-actions .btn:hover i {
+    opacity: 0.5;
+}
+
+/* --- Efeito Hover - Cards e Listas (Dashboard) --- */
 .card.conta-hover {
-    transition: all 0.2s ease-in-out;
-    /* suavidade */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    border: 1px solid var(--wf-text-light);
 }
 
 .card.conta-hover:hover {
-    background-color: var(--wf-box-bg2);
-    /* muda o fundo levemente */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    /* sombra */
+    background-color: var(--wf-azul-claro);
+    border-color: var(--wf-azul-destaque);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
 
 .itens-lista .list-group-item {
-    transition: all 0.2s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
 .itens-lista .list-group-item:hover {
-    background-color: var(--wf-box-bg2);
-    /* leve destaque */
+    background-color: var(--wf-azul-claro);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
+
 
 /* ==========================================================================
-   5. CLASSES UTILITÁRIAS
+   7. CLASSES UTILITÁRIAS
    ========================================================================== */
 
-.extra-small {
-    font-size: 0.7rem !important;
-}
+/* --- Tamanho de Fonte --- */
+.extra-small { font-size: 0.7rem !important; }
+.extra-small-2 { font-size: 0.6rem !important; }
+.extra-small-3 { font-size: 0.5rem !important; }
 
-.extra-small-2 {
-    font-size: 0.6rem !important;
-}
-
-.extra-small-3 {
-    font-size: 0.5rem !important;
-}
-
+/* --- Botões Customizados --- */
 .btn-azul {
     font-size: 0.9rem !important;
     padding: 0.2rem 1rem !important;
@@ -447,40 +481,60 @@ h6,
     opacity: 0.9;
 }
 
+/* --- Inputs de Formulário Customizados --- */
 .form-control-sm {
     padding: 1px 3px !important;
     font-size: 0.75rem !important;
     text-align: center;
 }
 
+.input-compacto {
+    width: 80px;
+    height: auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    margin: 0rem;
+    color: var(--wf-azul-destaque) !important;
+    border: 1px solid var(--wf-secondary);
+    background-color: transparent !important;
+}
+
+.input-normal {
+    width: 100px;
+    height: auto;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    margin: 0rem;
+    color: var(--wf-azul-destaque) !important;
+    border: 2px solid var(--wf-secondary);
+    background-color: transparent !important;
+}
+
+.input-maior {
+    width: 100px;
+    height: auto;
+    font-size: 1rem;
+    text-align: center;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    margin: 0rem;
+    color: var(--wf-azul-destaque) !important;
+    border: 2px solid var(--wf-secondary);
+    background-color: transparent !important;
+}
+
+
 /* ==========================================================================
-   Efeito Hover para Ícones da Barra de Navegação
+   8. ESTILOS DE PÁGINAS ESPECÍFICAS
    ========================================================================== */
 
-/* 1. Prepara todos os ícones para uma transição suave */
-.navbar-nav .nav-item a>i {
-    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
-}
-
-/* 2. Efeito para os ícones amarelos (Gráficos) */
-
-.navbar-nav .nav-item .btn.text-warning:hover>i,
-.navbar-nav .nav-item .btn.text-warning:focus>i {
-    color: var(--wf-texto-botao-hover) !important;
-    transform: scale(1.3);
-}
-
-/* 3. Efeito para o ícone azul (Home) */
-.navbar-nav .nav-item .nav-link:hover>.fa-home,
-.navbar-nav .nav-item .nav-link:focus>.fa-home {
-    color: var(--wf-amarelo-destaque) !important;
-    transform: scale(1.3);
-}
-
-/* ==========================================================================
-   6. ESTILOS DE PÁGINAS ESPECÍFICAS
-   ========================================================================== */
-
+/* --- Página de Login --- */
 body.login-body {
     display: flex;
     justify-content: center;
@@ -505,6 +559,7 @@ body.login-body {
     width: auto;
 }
 
+/* --- Página de Erro --- */
 .error-container {
     background: var(--wf-white);
     padding: 3rem;
@@ -514,161 +569,16 @@ body.login-body {
     width: 90%;
 }
 
-/* Estilo do logotipo */
 .error-container .error-icon {
     max-width: 150px;
 }
 
-/* ==========================================================================
-   7. RESPONSIVIDADE (MEDIA QUERIES)
-   ========================================================================== */
-
-@media (min-width: 768px) {
-    #sidebar-wrapper {
-        margin-left: 0;
-    }
-
-    #page-content-wrapper {
-        min-width: 0;
-        width: 100%;
-    }
-
-    #wrapper.toggled #sidebar-wrapper {
-        margin-left: -14rem;
-    }
-}
-
-@media (max-width: 767.98px) {
-
-    h1,
-    .h1 {
-        font-size: 1.8rem;
-    }
-
-    h2,
-    .h2 {
-        font-size: 1.5rem;
-    }
-
-    h3,
-    .h3 {
-        font-size: 1.3rem;
-    }
-
-    h4,
-    .h4 {
-        font-size: 1.1rem;
-    }
-
-    .table {
-        font-size: 0.8rem;
-    }
-
-    .table-actions .btn {
-        min-width: auto;
-        font-size: 0.7rem;
-        padding: 0.2rem 0.4rem;
-    }
-
-    .table-responsive {
-        max-width: 100%;
-        padding: 0;
-    }
-}
 
 /* ==========================================================================
-   8. AJUSTES CUSTOMIZADOS
+   9. SOBRESCRITA DE PLUGINS (OVERRIDES)
    ========================================================================== */
 
-/* Classe utilitária para campos de formulário pequenos e compactos */
-.input-compacto {
-    width: 80px;
-    height: auto;
-    font-size: 0.7rem;
-    text-align: center;
-    padding-top: 0rem;
-    padding-bottom: 0rem;
-    margin: 0.01rem;
-    background-color: var(--wf-light) !important;
-    color: var(--wf-cinza-destaque-hover) !important;
-}
-
-.input-normal {
-    width: auto;
-    height: auto;
-    font-size: 1rem;
-    text-align: center;
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
-    margin: 0rem;
-    background-color: var(--wf-light) !important;
-    color: var(--wf-cinza-destaque-hover) !important;
-    width: 100px;
-}
-
-.input-maior {
-    width: auto;
-    height: 35px;
-    font-size: 1rem;
-    text-align: center;
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
-    margin: 0rem;
-    background-color: var(--wf-light) !important;
-    color: var(--wf-cinza-destaque-hover) !important;
-    width: 100px;
-}
-
-.caixa-sombreada {
-    position: relative;
-    color: var(--wf-azul-destaque);
-    background-color: var(--wf-azul-claro);
-    padding: 4px 10px 4px 50px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px var(--wf-shadow-25);
-    font-weight: 600;
-    line-height: 1.5;
-    border-left: 4px solid var(--wf-azul-destaque);
-}
-
-.caixa-sombreada::before {
-    font-family: "Font Awesome 5 Free";
-    content: "\f05a";
-    font-weight: 900;
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.1rem;
-    color: var(--wf-texto-positivo);
-}
-
-.caixa-sombreada-cinza {
-    color: var(--wf-cinza-destaque-hover);
-    background-color: var(--wf-cinza-claro);
-    border-radius: 5px;
-    box-shadow: 0 1px 3px var(--wf-shadow-50);
-    font-size: 1rem;
-}
-
-.menu-primario {
-    color: var(--wf-white) !important;
-    background-color: var(--wf-sidebar-bg) !important;
-    border-radius: 5px !important;
-    font-size: 0.9rem !important;
-}
-
-.menu-secundario {
-    color: var(--wf-black) !important;
-    background-color: var(--wf-amarelo-destaque) !important;
-    border-radius: 5px !important;
-    font-size: 0.9rem !important;
-}
-
-/* ==========================================================
-   BOOTSTRAP DATEPICKER
-   ========================================================== */
-
+/* --- Bootstrap Datepicker --- */
 .datepicker {
     background-color: var(--wf-shadow) !important;
     border: 1px solid var(--wf-light) !important;
@@ -683,7 +593,7 @@ body.login-body {
     font-size: 0.7rem !important;
 }
 
-/* ====== Cabeçalho e navegação ====== */
+/* Cabeçalho e navegação do Datepicker */
 .datepicker .prev,
 .datepicker .next {
     background-color: transparent !important;
@@ -720,7 +630,7 @@ body.login-body {
     color: var(--wf-azul-destaque-hover) !important;
 }
 
-/* ====== Corpo - Mês e Ano ====== */
+/* Corpo (Mês e Ano) do Datepicker */
 .datepicker-months td {
     background: transparent !important;
 }
@@ -755,7 +665,6 @@ body.login-body {
     box-shadow: var(--wf-shadow-25) !important;
 }
 
-/* ====== Mês atual (hoje) ====== */
 .datepicker-months td span.month.today,
 .datepicker-months td span.month.focused {
     background-color: var(--wf-azul-destaque) !important;
@@ -765,8 +674,49 @@ body.login-body {
     box-shadow: none !important;
 }
 
-/* Hover do mês atual */
 .datepicker-months td span.month.today:hover,
 .datepicker-months td span.month.focused:hover {
     color: var(--wf-amarelo-destaque) !important;
+}
+
+
+/* ==========================================================================
+   10. RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -14rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    h1, .h1 { font-size: 1.8rem; }
+    h2, .h2 { font-size: 1.5rem; }
+    h3, .h3 { font-size: 1.3rem; }
+    h4, .h4 { font-size: 1.1rem; }
+
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .table-actions .btn {
+        min-width: auto;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .table-responsive {
+        max-width: 100%;
+        padding: 0;
+    }
 }

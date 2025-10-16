@@ -38,9 +38,9 @@
 
 <div class="row g-2 mb-2">
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
-        <h6 class="card-title text-muted small">SALDO OPERACIONAL </h6>
+        <h6 class="card-title text-muted small">SALDO OPERACIONAL</h6>
         <p
           class="card-text h5 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %}"
         >
@@ -50,7 +50,7 @@
     </div>
   </div>
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">INVESTIMENTOS</h6>
         <p class="card-text h5 fw-semibold text-success">
@@ -60,7 +60,7 @@
     </div>
   </div>
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">BENEFÍCIOS</h6>
         <p class="card-text h5 fw-semibold text-secondary">
@@ -70,7 +70,7 @@
     </div>
   </div>
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">FGTS</h6>
         <p class="card-text h5 fw-semibold text-secondary">
@@ -83,7 +83,7 @@
 
 <div class="row g-2 mb-2">
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">RECEITAS DO MÊS
           <span style="font-size: 0.7em; margin-left: 1px; color: var(--wf-info); font-style: italic;">
@@ -97,7 +97,7 @@
     </div>
   </div>
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
         <p class="card-text h5 fw-semibold text-danger">
@@ -107,7 +107,7 @@
     </div>
   </div>
   <div class="col">
-    <div class="card shadow-sm h-100 bg-light">
+    <div class="card conta-hover">
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small align-items-center">SALDO
           <span style="font-size: 0.7em; margin-left: 1px; color: var(--wf-info); font-style: italic;">
@@ -139,7 +139,7 @@
         {% if contas_do_usuario %}
         <div class="d-flex flex-column gap-1">
           {% for conta in contas_do_usuario %}
-          <div class="card border-1 conta-hover">
+          <div class="card conta-hover">
             <div
               class="card-body p-1 d-flex justify-content-between align-items-center"
             >
@@ -247,7 +247,7 @@
           {% if financiamentos %}
             {% for financ in financiamentos %}
               {% if financ.saldo_devedor_atual > 0 %}
-                <div class="card border-1 conta-hover">
+                <div class="card conta-hover">
                   <div
                     class="card-body p-1 d-flex justify-content-between align-items-center"
                   >
@@ -272,7 +272,7 @@
           {% endif %}
           {% if crediarios %}
             {% for cred in crediarios %}
-              {% if cred.saldo_devedor > 0 %}  <div class="card border-1 conta-hover">
+              {% if cred.saldo_devedor > 0 %}  <div class="card conta-hover">
                 <div
                   class="card-body p-1 d-flex justify-content-between align-items-center"
                 >
