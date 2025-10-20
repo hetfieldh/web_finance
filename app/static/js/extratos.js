@@ -1,4 +1,4 @@
-// app/static/js/extratos.js (VERSÃO COMPLETA E FINAL)
+// app/static/js/extratos.js
 
 console.log("extratos.js carregado com sucesso!");
 
@@ -49,6 +49,27 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .on("changeDate", function (e) {
           formExtratoConsolidado.submit();
+        });
+    }
+  }
+
+  // NOVO BLOCO ADICIONADO PARA O RESUMO MENSAL
+  const formResumoMensal = document.getElementById("form-resumo-mensal");
+  if (formResumoMensal) {
+    const selectMesResumo = document.getElementById("mes_ano_resumo");
+
+    if (selectMesResumo) {
+      $(selectMesResumo)
+        .datepicker({
+          format: "mm-yyyy",
+          startView: "months",
+          minViewMode: "months",
+          language: "pt-BR",
+          autoclose: true,
+          orientation: "bottom auto",
+        })
+        .on("changeDate", function (e) {
+          formResumoMensal.submit();
         });
     }
   }

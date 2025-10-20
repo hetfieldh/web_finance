@@ -209,6 +209,13 @@ def dashboard():
         else 0
     )
 
+    # Nova lógica para o alerta
+    contas_a_vencer = relatorios_service.get_contas_a_vencer(current_user.id)
+    contas_a_vencer_count = len(contas_a_vencer)
+
+    contas_vencidas = relatorios_service.get_contas_vencidas(current_user.id)
+    contas_vencidas_count = len(contas_vencidas)
+
     return render_template(
         "dashboard.html",
         kpis=kpis,
@@ -218,7 +225,23 @@ def dashboard():
         financiamentos=financiamentos_ativos,
         crediarios=crediarios_ativos,
         form_movimentos=form,
+        contas_a_vencer_count=contas_a_vencer_count,
+        contas_vencidas_count=contas_vencidas_count,
     )
+
+
+@main_bp.route("/alertas/contas-a-vencer")
+@login_required
+def contas_a_vencer():
+    movimentos = relatorios_service.get_contas_a_vencer(current_user.id)
+    return render_template("alertas/contas_a_vencer.html", movimentos=movimentos)
+
+
+@main_bp.route("/alertas/contas-vencidas")
+@login_required
+def contas_vencidas():
+    movimentos = relatorios_service.get_contas_vencidas(current_user.id)
+    return render_template("alertas/contas_vencidas.html", movimentos=movimentos)
 
 
 @main_bp.route("/favicon.ico")
