@@ -73,12 +73,35 @@ body {
 }
 
 /* --- Títulos (Headings) --- */
-h1, .h1 { font-size: 2.2rem; }
-h2, .h2 { font-size: 1.8rem; }
-h3, .h3 { font-size: 1.5rem; }
-h4, .h4 { font-size: 1.3rem; }
-h5, .h5 { font-size: 1.1rem; }
-h6, .h6 { font-size: 0.9rem; }
+h1,
+.h1 {
+    font-size: 2.2rem;
+}
+
+h2,
+.h2 {
+    font-size: 1.8rem;
+}
+
+h3,
+.h3 {
+    font-size: 1.5rem;
+}
+
+h4,
+.h4 {
+    font-size: 1.3rem;
+}
+
+h5,
+.h5 {
+    font-size: 1.1rem;
+}
+
+h6,
+.h6 {
+    font-size: 0.9rem;
+}
 
 
 /* ==========================================================================
@@ -144,10 +167,22 @@ h6, .h6 { font-size: 0.9rem; }
 }
 
 /* --- Scrollbar da Sidebar --- */
-.sidebar-menu-wrapper::-webkit-scrollbar { width: 8px; }
-.sidebar-menu-wrapper::-webkit-scrollbar-track { background: var(--wf-grey); }
-.sidebar-menu-wrapper::-webkit-scrollbar-thumb { background: var(--wf-border); border-radius: 2px; }
-.sidebar-menu-wrapper::-webkit-scrollbar-thumb:hover { background: var(--wf-light); }
+.sidebar-menu-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar-track {
+    background: var(--wf-grey);
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar-thumb {
+    background: var(--wf-border);
+    border-radius: 2px;
+}
+
+.sidebar-menu-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--wf-light);
+}
 
 
 /* ==========================================================================
@@ -220,11 +255,34 @@ h6, .h6 { font-size: 0.9rem; }
     box-shadow: none !important;
 }
 
-.table-actions .btn.btn-info i { color: var(--wf-info); }
-.table-actions .btn.btn-warning i { color: var(--wf-warning); }
-.table-actions .btn.btn-danger i { color: var(--wf-danger); }
-.table-actions .btn.btn-primary i { color: var(--wf-primary); }
-.table-actions .btn.btn-secondary i { color: var(--wf-secondary); }
+.table-actions .btn.btn-info i {
+    color: var(--wf-info);
+}
+
+.table-actions .btn.btn-warning i {
+    color: var(--wf-warning);
+}
+
+.table-actions .btn.btn-danger i {
+    color: var(--wf-danger);
+}
+
+.table-actions .btn.btn-primary i {
+    color: var(--wf-primary);
+}
+
+.table-actions .btn.btn-secondary i {
+    color: var(--wf-secondary);
+}
+
+/* .table.table-sm {
+    font-size: 0.6rem;
+}
+
+.table.table-sm th,
+.table.table-sm td {
+    padding: 0.1rem 0.1rem;
+} */
 
 /* --- Formulários --- */
 .form-control,
@@ -431,9 +489,17 @@ h6, .h6 { font-size: 0.9rem; }
    ========================================================================== */
 
 /* --- Tamanho de Fonte --- */
-.extra-small { font-size: 0.7rem !important; }
-.extra-small-2 { font-size: 0.6rem !important; }
-.extra-small-3 { font-size: 0.5rem !important; }
+.extra-small {
+    font-size: 0.7rem !important;
+}
+
+.extra-small-2 {
+    font-size: 0.6rem !important;
+}
+
+.extra-small-3 {
+    font-size: 0.5rem !important;
+}
 
 /* --- Botões Customizados --- */
 .btn-azul {
@@ -700,10 +766,26 @@ body.login-body {
 }
 
 @media (max-width: 767.98px) {
-    h1, .h1 { font-size: 1.8rem; }
-    h2, .h2 { font-size: 1.5rem; }
-    h3, .h3 { font-size: 1.3rem; }
-    h4, .h4 { font-size: 1.1rem; }
+
+    h1,
+    .h1 {
+        font-size: 1.8rem;
+    }
+
+    h2,
+    .h2 {
+        font-size: 1.5rem;
+    }
+
+    h3,
+    .h3 {
+        font-size: 1.3rem;
+    }
+
+    h4,
+    .h4 {
+        font-size: 1.1rem;
+    }
 
     .table {
         font-size: 0.8rem;

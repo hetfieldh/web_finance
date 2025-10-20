@@ -13,3 +13,13 @@ def format_currency(value):
         return value
 
     return locale.currency(val, grouping=True, symbol=True)
+
+
+def format_number(value):
+    if value is None:
+        value = 0
+    try:
+        # Formata como número com 2 casas decimais e separador de milhar
+        return locale.format_string("%.2f", value, grouping=True)
+    except (TypeError, ValueError):
+        return value

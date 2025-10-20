@@ -73,4 +73,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
   }
+
+  // NOVO BLOCO ADICIONADO PARA O RESUMO DA FOLHA
+  const formResumoFolha = document.getElementById("form-resumo-folha");
+  if (formResumoFolha) {
+    const selectAnoFolha = document.getElementById("ano_resumo_folha");
+    if (selectAnoFolha) {
+      selectAnoFolha.addEventListener("change", function () {
+        formResumoFolha.submit();
+      });
+    }
+  }
 });
