@@ -13,6 +13,11 @@ from app.models.conta_transacao_model import ContaTransacao
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_model import SalarioMovimento
+from app.utils import (
+    TIPO_DEBITO,
+    TIPO_MOVIMENTACAO_SIMPLES,
+    TIPO_MOVIMENTACAO_TRANSFERENCIA,
+)
 
 
 def registrar_movimento(form):
@@ -29,14 +34,18 @@ def registrar_movimento(form):
             return False, "O valor da movimentação deve ser maior que zero."
 
         is_debit_operation = False
-        if tipo_operacao == "simples":
-            tipo_transacao = db.session.get(
+        transacao_id_para_descricao = None
+
+        if tipo_operacao == TIPO_MOVIMENTACAO_SIMPLES:
+            tipo_transacao_obj = db.session.get(
                 ContaTransacao, form.conta_transacao_id.data
             )
-            if tipo_transacao and tipo_transacao.tipo == "Débito":
+            if tipo_transacao_obj and tipo_transacao_obj.tipo == TIPO_DEBITO:
                 is_debit_operation = True
-        elif tipo_operacao == "transferencia":
+            transacao_id_para_descricao = form.conta_transacao_id.data
+        elif tipo_operacao == TIPO_MOVIMENTACAO_TRANSFERENCIA:
             is_debit_operation = True
+            transacao_id_para_descricao = form.transferencia_tipo_id.data
 
         if is_debit_operation:
             saldo_disponivel = conta_origem.saldo_atual
@@ -48,29 +57,46 @@ def registrar_movimento(form):
                     f"Saldo e limite insuficientes na conta {conta_origem.nome_banco}. Saldo disponível: R$ {saldo_disponivel:.2f}",
                 )
 
-        if tipo_operacao == "simples":
+        descricao_final = descricao_manual
+        if not descricao_final and transacao_id_para_descricao:
+            tipo_transacao_fallback = db.session.get(
+                ContaTransacao, transacao_id_para_descricao
+            )
+            if tipo_transacao_fallback:
+                descricao_final = tipo_transacao_fallback.transacao_tipo
+
+        if tipo_operacao == TIPO_MOVIMENTACAO_SIMPLES:
             tipo_transacao = db.session.get(
                 ContaTransacao, form.conta_transacao_id.data
             )
+            if not tipo_transacao:
+                return False, "Tipo de transação inválido ou não encontrado."
+
             movimento = ContaMovimento(
                 usuario_id=current_user.id,
                 conta_id=conta_origem_id,
                 conta_transacao_id=form.conta_transacao_id.data,
                 data_movimento=data_movimento,
                 valor=valor,
-                descricao=descricao_manual,
+                descricao=descricao_final,
             )
             db.session.add(movimento)
-            if tipo_transacao.tipo == "Débito":
+            if tipo_transacao.tipo == TIPO_DEBITO:
                 conta_origem.saldo_atual -= valor
             else:
                 conta_origem.saldo_atual += valor
 
-        elif tipo_operacao == "transferencia":
+        elif tipo_operacao == TIPO_MOVIMENTACAO_TRANSFERENCIA:
             conta_destino = db.session.get(Conta, form.conta_destino_id.data)
             tipo_transacao_debito = db.session.get(
                 ContaTransacao, form.transferencia_tipo_id.data
             )
+            if not tipo_transacao_debito:
+                return (
+                    False,
+                    "Tipo de transferência (débito) inválido ou não encontrado.",
+                )
+
             tipo_transacao_credito = ContaTransacao.query.filter_by(
                 usuario_id=current_user.id,
                 transacao_tipo=tipo_transacao_debito.transacao_tipo,
@@ -83,13 +109,17 @@ def registrar_movimento(form):
                     f'Tipo de transação de Crédito correspondente a "{tipo_transacao_debito.transacao_tipo}" não encontrado.',
                 )
 
-            nome_origem = f"{conta_origem.nome_banco} - {conta_origem.conta}"
-            nome_destino = f"{conta_destino.nome_banco} - {conta_destino.conta}"
-            desc_origem = f"{tipo_transacao_debito.transacao_tipo} para {nome_destino}"
-            desc_destino = f"{tipo_transacao_debito.transacao_tipo} de {nome_origem}"
-            if descricao_manual:
-                desc_origem += f" ({descricao_manual})"
-                desc_destino += f" ({descricao_manual})"
+            descricao_base_origem = f"{tipo_transacao_debito.transacao_tipo} para {conta_destino.nome_banco} ({conta_destino.agencia}-{conta_destino.conta})"
+            descricao_base_destino = f"{tipo_transacao_debito.transacao_tipo} de {conta_origem.nome_banco} ({conta_origem.agencia}-{conta_origem.conta})"
+
+            desc_origem = (
+                f"{descricao_base_origem}" if descricao_final else descricao_base_origem
+            )
+            desc_destino = (
+                f"{descricao_base_destino}"
+                if descricao_final
+                else descricao_base_destino
+            )
 
             movimento_origem = ContaMovimento(
                 usuario_id=current_user.id,
@@ -119,6 +149,9 @@ def registrar_movimento(form):
             movimento_destino.id_movimento_relacionado = movimento_origem.id
 
         db.session.commit()
+        current_app.logger.info(
+            f"Movimentação registrada com sucesso por {current_user.login}."
+        )
         return True, "Movimentação registrada com sucesso!"
 
     except Exception as e:

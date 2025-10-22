@@ -209,12 +209,13 @@ def dashboard():
         else 0
     )
 
-    # Nova lógica para o alerta
     contas_a_vencer = relatorios_service.get_contas_a_vencer(current_user.id)
     contas_a_vencer_count = len(contas_a_vencer)
 
     contas_vencidas = relatorios_service.get_contas_vencidas(current_user.id)
     contas_vencidas_count = len(contas_vencidas)
+
+    ultimos_movimentos = conta_service.get_ultimos_movimentos_bancarios(current_user.id)
 
     return render_template(
         "dashboard.html",
@@ -227,6 +228,7 @@ def dashboard():
         form_movimentos=form,
         contas_a_vencer_count=contas_a_vencer_count,
         contas_vencidas_count=contas_vencidas_count,
+        ultimos_movimentos=ultimos_movimentos,
     )
 
 

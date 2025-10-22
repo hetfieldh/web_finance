@@ -5,10 +5,12 @@ from decimal import Decimal
 from flask import current_app
 from flask_login import current_user
 from sqlalchemy import case, func
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
+from app.models.conta_transacao_model import ContaTransacao
 
 
 def criar_conta(form):
@@ -228,3 +230,18 @@ def has_fgts_account():
         ).first()
         is not None
     )
+
+
+def get_ultimos_movimentos_bancarios(user_id, limit=10):
+    movimentos = (
+        ContaMovimento.query.join(Conta, ContaMovimento.conta_id == Conta.id)
+        .join(ContaTransacao, ContaMovimento.conta_transacao_id == ContaTransacao.id)
+        .filter(ContaMovimento.usuario_id == user_id)
+        .options(
+            joinedload(ContaMovimento.conta), joinedload(ContaMovimento.tipo_transacao)
+        )
+        .order_by(ContaMovimento.data_movimento.desc(), ContaMovimento.id.desc())
+        .limit(limit)
+        .all()
+    )
+    return movimentos

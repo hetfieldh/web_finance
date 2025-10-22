@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // NOVO BLOCO ADICIONADO PARA O RESUMO MENSAL
+  // RESUMO MENSAL
   const formResumoMensal = document.getElementById("form-resumo-mensal");
   if (formResumoMensal) {
     const selectMesResumo = document.getElementById("mes_ano_resumo");
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // NOVO BLOCO ADICIONADO PARA O RESUMO DA FOLHA
+  // RESUMO DA FOLHA
   const formResumoFolha = document.getElementById("form-resumo-folha");
   if (formResumoFolha) {
     const selectAnoFolha = document.getElementById("ano_resumo_folha");

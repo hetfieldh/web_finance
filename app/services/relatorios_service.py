@@ -33,14 +33,9 @@ from app.utils import (
 
 
 def get_resumo_folha_anual(user_id, ano):
-    """
-    Busca e estrutura os dados da folha de pagamento para um ano inteiro,
-    agrupando em categorias específicas.
-    """
     from app.models.salario_item_model import SalarioItem
     from app.models.salario_movimento_item_model import SalarioMovimentoItem
 
-    # 1. Buscar todos os itens de salário do ano selecionado
     itens_salario_ano = (
         db.session.query(
             SalarioMovimentoItem.valor,
@@ -60,7 +55,6 @@ def get_resumo_folha_anual(user_id, ano):
         .all()
     )
 
-    # 2. Estruturar os dados em um dicionário
     dados_pivotados = defaultdict(lambda: defaultdict(Decimal))
     verbas = {}
 
@@ -69,12 +63,10 @@ def get_resumo_folha_anual(user_id, ano):
         if item.nome not in verbas:
             verbas[item.nome] = item.tipo
 
-    # 3. Montar a estrutura final com as categorias desejadas
     meses = range(1, 13)
     categorias_desejadas = ["Provento", "Benefício", "Desconto", "Imposto", "FGTS"]
     tabela = {cat: [] for cat in categorias_desejadas}
 
-    # Dicionários para guardar os totais mensais de cada categoria principal
     totais_proventos_mes = defaultdict(Decimal)
     totais_beneficios_mes = defaultdict(Decimal)
     totais_descontos_mes = defaultdict(Decimal)
@@ -91,7 +83,6 @@ def get_resumo_folha_anual(user_id, ano):
             linha["valores_mes"].append(valor)
             linha["total_anual"] += valor
 
-            # Acumula totais para o cálculo do líquido
             if tipo_verba == "Provento":
                 totais_proventos_mes[mes] += valor
             elif tipo_verba == "Benefício":
@@ -104,7 +95,6 @@ def get_resumo_folha_anual(user_id, ano):
         if tipo_verba in tabela:
             tabela[tipo_verba].append(linha)
 
-    # 4. Calcular os totais gerais e o salário líquido
     def calcular_linha_total(nome, totais_mes):
         total_anual = sum(totais_mes.values())
         valores_mes = [totais_mes[mes] for mes in meses]
@@ -117,7 +107,6 @@ def get_resumo_folha_anual(user_id, ano):
     total_descontos = calcular_linha_total("Total de Descontos", totais_descontos_mes)
     total_impostos = calcular_linha_total("Total de Impostos", totais_impostos_mes)
 
-    # Salário Líquido = (Proventos + Benefícios) - (Descontos + Impostos)
     salario_liquido_mes = [
         (totais_proventos_mes[mes] + totais_beneficios_mes[mes])
         - (totais_descontos_mes[mes] + totais_impostos_mes[mes])
