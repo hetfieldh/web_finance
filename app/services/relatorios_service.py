@@ -1,16 +1,25 @@
 # app/services/relatorios_service.py
 
 from collections import defaultdict
-from datetime import date, timedelta
-from decimal import Decimal
+from datetime import (
+    date,
+    datetime,
+    timedelta,
+)
+from decimal import ROUND_HALF_UP, Decimal
 
+from flask import current_app
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import extract, func
 from sqlalchemy.orm import joinedload
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_grupo_model import CrediarioGrupo
+from app.models.crediario_movimento_model import (
+    CrediarioMovimento,
+)
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
@@ -916,3 +925,99 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
     movimentacoes.sort(key=lambda x: x["data"])
 
     return movimentacoes
+
+
+def get_gastos_crediario_por_destino_anual():
+    try:
+        ano_atual = datetime.now().year
+
+        query_destino = (
+            db.session.query(
+                CrediarioMovimento.destino,
+                func.sum(CrediarioMovimento.valor_total_compra).label("total_destino"),
+            )
+            .filter(
+                CrediarioMovimento.usuario_id == current_user.id,
+                extract("year", CrediarioMovimento.data_compra) == ano_atual,
+            )
+            .group_by(CrediarioMovimento.destino)
+            .order_by(CrediarioMovimento.destino)
+        )
+
+        resultados_destino = query_destino.all()
+
+        resumo_destino = {
+            "Próprio": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+            "Outros": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+            "Coletivo": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+        }
+
+        for destino, total in resultados_destino:
+            if destino in resumo_destino:
+                resumo_destino[destino]["valor"] = (
+                    total if total is not None else Decimal("0.00")
+                )
+
+        total_geral = sum(d["valor"] for d in resumo_destino.values())
+
+        if total_geral != Decimal("0.00"):
+            for destino in resumo_destino:
+                percentual = (
+                    resumo_destino[destino]["valor"] / total_geral * 100
+                ).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+                resumo_destino[destino]["percentual"] = percentual
+
+        resumo_final = {
+            **resumo_destino,
+            "Total Geral": {"valor": total_geral, "percentual": Decimal("100.0")},
+        }
+
+        return resumo_final
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao gerar relatório de gastos por destino: {e}", exc_info=True
+        )
+        return {
+            "Próprio": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+            "Outros": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+            "Coletivo": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+            "Total Geral": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
+        }
+
+
+def get_gastos_crediario_por_grupo_anual():
+    resumo_destino = get_gastos_crediario_por_destino_anual()
+
+    try:
+        ano_atual = datetime.now().year
+        query = (
+            db.session.query(
+                CrediarioGrupo.grupo_crediario,
+                func.sum(CrediarioMovimento.valor_total_compra).label("total_gasto"),
+            )
+            .join(
+                CrediarioGrupo,
+                CrediarioGrupo.id == CrediarioMovimento.crediario_grupo_id,
+            )
+            .filter(
+                CrediarioMovimento.usuario_id == current_user.id,
+                extract("year", CrediarioMovimento.data_compra) == ano_atual,
+            )
+            .group_by(CrediarioGrupo.grupo_crediario)
+            .order_by(func.sum(CrediarioMovimento.valor_total_compra).desc())
+        )
+
+        resultados = query.all()
+
+        relatorio_grupo = [
+            {"grupo": grupo, "total": total} for grupo, total in resultados
+        ]
+
+        return relatorio_grupo, resumo_destino
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao gerar relatório de gastos por grupo: {e}", exc_info=True
+        )
+        return [], resumo_destino

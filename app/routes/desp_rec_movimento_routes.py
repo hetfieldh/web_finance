@@ -135,7 +135,14 @@ def gerar_previsao():
 @desp_rec_movimento_bp.route("/adicionar-lancamento", methods=["GET", "POST"])
 @login_required
 def adicionar_lancamento_unico():
-    variable_choices = desp_rec_service.get_variable_desp_rec_for_user_choices()
+    variable_items = (
+        DespRec.query.filter_by(usuario_id=current_user.id, ativo=True, tipo="Variável")
+        .order_by(DespRec.nome)
+        .all()
+    )
+    variable_choices = [
+        (item.id, f"{item.nome} ({item.natureza})") for item in variable_items
+    ]
     form = LancamentoUnicoForm(desp_rec_choices=variable_choices)
     desp_rec_items = DespRec.query.filter_by(
         usuario_id=current_user.id, ativo=True

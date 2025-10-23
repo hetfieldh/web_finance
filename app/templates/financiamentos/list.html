@@ -50,21 +50,21 @@ render_confirm_modal %} {% block content %}
                 <td class="table-actions">
                   <a
                     href="{{ url_for('financiamento.visualizar_parcelas', id=financiamento.id) }}"
-                    class="btn btn-amarelo me-2"
+                    class="btn btn-secondary me-1"
                     title="Visualizar Parcelas"
                   >
                     <i class="fas fa-list-ol"></i>
                   </a>
                   <a
                     href="{{ url_for('financiamento.amortizar_financiamento', id=financiamento.id) }}"
-                    class="btn btn-primary me-2"
+                    class="btn btn-primary me-1"
                     title="Amortizar Parcelas"
                   >
                     <i class="fas fa-dollar-sign"></i>
                   </a>
                   <a
                     href="{{ url_for('financiamento.editar_financiamento', id=financiamento.id) }}"
-                    class="btn btn-warning me-2"
+                    class="btn btn-warning me-1"
                     title="Editar"
                   >
                     <i class="fas fa-edit"></i>

@@ -32,6 +32,8 @@ from app.utils import (
     TIPO_DEBITO,
     TIPO_MOVIMENTACAO_SIMPLES,
     TIPO_MOVIMENTACAO_TRANSFERENCIA,
+    TIPO_PIX,
+    TIPO_TRANSFERENCIA,
     FormChoices,
 )
 
@@ -117,14 +119,32 @@ class CadastroContaMovimentoForm(FlaskForm):
             .all()
         ]
 
+# --- INÍCIO DA MODIFICAÇÃO ---
+        # Filtra a lista de tipos de transferência para incluir apenas "PIX" e "TRANSFERÊNCIA"
+
+        tipos_desejados = [TIPO_PIX, TIPO_TRANSFERENCIA]
+
+        query_transferencia = ContaTransacao.query.filter(
+            ContaTransacao.usuario_id == current_user.id,
+            ContaTransacao.tipo == TIPO_DEBITO,
+            ContaTransacao.transacao_tipo.in_(tipos_desejados)
+        ).order_by(ContaTransacao.transacao_tipo.asc())
+
         self.transferencia_tipo_id.choices = [("", "Selecione...")] + [
             (ct.id, f"{ct.transacao_tipo}")
-            for ct in ContaTransacao.query.filter_by(
-                usuario_id=current_user.id, tipo=TIPO_DEBITO
-            )
-            .order_by(ContaTransacao.transacao_tipo.asc())
-            .all()
+            for ct in query_transferencia.all()
         ]
+
+        # --- FIM DA MODIFICAÇÃO ---
+
+        # self.transferencia_tipo_id.choices = [("", "Selecione...")] + [
+        #     (ct.id, f"{ct.transacao_tipo}")
+        #     for ct in ContaTransacao.query.filter_by(
+        #         usuario_id=current_user.id, tipo=TIPO_DEBITO
+        #     )
+        #     .order_by(ContaTransacao.transacao_tipo.asc())
+        #     .all()
+        # ]
 
     def validate(self, extra_validators=None):
         initial_validation = super().validate(extra_validators)

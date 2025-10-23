@@ -60,6 +60,8 @@ TIPO_SAC = "SAC"
 TIPO_PRICE = "Price"
 TIPO_MOVIMENTACAO_SIMPLES = "simples"
 TIPO_MOVIMENTACAO_TRANSFERENCIA = "transferencia"
+TIPO_PIX = "PIX"
+TIPO_TRANSFERENCIA = "TRANSFERÊNCIA"
 
 
 # OPÇÕES PARA FORMULÁRIOS (SELECT CHOICES) USANDO ENUM
@@ -147,6 +149,10 @@ class FormChoices:
         PROPRIO = "Próprio"
         OUTROS = "Outros"
         COLETIVO = "Coletivo"
+
+    class TipoTransfInterContas(Enum):
+        PIX = TIPO_PIX
+        TRANSFERENCIA = TIPO_TRANSFERENCIA
 
     @classmethod
     def get_choices(cls, enum_class):

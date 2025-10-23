@@ -39,7 +39,7 @@ def get_contas_a_receber_por_mes(ano, mes):
     for receita in receitas_recorrentes:
         recebido_em = None
         if receita.movimento_bancario and receita.movimento_bancario.conta:
-            recebido_em = receita.movimento_bancario.conta.nome_banco
+            recebido_em = f"{receita.movimento_bancario.conta.nome_banco} ({receita.movimento_bancario.conta.tipo})"
 
         lista_contas.append(
             {
@@ -67,9 +67,7 @@ def get_contas_a_receber_por_mes(ano, mes):
             is_pago = salario.movimento_bancario_salario_id is not None
             recebido_em_salario = None
             if is_pago and salario.movimento_bancario_salario:
-                recebido_em_salario = (
-                    salario.movimento_bancario_salario.conta.nome_banco
-                )
+                recebido_em_salario = f"{salario.movimento_bancario_salario.conta.nome_banco} ({salario.movimento_bancario_salario.conta.tipo})"
 
             folha_tem_fgts = any(
                 item.salario_item.tipo == "FGTS" and item.valor > 0
@@ -102,9 +100,7 @@ def get_contas_a_receber_por_mes(ano, mes):
             is_beneficio_pago = item_beneficio.movimento_bancario_id is not None
             recebido_em_beneficio = None
             if is_beneficio_pago and item_beneficio.movimento_bancario:
-                recebido_em_beneficio = (
-                    item_beneficio.movimento_bancario.conta.nome_banco
-                )
+                recebido_em_beneficio = f"{item_beneficio.movimento_bancario.conta.nome_banco} ({item_beneficio.movimento_bancario.conta.tipo})"
 
             lista_contas.append(
                 {

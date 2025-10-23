@@ -112,7 +112,7 @@ def extrato_bancario():
             flash("Por favor, selecione uma conta válida.", "warning")
 
     return render_template(
-        "extratos/bancario.html",
+        "relatorios/bancario.html",
         form=form,
         movimentacoes=movimentacoes,
         saldo_anterior=saldo_anterior,

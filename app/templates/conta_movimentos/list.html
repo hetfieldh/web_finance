@@ -89,7 +89,7 @@ render_confirm_modal %} {% block content %}
               {% for mov in movimentacoes %}
               <tr>
                 <td>{{ mov.id }}</td>
-                <td>{{ mov.conta.nome_banco }} - {{ mov.conta.conta }}</td>
+                <td>{{ mov.conta.nome_banco }} ({{ mov.conta.tipo }})</td>
                <td>{{ mov.tipo_transacao.transacao_tipo }} {{ '(+)' if mov.tipo_transacao.tipo == 'Crédito' else '(-)' }}</td>
                 <td>
                   {% if mov.tipo_transacao.tipo == 'Crédito' %}

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
   <div class="col-md-10 mx-auto">
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-2">
       <div class="card-header menu-primario">
         <h5 class="mb-0">
           Financiamento: {{ financiamento.nome_financiamento }}
@@ -98,7 +98,7 @@
         >
           {{ form.csrf_token }}
 
-          <div class="mb-3">{{ render_field(form.csv_file) }}</div>
+          <div class="mb-2">{{ render_field(form.csv_file) }}</div>
 
           <div class="mt-1">
             <button type="submit" class="btn btn-azul">

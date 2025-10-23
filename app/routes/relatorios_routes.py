@@ -1,6 +1,9 @@
 # app/routes/relatorios_routes.py
 
-from datetime import date
+from datetime import (
+    date,
+    datetime,
+)
 
 from flask import Blueprint, render_template, request
 from flask_login import current_user, login_required
@@ -11,6 +14,9 @@ from app.forms.fluxo_caixa_forms import FluxoCaixaForm
 from app.forms.relatorios_forms import ResumoAnualForm
 from app.models.salario_movimento_model import SalarioMovimento
 from app.services import relatorios_service
+from app.services.relatorios_service import (
+    get_gastos_crediario_por_grupo_anual,
+)
 
 relatorios_bp = Blueprint("relatorios", __name__, url_prefix="/relatorios")
 
@@ -42,7 +48,7 @@ def resumo_folha():
         )
 
     return render_template(
-        "extratos/resumo_folha.html",
+        "relatorios/resumo_folha.html",
         form=form,
         dados=dados_resumo,
         ano_selecionado=ano_selecionado,
@@ -65,5 +71,21 @@ def resumo_mensal():
     dados_resumo = relatorios_service.get_resumo_mensal(current_user.id, ano, mes)
 
     return render_template(
-        "extratos/resumo_mensal.html", form=form, dados=dados_resumo, mes=mes, ano=ano
+        "relatorios/resumo_mensal.html", form=form, dados=dados_resumo, mes=mes, ano=ano
+    )
+
+
+@relatorios_bp.route("/gastos_por_grupo")
+@login_required
+def gastos_por_grupo():
+    ano_atual = datetime.now().year
+    dados_grupo, dados_destino = get_gastos_crediario_por_grupo_anual()
+    template_path = "relatorios/gastos_por_grupo.html"
+
+    return render_template(
+        template_path,
+        title=f"Gastos por Grupo ({ano_atual})",
+        dados_grupo=dados_grupo,
+        dados_destino=dados_destino,
+        ano=ano_atual,
     )
