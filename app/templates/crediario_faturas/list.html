@@ -191,13 +191,13 @@ render_confirm_modal %} {% block content %}
                 </td>
                 <td>
                   {% if item.fatura.status == 'Pago' %}
-                  <span class="badge bg-success">{{ item.fatura.status }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ item.fatura.status }}</span>
                   {% elif item.fatura.status == 'Atrasado' %}
-                  <span class="badge bg-danger">{{ item.fatura.status }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ item.fatura.status }}</span>
                   {% elif item.fatura.status == 'Parcialmente Paga' %}
-                  <span class="badge bg-warning">{{ item.fatura.status }}</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis">{{ item.fatura.status }}</span>
                   {% else %}
-                  <span class="badge bg-secondary"
+                  <span class="badge bg-secondary-subtle text-secondary-emphasis"
                     >{{ item.fatura.status }}</span
                   >
                   {% endif %}

@@ -88,9 +88,9 @@
                 <td>
                   {% if mov.categoria == 'Receita' or mov.categoria == 'Salário'
                   or mov.categoria == 'Benefício' %}
-                  <span class="badge bg-success">{{ mov.categoria }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ mov.categoria }}</span>
                   {% else %}
-                  <span class="badge bg-danger">{{ mov.categoria }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ mov.categoria }}</span>
                   {% endif %}
                 </td>
                 <td class="text-end fw-bold">

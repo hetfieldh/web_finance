@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-2">
       <div class="col-lg-3 col-md-6">
         <div class="card h-100">
           <div class="card-body text-center">
@@ -104,21 +104,17 @@
               <tr>
                 <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
                 <td>{{ item.descricao }}</td>
+                <td class="text-center">{{ item.tipo }}</td>
                 <td class="text-center">
-                  {% if item.tipo == 'Receita' %}
+                  {% if item.status == 'Pago' or item.status == 'Recebido'%}
                   <span class="badge bg-success-subtle text-success-emphasis"
-                    >Receita</span
+                    >{{ item.status }}</span
                   >
                   {% else %}
                   <span class="badge bg-danger-subtle text-danger-emphasis"
-                    >Despesa</span
-                  >
-                  {% endif %}
-                </td>
-                <td class="text-center">
-                  <span class="badge bg-light text-dark"
                     >{{ item.status }}</span
                   >
+                  {% endif %}
                 </td>
                 <td
                   class="text-end fw-semibold {% if item.tipo == 'Receita' %}text-success{% else %}text-danger{% endif %}"

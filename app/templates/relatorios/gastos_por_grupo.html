@@ -92,6 +92,7 @@
           <tr>
             <th class="text-center">Posição</th>
             <th>Grupo de Crediário</th>
+            <th class="text-center">Quantidade Compras</th>
             <th class="text-end">Valor Total (Líquido)</th>
           </tr>
         </thead>
@@ -100,6 +101,7 @@
           <tr>
             <td class="text-center">{{ loop.index }}</td>
             <td>{{ item.grupo }}</td>
+            <td class="text-center">{{ item.contagem }}</td>
             <td
               class="text-end fw-semibold {% if item.total >= 0 %}text-danger{% else %}text-success{% endif %}"
             >

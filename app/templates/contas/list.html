@@ -60,9 +60,9 @@ render_confirm_modal %} {% block content %}
                 </td>
                 <td>
                   {% if conta.ativa %}
-                  <span class="badge bg-success">Sim</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
                   {% else %}
-                  <span class="badge bg-danger">Não</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
                   {% endif %}
                 </td>
                 <td>{{ conta.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>

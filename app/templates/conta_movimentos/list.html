@@ -93,11 +93,11 @@ render_confirm_modal %} {% block content %}
                <td>{{ mov.tipo_transacao.transacao_tipo }} {{ '(+)' if mov.tipo_transacao.tipo == 'Crédito' else '(-)' }}</td>
                 <td>
                   {% if mov.tipo_transacao.tipo == 'Crédito' %}
-                  <span class="badge bg-success"
+                  <span class="badge bg-success-subtle text-success-emphasis"
                     >{{ mov.tipo_transacao.tipo }}</span
                   >
                   {% elif mov.tipo_transacao.tipo == 'Débito' %}
-                  <span class="badge bg-danger"
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
                     >{{ mov.tipo_transacao.tipo }}</span
                   >
                   {% else %} {{ mov.tipo_transacao.tipo }} {% endif %}

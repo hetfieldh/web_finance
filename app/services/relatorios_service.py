@@ -995,6 +995,7 @@ def get_gastos_crediario_por_grupo_anual():
             db.session.query(
                 CrediarioGrupo.grupo_crediario,
                 func.sum(CrediarioMovimento.valor_total_compra).label("total_gasto"),
+                func.count(CrediarioMovimento.id).label("contagem_movimentos"),
             )
             .join(
                 CrediarioGrupo,
@@ -1011,7 +1012,8 @@ def get_gastos_crediario_por_grupo_anual():
         resultados = query.all()
 
         relatorio_grupo = [
-            {"grupo": grupo, "total": total} for grupo, total in resultados
+            {"grupo": grupo, "total": total, "contagem": contagem}
+            for grupo, total, contagem in resultados
         ]
 
         return relatorio_grupo, resumo_destino

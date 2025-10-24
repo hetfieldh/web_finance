@@ -99,13 +99,13 @@
                 <td>{{ mov.tipo_transacao_nome }}</td>
                 <td>
                   {% if mov.tipo_movimento == 'Crédito' %}
-                  <span class="badge bg-success">{{ mov.tipo_movimento }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ mov.tipo_movimento }}</span>
                   {% elif mov.tipo_movimento == 'Débito' %}
-                  <span class="badge bg-danger">{{ mov.tipo_movimento }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ mov.tipo_movimento }}</span>
                   {% else %} {{ mov.tipo_movimento }} {% endif %}
                 </td>
                 <td
-                  class="text-end {% if mov.tipo_movimento == 'Débito' %}text-danger{% else %}text-success{% endif %}"
+                  class="text-end {% if mov.tipo_movimento == 'Débito' %}text-danger fw-semibold{% else %}text-success fw-semibold{% endif %}"
                 >
                   {% if mov.tipo_movimento == 'Débito' %}-{% else %}+{% endif
                   %}{{mov.valor | format_currency }}

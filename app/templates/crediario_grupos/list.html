@@ -44,15 +44,15 @@ render_confirm_modal %} {% block content %}
                 <td>{{ grupo.grupo_crediario }}</td>
                 <td>
                   {% if grupo.tipo_grupo_crediario == 'Compra' %}
-                  <span class="badge bg-danger"
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
                     >{{ grupo.tipo_grupo_crediario }}</span
                   >
                   {% elif grupo.tipo_grupo_crediario == 'Estorno' %}
-                  <span class="badge bg-success"
+                  <span class="badge bg-success-subtle text-success-emphasis"
                     >{{ grupo.tipo_grupo_crediario }}</span
                   >
                   {% elif grupo.tipo_grupo_crediario == 'Ajuste' %}
-                  <span class="badge bg-secondary"
+                  <span class="badge bg-warning-subtle text-warning-emphasis"
                     >{{ grupo.tipo_grupo_crediario }}</span
                   >
                   {% else %} {{ grupo.tipo_grupo_crediario }} {% endif %}

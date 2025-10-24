@@ -49,13 +49,13 @@
             <p>
               <strong>Status:</strong>
               {% if fatura.status == 'Pago' %}
-              <span class="badge bg-success">{{ fatura.status }}</span>
+              <span class="badge bg-success-subtle text-success-emphasis">{{ fatura.status }}</span>
               {% elif fatura.status == 'Atrasado' %}
-              <span class="badge bg-danger">{{ fatura.status }}</span>
+              <span class="badge bg-danger-subtle text-danger-emphasis">{{ fatura.status }}</span>
               {% elif fatura.status == 'Parcialmente Pago' %}
-              <span class="badge bg-warning">{{ fatura.status }}</span>
+              <span class="badge bg-warning-subtle text-warning-emphasis">{{ fatura.status }}</span>
               {% else %}
-              <span class="badge bg-secondary">{{ fatura.status }}</span>
+              <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ fatura.status }}</span>
               {% endif %}
             </p>
           </div>

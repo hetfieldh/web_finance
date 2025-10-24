@@ -96,11 +96,11 @@ render_confirm_modal %} {% block content %}
                 <td>{{ movimento.despesa_receita.nome }}</td>
                 <td>
                   {% if movimento.despesa_receita.natureza == 'Receita' %}
-                  <span class="badge bg-success"
+                  <span class="text-success fw-semibold"
                     >{{ movimento.despesa_receita.natureza }}</span
                   >
                   {% else %}
-                  <span class="badge bg-danger"
+                  <span class="text-danger fw-semibold"
                     >{{ movimento.despesa_receita.natureza }}</span
                   >
                   {% endif %}
@@ -116,11 +116,11 @@ render_confirm_modal %} {% block content %}
                 <td>
                   {% if movimento.status == 'Pago' or movimento.status ==
                   'Recebido' %}
-                  <span class="badge bg-success">{{ movimento.status }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ movimento.status }}</span>
                   {% elif movimento.status == 'Atrasado' %}
-                  <span class="badge bg-danger">{{ movimento.status }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ movimento.status }}</span>
                   {% else %}
-                  <span class="badge bg-secondary">{{ movimento.status }}</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis">{{ movimento.status }}</span>
                   {% endif %}
                 </td>
                 <td class="table-actions text-center">

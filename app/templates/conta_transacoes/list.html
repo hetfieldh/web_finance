@@ -43,9 +43,9 @@ render_confirm_modal %} {% block content %}
                 <td>{{ tipo_t.transacao_tipo }}</td>
                 <td>
                   {% if tipo_t.tipo == 'Crédito' %}
-                  <span class="badge bg-success">{{ tipo_t.tipo }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ tipo_t.tipo }}</span>
                   {% elif tipo_t.tipo == 'Débito' %}
-                  <span class="badge bg-danger">{{ tipo_t.tipo }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ tipo_t.tipo }}</span>
                   {% else %} {{ tipo_t.tipo }} {% endif %}
                 </td>
                 <td>{{ tipo_t.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>

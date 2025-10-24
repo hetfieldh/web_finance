@@ -167,18 +167,18 @@
                 </td>
                 <td class="text-center">
                   {% if item.parcela.status == 'Pago' %}<span
-                    class="badge bg-success"
+                    class="badge bg-success-subtle text-success-emphasis"
                     >{{ item.parcela.status }}</span
                   >
                   {% elif item.parcela.status == 'Atrasado' %}<span
-                    class="badge bg-danger"
+                    class="badge bg-danger-subtle text-danger-emphasis"
                     >{{ item.parcela.status }}</span
                   >
                   {% elif item.parcela.status == 'Amortizado' %}<span
-                    class="badge bg-info"
+                    class="badge bg-info-subtle text-info-emphasis"
                     >{{ item.parcela.status }}</span
                   >
-                  {% else %}<span class="badge bg-secondary"
+                  {% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis"
                     >{{ item.parcela.status }}</span
                   >
                   {% endif %}

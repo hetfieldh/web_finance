@@ -43,13 +43,13 @@
             <p class="mb-0">
               <strong>Status:</strong>
               {% if solicitacao.status == 'Pendente' %}
-              <span class="badge bg-warning text-dark"
+              <span class="badge bg-warning-subtle text-warning-emphasis"
                 >{{ solicitacao.status }}</span
               >
               {% elif solicitacao.status == 'Aprovado' %}
-              <span class="badge bg-success">{{ solicitacao.status }}</span>
+              <span class="badge bg-success-subtle text-success-emphasis">{{ solicitacao.status }}</span>
               {% else %}
-              <span class="badge bg-danger">{{ solicitacao.status }}</span>
+              <span class="badge bg-danger-subtle text-success-emphasis">{{ solicitacao.status }}</span>
               {% endif %}
             </p>
             {% if solicitacao.status == 'Aprovado' %} {% if

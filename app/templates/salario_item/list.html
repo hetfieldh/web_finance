@@ -33,24 +33,24 @@ render_confirm_modal %} {% block content %}
                 <td>{{ item.nome }}</td>
                 <td>
                   {% if item.tipo == 'Provento' %}
-                  <span class="badge bg-success">{{ item.tipo }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ item.tipo }}</span>
                   {% elif item.tipo == 'Benefício' %}
-                  <span class="badge bg-info">{{ item.tipo }}</span>
+                  <span class="badge bg-info-subtle text-info-emphasis">{{ item.tipo }}</span>
                   {% elif item.tipo == 'Desconto' %}
-                  <span class="badge bg-warning text-dark"
+                  <span class="badge bg-warning-subtle text-warning-emphasis"
                     >{{ item.tipo }}</span
                   >
                   {% elif item.tipo == 'Imposto' %}
-                  <span class="badge bg-danger">{{ item.tipo }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ item.tipo }}</span>
                   {% else %}
-                  <span class="badge bg-secondary">{{ item.tipo }}</span>
+                  <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ item.tipo }}</span>
                   {% endif %}
                 </td>
                 <td>
                   {% if item.ativo %}
-                  <span class="badge bg-success">Sim</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
                   {% else %}
-                  <span class="badge bg-danger">Não</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
                   {% endif %}
                 </td>
                 <td>{{ item.descricao if item.descricao else '-' }}</td>

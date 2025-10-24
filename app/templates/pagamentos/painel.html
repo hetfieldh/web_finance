@@ -83,12 +83,12 @@ render_estornar_modal%} {% block content %}
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
                 <td>
-                  <span class="badge bg-secondary">{{ conta.tipo }}</span>
+                  <span class="text-dark">{{ conta.tipo }}</span>
                 </td>
                 <td class="text-end fw-regular">
                   {{ conta.valor_display | format_currency }}
                 </td>
-                <td class="text-end fw-bold text-danger">
+                <td class="text-end fw-bold text-success">
                   {% if conta.valor_pago > 0 %} {{ conta.valor_pago |
                   format_currency }} {% else %} - {% endif %}
                 </td>
@@ -99,12 +99,13 @@ render_estornar_modal%} {% block content %}
                 <td class="text-start">{{ conta.pago_com or '-' }}</td>
                 <td class="text-center">
                   {% set status_text = conta.status %} {% set status_class =
-                  'bg-warning text-dark' %} {% if conta.status in ['Pago'] %} {%
-                  set status_text = 'Pago' %} {% set status_class = 'bg-success'
-                  %} {% elif conta.status == 'Atrasado' %} {% set status_class =
-                  'bg-danger' %} {% elif conta.status == 'Parcialmente Paga' %}
+                  'bg-danger-subtle text-danger' %} {% if conta.status in
+                  ['Pago'] %} {% set status_text = 'Pago' %} {% set status_class
+                  = 'bg-success-subtle text-success' %} {% elif conta.status ==
+                  'Atrasado' %} {% set status_class = 'bg-danger-subtle
+                  text-danger' %} {% elif conta.status == 'Parcialmente Paga' %}
                   {% set status_text = 'Parcial' %} {% set status_class =
-                  'bg-info' %} {% endif %}
+                  'bg-info-subtle text-info' %} {% endif %}
                   <span class="badge {{ status_class }}"
                     >{{ status_text }}</span
                   >

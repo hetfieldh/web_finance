@@ -40,16 +40,16 @@ render_confirm_modal %} {% block content %}
                 <td>{{ cadastro.nome }}</td>
                 <td>
                   {% if cadastro.natureza == 'Receita' %}
-                  <span class="badge bg-success">{{ cadastro.natureza }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">{{ cadastro.natureza }}</span>
                   {% else %}
-                  <span class="badge bg-danger">{{ cadastro.natureza }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ cadastro.natureza }}</span>
                   {% endif %}
                 </td>
                 <td>
                   {% if cadastro.tipo == 'Fixa' %}
-                  <span class="badge bg-warning">{{ cadastro.tipo }}</span>
+                  <span class="text-dark">{{ cadastro.tipo }}</span>
                   {% else %}
-                  <span class="badge bg-info">{{ cadastro.tipo }}</span>
+                  <span class="text-dark">{{ cadastro.tipo }}</span>
                   {% endif %}
                 </td>
                 <td>
@@ -58,9 +58,9 @@ render_confirm_modal %} {% block content %}
                 </td>
                 <td>
                   {% if cadastro.ativo %}
-                  <span class="badge bg-success">Sim</span>
+                  <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
                   {% else %}
-                  <span class="badge bg-danger">Não</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
                   {% endif %}
                 </td>
                 <td>{{ cadastro.data_criacao.strftime('%d/%m/%Y') }}</td>

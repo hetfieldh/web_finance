@@ -89,7 +89,7 @@ render_estornar_modal %} {% block content %}
               <tr data-item-tipo="{{ conta.tipo }}" {{ attrs|xmlattr }}>
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
-                <td><span class="badge bg-primary">{{ conta.tipo }}</span></td>
+                <td><span class="text-dark">{{ conta.tipo }}</span></td>
                 <td class="text-end text-dark">
                   {{ conta.valor_previsto | format_currency }}
                 </td>
@@ -104,14 +104,14 @@ render_estornar_modal %} {% block content %}
                 <td class="text-start">{{ conta.recebido_em or '-' }}</td>
                 <td class="text-center">
                   {% if conta.status in ['Recebido', 'Pago'] %}<span
-                    class="badge bg-success"
+                    class="badge bg-success-subtle text-success-emphasis"
                     >Recebido</span
                   >
                   {% elif conta.status == 'Parcialmente Recebido' %}<span
-                    class="badge bg-info"
+                    class="badge bg-info-subtle text-info-emphasis"
                     >Parcial</span
                   >
-                  {% else %}<span class="badge bg-warning text-dark"
+                  {% else %}<span class="badge bg-danger-subtle text-danger-emphasis"
                     >Pendente</span
                   >{% endif %}
                 </td>

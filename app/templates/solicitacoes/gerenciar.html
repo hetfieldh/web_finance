@@ -33,11 +33,11 @@
             <td>{{ s.justificativa or 'N/A' }}</td>
             <td class="text-center">
               {% if s.status == 'Pendente' %}
-              <span class="badge bg-warning text-dark">{{ s.status }}</span>
+              <span class="badge bg-warning-subtle text-warning-emphasis">{{ s.status }}</span>
               {% elif s.status == 'Aprovado' %}
-              <span class="badge bg-success">{{ s.status }}</span>
+              <span class="badge bg-success-subtle text-success-emphasis">{{ s.status }}</span>
               {% else %}
-              <span class="badge bg-danger">{{ s.status }}</span>
+              <span class="badge bg-danger-subtle text-danger-emphasis">{{ s.status }}</span>
               {% endif %}
             </td>
             <td class="text-center">
