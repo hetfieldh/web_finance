@@ -11,14 +11,15 @@ from decimal import ROUND_HALF_UP, Decimal
 from flask import current_app
 from flask_login import current_user
 from sqlalchemy import extract, func
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import aliased, joinedload
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_grupo_model import CrediarioGrupo
-from app.models.crediario_movimento_model import (
-    CrediarioMovimento,
+from app.models.crediario_movimento_model import CrediarioMovimento
+from app.models.crediario_parcela_model import (
+    CrediarioParcela,
 )
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
@@ -969,7 +970,10 @@ def get_gastos_crediario_por_destino_anual():
 
         resumo_final = {
             **resumo_destino,
-            "Total Geral": {"valor": total_geral, "percentual": Decimal("100.0")},
+            "Total Geral": {
+                "valor": total_geral,
+                "percentual": Decimal("100.0"),
+            },
         }
 
         return resumo_final
@@ -993,6 +997,7 @@ def get_gastos_crediario_por_grupo_anual():
         ano_atual = datetime.now().year
         query = (
             db.session.query(
+                CrediarioGrupo.id,
                 CrediarioGrupo.grupo_crediario,
                 func.sum(CrediarioMovimento.valor_total_compra).label("total_gasto"),
                 func.count(CrediarioMovimento.id).label("contagem_movimentos"),
@@ -1005,15 +1010,15 @@ def get_gastos_crediario_por_grupo_anual():
                 CrediarioMovimento.usuario_id == current_user.id,
                 extract("year", CrediarioMovimento.data_compra) == ano_atual,
             )
-            .group_by(CrediarioGrupo.grupo_crediario)
+            .group_by(CrediarioGrupo.id, CrediarioGrupo.grupo_crediario)
             .order_by(func.sum(CrediarioMovimento.valor_total_compra).desc())
         )
 
         resultados = query.all()
 
         relatorio_grupo = [
-            {"grupo": grupo, "total": total, "contagem": contagem}
-            for grupo, total, contagem in resultados
+            {"id": grupo_id, "grupo": grupo, "total": total, "contagem": contagem}
+            for grupo_id, grupo, total, contagem in resultados
         ]
 
         return relatorio_grupo, resumo_destino
@@ -1023,3 +1028,75 @@ def get_gastos_crediario_por_grupo_anual():
             f"Erro ao gerar relatório de gastos por grupo: {e}", exc_info=True
         )
         return [], resumo_destino
+
+
+def get_detalhes_parcelas_por_grupo(grupo_id, ano):
+    try:
+        grupo = db.session.get(CrediarioGrupo, grupo_id)
+        if not grupo or grupo.usuario_id != current_user.id:
+            return None
+
+        movimentos = (
+            CrediarioMovimento.query.filter(
+                CrediarioMovimento.usuario_id == current_user.id,
+                CrediarioMovimento.crediario_grupo_id == grupo_id,
+                extract("year", CrediarioMovimento.data_compra) == ano,
+            )
+            .options(joinedload(CrediarioMovimento.parcelas))
+            .order_by(
+                CrediarioMovimento.data_compra.desc(), CrediarioMovimento.id.desc()
+            )
+            .all()
+        )
+
+        dados_saldo_devedor = defaultdict(lambda: defaultdict(Decimal))
+        dados_total = defaultdict(lambda: defaultdict(Decimal))
+        meses_anos = set()
+        compras = []
+
+        compras_dict = {}
+
+        for mov in movimentos:
+            chave_compra = f"{mov.descricao} (ID:{mov.id})"
+            if chave_compra not in compras_dict:
+                compras_dict[chave_compra] = {
+                    "descricao": mov.descricao,
+                    "id": mov.id,
+                    "data_compra": mov.data_compra,
+                    "chave": chave_compra,
+                }
+                compras.append(chave_compra)
+
+            for p in mov.parcelas:
+                mes_ano = p.data_vencimento.strftime("%Y-%m")
+                meses_anos.add(mes_ano)
+
+                dados_total[chave_compra][mes_ano] += p.valor_parcela
+
+                if not p.pago:
+                    dados_saldo_devedor[chave_compra][mes_ano] += p.valor_parcela
+
+        meses_anos_ordenados = sorted(list(meses_anos))
+
+        dados_saldo_devedor_final = {
+            compra: dict(meses) for compra, meses in dados_saldo_devedor.items()
+        }
+        dados_total_final = {
+            compra: dict(meses) for compra, meses in dados_total.items()
+        }
+
+        return {
+            "grupo_nome": grupo.grupo_crediario,
+            "compras": [compras_dict[chave] for chave in compras],
+            "meses_anos": meses_anos_ordenados,
+            "dados_saldo_devedor": dados_saldo_devedor_final,
+            "dados_total": dados_total_final,
+            "ano": ano,
+        }
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao buscar detalhes de parcelas para grupo ID {grupo_id}: {e}",
+            exc_info=True,
+        )
+        return None

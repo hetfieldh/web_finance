@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
               " Motivo: A folha de pagamento não possui um item de FGTS com valor.";
           }
 
-          actionsCell.innerHTML = `<i class="fas fa-lock text-muted" data-bs-toggle="tooltip" title="${title}"></i>`;
+          actionsCell.innerHTML = `<i class="fas fa-lock text-danger" data-bs-toggle="tooltip" title="${title}"></i>`;
         }
       }
     }

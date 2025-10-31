@@ -10,7 +10,8 @@
       </div>
       <div class="card-body">
         <p class="caixa-sombreada">
-          Selecione o mês de referência da folha de pagamento. O vencimento será sempre no 5° dia útil do mês posterior.
+          Selecione o mês de referência da folha de pagamento. O vencimento será
+          sempre no 5° dia útil do mês posterior.
         </p>
         <form
           method="POST"
@@ -35,7 +36,7 @@
             </div>
           </div>
           <div class="mt-1">
-            {{ form.submit(class="btn btn-azul ") }}
+            {{ form.submit(class="btn btn-azul") }}
             <a
               href="{{ url_for('salario.listar_movimentos') }}"
               class="btn btn-cinza"

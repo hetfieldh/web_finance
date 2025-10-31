@@ -79,10 +79,10 @@
         </div>
         <div class="text-center">
           <button type="submit" class="btn btn-azul me-2" {{ 'disabled' if limite_atingido }}>
-            <i class="fas fa-paper-plane me-1"></i> {{ form.submit.label.text }}
+            <i class="fas fa-paper-plane  text-warning me-2"></i> {{ form.submit.label.text }}
           </button>
           <a href="{{ url_for('auth.login') }}" class="btn btn-cinza">
-            <i class="fas fa-arrow-left me-1"></i> Login
+            <i class="fas fa-arrow-left text-warning me-2"></i> Login
           </a>
         </div>
       </form>

@@ -4,20 +4,25 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2  d-flex justify-content-between align-items-center mb-2">
-      <h4 class="mb-0">Crediários Cadastrados</h4>
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+    >
+      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+        <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
+        Cadastro de Crediários
+      </h4>
       <div>
         <a
           href="{{ url_for('crediario.adicionar_crediario') }}"
           class="btn btn-azul me-1"
         >
-          <i class="fas fa-plus"></i> Crediário
+          <i class="fas fa-plus text-warning me-1"></i> Crediário
         </a>
         <a
           href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
           class="btn btn-cinza"
         >
-          <i class="fas fa-tags"></i> Grupos de Crediário
+          <i class="fas fa-tags text-warning me-1"></i> Grupos de Crediário
         </a>
       </div>
     </div>
@@ -54,9 +59,13 @@ render_confirm_modal %} {% block content %}
                 <td>{{ cred.dia_vencimento }}</td>
                 <td>
                   {% if cred.ativa %}
-                  <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >Sim</span
+                  >
                   {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >Não</span
+                  >
                   {% endif %}
                 </td>
                 <td>{{ cred.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>

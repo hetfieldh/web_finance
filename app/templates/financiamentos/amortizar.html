@@ -14,7 +14,7 @@
       <div class="card shadow-sm">
         <div class="card-header menu-primario">
           <h5 class="mb-0">
-            <i class="fas fa-calculator me-2"></i>Amortização de Financiamento
+            <i class="fas fa-calculator text-warning me-2"></i>Amortização de Financiamento
           </h5>
         </div>
         <div class="card-body">
@@ -126,14 +126,14 @@
 
           <div class="d-flex justify-content-center gap-2">
             <button type="submit" class="btn btn-azul">
-              <i class="fas fa-hand-holding-usd me-1"></i> {{
+              <i class="fas fa-hand-holding-usd text-warning me-1"></i> {{
               form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('financiamento.listar_financiamentos') }}"
               class="btn btn-cinza"
             >
-              <i class="fas fa-arrow-left me-1"></i> Voltar
+              <i class="fas fa-arrow-left text-warning me-1"></i> Voltar
             </a>
           </div>
         </div>

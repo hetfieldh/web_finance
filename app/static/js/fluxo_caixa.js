@@ -1,7 +1,5 @@
 // app/static/js/fluxo_caixa.js
 
-console.log("fluxo_caixa.js carregado com sucesso!");
-
 document.addEventListener("DOMContentLoaded", function () {
   const selectMesFluxoCaixa = document.getElementById("mes_ano_fluxo_caixa");
   if (selectMesFluxoCaixa) {

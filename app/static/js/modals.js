@@ -1,6 +1,4 @@
 // app/static/js/modals.js
-console.log("modals.js carregado com sucesso!");
-
 document.addEventListener("DOMContentLoaded", () => {
   const pagamentoModal = document.getElementById("pagamentoModal");
   if (pagamentoModal) {
@@ -74,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
-  // NOVA LÓGICA PARA O MODAL DE ESTORNO GENÉRICO
+  // ESTORNO GENÉRICO
   const confirmEstornarModal = document.getElementById("confirmEstornarModal");
   if (confirmEstornarModal) {
     confirmEstornarModal.addEventListener("show.bs.modal", function (event) {

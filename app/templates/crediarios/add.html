@@ -6,7 +6,10 @@ render_checkbox %}{% block content %}
   <div class="col-md-6 mx-auto">
     <div class="card shadow-sm">
       <div class="card-header menu-primario">
-        <h5 class="mb-0">Cadastro de Crediário</h5>
+        <h5 class="mb-0">
+          <i class="px-2 fas fa-plus fa-lg text-warning"></i>Cadastro de
+          Crediário
+        </h5>
       </div>
       <div class="card-body">
         <form
@@ -42,7 +45,7 @@ render_checkbox %}{% block content %}
 
           <div class="mt-1">
             <button type="submit" class="btn btn-azul">
-              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+              <i class="fas fa-save text-warning me-1"></i> {{ form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('crediario.listar_crediarios') }}"

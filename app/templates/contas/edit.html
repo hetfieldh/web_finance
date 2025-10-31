@@ -7,6 +7,7 @@ render_checkbox %} {% block content %}
     <div class="card shadow-sm">
       <div class="card-header menu-primario">
         <h5 class="mb-0">
+          <i class="px-2 fas fa-pen text-warning"></i>
           Editar Conta: {{ conta.nome_banco }} ({{ conta.agencia }} | {{
           conta.conta }}) {{ conta.tipo }}
         </h5>
@@ -52,7 +53,7 @@ render_checkbox %} {% block content %}
 
           <div class="mt-1">
             <button type="submit" class="btn btn-amarelo">
-              <i class="fas fa-save"></i> {{ form.submit.label.text }}
+              <i class="fas fa-save me-1"></i> {{ form.submit.label.text }}
             </button>
             <a href="{{ url_for('conta.listar_contas') }}" class="btn btn-cinza"
               >Cancelar</a

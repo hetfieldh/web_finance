@@ -1,4 +1,4 @@
-<!--- app/templates/relatorios/bancario.html -->
+<!--- app\templates\relatorios\bancario.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
@@ -6,7 +6,7 @@
   <div class="col-12">
     <div class="caixa-sombreada mb-2">
       <span class="text-dark fw-bold">Extrato Bancário:</span>
-      <span class="text-danger">Movimentações em conta no mês.</span>
+      <span class="text-danger">Movimentações da conta no mês.</span>
     </div>
 
     <div class="card shadow-sm mb-2">
@@ -18,11 +18,20 @@
         >
           <div class="row align-items-center">
             <div class="col-md-3">
-              {{ form.conta_id(class="form-select", id="conta_id") }}
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-university"></i
+                ></span>
+                {{ form.conta_id(class="form-select", id="conta_id") }}
+              </div>
             </div>
-            <div class="col-md-3">
-              {{ form.mes_ano(class="form-control input-normal",
-              id="mes_ano_extratos") }}
+            <div class="col-md-2" style="width: 145px">
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-calendar-alt"></i
+                ></span>
+                {{ form.mes_ano(class="form-control fw-semibold text-danger", id="mes_ano_extratos") }}
+              </div>
             </div>
           </div>
         </form>
@@ -99,9 +108,13 @@
                 <td>{{ mov.tipo_transacao_nome }}</td>
                 <td>
                   {% if mov.tipo_movimento == 'Crédito' %}
-                  <span class="badge bg-success-subtle text-success-emphasis">{{ mov.tipo_movimento }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >{{ mov.tipo_movimento }}</span
+                  >
                   {% elif mov.tipo_movimento == 'Débito' %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ mov.tipo_movimento }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >{{ mov.tipo_movimento }}</span
+                  >
                   {% else %} {{ mov.tipo_movimento }} {% endif %}
                 </td>
                 <td

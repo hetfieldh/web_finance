@@ -1,4 +1,4 @@
-<!--- app\templates\relatorios\consolidado.html -->
+<!--- app\templates\relatorios\fluxo_caixa_detalhado.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
@@ -7,8 +7,8 @@
     <div class="caixa-sombreada mb-2">
       <span class="text-dark fw-bold">Fluxo de Caixa Detalhado:</span>
       <span class="text-danger"
-        >Pagamentos e Recebimentos realizados dentro do mês. Detalhados por
-        parcela, caso haja.</span
+        >Pagamentos e recebimentos realizados no mês, detalhados por parcela
+        quando aplicável.</span
       >
     </div>
     <div class="card shadow-sm mb-2">
@@ -19,22 +19,21 @@
           action="{{ url_for('extrato_consolidado.extrato_consolidado') }}"
         >
           <div class="row align-items-center">
-            <div class="col-md-3 d-flex align-items-center">
-              <label
-                for="mes_ano_consolidado"
-                class="form-label mb-0 me-2 fw-semibold text-secondary"
-              >
-                Mês/Ano:
-              </label>
-              {{ form.mes_ano(class="form-control input-normal",
-              id="mes_ano_consolidado") }}
+            <div class="col-md-2" style="width: 145px">
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-calendar-alt"></i
+                ></span>
+                {{ form.mes_ano(class="form-control fw-semibold text-danger", id="mes_ano_consolidado")
+                }}
+              </div>
             </div>
           </div>
         </form>
       </div>
     </div>
     <div class="card shadow-sm mb-2">
-      <div class="card-body">
+      <div class="card-body p-2">
         <div class="row text-center">
           <div class="col-md-3">
             <h6>Total de Receitas</h6>
@@ -88,9 +87,13 @@
                 <td>
                   {% if mov.categoria == 'Receita' or mov.categoria == 'Salário'
                   or mov.categoria == 'Benefício' %}
-                  <span class="badge bg-success-subtle text-success-emphasis">{{ mov.categoria }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >{{ mov.categoria }}</span
+                  >
                   {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ mov.categoria }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >{{ mov.categoria }}</span
+                  >
                   {% endif %}
                 </td>
                 <td class="text-end fw-bold">

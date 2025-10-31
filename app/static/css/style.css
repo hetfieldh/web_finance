@@ -44,6 +44,7 @@
     --wf-azul-destaque: #396694;
     --wf-azul-destaque-hover: #254f79;
     --wf-cinza-claro: #eceff1;
+    --wf-cinza-claro-2: #d9dcde;
     --wf-cinza-destaque: #6e6e6e;
     --wf-cinza-destaque-hover: #444444;
     --wf-texto-botao-hover: #e8e238;
@@ -274,15 +275,6 @@ h6,
 .table-actions .btn.btn-secondary i {
     color: var(--wf-secondary);
 }
-
-/* .table.table-sm {
-    font-size: 0.6rem;
-}
-
-.table.table-sm th,
-.table.table-sm td {
-    padding: 0.1rem 0.1rem;
-} */
 
 /* --- Formulários --- */
 .form-control,
@@ -578,7 +570,7 @@ h6,
     padding-bottom: 0.1rem;
     margin: 0rem;
     color: var(--wf-azul-destaque) !important;
-    border: 2px solid var(--wf-secondary);
+    border: 1px solid var(--wf-cinza-claro-2);
     background-color: transparent !important;
 }
 
@@ -802,3 +794,14 @@ body.login-body {
         padding: 0;
     }
 }
+
+
+.logo-effect {
+    transition: all 0.4s ease;
+}
+
+.logo-effect:hover {
+    filter: sepia(1) saturate(5) hue-rotate(-10deg) brightness(0.8);
+    transform: scale(1.1);
+}
+

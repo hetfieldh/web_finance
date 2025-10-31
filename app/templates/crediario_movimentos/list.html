@@ -7,13 +7,16 @@ render_confirm_modal %} {% block content %}
     <div
       class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
     >
-      <h4 class="mb-0">Movimentações de Crediário</h4>
+      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+        <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
+        Movimentações de Crediário
+      </h4>
       <div>
         <a
           href="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}"
-          class="btn btn-azul me-2"
+          class="btn btn-azul"
         >
-          <i class="fas fa-plus"></i> Adicionar
+          <i class="fas fa-plus text-warning me-2"></i> Adicionar
         </a>
       </div>
     </div>

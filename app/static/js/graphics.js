@@ -1,8 +1,6 @@
 // app/static/js/graphics.js
 
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("graphics.js carregado com sucesso!");
-
   const centerTextPlugin = {
     id: "centerText",
     afterDraw: function (chart) {

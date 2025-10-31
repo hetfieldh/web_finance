@@ -56,9 +56,9 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     )
 
     destino = SelectField(
-        "Destino",
+        "Consumo",
         choices=FormChoices.get_choices(FormChoices.DestinoCrediario),
-        validators=[DataRequired("O destino é obrigatório.")],
+        validators=[DataRequired("O movimento que gerou o consumo é obrigatório.")],
         default=FormChoices.DestinoCrediario.PROPRIO.value,
     )
 

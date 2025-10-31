@@ -1,7 +1,5 @@
 // app/static/js/form-spinner.js
 
-console.log("form-spinner.js carregado!");
-
 document.addEventListener("DOMContentLoaded", () => {
   const forms = document.querySelectorAll(".form-with-spinner");
 

@@ -4,8 +4,13 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2">
-      <h4 class="mb-0">Faturas de Crediário</h4>
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+    >
+      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+        <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
+        Faturas de Crediário
+      </h4>
       <div>
         <button
           type="button"
@@ -13,7 +18,7 @@ render_confirm_modal %} {% block content %}
           data-bs-toggle="modal"
           data-bs-target="#confirmFaturasModal"
         >
-          <i class="fas fa-sync-alt"></i> Sincronizar Faturas
+          <i class="fas fa-sync-alt text-warning me-1"></i> Sincronizar Faturas
         </button>
       </div>
     </div>
@@ -191,13 +196,20 @@ render_confirm_modal %} {% block content %}
                 </td>
                 <td>
                   {% if item.fatura.status == 'Pago' %}
-                  <span class="badge bg-success-subtle text-success-emphasis">{{ item.fatura.status }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >{{ item.fatura.status }}</span
+                  >
                   {% elif item.fatura.status == 'Atrasado' %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ item.fatura.status }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >{{ item.fatura.status }}</span
+                  >
                   {% elif item.fatura.status == 'Parcialmente Paga' %}
-                  <span class="badge bg-warning-subtle text-warning-emphasis">{{ item.fatura.status }}</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis"
+                    >{{ item.fatura.status }}</span
+                  >
                   {% else %}
-                  <span class="badge bg-secondary-subtle text-secondary-emphasis"
+                  <span
+                    class="badge bg-secondary-subtle text-secondary-emphasis"
                     >{{ item.fatura.status }}</span
                   >
                   {% endif %}

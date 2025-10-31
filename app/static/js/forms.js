@@ -1,7 +1,5 @@
 // app/static/js/forms.js (VERSÃO COMPLETA E FINAL)
 
-console.log("forms.js carregado com sucesso!");
-
 document.addEventListener("DOMContentLoaded", () => {
   const tipoContaSelect = document.getElementById("tipo-conta-select");
   const limiteContainer = document.getElementById("limite-container");

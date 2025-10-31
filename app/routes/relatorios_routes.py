@@ -5,7 +5,7 @@ from datetime import (
     datetime,
 )
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, abort, render_template, request
 from flask_login import current_user, login_required
 from sqlalchemy import func
 
@@ -15,6 +15,7 @@ from app.forms.relatorios_forms import ResumoAnualForm
 from app.models.salario_movimento_model import SalarioMovimento
 from app.services import relatorios_service
 from app.services.relatorios_service import (
+    get_detalhes_parcelas_por_grupo,
     get_gastos_crediario_por_grupo_anual,
 )
 
@@ -80,6 +81,7 @@ def resumo_mensal():
 def gastos_por_grupo():
     ano_atual = datetime.now().year
     dados_grupo, dados_destino = get_gastos_crediario_por_grupo_anual()
+
     template_path = "relatorios/gastos_por_grupo.html"
 
     return render_template(
@@ -88,4 +90,19 @@ def gastos_por_grupo():
         dados_grupo=dados_grupo,
         dados_destino=dados_destino,
         ano=ano_atual,
+    )
+
+
+@relatorios_bp.route("/detalhe_grupo_crediario/<int:grupo_id>/<int:ano>")
+@login_required
+def detalhe_grupo_crediario(grupo_id, ano):
+    dados_detalhe = get_detalhes_parcelas_por_grupo(grupo_id, ano)
+
+    if dados_detalhe is None:
+        abort(404)
+
+    return render_template(
+        "relatorios/detalhe_grupo_crediario.html",
+        title=f"Detalhes: {dados_detalhe['grupo_nome']} ({ano})",
+        dados=dados_detalhe,
     )

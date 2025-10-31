@@ -1,7 +1,5 @@
 // app/static/js/global.js
 
-console.log("global.js carregado com sucesso!");
-
 document.addEventListener("DOMContentLoaded", () => {
   const sidebarToggle = document.getElementById("sidebarToggle");
   if (sidebarToggle) {

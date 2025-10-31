@@ -1,7 +1,5 @@
 // app/static/js/financiamento.js
 
-console.log("financiamento.js carregado com sucesso!");
-
 document.addEventListener("DOMContentLoaded", () => {
   const formImportar = document.getElementById("form-importar-csv");
   if (formImportar) {

@@ -224,8 +224,12 @@ PAGE_CONFIG = {
     "salario.gerenciar_itens_folha": {"title": "Salários"},
     # Relatórios
     "extrato.extrato_bancario": {"title": "Extrato Bancário"},
-    "extrato_consolidado.extrato_consolidado": {"title": "Fluxo de Caixa"},
+    "extrato_consolidado.extrato_consolidado": {"title": "Fluxo de Caixa Detalhado"},
     "fluxo_caixa.painel": {"title": "Fluxo de Caixa"},
+    "relatorios.detalhe_grupo_crediario": {"title": "Detalhe Parcelas Grupo Crediario"},
+    "relatorios.gastos_por_grupo": {"title": "Gastos por Grupo de Crediário"},
+    "relatorios.resumo_mensal": {"title": "Resumo das Contas no Mês"},
+    "relatorios.resumo_folha": {"title": "Folha Anual"},
     # Painéis
     "pagamentos.painel": {"title": "Pagamentos"},
     "recebimentos.painel": {"title": "Recebimentos"},
@@ -236,4 +240,7 @@ PAGE_CONFIG = {
     "solicitacao.solicitar_acesso": {"title": "Solicitar Acesso"},
     "solicitacao.verificar_status": {"title": "Status Solicitação"},
     "solicitacao.gerenciar_solicitacoes": {"title": "Usuários"},
+    # Contas a Vencer e Vencidas
+    "main.contas_a_vencer": {"title": "Contas a Vencer"},
+    "main.contas_vencidas": {"title": "Contas Atrasadas"},
 }

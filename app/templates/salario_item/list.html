@@ -4,10 +4,15 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2">
-      <h4 class="mb-0">Verbas de Salário</h4>
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+    >
+      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+        <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
+        Cadastro de Verbas de Salário
+      </h4>
       <a href="{{ url_for('salario.adicionar_item') }}" class="btn btn-azul">
-        <i class="fas fa-plus"></i> Verba
+        <i class="fas fa-plus text-warning me-2"></i> Verba
       </a>
     </div>
 
@@ -33,24 +38,37 @@ render_confirm_modal %} {% block content %}
                 <td>{{ item.nome }}</td>
                 <td>
                   {% if item.tipo == 'Provento' %}
-                  <span class="badge bg-success-subtle text-success-emphasis">{{ item.tipo }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >{{ item.tipo }}</span
+                  >
                   {% elif item.tipo == 'Benefício' %}
-                  <span class="badge bg-info-subtle text-info-emphasis">{{ item.tipo }}</span>
+                  <span class="badge bg-info-subtle text-info-emphasis"
+                    >{{ item.tipo }}</span
+                  >
                   {% elif item.tipo == 'Desconto' %}
                   <span class="badge bg-warning-subtle text-warning-emphasis"
                     >{{ item.tipo }}</span
                   >
                   {% elif item.tipo == 'Imposto' %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ item.tipo }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >{{ item.tipo }}</span
+                  >
                   {% else %}
-                  <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ item.tipo }}</span>
+                  <span
+                    class="badge bg-secondary-subtle text-secondary-emphasis"
+                    >{{ item.tipo }}</span
+                  >
                   {% endif %}
                 </td>
                 <td>
                   {% if item.ativo %}
-                  <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >Sim</span
+                  >
                   {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >Não</span
+                  >
                   {% endif %}
                 </td>
                 <td>{{ item.descricao if item.descricao else '-' }}</td>

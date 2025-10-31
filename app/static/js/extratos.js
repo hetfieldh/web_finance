@@ -1,7 +1,6 @@
 // app/static/js/extratos.js
 
-console.log("extratos.js carregado com sucesso!");
-
+// EXTRATO BANCÁRIO
 document.addEventListener("DOMContentLoaded", function () {
   const formExtratoBancario = document.getElementById("form-extrato-bancario");
 
@@ -31,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // EXTRATO BANCÁRIO DETALHADO
   const formExtratoConsolidado = document.getElementById(
     "form-extrato-consolidado"
   );
@@ -83,5 +83,37 @@ document.addEventListener("DOMContentLoaded", function () {
         formResumoFolha.submit();
       });
     }
+  }
+
+  // DETALHE GRUPO CREDIÁRIO
+  const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
+  const btnTotal = document.getElementById("btn-total");
+  const tabelaSaldoDevedor = document.getElementById("tabela-saldo-devedor");
+  const tabelaTotal = document.getElementById("tabela-total");
+
+  function mostrarTabela(tipo) {
+    if (!tabelaSaldoDevedor || !tabelaTotal || !btnSaldoDevedor || !btnTotal) {
+      return;
+    }
+    if (tipo === "saldo-devedor") {
+      tabelaSaldoDevedor.style.display = "block";
+      tabelaTotal.style.display = "none";
+      btnSaldoDevedor.classList.add("active");
+      btnTotal.classList.remove("active");
+    } else {
+      tabelaSaldoDevedor.style.display = "none";
+      tabelaTotal.style.display = "block";
+      btnSaldoDevedor.classList.remove("active");
+      btnTotal.classList.add("active");
+    }
+  }
+
+  if (btnSaldoDevedor && btnTotal) {
+    btnSaldoDevedor.addEventListener("click", () =>
+      mostrarTabela("saldo-devedor")
+    );
+    btnTotal.addEventListener("click", () => mostrarTabela("total"));
+
+    mostrarTabela("saldo-devedor");
   }
 });

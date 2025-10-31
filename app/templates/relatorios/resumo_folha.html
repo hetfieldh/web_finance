@@ -6,7 +6,7 @@
     <div class="caixa-sombreada mb-2">
       <span class="text-dark fw-bold">Resumo da Folha:</span>
       <span class="text-danger"
-        >Visão consolidada anual de Salários mês a mês.</span
+        >Visão anual consolidada dos salários, exibidos mês a mês.</span
       >
     </div>
 
@@ -18,15 +18,14 @@
           action="{{ url_for('relatorios.resumo_folha') }}"
         >
           <div class="row align-items-center">
-            <div class="col-md-3 d-flex align-items-center">
-              <label
-                for="ano_resumo_folha"
-                class="form-label mb-0 me-2 fw-semibold text-secondary"
-              >
-                Ano:
-              </label>
-              {{ form.ano(class="form-select input-normal",
-              id="ano_resumo_folha", style="width: 100px;") }}
+            <div class="col-md-2" style="width: 150px">
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-calendar-alt"></i
+                ></span>
+                {{ form.ano(class="form-select fw-semibold text-danger",
+                id="ano_resumo_folha") }}
+              </div>
             </div>
           </div>
         </form>
@@ -34,7 +33,7 @@
     </div>
 
     {% if dados %}
-    <div class="card border-1 bg-transparent mx-0">
+    <div class="card border-0 bg-light my-2">
       <div class="card-body p-0">
         <div class="table-responsive">
           <table

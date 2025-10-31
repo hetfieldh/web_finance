@@ -8,12 +8,12 @@
       <div
         class="card-header menu-primario d-flex justify-content-between align-items-center"
       >
-        <h5 class="mb-0">Salário de {{ movimento.mes_referencia }}</h5>
+        <h5 class="mb-0"><i class="far fa-money-bill-alt fa-lg text-warning mx-2"></i>Salário de {{ movimento.mes_referencia }}</h5>
         <a
           href="{{ url_for('salario.listar_movimentos') }}"
           class="btn btn-cinza"
         >
-          <i class="fas fa-arrow-left"></i> Voltar
+          <i class="fas fa-arrow-left text-warning me-2"></i> Voltar
         </a>
       </div>
     </div>
