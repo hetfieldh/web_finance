@@ -38,14 +38,6 @@ def listar_faturas():
 
     hoje = date.today()
 
-    if not data_inicial_str and not data_final_str:
-        primeiro_dia = date(hoje.year, hoje.month, 1)
-        ultimo_dia = date(
-            hoje.year, hoje.month, calendar.monthrange(hoje.year, hoje.month)[1]
-        )
-        data_inicial_str = primeiro_dia.isoformat()
-        data_final_str = ultimo_dia.isoformat()
-
     query = CrediarioFatura.query.filter_by(usuario_id=current_user.id).options(
         joinedload(CrediarioFatura.crediario)
     )

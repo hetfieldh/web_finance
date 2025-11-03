@@ -78,7 +78,7 @@ def get_all_crediario_grupos_for_user_choices():
         .all()
     )
     choices = [("", "Nenhum")] + [
-        (str(cg.id), f"{cg.grupo_crediario} ({cg.tipo_grupo_crediario})")
+        (str(cg.id), f"{cg.grupo_crediario}")
         for cg in grupos
     ]
     return choices
