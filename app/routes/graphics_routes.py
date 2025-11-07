@@ -10,6 +10,7 @@ from app.services.graphics_service import (
     get_annual_evolution_data,
     get_financing_progress_data,
     get_financing_summary_data,
+    get_installment_evolution_data,
     get_monthly_graphics_data,
 )
 
@@ -78,4 +79,20 @@ def resumo_financiamentos():
         summary_data=summary_data,
         todos_financiamentos=todos_financiamentos,
         selected_finan_id=selected_finan_id,
+    )
+
+
+@graphics_bp.route("/evolucao-dividas")
+@login_required
+def evolucao_dividas_crediario():
+    grouping_by = request.args.get("grouping_by", "crediario")
+
+    chart_data = get_installment_evolution_data(
+        user_id=current_user.id, grouping_by=grouping_by
+    )
+
+    return render_template(
+        "graphics_3.html",
+        chart_data=chart_data,
+        selected_grouping=grouping_by,
     )

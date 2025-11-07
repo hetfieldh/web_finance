@@ -3,6 +3,7 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
+from dateutil.relativedelta import relativedelta
 from flask_login import current_user
 from sqlalchemy import func
 
@@ -10,6 +11,11 @@ from app import db
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_grupo_model import CrediarioGrupo
+from app.models.crediario_model import Crediario
+from app.models.crediario_movimento_model import CrediarioMovimento
+from app.models.crediario_parcela_model import CrediarioParcela
+from app.models.crediario_subgrupo_model import CrediarioSubgrupo
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_model import Financiamento
@@ -358,3 +364,87 @@ def get_financing_summary_data(user_id, financiamento_id=None):
 
     total = sum(valores)
     return {"labels": labels, "valores": valores, "total": total}
+
+
+# Gráfico(3) --> Evolução do Saldo Devedor do Crediário
+def get_installment_evolution_data(user_id, grouping_by="crediario"):
+    hoje = date.today()
+    num_months = 36
+    labels = []
+    for i in range(num_months):
+        data_ponto = hoje + relativedelta(months=i)
+        labels.append(data_ponto.strftime("%b/%y"))
+
+    if grouping_by == "grupo":
+        group_entity = CrediarioGrupo
+        group_field = CrediarioGrupo.grupo_crediario
+        join_path = [CrediarioMovimento, CrediarioParcela]
+    elif grouping_by == "subgrupo":
+        group_entity = CrediarioSubgrupo
+        group_field = CrediarioSubgrupo.nome
+        join_path = [CrediarioMovimento, CrediarioParcela]
+    else:
+        group_entity = Crediario
+        group_field = Crediario.nome_crediario
+        join_path = [CrediarioMovimento, CrediarioParcela]
+
+    query_distintos = db.session.query(group_entity.id, group_field)
+
+    for model_to_join in join_path:
+        query_distintos = query_distintos.join(model_to_join)
+
+    query_distintos = query_distintos.filter(
+        CrediarioMovimento.usuario_id == user_id,
+        CrediarioParcela.pago == False,
+        CrediarioParcela.data_vencimento >= hoje,
+    )
+
+    grupos_distintos = query_distintos.distinct().all()
+
+    datasets = []
+
+    for item_id, nome_item in grupos_distintos:
+        data_values = []
+        for i in range(num_months):
+            data_ponto_inicio_mes = (hoje + relativedelta(months=i)).replace(day=1)
+
+            query_saldo = db.session.query(func.sum(CrediarioParcela.valor_parcela))
+
+            if grouping_by == "grupo":
+                query_saldo = (
+                    query_saldo.join(CrediarioMovimento)
+                    .join(CrediarioSubgrupo)
+                    .join(CrediarioGrupo)
+                    .filter(CrediarioGrupo.id == item_id)
+                )
+            elif grouping_by == "subgrupo":
+                query_saldo = (
+                    query_saldo.join(CrediarioMovimento)
+                    .join(CrediarioSubgrupo)
+                    .filter(CrediarioSubgrupo.id == item_id)
+                )
+            else:
+                query_saldo = (
+                    query_saldo.join(CrediarioMovimento)
+                    .join(Crediario)
+                    .filter(Crediario.id == item_id)
+                )
+
+            query_saldo = query_saldo.filter(
+                CrediarioMovimento.usuario_id == user_id,
+                CrediarioParcela.pago == False,
+                CrediarioParcela.data_vencimento >= data_ponto_inicio_mes,
+            )
+
+            saldo = query_saldo.scalar() or Decimal("0.00")
+
+            data_values.append(float(saldo))
+
+        datasets.append(
+            {
+                "label": nome_item,
+                "data": data_values,
+            }
+        )
+
+    return {"labels": labels, "datasets": datasets}

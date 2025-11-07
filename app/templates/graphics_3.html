@@ -1,0 +1,39 @@
+<!--- app\templates\graphics_3.html -->
+
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row g-2 mb-2">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light p-2 d-flex align-items-center">
+            <form id="form-select-grouping" method="GET" class="d-flex align-items-center">
+                <label for="grouping_by" class="form-label mb-0 me-2 fw-semibold text-secondary">Evolução do Saldo Devedor dos Crediários por:</label>
+                <select name="grouping_by" id="grouping_by" class="form-select form-select-sm w-auto input-compacto">
+                    <option value="crediario" {{ 'selected' if selected_grouping == 'crediario' else '' }}>Crediário</option>
+                    <option value="grupo" {{ 'selected' if selected_grouping == 'grupo' else '' }}>Grupo</option>
+                    <option value="subgrupo" {{ 'selected' if selected_grouping == 'subgrupo' else '' }}>Subgrupo</option>
+                </select>
+            </form>
+        </div>
+        <div class="card-body" style="height: 600px">
+          {% if chart_data and chart_data.datasets %}
+              <canvas id="evolucaoParcelasChart"></canvas>
+          {% else %}
+              <div class="d-flex h-100 justify-content-center align-items-center">
+                  <p class="text-muted">Nenhuma parcela de crediário pendente encontrada.</p>
+              </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="application/json" id="evolucao-chart-data">
+  {{ chart_data|tojson|safe }}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/graphics.js') }}"></script>
+{% endblock %}

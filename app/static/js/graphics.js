@@ -427,3 +427,102 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+// graphics_3.html
+document.addEventListener("DOMContentLoaded", function () {
+  const chartDataElement = document.getElementById("evolucao-chart-data");
+
+  if (chartDataElement) {
+    const chartData = JSON.parse(chartDataElement.textContent);
+
+    const evolucaoParcelasCanvas = document.getElementById(
+      "evolucaoParcelasChart"
+    );
+
+    if (
+      evolucaoParcelasCanvas &&
+      chartData.datasets &&
+      chartData.datasets.length > 0
+    ) {
+      chartData.datasets.forEach((dataset) => {
+        const r = Math.floor(Math.random() * 200);
+        const g = Math.floor(Math.random() * 200);
+        const b = Math.floor(Math.random() * 200);
+
+        dataset.fill = true;
+        dataset.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+        dataset.borderColor = `rgba(${r}, ${g}, ${b}, 1)`;
+        dataset.tension = 0.3;
+        dataset.borderWidth = 1.5;
+        dataset.pointRadius = 0;
+        dataset.pointHoverRadius = 4;
+      });
+
+      new Chart(evolucaoParcelasCanvas, {
+        type: "line",
+        data: {
+          labels: chartData.labels,
+          datasets: chartData.datasets,
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              stacked: true,
+              ticks: {
+                callback: function (value) {
+                  return new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                    minimumFractionDigits: 0,
+                  }).format(value);
+                },
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+            },
+          },
+          plugins: {
+            legend: { position: "top", align: "start" },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || "";
+                  if (label) {
+                    label += ": ";
+                  }
+                  if (context.parsed.y !== null) {
+                    label += new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(context.parsed.y);
+                  }
+                  return label;
+                },
+              },
+            },
+            datalabels: { display: false },
+          },
+          interaction: {
+            mode: "index",
+            intersect: false,
+          },
+        },
+      });
+    }
+  }
+
+  const selectGrouping = document.getElementById("grouping_by");
+  if (selectGrouping) {
+    selectGrouping.addEventListener("change", function () {
+      this.closest("form").submit();
+    });
+  }
+});
