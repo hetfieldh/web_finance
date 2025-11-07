@@ -8,8 +8,8 @@
     >
       <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
-        Fatura de {{ fatura.crediario.nome_crediario }} ({%set partes =
-        fatura.mes_referencia.split('-') %}{{ partes[1] }}-{{ partes[0]}})
+        Fatura de {{ fatura.crediario.nome_crediario }} ({% set partes =
+        fatura.mes_referencia.split('-') %}{{ partes[1] }}-{{ partes[0] }})
       </h4>
       <div>
         <a
@@ -20,56 +20,41 @@
         </a>
       </div>
     </div>
+
     <div class="card shadow-sm mb-2">
-      <div class="card-header bg-secondary text-white">
-        <h5 class="mb-0">
-          <i class="fas fa-receipt fa-lg text-warning mx-2"></i>Resumo da Fatura
-        </h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-3">
-            <p>
-              <strong>Crediário:</strong> {{ fatura.crediario.nome_crediario }}
-            </p>
+      <!-- <div class="card-header bg-secondary text-white py-2">
+        <h6 class="mb-0">
+          <i class="fas fa-receipt text-warning me-2"></i>Resumo
+        </h6>
+      </div> -->
+      <div class="card-body py-2">
+        <div class="d-flex flex-wrap justify-content-between text-sm">
+          <div>
+            <i class="fas fa-store text-danger me-2"></i>{{
+            fatura.crediario.nome_crediario }}
           </div>
-          <div class="col-md-3">
-            <p>
-              <strong>Mês de Referência:</strong>
-              {% set partes = fatura.mes_referencia.split('-') %} {{ partes[1]
-              }}-{{ partes[0]}}
-            </p>
+          <div>
+            <i class="fas fa-calendar-alt text-danger me-2"></i>{% set partes =
+            fatura.mes_referencia.split('-') %}{{ partes[1] }}-{{ partes[0] }}
           </div>
-          <div class="col-md-3">
-            <p>
-              <strong>Valor Total:</strong>
-              <span
-                class="fw-bold {% if fatura.valor_total_fatura < 0 %}text-danger{% endif %}"
-                >{{ fatura.valor_total_fatura | format_currency }}</span
-              >
-            </p>
+          <div>
+            <i class="fas fa-dollar-sign text-danger me-2"></i
+            ><strong>{{ fatura.valor_total_fatura | format_currency }}</strong>
           </div>
-          <div class="col-md-3">
-            <p>
-              <strong>Status:</strong>
-              {% if fatura.status == 'Pago' %}
-              <span class="badge bg-success-subtle text-success-emphasis"
-                >{{ fatura.status }}</span
-              >
-              {% elif fatura.status == 'Atrasado' %}
-              <span class="badge bg-danger-subtle text-danger-emphasis"
-                >{{ fatura.status }}</span
-              >
-              {% elif fatura.status == 'Parcialmente Pago' %}
-              <span class="badge bg-warning-subtle text-warning-emphasis"
-                >{{ fatura.status }}</span
-              >
-              {% else %}
-              <span class="badge bg-secondary-subtle text-secondary-emphasis"
-                >{{ fatura.status }}</span
-              >
-              {% endif %}
-            </p>
+          <div> <i class="fas fa-calendar-check text-danger me-2"></i>
+            {% if fatura.status == 'Pago' %}
+            <span class="badge bg-success-subtle text-success-emphasis"
+              >{{ fatura.status }}</span
+            >
+            {% elif fatura.status == 'Atrasado' %}
+            <span class="badge bg-danger-subtle text-danger-emphasis"
+              >{{ fatura.status }}</span
+            >
+            {% else %}
+            <span class="badge bg-secondary-subtle text-secondary-emphasis"
+              >{{ fatura.status }}</span
+            >
+            {% endif %}
           </div>
         </div>
       </div>
@@ -82,7 +67,7 @@
       <div class="card-body">
         {% if parcelas_da_fatura %}
         <div class="table-responsive">
-          <table class="table table-striped table-hover">
+          <table class="table table-striped table-hover align-middle">
             <thead>
               <tr>
                 <th>ID Mov.</th>
@@ -105,7 +90,7 @@
                 <td
                   class="text-end {% if parcela.valor_parcela < 0 %}text-danger fw-bold{% endif %}"
                 >
-                  {{parcela.valor_parcela | format_currency }}
+                  {{ parcela.valor_parcela | format_currency }}
                 </td>
               </tr>
               {% endfor %}
@@ -113,7 +98,7 @@
           </table>
         </div>
         {% else %}
-        <p class="text-center">Nenhuma parcela associada a esta fatura.</p>
+        <p class="text-center mb-0">Nenhuma parcela associada a esta fatura.</p>
         {% endif %}
       </div>
     </div>

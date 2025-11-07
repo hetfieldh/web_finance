@@ -49,9 +49,18 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
         coerce=lambda x: int(x) if x else None,
     )
 
+    fornecedor_id = SelectField(
+        "Fornecedor", validators=[Optional()], coerce=lambda x: int(x) if x else None
+    )
+
     crediario_grupo_id = SelectField(
-        "Grupo de Crediário",
-        validators=[DataRequired("O grupo de crediário é obrigatório.")],
+        "Grupo",
+        validators=[DataRequired("O grupo é obrigatório.")],
+        coerce=lambda x: int(x) if x else None,
+    )
+    crediario_subgrupo_id = SelectField(
+        "Subgrupo",
+        validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
     )
 
@@ -106,11 +115,15 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         crediario_choices = kwargs.pop("crediario_choices", [])
         grupo_choices = kwargs.pop("grupo_choices", [])
+        fornecedor_choices = kwargs.pop("fornecedor_choices", [])
 
         super().__init__(*args, **kwargs)
 
         self.crediario_id.choices = crediario_choices
         self.crediario_grupo_id.choices = grupo_choices
+        self.crediario_subgrupo_id.choices = [("", "Selecione...")]
+        self.crediario_subgrupo_id.render_kw = {"disabled": True}
+        self.fornecedor_id.choices = fornecedor_choices
 
         meses_anos = []
         hoje = date.today()
@@ -153,8 +166,22 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         render_kw={"disabled": True},
     )
 
+    fornecedor_id = SelectField(
+        "Fornecedor",
+        validators=[Optional()],
+        coerce=lambda x: int(x) if x else None,
+        render_kw={"disabled": True},
+    )
+
     crediario_grupo_id = SelectField(
-        "Grupo de Crediário (opcional)",
+        "Grupo",
+        validators=[Optional()],
+        coerce=lambda x: int(x) if x else None,
+        render_kw={"disabled": True},
+    )
+
+    crediario_subgrupo_id = SelectField(
+        "Subgrupo",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
         render_kw={"disabled": True},
@@ -213,11 +240,14 @@ class EditarCrediarioMovimentoForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         crediario_choices = kwargs.pop("crediario_choices", [])
         grupo_choices = kwargs.pop("grupo_choices", [])
-
+        subgrupo_choices = kwargs.pop("subgrupo_choices", [])
+        fornecedor_choices = kwargs.pop("fornecedor_choices", [])
         super().__init__(*args, **kwargs)
 
         self.crediario_id.choices = crediario_choices
         self.crediario_grupo_id.choices = grupo_choices
+        self.crediario_subgrupo_id.choices = subgrupo_choices
+        self.fornecedor_id.choices = fornecedor_choices
 
         meses_anos = []
         hoje = date.today()

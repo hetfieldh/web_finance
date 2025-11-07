@@ -1,4 +1,4 @@
-// app/static/js/forms.js (VERSÃO COMPLETA E FINAL)
+// app/static/js/forms.js (COMPLETO E CORRIGIDO)
 
 document.addEventListener("DOMContentLoaded", () => {
   const tipoContaSelect = document.getElementById("tipo-conta-select");
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedOption =
       transacaoSelect.options[transacaoSelect.selectedIndex];
 
-    resetSelectStyle();
+    resetSelect.style();
 
     if (selectedOption && selectedOption.value) {
       const text = selectedOption.textContent;
@@ -349,5 +349,56 @@ document.addEventListener("DOMContentLoaded", () => {
     styleSelectedTransacao();
     transacaoSelect.addEventListener("mousedown", resetSelectStyle);
     transacaoSelect.addEventListener("change", styleSelectedTransacao);
+  }
+
+  const grupoCrediarioSelect = document.getElementById("crediario_grupo_id");
+  const subgrupoCrediarioSelect = document.getElementById(
+    "crediario_subgrupo_id"
+  );
+
+  if (grupoCrediarioSelect && subgrupoCrediarioSelect) {
+    grupoCrediarioSelect.addEventListener("change", function () {
+      const grupoId = this.value;
+
+      subgrupoCrediarioSelect.innerHTML = "";
+      subgrupoCrediarioSelect.disabled = true;
+
+      if (!grupoId) {
+        subgrupoCrediarioSelect.add(new Option("Selecione um Grupo...", ""));
+        return;
+      }
+
+      subgrupoCrediarioSelect.add(new Option("Carregando...", ""));
+
+      fetch(`/subgrupos_crediario/json/${grupoId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Erro ao buscar subgrupos");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          subgrupoCrediarioSelect.innerHTML = "";
+
+          if (data.length === 0) {
+            subgrupoCrediarioSelect.add(
+              new Option("Nenhum subgrupo encontrado", "")
+            );
+          } else {
+            subgrupoCrediarioSelect.add(new Option("Selecione...", ""));
+            data.forEach((subgrupo) => {
+              subgrupoCrediarioSelect.add(
+                new Option(subgrupo.nome, subgrupo.id)
+              );
+            });
+            subgrupoCrediarioSelect.disabled = false;
+          }
+        })
+        .catch((error) => {
+          console.error("Erro no fetch:", error);
+          subgrupoCrediarioSelect.innerHTML = "";
+          subgrupoCrediarioSelect.add(new Option("Erro ao carregar", ""));
+        });
+    });
   }
 });

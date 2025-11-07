@@ -19,7 +19,7 @@
           {{ form.csrf_token }}
 
           <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               <label class="form-label mb-1 small">Crediário:</label>
               <input
                 type="text"
@@ -28,13 +28,33 @@
                 readonly
               />
             </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label mb-1 small">Fornecedor:</label>
+              <input
+                type="text"
+                class="form-control form-control-sm text-start"
+                value="{{ movimento.fornecedor.nome if movimento.fornecedor else 'N/A' }}"
+                readonly
+              />
+            </div>
+          </div>
 
+          <div class="row">
             <div class="col-md-4 mb-3">
-              <label class="form-label mb-1 small">Grupo de Crediário:</label>
+              <label class="form-label mb-1 small">Grupo:</label>
               <input
                 type="text"
                 class="form-control form-control-sm text-start"
                 value="{{ movimento.crediario_grupo.grupo_crediario if movimento.crediario_grupo else 'N/A' }}"
+                readonly
+              />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label mb-1 small">Subgrupo:</label>
+              <input
+                type="text"
+                class="form-control form-control-sm text-start"
+                value="{{ movimento.crediario_subgrupo.nome if movimento.crediario_subgrupo else 'N/A' }}"
                 readonly
               />
             </div>

@@ -12,6 +12,7 @@ from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_grupo_model import CrediarioGrupo
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
+from app.models.crediario_subgrupo_model import CrediarioSubgrupo
 from app.utils import STATUS_PAGO, STATUS_PARCIAL_PAGO
 
 
@@ -48,6 +49,14 @@ def adicionar_movimento(form):
             crediario_id=crediario_id,
             crediario_grupo_id=(
                 form.crediario_grupo_id.data if form.crediario_grupo_id.data else None
+            ),
+            crediario_subgrupo_id=(
+                form.crediario_subgrupo_id.data
+                if form.crediario_subgrupo_id.data
+                else None
+            ),
+            fornecedor_id=(
+                form.fornecedor_id.data if form.fornecedor_id.data else None
             ),
             data_compra=form.data_compra.data,
             valor_total_compra=valor_total_compra,

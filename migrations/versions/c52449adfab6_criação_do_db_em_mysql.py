@@ -1,8 +1,8 @@
 """Criação do DB em MySql
 
-Revision ID: 0d19b2004207
+Revision ID: c52449adfab6
 Revises: 
-Create Date: 2025-11-03 17:37:57.455979
+Create Date: 2025-11-03 19:24:46.566140
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0d19b2004207'
+revision = 'c52449adfab6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -97,6 +97,16 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('usuario_id', 'nome', 'natureza', 'tipo', name='_usuario_desp_rec_uc')
     )
+    op.create_table('fornecedor',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('usuario_id', sa.Integer(), nullable=False),
+    sa.Column('nome', sa.String(length=100), nullable=False),
+    sa.Column('descricao', sa.String(length=255), nullable=True),
+    sa.Column('data_criacao', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('usuario_id', 'nome', name='_usuario_fornecedor_nome_uc')
+    )
     op.create_table('solicitacao_acesso',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
@@ -129,22 +139,16 @@ def upgrade():
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('crediario_movimento',
+    op.create_table('crediario_subgrupo',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('usuario_id', sa.Integer(), nullable=False),
-    sa.Column('crediario_id', sa.Integer(), nullable=False),
-    sa.Column('crediario_grupo_id', sa.Integer(), nullable=True),
-    sa.Column('data_compra', sa.Date(), nullable=False),
-    sa.Column('valor_total_compra', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('descricao', sa.String(length=255), nullable=False),
-    sa.Column('destino', sa.Enum('Próprio', 'Outros', 'Coletivo', name='destino_crediario_enum'), server_default='Próprio', nullable=False),
-    sa.Column('data_primeira_parcela', sa.Date(), nullable=False),
-    sa.Column('numero_parcelas', sa.Integer(), nullable=False),
+    sa.Column('grupo_id', sa.Integer(), nullable=False),
+    sa.Column('nome', sa.String(length=100), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['crediario_grupo_id'], ['crediario_grupo.id'], ),
-    sa.ForeignKeyConstraint(['crediario_id'], ['crediario.id'], ),
+    sa.ForeignKeyConstraint(['grupo_id'], ['crediario_grupo.id'], ),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('usuario_id', 'grupo_id', 'nome', name='_usuario_grupo_subgrupo_nome_uc')
     )
     op.create_table('financiamento',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -197,18 +201,26 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('usuario_id', 'crediario_id', 'mes_referencia', name='_usuario_crediario_fatura_uc')
     )
-    op.create_table('crediario_parcela',
+    op.create_table('crediario_movimento',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('crediario_movimento_id', sa.Integer(), nullable=False),
-    sa.Column('numero_parcela', sa.Integer(), nullable=False),
-    sa.Column('data_vencimento', sa.Date(), nullable=False),
-    sa.Column('valor_parcela', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('pago', sa.Boolean(), nullable=False),
-    sa.Column('data_pagamento', sa.Date(), nullable=True),
+    sa.Column('usuario_id', sa.Integer(), nullable=False),
+    sa.Column('crediario_id', sa.Integer(), nullable=False),
+    sa.Column('crediario_grupo_id', sa.Integer(), nullable=True),
+    sa.Column('crediario_subgrupo_id', sa.Integer(), nullable=True),
+    sa.Column('fornecedor_id', sa.Integer(), nullable=True),
+    sa.Column('data_compra', sa.Date(), nullable=False),
+    sa.Column('valor_total_compra', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('descricao', sa.String(length=255), nullable=False),
+    sa.Column('destino', sa.Enum('Próprio', 'Outros', 'Coletivo', name='destino_crediario_enum'), server_default='Próprio', nullable=False),
+    sa.Column('data_primeira_parcela', sa.Date(), nullable=False),
+    sa.Column('numero_parcelas', sa.Integer(), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['crediario_movimento_id'], ['crediario_movimento.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('crediario_movimento_id', 'numero_parcela', name='_crediario_parcela_uc')
+    sa.ForeignKeyConstraint(['crediario_grupo_id'], ['crediario_grupo.id'], ),
+    sa.ForeignKeyConstraint(['crediario_id'], ['crediario.id'], ),
+    sa.ForeignKeyConstraint(['crediario_subgrupo_id'], ['crediario_subgrupo.id'], ),
+    sa.ForeignKeyConstraint(['fornecedor_id'], ['fornecedor.id'], ),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('desp_rec_movimento',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -277,6 +289,19 @@ def upgrade():
     sa.UniqueConstraint('movimento_bancario_salario_id'),
     sa.UniqueConstraint('usuario_id', 'mes_referencia', name='_usuario_mes_referencia_uc')
     )
+    op.create_table('crediario_parcela',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('crediario_movimento_id', sa.Integer(), nullable=False),
+    sa.Column('numero_parcela', sa.Integer(), nullable=False),
+    sa.Column('data_vencimento', sa.Date(), nullable=False),
+    sa.Column('valor_parcela', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('pago', sa.Boolean(), nullable=False),
+    sa.Column('data_pagamento', sa.Date(), nullable=True),
+    sa.Column('data_criacao', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['crediario_movimento_id'], ['crediario_movimento.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('crediario_movimento_id', 'numero_parcela', name='_crediario_parcela_uc')
+    )
     op.create_table('salario_movimento_item',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('salario_movimento_id', sa.Integer(), nullable=False),
@@ -294,16 +319,18 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('salario_movimento_item')
+    op.drop_table('crediario_parcela')
     op.drop_table('salario_movimento')
     op.drop_table('financiamento_parcela')
     op.drop_table('desp_rec_movimento')
-    op.drop_table('crediario_parcela')
+    op.drop_table('crediario_movimento')
     op.drop_table('crediario_fatura')
     op.drop_table('salario_item')
     op.drop_table('financiamento')
-    op.drop_table('crediario_movimento')
+    op.drop_table('crediario_subgrupo')
     op.drop_table('conta_movimento')
     op.drop_table('solicitacao_acesso')
+    op.drop_table('fornecedor')
     op.drop_table('desp_rec')
     op.drop_table('crediario_grupo')
     op.drop_table('crediario')

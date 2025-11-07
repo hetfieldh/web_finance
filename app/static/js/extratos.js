@@ -86,25 +86,34 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // DETALHE GRUPO CREDIÁRIO
-  const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
+const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
   const btnTotal = document.getElementById("btn-total");
   const tabelaSaldoDevedor = document.getElementById("tabela-saldo-devedor");
   const tabelaTotal = document.getElementById("tabela-total");
+  const tituloDinamico = document.getElementById("titulo-tabela-dinamica");
 
+  // --- INÍCIO DA CORREÇÃO ---
   function mostrarTabela(tipo) {
     if (!tabelaSaldoDevedor || !tabelaTotal || !btnSaldoDevedor || !btnTotal) {
       return;
     }
+
     if (tipo === "saldo-devedor") {
       tabelaSaldoDevedor.style.display = "block";
       tabelaTotal.style.display = "none";
       btnSaldoDevedor.classList.add("active");
       btnTotal.classList.remove("active");
+      if (tituloDinamico) {
+        tituloDinamico.textContent = " - Saldo Devedor";
+      }
     } else {
       tabelaSaldoDevedor.style.display = "none";
       tabelaTotal.style.display = "block";
       btnSaldoDevedor.classList.remove("active");
       btnTotal.classList.add("active");
+      if (tituloDinamico) {
+        tituloDinamico.textContent = " - Todas as parcelas";
+      }
     }
   }
 
@@ -114,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     btnTotal.addEventListener("click", () => mostrarTabela("total"));
 
+    // Isso garante que o título correto apareça quando a página carregar
     mostrarTabela("saldo-devedor");
   }
 });

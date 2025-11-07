@@ -60,10 +60,12 @@ def create_app(config_class=Config, config_overrides=None):
     from app.models.crediario_model import Crediario
     from app.models.crediario_movimento_model import CrediarioMovimento
     from app.models.crediario_parcela_model import CrediarioParcela
+    from app.models.crediario_subgrupo_model import CrediarioSubgrupo
     from app.models.desp_rec_model import DespRec
     from app.models.desp_rec_movimento_model import DespRecMovimento
     from app.models.financiamento_model import Financiamento
     from app.models.financiamento_parcela_model import FinanciamentoParcela
+    from app.models.fornecedor_model import Fornecedor
     from app.models.salario_item_model import SalarioItem
     from app.models.salario_movimento_item_model import SalarioMovimentoItem
     from app.models.salario_movimento_model import SalarioMovimento
@@ -98,12 +100,14 @@ def create_app(config_class=Config, config_overrides=None):
     from app.routes.crediario_grupo_routes import crediario_grupo_bp
     from app.routes.crediario_movimento_routes import crediario_movimento_bp
     from app.routes.crediario_routes import crediario_bp
+    from app.routes.crediario_subgrupo_routes import crediario_subgrupo_bp
     from app.routes.desp_rec_movimento_routes import desp_rec_movimento_bp
     from app.routes.desp_rec_routes import desp_rec_bp
     from app.routes.extrato_consolidado_routes import extrato_consolidado_bp
     from app.routes.extrato_routes import extrato_bp
     from app.routes.financiamento_routes import financiamento_bp
     from app.routes.fluxo_caixa_routes import fluxo_caixa_bp
+    from app.routes.fornecedor_routes import fornecedor_bp
     from app.routes.graphics_routes import graphics_bp
     from app.routes.main_routes import main_bp
     from app.routes.pagamentos_routes import pagamentos_bp
@@ -135,6 +139,8 @@ def create_app(config_class=Config, config_overrides=None):
     app.register_blueprint(graphics_bp)
     app.register_blueprint(solicitacao_bp)
     app.register_blueprint(relatorios_bp)
+    app.register_blueprint(crediario_subgrupo_bp)
+    app.register_blueprint(fornecedor_bp)
 
     @app.route("/")
     def index():

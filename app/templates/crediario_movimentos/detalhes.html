@@ -2,13 +2,12 @@
 
 {% extends "base.html" %} {% block content %}
 <div class="row">
-  <div class="col-lg-6 mx-auto">
-    <!-- ====== RESUMO DA COMPRA ====== -->
+  <div class="col-lg-8 mx-auto">
     <div class="card shadow-sm mb-2">
       <div
         class="card-header menu-primario d-flex justify-content-between align-items-center py-2"
       >
-        <h6 class="mb-0 h5"></i>Resumo da Compra</h6>
+        <h6 class="mb-0 h5">Resumo da Compra</h6>
         <a
           href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
           class="btn btn-cinza"
@@ -19,47 +18,113 @@
 
       <div class="card-body small">
         <div class="row">
-          <div class="col-md-3 mb-2">
-            <p class="mb-1"><strong>Descrição:</strong></p>
-            <p class="mb-0">{{ movimento.descricao }}</p>
+          <div class="col-md-7">
+            <h6 class="mb-2 text-dark fw-bold">
+              <i class="fas fa-info-circle text-primary me-1"></i>
+              Detalhes da Compra
+            </h6>
+            <ul class="list-group list-group-flush">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Crediário:</strong>
+                <span style="color: var(--wf-azul-destaque)"
+                  >{{ movimento.crediario.nome_crediario }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Fornecedor:</strong>
+                <span style="color: var(--wf-azul-destaque)"
+                  >{{ movimento.fornecedor.nome if movimento.fornecedor else
+                  'N/A' }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Destino:</strong>
+                <span style="color: var(--wf-azul-destaque)"
+                  >{{ movimento.destino }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Grupo:</strong>
+                <span style="color: var(--wf-azul-destaque)"
+                  >{{ movimento.crediario_grupo.grupo_crediario if
+                  movimento.crediario_grupo else 'N/A' }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Subgrupo:</strong>
+                <span style="color: var(--wf-azul-destaque)"
+                  >{{ movimento.crediario_subgrupo.nome if
+                  movimento.crediario_subgrupo else 'N/A' }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-start py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong class="me-3">Descrição:</strong>
+                <span style="color: var(--wf-azul-destaque)"
+                  >{{ movimento.descricao }}</span
+                >
+              </li>
+            </ul>
           </div>
-          <div class="col-md-3 mb-2">
-            <p class="mb-1"><strong>Destino:</strong></p>
-            <p class="mb-0">{{ movimento.destino }}</p>
-          </div>
-          <div class="col-md-3 mb-2">
-            <p class="mb-1"><strong>Crediário:</strong></p>
-            <p class="mb-0">{{ movimento.crediario.nome_crediario }}</p>
-          </div>
-          <div class="col-md-3 mb-2">
-            <p class="mb-1"><strong>Grupo:</strong></p>
-            <p class="mb-0">
-              {{ movimento.crediario_grupo.grupo_crediario if
-              movimento.crediario_grupo else 'N/A' }}
-            </p>
-          </div>
-        </div>
 
-        <div class="row mt-2">
-          <div class="col-md-4 mb-2">
-            <p class="mb-1"><strong>Data da Compra:</strong></p>
-            <p class="mb-0">{{ movimento.data_compra.strftime('%d/%m/%Y') }}</p>
-          </div>
-          <div class="col-md-4 mb-2">
-            <p class="mb-1"><strong>Valor Total:</strong></p>
-            <p class="fw-bold mb-0">
-              {{ movimento.valor_total_compra | format_currency }}
-            </p>
-          </div>
-          <div class="col-md-4 mb-2">
-            <p class="mb-1"><strong>Parcelamento:</strong></p>
-            <p class="mb-0">{{ movimento.numero_parcelas }}x</p>
+          <div class="col-md-5">
+            <h6 class="mb-2 text-dark fw-bold">
+              <i class="fas fa-dollar-sign text-success me-1"></i>
+              Informações de Pagamento
+            </h6>
+            <ul class="list-group list-group-flush">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Data da Compra:</strong>
+                <span class="text-danger mb-0"
+                  >{{ movimento.data_compra.strftime('%d/%m/%Y') }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Valor Total:</strong>
+                <span
+                  class="fw-bold mb-0 {% if movimento.valor_total_compra < 0 %}text-info{% else %}text-danger{% endif %}"
+                >
+                  {{ movimento.valor_total_compra | format_currency }}
+                </span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-0 px-0"
+                style="color: var(--wf-cinza-destaque)"
+              >
+                <strong>Parcelamento:</strong>
+                <span class="fw-bold text-danger mb-0"
+                  >{{ movimento.numero_parcelas }}x</span
+                >
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ====== EXTRATO DE PARCELAS ====== -->
     <div class="card shadow-sm">
       <div class="card-header menu-secundario py-2">
         <h6 class="mb-0 h5">Extrato de Parcelas</h6>
@@ -83,14 +148,20 @@
               <tr>
                 <td class="text-center">{{ parcela.numero_parcela }}</td>
                 <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                <td class="text-end">
+                <td
+                  class="text-end {% if parcela.valor_parcela < 0 %}text-danger fw-bold{% endif %}"
+                >
                   {{ parcela.valor_parcela | format_currency }}
                 </td>
                 <td class="text-center">
                   {% if parcela.pago %}
-                  <span class="badge bg-success-subtle text-success-emphasis">Paga</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >Paga</span
+                  >
                   {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">Pendente</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >Pendente</span
+                  >
                   {% endif %}
                 </td>
               </tr>

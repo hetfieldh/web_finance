@@ -55,6 +55,11 @@ def excluir_grupo_por_id(grupo_id):
             False,
             "Não é possível excluir este grupo. Existem movimentos de crediário associados a ele.",
         )
+    if grupo.subgrupos.count() > 0:
+        return (
+            False,
+            "Não é possível excluir este grupo. Existem subgrupos associados a ele.",
+        )
 
     try:
         db.session.delete(grupo)
@@ -77,8 +82,7 @@ def get_all_crediario_grupos_for_user_choices():
         .order_by(CrediarioGrupo.grupo_crediario.asc())
         .all()
     )
-    choices = [("", "Nenhum")] + [
-        (str(cg.id), f"{cg.grupo_crediario}")
-        for cg in grupos
+    choices = [("", "Selecione...")] + [
+        (str(cg.id), f"{cg.grupo_crediario}") for cg in grupos
     ]
     return choices

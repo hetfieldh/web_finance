@@ -80,7 +80,9 @@ render_confirm_modal %} {% block content %}
               <tr>
                 <th>ID</th>
                 <th>Crediário</th>
+                <th>Fornecedor</th>
                 <th>Grupo</th>
+                <th>Subgrupo</th>
                 <th>Destino</th>
                 <th>Data Compra</th>
                 <th>Valor Total</th>
@@ -99,9 +101,14 @@ render_confirm_modal %} {% block content %}
                   {{ mov.crediario.nome_crediario }} ({{
                   mov.crediario.tipo_crediario }})
                 </td>
+                <td>{{ mov.fornecedor.nome if mov.fornecedor else 'N/A' }}</td>
                 <td>
                   {{ mov.crediario_grupo.grupo_crediario if mov.crediario_grupo
                   else 'N/A' }}
+                </td>
+                <td>
+                  {{ mov.crediario_subgrupo.nome if mov.crediario_subgrupo else
+                  'N/A' }}
                 </td>
                 <td>{{ mov.destino }}</td>
                 <td>{{ mov.data_compra.strftime('%d/%m/%Y') }}</td>

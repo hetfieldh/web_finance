@@ -36,6 +36,10 @@
                     class="list-group-item list-group-item-action bg-transparent ps-4">
                     <i class="fas fa-money-check-alt me-2"></i>Despesas e Receitas
                 </a>
+                <a href="{{ url_for('fornecedor.listar_fornecedores') }}"
+                    class="list-group-item list-group-item-action bg-transparent ps-4">
+                    <i class="fas fa-store fa-fw me-2"></i>Fornecedores
+                </a>
                 <a href="{{ url_for('salario.listar_itens') }}"
                     class="list-group-item list-group-item-action bg-transparent ps-4">
                     <i class="fas fa-file-invoice-dollar me-2"></i>Itens da Salário
@@ -120,7 +124,7 @@
                     <i class="fas fa-chart-bar me-2"></i>Fluxo Detalhado
                 </a>
                 <a href="{{ url_for('relatorios.gastos_por_grupo') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
-                    <i class="fas fa-tags me-2"></i>Gastos por Crediário
+                    <i class="fas fa-tags me-2"></i>Gastos no Crediário
                 </a>
                 <a href="{{ url_for('relatorios.resumo_mensal') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
                     <i class="fas fa-chart-pie me-2"></i>Resumo do Mês

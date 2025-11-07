@@ -20,7 +20,13 @@ from app.forms.crediario_movimento_forms import (
     EditarCrediarioMovimentoForm,
 )
 from app.models.crediario_movimento_model import CrediarioMovimento
-from app.services import crediario_grupo_service, crediario_service
+from app.models.crediario_subgrupo_model import CrediarioSubgrupo
+from app.services import (
+    crediario_grupo_service,
+    crediario_service,
+    crediario_subgrupo_service,
+    fornecedor_service,
+)
 from app.services.crediario_movimento_service import (
     adicionar_movimento,
 )
@@ -45,6 +51,8 @@ def listar_movimentos_crediario():
     query = CrediarioMovimento.query.filter_by(usuario_id=current_user.id).options(
         joinedload(CrediarioMovimento.crediario),
         joinedload(CrediarioMovimento.crediario_grupo),
+        joinedload(CrediarioMovimento.crediario_subgrupo),
+        joinedload(CrediarioMovimento.fornecedor),
     )
 
     try:
@@ -72,15 +80,28 @@ def listar_movimentos_crediario():
     )
 
 
-
 @crediario_movimento_bp.route("/adicionar", methods=["GET", "POST"])
 @login_required
 def adicionar_movimento_crediario():
     crediario_choices = crediario_service.get_active_crediarios_for_user_choices()
     grupo_choices = crediario_grupo_service.get_all_crediario_grupos_for_user_choices()
+    fornecedor_choices = fornecedor_service.get_all_fornecedores_for_user_choices()
     form = CadastroCrediarioMovimentoForm(
-        crediario_choices=crediario_choices, grupo_choices=grupo_choices
+        crediario_choices=crediario_choices,
+        grupo_choices=grupo_choices,
+        fornecedor_choices=fornecedor_choices,
     )
+
+    if request.method == "POST":
+        grupo_id_selecionado = form.crediario_grupo_id.data
+        if grupo_id_selecionado:
+            subgrupo_choices = (
+                crediario_subgrupo_service.get_subgrupos_for_grupo_choices(
+                    grupo_id_selecionado
+                )
+            )
+            form.crediario_subgrupo_id.choices = subgrupo_choices
+            form.crediario_subgrupo_id.render_kw = {"disabled": False}
     if form.validate_on_submit():
         success, message = adicionar_movimento(form)
         if success:
@@ -100,8 +121,18 @@ def editar_movimento_crediario(id):
     ).first_or_404()
     crediario_choices = crediario_service.get_active_crediarios_for_user_choices()
     grupo_choices = crediario_grupo_service.get_all_crediario_grupos_for_user_choices()
+    fornecedor_choices = fornecedor_service.get_all_fornecedores_for_user_choices()
+    subgrupo_choices = []
+    if movimento.crediario_grupo_id:
+        subgrupo_choices = crediario_subgrupo_service.get_subgrupos_for_grupo_choices(
+            movimento.crediario_grupo_id
+        )
     form = EditarCrediarioMovimentoForm(
-        obj=movimento, crediario_choices=crediario_choices, grupo_choices=grupo_choices
+        obj=movimento,
+        crediario_choices=crediario_choices,
+        grupo_choices=grupo_choices,
+        subgrupo_choices=subgrupo_choices,
+        fornecedor_choices=fornecedor_choices,
     )
 
     if form.validate_on_submit():
@@ -143,6 +174,8 @@ def detalhes_movimento(id):
             joinedload(CrediarioMovimento.parcelas),
             joinedload(CrediarioMovimento.crediario),
             joinedload(CrediarioMovimento.crediario_grupo),
+            joinedload(CrediarioMovimento.crediario_subgrupo),
+            joinedload(CrediarioMovimento.fornecedor),
         )
         .filter_by(id=id, usuario_id=current_user.id)
         .first_or_404()

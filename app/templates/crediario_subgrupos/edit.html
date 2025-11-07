@@ -1,0 +1,39 @@
+<!--- app\templates\crediario_subgrupos\edit.html -->
+
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-header menu-primario">
+        <h5 class="mb-0">
+          <i class="px-2 fas fa-edit fa-lg text-warning"></i>Editar Subgrupo: {{
+          subgrupo.nome }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('crediario_subgrupo.editar_subgrupo', id=subgrupo.id) }}"
+        >
+          {{ form.csrf_token }}
+          <div class="mb-3">{{ render_field(form.grupo_id) }}</div>
+          <div class="mb-3">{{ render_field(form.nome) }}</div>
+
+          <div class="mt-1">
+            <button type="submit" class="btn btn-azul">
+              <i class="fas fa-save text-warning me-2"></i>
+              {{ form.submit.label.text }}
+            </button>
+            <a
+              href="{{ url_for('crediario_subgrupo.listar_subgrupos') }}"
+              class="btn btn-cinza"
+              >Cancelar</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

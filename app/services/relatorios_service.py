@@ -1042,7 +1042,10 @@ def get_detalhes_parcelas_por_grupo(grupo_id, ano):
                 CrediarioMovimento.crediario_grupo_id == grupo_id,
                 extract("year", CrediarioMovimento.data_compra) == ano,
             )
-            .options(joinedload(CrediarioMovimento.parcelas))
+            .options(
+                joinedload(CrediarioMovimento.parcelas),
+                joinedload(CrediarioMovimento.fornecedor),
+            )
             .order_by(
                 CrediarioMovimento.data_compra.desc(), CrediarioMovimento.id.desc()
             )
@@ -1059,11 +1062,13 @@ def get_detalhes_parcelas_por_grupo(grupo_id, ano):
         for mov in movimentos:
             chave_compra = f"{mov.descricao} (ID:{mov.id})"
             if chave_compra not in compras_dict:
+                nome_fornecedor = mov.fornecedor.nome if mov.fornecedor else None
                 compras_dict[chave_compra] = {
                     "descricao": mov.descricao,
                     "id": mov.id,
                     "data_compra": mov.data_compra,
                     "chave": chave_compra,
+                    "fornecedor_nome": nome_fornecedor,
                 }
                 compras.append(chave_compra)
 

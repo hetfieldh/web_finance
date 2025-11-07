@@ -19,11 +19,20 @@
           {{ form.csrf_token }}
 
           <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
               {{ render_field(form.crediario_id) }}
             </div>
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.fornecedor_id) }}
+            </div>
+          </div>
+
+          <div class="row">
             <div class="col-md-4 mb-3">
               {{ render_field(form.crediario_grupo_id) }}
+            </div>
+            <div class="col-md-4 mb-3">
+              {{ render_field(form.crediario_subgrupo_id) }}
             </div>
             <div class="col-md-4 mb-3">{{ render_field(form.destino) }}</div>
           </div>
@@ -50,7 +59,8 @@
 
           <div class="mt-1">
             <button type="submit" class="btn btn-azul">
-              <i class="fas fa-save text-warning me-2"></i> {{ form.submit.label.text }}
+              <i class="fas fa-save text-warning me-2"></i>
+              {{ form.submit.label.text }}
             </button>
             <a
               href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
@@ -63,4 +73,6 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
 {% endblock %}

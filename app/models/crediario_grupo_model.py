@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Enum, UniqueConstraint
 
 from app import db
+from app.models.crediario_subgrupo_model import CrediarioSubgrupo
 from app.utils import FormChoices
 
 
@@ -28,6 +29,12 @@ class CrediarioGrupo(db.Model):
 
     usuario = db.relationship(
         "Usuario", backref=db.backref("crediario_grupos", lazy=True)
+    )
+    subgrupos = db.relationship(
+        "CrediarioSubgrupo",
+        back_populates="grupo",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
     )
 
     __table_args__ = (
