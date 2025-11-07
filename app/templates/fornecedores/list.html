@@ -9,7 +9,7 @@ render_confirm_modal %} {% block content %}
     >
       <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
         <i class="fas fa-store fa-lg px-2 text-warning"></i>
-        Cadastro de Fornecedores
+        Cadastro de Lojas ou Serviços
       </h4>
       <div>
         <a
@@ -67,12 +67,12 @@ render_confirm_modal %} {% block content %}
           </table>
         </div>
         {% else %}
-        <p class="text-center">Nenhum fornecedor cadastrado.</p>
+        <p class="text-center">Nenhuma Loja ou Serviço cadastrado.</p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
-Exclusão', body_text='Tem certeza que deseja excluir este fornecedor? Esta ação
+Exclusão', body_text='Tem certeza que deseja excluir esta Loja/Serviço? Esta ação
 não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}

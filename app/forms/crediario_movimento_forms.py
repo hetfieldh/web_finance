@@ -50,7 +50,7 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
     )
 
     fornecedor_id = SelectField(
-        "Fornecedor", validators=[Optional()], coerce=lambda x: int(x) if x else None
+        "Loja/Serviço", validators=[Optional()], coerce=lambda x: int(x) if x else None
     )
 
     crediario_grupo_id = SelectField(
@@ -167,7 +167,7 @@ class EditarCrediarioMovimentoForm(FlaskForm):
     )
 
     fornecedor_id = SelectField(
-        "Fornecedor",
+        "Loja/Serviço",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
         render_kw={"disabled": True},

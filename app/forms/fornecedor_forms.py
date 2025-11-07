@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired, Length, Optional
 
 class CadastroFornecedorForm(FlaskForm):
     nome = StringField(
-        "Nome do Fornecedor",
+        "Nome da Loja ou Serviço",
         validators=[
             DataRequired("O nome é obrigatório."),
             Length(min=2, max=100),
@@ -21,7 +21,7 @@ class CadastroFornecedorForm(FlaskForm):
 
 class EditarFornecedorForm(CadastroFornecedorForm):
     nome = StringField(
-        "Nome do Fornecedor",
+        "Nome da Loja ou Serviço",
         validators=[Optional()],
         render_kw={"disabled": True},
     )

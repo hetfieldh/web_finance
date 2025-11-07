@@ -10,20 +10,23 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from flask import current_app
 from flask_login import current_user
-from sqlalchemy import extract, func
+from sqlalchemy import case, extract, func
 from sqlalchemy.orm import aliased, joinedload
 
 from app import db
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.crediario_fatura_model import CrediarioFatura
 from app.models.crediario_grupo_model import CrediarioGrupo
+from app.models.crediario_model import Crediario
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import (
     CrediarioParcela,
 )
+from app.models.crediario_subgrupo_model import CrediarioSubgrupo
 from app.models.desp_rec_model import DespRec
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
+from app.models.fornecedor_model import Fornecedor
 from app.models.salario_item_model import SalarioItem
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
@@ -928,10 +931,8 @@ def get_extrato_detalhado_mensal(user_id, ano, mes):
     return movimentacoes
 
 
-def get_gastos_crediario_por_destino_anual():
+def get_gastos_crediario_por_destino_anual(ano):
     try:
-        ano_atual = datetime.now().year
-
         query_destino = (
             db.session.query(
                 CrediarioMovimento.destino,
@@ -939,7 +940,7 @@ def get_gastos_crediario_por_destino_anual():
             )
             .filter(
                 CrediarioMovimento.usuario_id == current_user.id,
-                extract("year", CrediarioMovimento.data_compra) == ano_atual,
+                extract("year", CrediarioMovimento.data_compra) == ano,
             )
             .group_by(CrediarioMovimento.destino)
             .order_by(CrediarioMovimento.destino)
@@ -980,7 +981,8 @@ def get_gastos_crediario_por_destino_anual():
 
     except Exception as e:
         current_app.logger.error(
-            f"Erro ao gerar relatório de gastos por destino: {e}", exc_info=True
+            f"Erro ao gerar relatório de gastos por destino (Ano: {ano}): {e}",
+            exc_info=True,
         )
         return {
             "Próprio": {"valor": Decimal("0.00"), "percentual": Decimal("0.0")},
@@ -990,11 +992,8 @@ def get_gastos_crediario_por_destino_anual():
         }
 
 
-def get_gastos_crediario_por_grupo_anual():
-    resumo_destino = get_gastos_crediario_por_destino_anual()
-
+def get_gastos_crediario_por_grupo_anual(ano):
     try:
-        ano_atual = datetime.now().year
         query = (
             db.session.query(
                 CrediarioGrupo.id,
@@ -1008,7 +1007,7 @@ def get_gastos_crediario_por_grupo_anual():
             )
             .filter(
                 CrediarioMovimento.usuario_id == current_user.id,
-                extract("year", CrediarioMovimento.data_compra) == ano_atual,
+                extract("year", CrediarioMovimento.data_compra) == ano,
             )
             .group_by(CrediarioGrupo.id, CrediarioGrupo.grupo_crediario)
             .order_by(func.sum(CrediarioMovimento.valor_total_compra).desc())
@@ -1017,17 +1016,18 @@ def get_gastos_crediario_por_grupo_anual():
         resultados = query.all()
 
         relatorio_grupo = [
-            {"id": grupo_id, "grupo": grupo, "total": total, "contagem": contagem}
+            {"id": grupo_id, "nome": grupo, "total": total, "contagem": contagem}
             for grupo_id, grupo, total, contagem in resultados
         ]
 
-        return relatorio_grupo, resumo_destino
+        return relatorio_grupo
 
     except Exception as e:
         current_app.logger.error(
-            f"Erro ao gerar relatório de gastos por grupo: {e}", exc_info=True
+            f"Erro ao gerar relatório de gastos por grupo (Ano: {ano}): {e}",
+            exc_info=True,
         )
-        return [], resumo_destino
+        return []
 
 
 def get_detalhes_parcelas_por_grupo(grupo_id, ano):
@@ -1105,3 +1105,87 @@ def get_detalhes_parcelas_por_grupo(grupo_id, ano):
             exc_info=True,
         )
         return None
+
+
+def get_gastos_crediario_por_subgrupo_anual(ano):
+    try:
+        subgrupo_nome = case(
+            (CrediarioSubgrupo.nome != None, CrediarioSubgrupo.nome),
+            else_="Subgrupo não categorizado",
+        )
+
+        query = (
+            db.session.query(
+                CrediarioSubgrupo.id,
+                subgrupo_nome.label("subgrupo_nome"),
+                func.sum(CrediarioMovimento.valor_total_compra).label("total_gasto"),
+                func.count(CrediarioMovimento.id).label("contagem_movimentos"),
+            )
+            .outerjoin(
+                CrediarioSubgrupo,
+                CrediarioSubgrupo.id == CrediarioMovimento.crediario_subgrupo_id,
+            )
+            .filter(
+                CrediarioMovimento.usuario_id == current_user.id,
+                extract("year", CrediarioMovimento.data_compra) == ano,
+            )
+            .group_by(CrediarioSubgrupo.id, subgrupo_nome)
+            .order_by(func.sum(CrediarioMovimento.valor_total_compra).desc())
+        )
+
+        resultados = query.all()
+
+        relatorio_subgrupo = [
+            {"id": subgrupo_id, "nome": nome, "total": total, "contagem": contagem}
+            for subgrupo_id, nome, total, contagem in resultados
+        ]
+
+        return relatorio_subgrupo
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao gerar relatório de gastos por subgrupo (Ano: {ano}): {e}",
+            exc_info=True,
+        )
+        return []
+
+
+def get_gastos_crediario_por_fornecedor_anual(ano, limit=20):
+    try:
+        fornecedor_nome = case(
+            (Fornecedor.nome != None, Fornecedor.nome),
+            else_="Fornecedor não categorizado",
+        )
+
+        query = (
+            db.session.query(
+                Fornecedor.id,
+                fornecedor_nome.label("fornecedor_nome"),
+                func.sum(CrediarioMovimento.valor_total_compra).label("total_gasto"),
+                func.count(CrediarioMovimento.id).label("contagem_movimentos"),
+            )
+            .outerjoin(Fornecedor, Fornecedor.id == CrediarioMovimento.fornecedor_id)
+            .filter(
+                CrediarioMovimento.usuario_id == current_user.id,
+                extract("year", CrediarioMovimento.data_compra) == ano,
+            )
+            .group_by(Fornecedor.id, fornecedor_nome)
+            .order_by(func.sum(CrediarioMovimento.valor_total_compra).desc())
+            .limit(limit)
+        )
+
+        resultados = query.all()
+
+        relatorio_fornecedor = [
+            {"id": fornecedor_id, "nome": nome, "total": total, "contagem": contagem}
+            for fornecedor_id, nome, total, contagem in resultados
+        ]
+
+        return relatorio_fornecedor
+
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao gerar relatório de gastos por fornecedor (Ano: {ano}): {e}",
+            exc_info=True,
+        )
+        return []

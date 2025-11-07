@@ -1,14 +1,33 @@
 <!--- app\templates\relatorios\gastos_por_grupo.html -->
 
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
+{% block content %}
 <div class="caixa-sombreada mb-2">
   <span class="text-dark fw-bold">Gastos no Crediário: </span>
   <span class="text-danger"
-    >Soma de todos movimentos de crediário no ano de {{ ano }}, agrupados por
-    grupo e ordenados do maior para o menor. Clique no nome do grupo para ver
-    detalhes.</span
+    >Soma de todos movimentos de crediário no ano selecionado, agrupados pela
+    visualização escolhida.</span
   >
 </div>
+
+<div class="card shadow-sm mb-2">
+  <div class="card-body">
+    <form
+      method="GET"
+      action="{{ url_for('relatorios.gastos_por_grupo') }}"
+      class="row g-2 align-items-end"
+    >
+      <div class="col-md-1">{{ render_field(form.ano) }}</div>
+      <div class="col-md-2">{{ render_field(form.visualizacao) }}</div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-azul">
+          <i class="fas fa-filter me-1"></i> Filtrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="card mb-2 border-0">
   <div class="card-body p-0">
     <div class="row g-2 text-center">
@@ -16,12 +35,13 @@
         <div class="border rounded p-1">
           <div class="text-muted small fw-bold">Próprio</div>
           <div
-            class="h5 mb-0 {% if dados_destino['Próprio'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
+            class="h5 mb-0 {% if dados_destino and dados_destino['Próprio'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
           >
-            {{ dados_destino['Próprio'].valor | format_currency }}
+            {{ dados_destino['Próprio'].valor | format_currency if dados_destino
+            else 0 | format_currency }}
           </div>
           <div class="text-muted extra-small">
-            ({{ dados_destino['Próprio'].percentual }}%)
+            ({{ dados_destino['Próprio'].percentual if dados_destino else 0 }}%)
           </div>
         </div>
       </div>
@@ -30,12 +50,13 @@
         <div class="border rounded p-1">
           <div class="text-muted small fw-bold">Outros</div>
           <div
-            class="h5 mb-0 {% if dados_destino['Outros'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
+            class="h5 mb-0 {% if dados_destino and dados_destino['Outros'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
           >
-            {{ dados_destino['Outros'].valor | format_currency }}
+            {{ dados_destino['Outros'].valor | format_currency if dados_destino
+            else 0 | format_currency }}
           </div>
           <div class="text-muted extra-small">
-            ({{ dados_destino['Outros'].percentual }}%)
+            ({{ dados_destino['Outros'].percentual if dados_destino else 0 }}%)
           </div>
         </div>
       </div>
@@ -44,23 +65,26 @@
         <div class="border rounded p-1">
           <div class="text-muted small fw-bold">Coletivo</div>
           <div
-            class="h5 mb-0 {% if dados_destino['Coletivo'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
+            class="h5 mb-0 {% if dados_destino and dados_destino['Coletivo'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
           >
-            {{ dados_destino['Coletivo'].valor | format_currency }}
+            {{ dados_destino['Coletivo'].valor | format_currency if
+            dados_destino else 0 | format_currency }}
           </div>
           <div class="text-muted extra-small">
-            ({{ dados_destino['Coletivo'].percentual }}%)
+            ({{ dados_destino['Coletivo'].percentual if dados_destino else 0
+            }}%)
           </div>
         </div>
       </div>
 
       <div class="col">
-        <div class="border border-primary rounded p-1 bg-primary-subtle">
-          <div class="text-primary small fw-bold">TOTAL GERAL</div>
+        <div class="border border-secondary rounded p-1 bg-secondary-subtle">
+          <div class="text-dark small fw-bold">TOTAL GERAL</div>
           <div
-            class="h5 mb-0 fw-bold {% if dados_destino['Total Geral'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
+            class="h5 mb-0 fw-bold {% if dados_destino and dados_destino['Total Geral'].valor >= 0 %}text-danger{% else %}text-success{% endif %}"
           >
-            {{ dados_destino['Total Geral'].valor | format_currency }}
+            {{ dados_destino['Total Geral'].valor | format_currency if
+            dados_destino else 0 | format_currency }}
           </div>
           <div class="text-muted extra-small">(100.0%)</div>
         </div>
@@ -68,37 +92,50 @@
     </div>
   </div>
 </div>
-<div class="card shadow-sm mb-3">
+
+<div class="card shadow-sm mb-2">
   <div class="card-header menu-primario">
     <h5 class="mb-0">
-      <i class="fas text-warning fa-chart-pie me-2"></i> Gastos por Grupo (Ano:
-      {{ ano }})
+      <i class="fas text-warning fa-chart-pie me-2"></i> {{ titulo_tabela or
+      'Gastos' }}
     </h5>
   </div>
   <div class="card-body">
-    {% if dados_grupo %}
+    {% if dados_tabela %}
     <div class="table-responsive">
-      <table class="table table-striped table-hover">
+      <table class="table table-striped table-hover table-sm">
         <thead>
           <tr>
-            <th class="text-center">Posição</th>
-            <th>Grupo de Crediário</th>
+            <th class="text-center">Pos.</th>
+
+            {% if visualizacao_selecionada == 'grupo' %}
+            <th>Grupo</th>
+            {% elif visualizacao_selecionada == 'subgrupo' %}
+            <th>Subgrupo</th>
+            {% elif visualizacao_selecionada == 'fornecedor' %}
+            <th>Loja/Serviço</th>
+            {% endif %}
+
             <th class="text-center">Nº Compras</th>
-            <th class="text-end">Valor Total (Líquido)</th>
+            <th class="text-end">Valor Total</th>
           </tr>
         </thead>
         <tbody>
-          {% for item in dados_grupo %}
+          {% for item in dados_tabela %}
           <tr>
             <td class="text-center">{{ loop.index }}</td>
             <td>
+              {% if visualizacao_selecionada == 'grupo' %}
               <a
-                href="{{ url_for('relatorios.detalhe_grupo_crediario', grupo_id=item.id, ano=ano) }}"
+                href="{{ url_for('relatorios.detalhe_grupo_crediario', grupo_id=item.id, ano=ano_selecionado) }}"
                 class="text-decoration-none text-dark fw-semibold"
               >
-                {{ item.grupo }}
+                {{ item.nome }}
                 <i class="fas fa-arrow-alt-circle-right text-danger ms-1"></i>
               </a>
+              {% else %}
+              <span class="fw-semibold text-capitalize">{{ item.nome }}</span>
+              {% endif %}
             </td>
             <td class="text-center">{{ item.contagem }}</td>
             <td
@@ -111,9 +148,14 @@
         </tbody>
       </table>
     </div>
+    {% elif not ano_selecionado %}
+    <p class="text-center alert alert-warning">
+      Por favor, selecione um ano para filtrar.
+    </p>
     {% else %}
     <p class="text-center alert alert-info">
-      Nenhum dado de crediário encontrado para o ano de {{ ano }}.
+      Nenhum dado de crediário encontrado para o ano de {{ ano_selecionado }}
+      com a visualização selecionada.
     </p>
     {% endif %}
   </div>

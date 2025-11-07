@@ -11,12 +11,16 @@ from sqlalchemy import func
 
 from app import db
 from app.forms.fluxo_caixa_forms import FluxoCaixaForm
-from app.forms.relatorios_forms import ResumoAnualForm
+from app.forms.relatorios_forms import GastosCrediarioForm, ResumoAnualForm
+from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.salario_movimento_model import SalarioMovimento
 from app.services import relatorios_service
 from app.services.relatorios_service import (
     get_detalhes_parcelas_por_grupo,
+    get_gastos_crediario_por_destino_anual,
+    get_gastos_crediario_por_fornecedor_anual,
     get_gastos_crediario_por_grupo_anual,
+    get_gastos_crediario_por_subgrupo_anual,
 )
 
 relatorios_bp = Blueprint("relatorios", __name__, url_prefix="/relatorios")
@@ -76,20 +80,69 @@ def resumo_mensal():
     )
 
 
-@relatorios_bp.route("/gastos_por_grupo")
+@relatorios_bp.route("/gastos_por_grupo", methods=["GET"])
 @login_required
 def gastos_por_grupo():
-    ano_atual = datetime.now().year
-    dados_grupo, dados_destino = get_gastos_crediario_por_grupo_anual()
+    form = GastosCrediarioForm(request.args)
+
+    # Busca anos disponíveis com base nas compras de crediário
+    anos_disponiveis = (
+        db.session.query(func.extract("year", CrediarioMovimento.data_compra))
+        .filter(CrediarioMovimento.usuario_id == current_user.id)
+        .distinct()
+        .order_by(func.extract("year", CrediarioMovimento.data_compra).desc())
+        .all()
+    )
+
+    form.ano.choices = [(ano[0], str(ano[0])) for ano in anos_disponiveis]
+
+    # --- Lógica de Seleção de Ano e Visualização ---
+    ano_selecionado = form.ano.data
+    if not ano_selecionado and anos_disponiveis:
+        ano_selecionado = anos_disponiveis[0][0]
+
+    if ano_selecionado:
+        ano_selecionado = int(ano_selecionado)
+        form.ano.data = ano_selecionado
+
+    visualizacao_selecionada = form.visualizacao.data or "grupo"
+    form.visualizacao.data = visualizacao_selecionada
+
+    dados_destino = None
+    dados_tabela = None
+    titulo_tabela = ""
+
+    if ano_selecionado:
+        # 1. Busca os dados dos cards de resumo (sempre)
+        dados_destino = get_gastos_crediario_por_destino_anual(ano_selecionado)
+
+        # 2. Busca os dados da tabela principal (condicional)
+        if visualizacao_selecionada == "grupo":
+            titulo_tabela = f"Gastos por Grupo ({ano_selecionado})"
+            dados_tabela = get_gastos_crediario_por_grupo_anual(ano_selecionado)
+
+        elif visualizacao_selecionada == "subgrupo":
+            titulo_tabela = f"Gastos por Subgrupo ({ano_selecionado})"
+            # --- CHAMADA DE FUNÇÃO CORRIGIDA ---
+            dados_tabela = get_gastos_crediario_por_subgrupo_anual(ano_selecionado)
+
+        elif visualizacao_selecionada == "fornecedor":
+            titulo_tabela = f"Gastos por Fornecedor ({ano_selecionado})"
+            dados_tabela = get_gastos_crediario_por_fornecedor_anual(
+                ano_selecionado
+            )
 
     template_path = "relatorios/gastos_por_grupo.html"
 
     return render_template(
         template_path,
-        title=f"Gastos por Grupo ({ano_atual})",
-        dados_grupo=dados_grupo,
+        title=f"Gastos no Crediário ({ano_selecionado or 'N/A'})",
+        form=form,
         dados_destino=dados_destino,
-        ano=ano_atual,
+        dados_tabela=dados_tabela,
+        ano_selecionado=ano_selecionado,
+        visualizacao_selecionada=visualizacao_selecionada,
+        titulo_tabela=titulo_tabela,
     )
 
 
