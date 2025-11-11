@@ -41,6 +41,7 @@
     --wf-amarelo-destaque: #ffc107;
     --wf-amarelo-destaque-hover: #e0aa05;
     --wf-azul-claro: #e9eaf8;
+    --wf-amarelo-claro: #f7f5dda8;
     --wf-azul-destaque: #396694;
     --wf-azul-destaque-hover: #254f79;
     --wf-cinza-claro: #eceff1;
@@ -360,6 +361,30 @@ h6,
     font-weight: 600;
     line-height: 1.5;
     border-left: 4px solid var(--wf-azul-destaque);
+}
+
+.caixa-sombreada-aviso {
+    position: relative;
+    color: var(--wf-texto-negativo);
+    background-color: var(--wf-amarelo-claro);
+    padding: 4px 10px 4px 50px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px var(--wf-shadow-25);
+    font-weight: 600;
+    line-height: 1.5;
+    border-left: 4px solid var(--wf-texto-negativo);
+}
+
+.caixa-sombreada-aviso::before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f05a";
+    font-weight: 900;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: var(--wf-texto-negativo);
 }
 
 .caixa-sombreada::before {

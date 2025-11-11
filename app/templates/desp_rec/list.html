@@ -4,7 +4,9 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2">
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+    >
       <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
         Cadastro de Despesas / Receitas
@@ -17,6 +19,10 @@ render_confirm_modal %} {% block content %}
           <i class="fas fa-plus text-warning me-1"></i> Adicionar
         </a>
       </div>
+    </div>
+    <div class="caixa-sombreada-aviso mb-2">
+      <span class="text-dark fw-bold">Atenção!! </span>
+      <span>Não cadastre aqui CREDIÁRIOS ou FINANCIAMENTOS.</span>
     </div>
 
     <div class="card shadow-sm">
@@ -43,9 +49,13 @@ render_confirm_modal %} {% block content %}
                 <td>{{ cadastro.nome }}</td>
                 <td>
                   {% if cadastro.natureza == 'Receita' %}
-                  <span class="badge bg-success-subtle text-success-emphasis">{{ cadastro.natureza }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >{{ cadastro.natureza }}</span
+                  >
                   {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ cadastro.natureza }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >{{ cadastro.natureza }}</span
+                  >
                   {% endif %}
                 </td>
                 <td>
@@ -61,9 +71,13 @@ render_confirm_modal %} {% block content %}
                 </td>
                 <td>
                   {% if cadastro.ativo %}
-                  <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >Sim</span
+                  >
                   {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >Não</span
+                  >
                   {% endif %}
                 </td>
                 <td>{{ cadastro.data_criacao.strftime('%d/%m/%Y') }}</td>

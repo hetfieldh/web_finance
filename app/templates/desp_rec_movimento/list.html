@@ -4,7 +4,9 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2  d-flex justify-content-between align-items-center mb-2">
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+    >
       <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
         Movimentações de Despesas / Receitas
@@ -119,11 +121,17 @@ render_confirm_modal %} {% block content %}
                 <td>
                   {% if movimento.status == 'Pago' or movimento.status ==
                   'Recebido' %}
-                  <span class="badge bg-success-subtle text-success-emphasis">{{ movimento.status }}</span>
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >{{ movimento.status }}</span
+                  >
                   {% elif movimento.status == 'Atrasado' %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis">{{ movimento.status }}</span>
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
+                    >{{ movimento.status }}</span
+                  >
                   {% else %}
-                  <span class="badge bg-warning-subtle text-warning-emphasis">{{ movimento.status }}</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis"
+                    >{{ movimento.status }}</span
+                  >
                   {% endif %}
                 </td>
                 <td class="table-actions text-center">

@@ -56,6 +56,7 @@ def dashboard():
     }
     contas_do_usuario = (
         Conta.query.filter_by(usuario_id=current_user.id, ativa=True)
+        .filter(Conta.saldo_atual != 0)
         .order_by(Conta.nome_banco.asc())
         .all()
     )

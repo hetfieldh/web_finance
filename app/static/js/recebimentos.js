@@ -12,7 +12,6 @@ function formatCurrencyJS(value) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // --- ALTERAÇÃO INICIADA ---
   const fgtsInfoElement = document.getElementById("fgts-info-data");
   if (fgtsInfoElement) {
     const fgtsInfo = JSON.parse(fgtsInfoElement.textContent);
@@ -26,11 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const folhaTemFgts =
         salarioRow.getAttribute("data-folha-tem-fgts") === "true";
 
-      // A baixa é bloqueada se a conta FGTS não existir OU se a folha não tiver o item de FGTS
       if (!hasFgtsAccount || !folhaTemFgts) {
         const actionsCell = salarioRow.querySelector("td:last-child");
         if (actionsCell) {
-          // Cria uma mensagem de erro específica para o tooltip
           let title = "Recebimento bloqueado.";
           if (!hasFgtsAccount) {
             title +=
@@ -46,14 +43,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Inicializa os tooltips para que a nova mensagem apareça
   var tooltipTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="tooltip"]')
   );
   tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
-  // --- ALTERAÇÃO FINALIZADA ---
   $("#mes_ano_recebimentos").datepicker({
     format: "mm-yyyy",
     startView: "months",
