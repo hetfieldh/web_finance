@@ -36,8 +36,13 @@ document.addEventListener("DOMContentLoaded", function () {
             title +=
               " Motivo: A folha de pagamento não possui um item de FGTS com valor.";
           }
-
-          actionsCell.innerHTML = `<i class="fas fa-lock text-danger" data-bs-toggle="tooltip" title="${title}"></i>`;
+          const lockIcon = actionsCell.querySelector(".fa-lock");
+          if (!lockIcon) {
+            actionsCell.innerHTML = `<i class="fas fa-lock text-danger" data-bs-toggle="tooltip" title="${title}"></i>`;
+          } else {
+            lockIcon.setAttribute("data-bs-toggle", "tooltip");
+            lockIcon.setAttribute("title", title);
+          }
         }
       }
     }
@@ -49,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
   tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
+
   $("#mes_ano_recebimentos").datepicker({
     format: "mm-yyyy",
     startView: "months",
@@ -105,6 +111,15 @@ document.addEventListener("DOMContentLoaded", function () {
   recebimentoModal.addEventListener("show.bs.modal", function (event) {
     const button = event.relatedTarget;
     const modalForm = recebimentoModal.querySelector("form");
+
+    const dataInput = this.querySelector("#data_recebimento");
+    if (!dataInput.value) {
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+      const dia = String(hoje.getDate()).padStart(2, "0");
+      dataInput.value = `${ano}-${mes}-${dia}`;
+    }
 
     const itemTipo = button.getAttribute("data-item-tipo");
     const contaSugeridaId = button.getAttribute("data-conta-sugerida-id");

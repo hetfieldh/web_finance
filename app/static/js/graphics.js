@@ -428,7 +428,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// graphics_3.html
 document.addEventListener("DOMContentLoaded", function () {
   const chartDataElement = document.getElementById("evolucao-chart-data");
 

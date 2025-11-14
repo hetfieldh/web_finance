@@ -35,7 +35,7 @@ render_confirm_modal %} {% block content %}
                 <th>ID</th>
                 <th>Tipo de Transação</th>
                 <th>Tipo de Movimento</th>
-                <th>Criação</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -51,7 +51,7 @@ render_confirm_modal %} {% block content %}
                   <span class="badge bg-danger-subtle text-danger-emphasis">{{ tipo_t.tipo }}</span>
                   {% else %} {{ tipo_t.tipo }} {% endif %}
                 </td>
-                <td>{{ tipo_t.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ tipo_t.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_t.id) }}"

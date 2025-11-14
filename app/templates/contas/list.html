@@ -41,7 +41,7 @@ render_confirm_modal %} {% block content %}
                 <th>Saldo Atual</th>
                 <th>Limite</th>
                 <th>Ativa</th>
-                <th>Criação</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -68,7 +68,7 @@ render_confirm_modal %} {% block content %}
                   <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
                   {% endif %}
                 </td>
-                <td>{{ conta.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ conta.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('conta.editar_conta', id=conta.id) }}"

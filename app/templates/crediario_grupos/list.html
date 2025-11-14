@@ -4,7 +4,9 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2  d-flex justify-content-between align-items-center mb-2">
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+    >
       <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
         Cadastro de Grupos de Crediário
@@ -36,7 +38,7 @@ render_confirm_modal %} {% block content %}
                 <th>Grupo</th>
                 <th>Tipo</th>
                 <th>Descrição</th>
-                <th>Criação</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -61,7 +63,7 @@ render_confirm_modal %} {% block content %}
                   {% else %} {{ grupo.tipo_grupo_crediario }} {% endif %}
                 </td>
                 <td>{{ grupo.descricao if grupo.descricao else '-' }}</td>
-                <td>{{ grupo.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ grupo.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo.id) }}"

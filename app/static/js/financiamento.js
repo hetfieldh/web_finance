@@ -24,13 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
       formAmortizacao.dataset.saldoDevedorAtual
     );
 
-    // --- Elementos do Resumo ---
     const resumoValor = document.getElementById("resumo-valor");
     const resumoSaldoDepois = document.getElementById("resumo-saldo-depois");
-    // Blocos de Resumo
     const resumoPrazoDiv = document.getElementById("resumo-prazo");
     const resumoParcelaDiv = document.getElementById("resumo-parcela");
-    // Resumo 'Prazo'
     const resumoEconomiaJuros = document.getElementById(
       "resumo-economia-juros"
     );
@@ -40,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const resumoAmortizacaoParcialDetalhe = document.getElementById(
       "resumo-amortizacao-parcial-detalhe"
     );
-    // Resumo 'Parcela'
     const resumoParcelasAfetadas = document.getElementById(
       "resumo-parcelas-afetadas"
     );
@@ -64,13 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
         valorAmortizacaoInput.value = valorAmortizar.toFixed(2);
       }
 
-      // --- Atualiza valores comuns ---
       resumoValor.textContent = formatCurrency(valorAmortizar);
       resumoSaldoDepois.textContent = formatCurrency(
         saldoDevedorAtual - valorAmortizar
       );
 
-      // --- Lógica de exibição e cálculo por estratégia ---
       if (estrategia === "prazo") {
         resumoPrazoDiv.style.display = "block";
         resumoParcelaDiv.style.display = "none";
@@ -120,7 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    // --- Listeners ---
     if (valorAmortizacaoInput) {
       valorAmortizacaoInput.addEventListener("input", atualizarResumo);
     }
@@ -128,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
       estrategiaSelect.addEventListener("change", atualizarResumo);
     }
 
-    // --- Inicialização ---
     atualizarResumo();
   }
 });

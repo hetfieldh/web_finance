@@ -31,7 +31,7 @@ render_confirm_modal %} {% block content %}
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Descrição</th>
-                <th>Data Criação</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -41,7 +41,7 @@ render_confirm_modal %} {% block content %}
                 <td>{{ f.id }}</td>
                 <td>{{ f.nome }}</td>
                 <td>{{ f.descricao or '-' }}</td>
-                <td>{{ f.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ f.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('fornecedor.editar_fornecedor', id=f.id) }}"

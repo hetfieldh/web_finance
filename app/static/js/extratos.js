@@ -1,6 +1,5 @@
 // app/static/js/extratos.js
 
-// EXTRATO BANCÁRIO
 document.addEventListener("DOMContentLoaded", function () {
   const formExtratoBancario = document.getElementById("form-extrato-bancario");
 
@@ -30,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // EXTRATO BANCÁRIO DETALHADO
   const formExtratoConsolidado = document.getElementById(
     "form-extrato-consolidado"
   );
@@ -53,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // RESUMO MENSAL
   const formResumoMensal = document.getElementById("form-resumo-mensal");
   if (formResumoMensal) {
     const selectMesResumo = document.getElementById("mes_ano_resumo");
@@ -74,7 +71,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // RESUMO DA FOLHA
   const formResumoFolha = document.getElementById("form-resumo-folha");
   if (formResumoFolha) {
     const selectAnoFolha = document.getElementById("ano_resumo_folha");
@@ -85,7 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // DETALHE GRUPO CREDIÁRIO
 const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
   const btnTotal = document.getElementById("btn-total");
   const tabelaSaldoDevedor = document.getElementById("tabela-saldo-devedor");

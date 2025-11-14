@@ -208,12 +208,12 @@ h6,
 
 /* --- Tabelas --- */
 .table {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
 }
 
 .table td,
 .table th {
-    padding: 0.1rem 0.2rem;
+    padding: 0.0rem 0.2rem;
     height: 15px;
     line-height: 1.2rem;
     vertical-align: middle;

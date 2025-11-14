@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ? JSON.parse(jsonDataElement.textContent)
     : [];
 
-  if (pagamentoModal && todasAsContas.length > 0) {
+  if (pagamentoModal && jsonDataElement) {
     const tiposDeContaPermitidosParaPagamento = [
       "Corrente",
       "Poupança",
@@ -62,7 +62,11 @@ document.addEventListener("DOMContentLoaded", function () {
         contasFiltradas.forEach((conta) => {
           const saldoDisponivel = conta.saldo_atual;
           const saldoLimite = conta.limite;
-          const optionText = `${conta.nome} (${conta.tipo}) - Saldo: ${formatCurrency(saldoDisponivel)} | Limite: ${formatCurrency(saldoLimite)} `;
+          const optionText = `${conta.nome} (${
+            conta.tipo
+          }) - Saldo: ${formatCurrency(saldoDisponivel)} | Limite: ${formatCurrency(
+            saldoLimite
+          )} `;
           const option = new Option(optionText, conta.id);
           contaSelectInput.add(option);
         });
@@ -83,6 +87,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const valorPagoHelp = document.getElementById("valor-pago-help");
 
       valorPagoInput.value = itemValor;
+
+      const dataInput = this.querySelector("#data_pagamento");
+      if (!dataInput.value) {
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+        const dia = String(hoje.getDate()).padStart(2, "0");
+        dataInput.value = `${ano}-${mes}-${dia}`;
+      }
 
       if (itemTipo === "Financiamento") {
         valorPagoInput.readOnly = false;

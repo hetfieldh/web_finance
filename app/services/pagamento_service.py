@@ -13,6 +13,8 @@ from app.models.conta_model import Conta
 from app.models.conta_movimento_model import ContaMovimento
 from app.models.conta_transacao_model import ContaTransacao
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_movimento_model import CrediarioMovimento
+from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_model import Financiamento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
@@ -30,6 +32,7 @@ def get_contas_a_pagar_por_mes(ano, mes):
     ultimo_dia = (primeiro_dia + timedelta(days=32)).replace(day=1) - timedelta(days=1)
 
     contas_a_pagar = []
+    TWO_PLACES = Decimal("0.01")
 
     faturas = CrediarioFatura.query.filter(
         CrediarioFatura.usuario_id == current_user.id,
@@ -39,6 +42,27 @@ def get_contas_a_pagar_por_mes(ano, mes):
         pago_com = None
         if fatura.movimento_bancario and fatura.movimento_bancario.conta:
             pago_com = f"{fatura.movimento_bancario.conta.nome_banco} ({fatura.movimento_bancario.conta.tipo})"
+
+        soma_parcelas_query = (
+            db.session.query(func.sum(CrediarioParcela.valor_parcela))
+            .join(
+                CrediarioMovimento,
+                CrediarioMovimento.id == CrediarioParcela.crediario_movimento_id,
+            )
+            .filter(
+                CrediarioMovimento.crediario_id == fatura.crediario_id,
+                func.date_format(CrediarioParcela.data_vencimento, "%Y-%m")
+                == fatura.mes_referencia,
+            )
+            .scalar()
+        )
+        soma_parcelas = soma_parcelas_query or Decimal("0.00")
+
+        valor_fatura_rounded = (fatura.valor_total_fatura or Decimal("0.00")).quantize(
+            TWO_PLACES
+        )
+        soma_parcelas_rounded = soma_parcelas.quantize(TWO_PLACES)
+        desatualizada = valor_fatura_rounded != soma_parcelas_rounded
 
         contas_a_pagar.append(
             {
@@ -53,6 +77,7 @@ def get_contas_a_pagar_por_mes(ano, mes):
                 "pago_com": pago_com,
                 "valor_pendente": fatura.valor_total_fatura
                 - (fatura.valor_pago_fatura or 0),
+                "desatualizada": desatualizada,
             }
         )
 

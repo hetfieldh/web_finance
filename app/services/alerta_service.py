@@ -4,10 +4,13 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from flask_login import current_user
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, func, or_
 
+from app import db
 from app.models.conta_model import Conta
 from app.models.crediario_fatura_model import CrediarioFatura
+from app.models.crediario_movimento_model import CrediarioMovimento
+from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.desp_rec_movimento_model import DespRecMovimento
 from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_model import SalarioMovimento
@@ -22,6 +25,7 @@ from app.utils import (
 
 STATUS_NAO_PAGO = [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]
 STATUS_NAO_RECEBIDO = [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_RECEBIDO]
+TWO_PLACES = Decimal("0.01")
 
 
 def _formatar_item_despesa(item):
@@ -49,6 +53,27 @@ def _formatar_item_financiamento(item):
 
 
 def _formatar_item_crediario(item):
+    soma_parcelas_query = (
+        db.session.query(func.sum(CrediarioParcela.valor_parcela))
+        .join(
+            CrediarioMovimento,
+            CrediarioMovimento.id == CrediarioParcela.crediario_movimento_id,
+        )
+        .filter(
+            CrediarioMovimento.crediario_id == item.crediario_id,
+            func.date_format(CrediarioParcela.data_vencimento, "%Y-%m")
+            == item.mes_referencia,
+        )
+        .scalar()
+    )
+    soma_parcelas = soma_parcelas_query or Decimal("0.00")
+
+    valor_fatura_rounded = (item.valor_total_fatura or Decimal("0.00")).quantize(
+        TWO_PLACES
+    )
+    soma_parcelas_rounded = soma_parcelas.quantize(TWO_PLACES)
+    desatualizada = valor_fatura_rounded != soma_parcelas_rounded
+
     valor_pendente = item.valor_total_fatura - (item.valor_pago_fatura or 0)
     return {
         "data": item.data_vencimento_fatura,
@@ -58,6 +83,7 @@ def _formatar_item_crediario(item):
         "id_original": item.id,
         "tipo_item": "Crediário",
         "valor_para_modal": valor_pendente,
+        "desatualizada": desatualizada,
     }
 
 

@@ -40,7 +40,7 @@ render_confirm_modal %} {% block content %}
                 <th>E-mail</th>
                 <th>Admin</th>
                 <th>Ativo</th>
-                <th>Criação</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -69,7 +69,7 @@ render_confirm_modal %} {% block content %}
                   >
                   {% endif %}
                 </td>
-                <td>{{ usuario.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ usuario.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('usuario.editar_usuario', id=usuario.id) }}"

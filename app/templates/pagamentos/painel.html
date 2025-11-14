@@ -114,7 +114,21 @@ render_estornar_modal %} {% block content %}
                   >
                 </td>
                 <td class="text-center">
-                  {% if conta.status != 'Pago' %}
+                  {% if conta.status != 'Pago' %} {% if conta.tipo ==
+                  'Crediário' and conta.desatualizada %}
+
+                  <div
+                    class="d-flex justify-content-center align-items-center"
+                    style="min-height: 26px;"
+                  >
+                    <i
+                      class="fas fa-sync-alt fa-lg text-primary"
+                      data-bs-toggle="tooltip"
+                      title="Fatura desatualizada! Sincronize as faturas na tela de 'Faturas de Crediário' antes de pagar."
+                    ></i>
+                  </div>
+
+                  {% else %}
                   <button
                     type="button"
                     class="btn btn-link text-danger p-0"
@@ -128,7 +142,7 @@ render_estornar_modal %} {% block content %}
                   >
                     <i class="fas fa-hand-holding-usd fa-sm"></i>
                   </button>
-                  {% else %}
+                  {% endif %} {% else %}
                   <button
                     type="button"
                     class="btn btn-link text-primary p-0"

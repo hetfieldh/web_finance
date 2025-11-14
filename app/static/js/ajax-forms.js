@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const formAdicionarVerba = document.getElementById("form-adicionar-verba");
   const tabelaVerbasCorpo = document.getElementById("tabela-verbas-corpo");
 
-  // --- LÓGICA PARA ADICIONAR VERBA ---
   if (formAdicionarVerba) {
     formAdicionarVerba.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -50,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- LÓGICA PARA EXCLUIR VERBA ---
   if (tabelaVerbasCorpo) {
     tabelaVerbasCorpo.addEventListener("click", function (event) {
       const target = event.target.closest(".btn-excluir-verba");

@@ -84,7 +84,7 @@ render_confirm_modal %} {% block content %}
                 <th>Valor</th>
                 <th>Descrição</th>
                 <th>TIC</th>
-                <th>Criação Registro</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -118,7 +118,7 @@ render_confirm_modal %} {% block content %}
                   ></i>
                   {% endif %}
                 </td>
-                <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ mov.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}"

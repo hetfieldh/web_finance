@@ -20,7 +20,6 @@ render_confirm_modal %} {% block content %}
         </a>
       </div>
     </div>
-
     <div class="card shadow-sm border-1 mb-2">
       <div class="card-body p-1">
         <form
@@ -52,6 +51,30 @@ render_confirm_modal %} {% block content %}
               value="{{ data_final if data_final else '' }}"
             />
           </div>
+
+          <div class="d-flex flex-column">
+            <label for="crediario_id" class="form-label small text-muted mb-0"
+              >Crediário</label
+            >
+            <select
+              class="form-select form-select-sm w-auto"
+              id="crediario_id"
+              name="crediario_id"
+              style="min-width: 150px"
+            >
+              <option value="">Todos</option>
+              {% for cred in crediarios %}
+              <!-- prettier-ignore -->
+              <option
+                value="{{ cred.id }}"
+                {% if cred.id == selected_crediario_id %}selected{% endif %}
+              >
+                {{ cred.nome_crediario }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
           <div class="d-flex gap-1 align-items-end">
             <button type="submit" class="btn btn-azul">
               <i class="fas fa-search"></i>
@@ -84,13 +107,13 @@ render_confirm_modal %} {% block content %}
                 <th>Grupo</th>
                 <th>Subgrupo</th>
                 <th>Destino</th>
-                <th>Data Compra</th>
-                <th>Valor Total</th>
-                <th>Parcelas</th>
+                <th>Data</th>
+                <th>Total</th>
+                <th>Parc.</th>
                 <th>1ª Parcela</th>
-                <th>Descrição</th>
-                <th>Criação Registro</th>
                 <th>Ações</th>
+                <th>Registro</th>
+                <th>Descrição</th>
               </tr>
             </thead>
             <tbody>
@@ -99,7 +122,7 @@ render_confirm_modal %} {% block content %}
                 <td>{{ mov.id }}</td>
                 <td>
                   {{ mov.crediario.nome_crediario }} ({{
-                  mov.crediario.tipo_crediario }})
+                  mov.crediario.identificador_final or 'N/A' }})
                 </td>
                 <td>{{ mov.fornecedor.nome if mov.fornecedor else 'N/A' }}</td>
                 <td>
@@ -119,19 +142,17 @@ render_confirm_modal %} {% block content %}
                 </td>
                 <td>{{ mov.numero_parcelas }}</td>
                 <td>{{ mov.data_primeira_parcela.strftime('%m-%Y') }}</td>
-                <td>{{ mov.descricao }}</td>
-                <td>{{ mov.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('crediario_movimento.detalhes_movimento', id=mov.id) }}"
-                    class="btn btn-amarelo me-2"
+                    class="btn btn-amarelo me-0"
                     title="Ver Detalhes das Parcelas"
                   >
                     <i class="fas fa-list-ul"></i>
                   </a>
                   <a
                     href="{{ url_for('crediario_movimento.editar_movimento_crediario', id=mov.id) }}"
-                    class="btn btn-warning me-2"
+                    class="btn btn-warning"
                     title="Editar"
                   >
                     <i class="fas fa-edit"></i>
@@ -147,6 +168,8 @@ render_confirm_modal %} {% block content %}
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
+                <td>{{ mov.data_criacao.strftime('%d/%m/%Y') }}</td>
+                <td>{{ mov.descricao }}</td>
               </tr>
               {% endfor %}
             </tbody>

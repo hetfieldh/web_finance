@@ -47,7 +47,7 @@ render_confirm_modal %} {% block content %}
                 <th>Limite Total</th>
                 <th>Dia Venc.</th>
                 <th>Ativo</th>
-                <th>Criação</th>
+                <th>Registro</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -74,7 +74,7 @@ render_confirm_modal %} {% block content %}
                   >
                   {% endif %}
                 </td>
-                <td>{{ cred.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ cred.data_criacao.strftime('%d/%m/%Y') }}</td>
                 <td class="table-actions">
                   <a
                     href="{{ url_for('crediario.editar_crediario', id=cred.id) }}"

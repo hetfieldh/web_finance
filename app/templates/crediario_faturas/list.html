@@ -49,7 +49,7 @@ render_confirm_modal %} {% block content %}
               aria-label="Fechar"
             ></button>
           </div>
-          <div class="modal-body ext-dark h6">
+          <div class="modal-body">
             Vamos sincronizar todas as compras nas faturas que ainda não foram
             pagas. Gostaria de continuar?
           </div>
@@ -134,7 +134,7 @@ render_confirm_modal %} {% block content %}
                 <th>Valor Total</th>
                 <th>Valor Pago</th>
                 <th>Status</th>
-                <th>Criação</th>
+                <th>Registro</th>
                 <th class="text-center">Ações</th>
               </tr>
             </thead>
@@ -146,7 +146,7 @@ render_confirm_modal %} {% block content %}
                 >
                   {% if item.desatualizada %}
                   <i
-                    class="fas fa-exclamation-triangle text-warning"
+                    class="fas fa-exclamation-triangle text-danger"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     title="Desatualizada! O valor das parcelas do mês é diferente do valor da fatura. Use 'Sincronizar Faturas' para corrigir."
@@ -168,8 +168,7 @@ render_confirm_modal %} {% block content %}
                 <td
                   class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
-                  {{ item.fatura.crediario.nome_crediario }} ({{
-                  item.fatura.crediario.tipo_crediario }})
+                  {{ item.fatura.crediario.nome_crediario }} ({{item.fatura.crediario.tipo_crediario}})
                 </td>
                 <td
                   class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
@@ -223,7 +222,7 @@ render_confirm_modal %} {% block content %}
                 <td
                   class="{% if item.destaque_status == 'Atrasado' %}fw-bold text-danger{% elif item.destaque_status == 'vence_este_mes' %}fw-bold text-dark{% endif %}"
                 >
-                  {{ item.fatura.data_criacao.strftime('%d/%m/%Y %H:%M') }}
+                  {{ item.fatura.data_criacao.strftime('%d/%m/%Y') }}
                 </td>
                 <td class="table-actions text-center">
                   <a
