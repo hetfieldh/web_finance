@@ -245,3 +245,38 @@ def get_ultimos_movimentos_bancarios(user_id, limit=10):
         .all()
     )
     return movimentos
+
+
+def get_contas_json():
+    contas = (
+        Conta.query.filter(
+            Conta.usuario_id == current_user.id,
+            Conta.ativa == True,
+        )
+        .order_by(Conta.nome_banco.asc())
+        .all()
+    )
+
+    contas_list = []
+    for conta in contas:
+        contas_list.append(
+            {
+                "id": conta.id,
+                "nome": conta.nome_banco,
+                "tipo": conta.tipo,
+                "saldo_atual": float(conta.saldo_atual or 0),
+                "limite": float(conta.limite or 0),
+            }
+        )
+    return contas_list
+
+
+def get_fgts_info_json():
+    has_account = (
+        Conta.query.filter_by(
+            usuario_id=current_user.id, tipo="FGTS", ativa=True
+        ).count()
+        > 0
+    )
+
+    return {"has_account": has_account}

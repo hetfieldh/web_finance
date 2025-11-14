@@ -1,4 +1,4 @@
-// app/static/js/forms.js (COMPLETO E CORRIGIDO)
+// app/static/js/forms.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const tipoContaSelect = document.getElementById("tipo-conta-select");

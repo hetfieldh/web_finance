@@ -163,35 +163,30 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Crediário",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
-        render_kw={"disabled": True},
     )
 
     fornecedor_id = SelectField(
         "Loja/Serviço",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
-        render_kw={"disabled": True},
     )
 
     crediario_grupo_id = SelectField(
         "Grupo",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
-        render_kw={"disabled": True},
     )
 
     crediario_subgrupo_id = SelectField(
         "Subgrupo",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
-        render_kw={"disabled": True},
     )
 
     data_compra = DateField(
         "Data da Compra",
         format="%Y-%m-%d",
         validators=[DataRequired("A data da compra é obrigatória.")],
-        render_kw={"readonly": True},
     )
 
     valor_total_compra = DecimalField(
@@ -201,7 +196,6 @@ class EditarCrediarioMovimentoForm(FlaskForm):
             NumberRange(min=0.01, message="O valor deve ser maior que zero."),
         ],
         places=2,
-        render_kw={"readonly": True},
     )
 
     descricao = TextAreaField(
@@ -216,14 +210,12 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Destino",
         choices=FormChoices.get_choices(FormChoices.DestinoCrediario),
         validators=[DataRequired("O destino é obrigatório.")],
-        render_kw={"disabled": True},
     )
 
     data_primeira_parcela = SelectField(
         "Mês/Ano da 1ª Parcela",
         validators=[DataRequired("A data da primeira parcela é obrigatória.")],
         coerce=coerce_month_year_to_date,
-        render_kw={"disabled": True},
     )
 
     numero_parcelas = IntegerField(
@@ -232,7 +224,6 @@ class EditarCrediarioMovimentoForm(FlaskForm):
             DataRequired("O número de parcelas é obrigatório."),
             NumberRange(min=1, message="O número de parcelas deve ser no mínimo 1."),
         ],
-        render_kw={"readonly": True},
     )
 
     submit = SubmitField("Atualizar")

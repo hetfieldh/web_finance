@@ -6,6 +6,7 @@ from decimal import Decimal
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     redirect,
     render_template,
@@ -20,9 +21,6 @@ from app.services import conta_service, pagamento_service
 from app.services.pagamento_service import (
     estornar_pagamento as estornar_pagamento_service,
 )
-from app.services.pagamento_service import (
-    registrar_pagamento as pagar_conta_service,
-)
 
 pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 
@@ -31,10 +29,9 @@ pagamentos_bp = Blueprint("pagamentos", __name__, url_prefix="/pagamentos")
 @login_required
 def painel():
     form = PainelPagamentosForm(request.args)
-    account_choices = conta_service.get_active_accounts_for_user_choices()
-    pagamento_form = PagamentoForm(account_choices=account_choices)
+    pagamento_form = PagamentoForm()
     contas_ativas = Conta.query.filter_by(usuario_id=current_user.id, ativa=True).all()
-    contas_list = [
+    contas_json = [
         {
             "id": conta.id,
             "nome": conta.nome_banco,
@@ -73,33 +70,52 @@ def painel():
         pagamento_form=pagamento_form,
         contas=contas_a_pagar,
         totais=totais,
-        contas_json=contas_list,
+        contas_json=contas_json,
         title="Painel de Pagamentos",
         today=date.today(),
     )
 
 
-@pagamentos_bp.route("/pagar", methods=["POST"])
+@pagamentos_bp.route("/registrar", methods=["POST"])
 @login_required
-def pagar_conta():
+def registrar_pagamento():
     account_choices = conta_service.get_active_accounts_for_user_choices()
     form = PagamentoForm(request.form, account_choices=account_choices)
 
-    if form.validate_on_submit():
-        success, message = pagar_conta_service(form)
+    form.item_id.data = request.form.get("item_id", type=int)
+    form.item_tipo.data = request.form.get("item_tipo")
+    form.item_descricao.data = request.form.get("item_descricao")
+    form.data_pagamento.data = request.form.get(
+        "data_pagamento", type=lambda x: date.fromisoformat(x) if x else None
+    )
+    form.valor_pago.data = request.form.get("valor_pago", type=Decimal)
+    form.conta_id.data = request.form.get("conta_id", type=int)
+
+    if (
+        not form.data_pagamento.data
+        or not form.valor_pago.data
+        or not form.conta_id.data
+        or not form.item_id.data
+    ):
+        flash(
+            "Erro de validação: Campos obrigatórios (data, valor, conta, item) não foram preenchidos.",
+            "danger",
+        )
+        return redirect(request.referrer or url_for("main.dashboard"))
+
+    try:
+        success, message = pagamento_service.registrar_pagamento(form)
         if success:
             flash(message, "success")
         else:
             flash(message, "danger")
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(
-                    f"Erro no campo '{getattr(form, field).label.text}': {error}",
-                    "danger",
-                )
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao registrar pagamento (rota): {e}", exc_info=True
+        )
+        flash(f"Erro ao registrar pagamento: {str(e)}", "danger")
 
-    return redirect(url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano")))
+    return redirect(request.referrer or url_for("main.dashboard"))
 
 
 @pagamentos_bp.route("/estornar", methods=["POST"])
@@ -107,6 +123,7 @@ def pagar_conta():
 def estornar_pagamento():
     item_id = request.form.get("item_id")
     item_tipo = request.form.get("item_tipo")
+    mes_ano = request.form.get("mes_ano")
 
     success, message = estornar_pagamento_service(item_id, item_tipo)
     if success:
@@ -114,4 +131,4 @@ def estornar_pagamento():
     else:
         flash(message, "danger")
 
-    return redirect(url_for("pagamentos.painel", mes_ano=request.form.get("mes_ano")))
+    return redirect(request.referrer or url_for("pagamentos.painel", mes_ano=mes_ano))

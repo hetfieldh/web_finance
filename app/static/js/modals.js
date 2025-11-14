@@ -13,6 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.querySelector("#item_tipo").value = itemTipo;
       modal.querySelector("#valor_pago").value = itemValor;
       modal.querySelector("#item_descricao").value = itemDescricao;
+      const dataInput = this.querySelector("#data_pagamento");
+      // Preenche a data apenas se estiver vazia
+      if (!dataInput.value) {
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+        const dia = String(hoje.getDate()).padStart(2, "0");
+        dataInput.value = `${ano}-${mes}-${dia}`;
+      }
     });
   }
 

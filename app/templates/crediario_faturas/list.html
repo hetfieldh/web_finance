@@ -32,16 +32,24 @@ render_confirm_modal %} {% block content %}
     >
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header bg-warning text-dark">
-            <h5 class="modal-title" id="confirmFaturasLabel">Confirmar Ação</h5>
+          <div class="modal-header bg-dark text-white">
+            <div class="position-relative w-100">
+              <i
+                class="fas fa-2x fa-question-circle text-white position-absolute start-0 top-50 translate-middle-y ms-2"
+              ></i>
+
+              <h4 class="modal-title text-center m-0" id="confirmFaturasLabel">
+                Sincronizar Faturas
+              </h4>
+            </div>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close btn-sm"
               data-bs-dismiss="modal"
               aria-label="Fechar"
             ></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body ext-dark h6">
             Vamos sincronizar todas as compras nas faturas que ainda não foram
             pagas. Gostaria de continuar?
           </div>
@@ -54,9 +62,7 @@ render_confirm_modal %} {% block content %}
               method="POST"
               style="display: inline"
             >
-              <button type="submit" class="btn btn-danger">
-                Sim, continuar
-              </button>
+              <button type="submit" class="btn btn-dark">Sim, continuar</button>
             </form>
           </div>
         </div>

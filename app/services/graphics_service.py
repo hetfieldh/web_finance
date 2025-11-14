@@ -266,7 +266,7 @@ def get_annual_evolution_data(user_id, year):
     }
 
 
-# Gráfico(1) --> Progresso de Financiamento
+# Gráfico(2) --> Progresso de Financiamento
 def get_financing_progress_data(user_id, year, financiamento_id):
     if not financiamento_id:
         return None
@@ -336,7 +336,7 @@ def get_financing_progress_data(user_id, year, financiamento_id):
     }
 
 
-# Gráfico(2) --> Resumo do Financiamento (PIZZA)
+# Gráfico(3) --> Resumo do Financiamento (PIZZA)
 def get_financing_summary_data(user_id, financiamento_id=None):
     query = (
         db.session.query(
@@ -366,7 +366,7 @@ def get_financing_summary_data(user_id, financiamento_id=None):
     return {"labels": labels, "valores": valores, "total": total}
 
 
-# Gráfico(3) --> Evolução do Saldo Devedor do Crediário
+# Gráfico(4) --> Evolução do Saldo Devedor do Crediário
 def get_installment_evolution_data(user_id, grouping_by="crediario"):
     hoje = date.today()
     num_months = 36

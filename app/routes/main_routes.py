@@ -23,7 +23,7 @@ from app.models.financiamento_parcela_model import FinanciamentoParcela
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
 from app.models.solicitacao_acesso_model import SolicitacaoAcesso
-from app.services import conta_service, relatorios_service
+from app.services import alerta_service, conta_service, relatorios_service
 from app.utils import (
     NATUREZA_DESPESA,
     STATUS_ATRASADO,
@@ -192,15 +192,20 @@ def dashboard():
                     "tipo": TIPO_ENTRADA,
                 }
             )
-        if not salario.movimento_bancario_beneficio_id and salario.total_beneficios > 0:
-            proximos_movimentos.append(
-                {
-                    "data": salario.data_recebimento,
-                    "descricao": f"Benefícios (Ref: {salario.mes_referencia})",
-                    "valor": salario.total_beneficios,
-                    "tipo": TIPO_ENTRADA,
-                }
-            )
+
+        for item_beneficio in salario.itens:
+            if (
+                item_beneficio.salario_item.tipo == "Benefício"
+                and not item_beneficio.movimento_bancario_id
+            ):
+                proximos_movimentos.append(
+                    {
+                        "data": salario.data_recebimento,
+                        "descricao": f"{item_beneficio.salario_item.nome} (Ref: {salario.mes_referencia})",
+                        "valor": item_beneficio.valor,
+                        "tipo": TIPO_ENTRADA,
+                    }
+                )
 
     proximos_movimentos.sort(key=lambda x: x["data"])
 
@@ -236,15 +241,31 @@ def dashboard():
 @main_bp.route("/alertas/contas-a-vencer")
 @login_required
 def contas_a_vencer():
-    movimentos = relatorios_service.get_contas_a_vencer(current_user.id)
-    return render_template("alertas/contas_a_vencer.html", movimentos=movimentos)
+    movimentos = alerta_service.get_contas_a_vencer(dias=7)
+    contas_json = conta_service.get_contas_json()
+    fgts_info = conta_service.get_fgts_info_json()
+
+    return render_template(
+        "alertas/contas_a_vencer.html",
+        movimentos=movimentos,
+        contas_json=contas_json,
+        fgts_info=fgts_info,
+    )
 
 
 @main_bp.route("/alertas/contas-vencidas")
 @login_required
 def contas_vencidas():
-    movimentos = relatorios_service.get_contas_vencidas(current_user.id)
-    return render_template("alertas/contas_vencidas.html", movimentos=movimentos)
+    movimentos = alerta_service.get_contas_vencidas()
+    contas_json = conta_service.get_contas_json()
+    fgts_info = conta_service.get_fgts_info_json()
+
+    return render_template(
+        "alertas/contas_vencidas.html",
+        movimentos=movimentos,
+        contas_json=contas_json,
+        fgts_info=fgts_info,
+    )
 
 
 @main_bp.route("/favicon.ico")

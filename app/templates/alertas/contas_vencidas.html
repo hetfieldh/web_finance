@@ -22,7 +22,8 @@
             <th>Vencimento</th>
             <th>Descrição</th>
             <th class="text-end">Valor Pendente</th>
-            <th class="text-center">Status</th>
+            <th class="text-center">Tipo</th>
+            <th class="text-center">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -35,7 +36,7 @@
             <td>{{ item.descricao }}</td>
             <td class="text-end">{{ item.valor | format_currency }}</td>
             <td class="text-center">
-              {% if item.tipo == 'Saída' %}
+              {% if item.natureza == 'Despesa' %}
               <span class="badge bg-danger-subtle text-danger-emphasis"
                 >A Pagar</span
               >
@@ -45,10 +46,43 @@
               >
               {% endif %}
             </td>
+            <td class="text-center">
+              {% if item.natureza == 'Despesa' %}
+              <button
+                type="button"
+                class="btn btn-link text-danger p-0"
+                data-bs-toggle="modal"
+                data-bs-target="#pagamentoModal"
+                data-item-id="{{ item.id_original }}"
+                data-item-tipo="{{ item.tipo_item }}"
+                data-item-valor="{{ item.valor_para_modal }}"
+                data-item-descricao="{{ item.descricao }}"
+                title="Registrar Pagamento"
+              >
+                <i class="fas fa-hand-holding-usd fa-sm"></i>
+              </button>
+              {% else %}
+              <button
+                type="button"
+                class="btn btn-link text-success p-0"
+                data-bs-toggle="modal"
+                data-bs-target="#recebimentoModal"
+                data-item-id="{{ item.id_original }}"
+                data-item-tipo="{{ item.tipo_item }}"
+                data-item-valor="{{ item.valor_para_modal }}"
+                data-item-descricao="{{ item.descricao }}"
+                data-conta-sugerida-id="{{ item.conta_sugerida_id or '' }}"
+                data-folha-tem-fgts="{{ 'true' if item.folha_tem_fgts else 'false' }}"
+                title="Registrar Recebimento"
+              >
+                <i class="fas fa-hand-holding-usd fa-sm"></i>
+              </button>
+              {% endif %}
+            </td>
           </tr>
           {% else %}
           <tr>
-            <td colspan="4" class="text-center">
+            <td colspan="5" class="text-center">
               Ótimo! Nenhuma conta vencida encontrada.
             </td>
           </tr>
@@ -58,5 +92,23 @@
     </div>
   </div>
 </div>
+
+{% include 'includes/_modal_pagamento.html' %} {% include
+'includes/_modal_recebimento.html' %} {% endblock %} {% block scripts %} {{
+super() }}
+
+<script type="application/json" id="json-data-pagamentos">
+  {{ contas_json | tojson }}
+</script>
+<script type="application/json" id="contas-data">
+  {{ contas_json | tojson }}
+</script>
+<script type="application/json" id="fgts-info-data">
+  {{ fgts_info | tojson }}
+</script>
+
+<script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pagamentos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/recebimentos.js') }}"></script>
 
 {% endblock %}

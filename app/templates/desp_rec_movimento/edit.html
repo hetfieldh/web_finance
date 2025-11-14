@@ -5,11 +5,13 @@
 <div class="row">
   <div class="col-md-6 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-warning"></i>
-          Editando: {{ movimento.despesa_receita.nome }} - Venc: {{
-          movimento.data_vencimento.strftime('%d/%m/%Y') }}
+      <div class="card-header bg-warning">
+        <h5 class="mb-0 d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
+          <span class="flex-grow-1 text-center">
+            Editando: {{ movimento.despesa_receita.nome }} - Venc:
+            {{movimento.data_vencimento.strftime('%d/%m/%Y') }}
+          </span>
         </h5>
       </div>
       <div class="card-body">

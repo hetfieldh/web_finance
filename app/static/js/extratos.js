@@ -92,7 +92,6 @@ const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
   const tabelaTotal = document.getElementById("tabela-total");
   const tituloDinamico = document.getElementById("titulo-tabela-dinamica");
 
-  // --- INÍCIO DA CORREÇÃO ---
   function mostrarTabela(tipo) {
     if (!tabelaSaldoDevedor || !tabelaTotal || !btnSaldoDevedor || !btnTotal) {
       return;
@@ -123,7 +122,6 @@ const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
     );
     btnTotal.addEventListener("click", () => mostrarTabela("total"));
 
-    // Isso garante que o título correto apareça quando a página carregar
     mostrarTabela("saldo-devedor");
   }
 });

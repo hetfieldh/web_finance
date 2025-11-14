@@ -5,10 +5,12 @@ render_checkbox %} {% block content %}
 <div class="row">
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="px-2 fas fa-pen text-warning"></i>
-          Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}
+      <div class="card-header bg-warning">
+        <h5 class="mb-0 d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
+          <span class="flex-grow-1 text-center">
+            Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}
+          </span>
         </h5>
       </div>
       <div class="card-body">

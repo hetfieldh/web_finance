@@ -5,10 +5,12 @@
 <div class="row">
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-warning"></i
-          >Editar Lançamento Crediário ID: {{ movimento.id }}
+      <div class="card-header bg-warning">
+        <h5 class="mb-0 d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
+          <span class="flex-grow-1 text-center">
+            Editar Lançamento Crediário ID: {{ movimento.id }}
+          </span>
         </h5>
       </div>
       <div class="card-body">
@@ -20,43 +22,19 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label mb-1 small">Crediário:</label>
-              <input
-                type="text"
-                class="form-control form-control-sm text-start"
-                value="{{ movimento.crediario.nome_crediario }} ({{ movimento.crediario.tipo_crediario }})"
-                readonly
-              />
+              {{ render_field(form.crediario_id) }}
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label mb-1 small">Loja/Serviço:</label>
-              <input
-                type="text"
-                class="form-control form-control-sm text-start"
-                value="{{ movimento.fornecedor.nome if movimento.fornecedor else 'N/A' }}"
-                readonly
-              />
+              {{ render_field(form.fornecedor_id) }}
             </div>
           </div>
 
           <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label mb-1 small">Grupo:</label>
-              <input
-                type="text"
-                class="form-control form-control-sm text-start"
-                value="{{ movimento.crediario_grupo.grupo_crediario if movimento.crediario_grupo else 'N/A' }}"
-                readonly
-              />
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.crediario_grupo_id) }}
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label mb-1 small">Subgrupo:</label>
-              <input
-                type="text"
-                class="form-control form-control-sm text-start"
-                value="{{ movimento.crediario_subgrupo.nome if movimento.crediario_subgrupo else 'N/A' }}"
-                readonly
-              />
+            <div class="col-md-6 mb-3">
+              {{ render_field(form.crediario_subgrupo_id) }}
             </div>
             <div class="col-md-4 mb-3">{{ render_field(form.destino) }}</div>
           </div>
@@ -96,4 +74,6 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
 {% endblock %}

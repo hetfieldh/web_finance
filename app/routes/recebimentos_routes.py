@@ -6,6 +6,7 @@ from decimal import Decimal
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     redirect,
     render_template,
@@ -21,9 +22,6 @@ from app.services import conta_service, recebimento_service, salario_service
 from app.services.recebimento_service import (
     estornar_recebimento as estornar_recebimento_service,
 )
-from app.services.recebimento_service import (
-    registrar_recebimento as registrar_recebimento_service,
-)
 
 recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos")
 
@@ -32,10 +30,7 @@ recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos"
 @login_required
 def painel():
     form = PainelRecebimentosForm(request.args)
-
-    account_choices = conta_service.get_active_accounts_for_user_choices()
-    recebimento_form = RecebimentoForm(account_choices=account_choices)
-
+    recebimento_form = RecebimentoForm()
     contas_ativas = Conta.query.filter_by(usuario_id=current_user.id, ativa=True).all()
     contas_para_js = [
         {
@@ -94,21 +89,40 @@ def registrar_recebimento():
     account_choices = conta_service.get_active_accounts_for_user_choices()
     form = RecebimentoForm(request.form, account_choices=account_choices)
 
-    if form.validate_on_submit():
-        success, message = registrar_recebimento_service(form)
+    form.item_id.data = request.form.get("item_id", type=int)
+    form.item_tipo.data = request.form.get("item_tipo")
+    form.item_descricao.data = request.form.get("item_descricao")
+    form.data_recebimento.data = request.form.get(
+        "data_recebimento", type=lambda x: date.fromisoformat(x) if x else None
+    )
+    form.valor_recebido.data = request.form.get("valor_recebido", type=Decimal)
+    form.conta_id.data = request.form.get("conta_id", type=int)
+
+    if (
+        not form.data_recebimento.data
+        or not form.valor_recebido.data
+        or not form.conta_id.data
+        or not form.item_id.data
+    ):
+        flash(
+            "Erro de validação: Campos obrigatórios (data, valor, conta, item) não foram preenchidos.",
+            "danger",
+        )
+        return redirect(request.referrer or url_for("main.dashboard"))
+
+    try:
+        success, message = recebimento_service.registrar_recebimento(form)
         if success:
             flash(message, "success")
         else:
             flash(message, "danger")
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(
-                    f"Erro no campo '{getattr(form, field).label.text}': {error}",
-                    "danger",
-                )
+    except Exception as e:
+        current_app.logger.error(
+            f"Erro ao registrar recebimento (rota): {e}", exc_info=True
+        )
+        flash(f"Erro ao registrar recebimento: {str(e)}", "danger")
 
-    return redirect(url_for("recebimentos.painel", mes_ano=request.form.get("mes_ano")))
+    return redirect(request.referrer or url_for("main.dashboard"))
 
 
 @recebimentos_bp.route("/estornar", methods=["POST"])
@@ -116,6 +130,7 @@ def registrar_recebimento():
 def estornar_recebimento():
     item_id = request.form.get("item_id")
     item_tipo = request.form.get("item_tipo")
+    mes_ano = request.form.get("mes_ano")
 
     success, message = estornar_recebimento_service(item_id, item_tipo)
     if success:
@@ -123,4 +138,4 @@ def estornar_recebimento():
     else:
         flash(message, "danger")
 
-    return redirect(url_for("recebimentos.painel", mes_ano=request.form.get("mes_ano")))
+    return redirect(request.referrer or url_for("recebimentos.painel", mes_ano=mes_ano))

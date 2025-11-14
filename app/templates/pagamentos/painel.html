@@ -1,7 +1,7 @@
 <!--- app\templates\pagamentos\painel.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field,
-render_estornar_modal%} {% block content %}
+render_estornar_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="caixa-sombreada mb-2">
@@ -25,8 +25,8 @@ render_estornar_modal%} {% block content %}
               <span class="input-group-text"
                 ><i class="fas fa-calendar-alt"></i
               ></span>
-              {{ form.mes_ano(class="form-control form-control-sm fw-semibold text-danger",
-              id="mes_ano_pagamentos") }}
+              {{ form.mes_ano(class="form-control form-control-sm fw-semibold
+              text-danger", id="mes_ano_pagamentos") }}
             </div>
           </div>
         </form>
@@ -117,7 +117,7 @@ render_estornar_modal%} {% block content %}
                   {% if conta.status != 'Pago' %}
                   <button
                     type="button"
-                    class="btn btn-link text-success p-0 pagar-btn"
+                    class="btn btn-link text-danger p-0"
                     title="Registrar Pagamento"
                     data-bs-toggle="modal"
                     data-bs-target="#pagamentoModal"
@@ -126,12 +126,12 @@ render_estornar_modal%} {% block content %}
                     data-item-valor="{{ '%.2f'|format(conta.valor_pendente) }}"
                     data-item-descricao="Pagamento: {{ conta.origem }}"
                   >
-                    <i class="fas fa-check-double fa-sm"></i>
+                    <i class="fas fa-hand-holding-usd fa-sm"></i>
                   </button>
                   {% else %}
                   <button
                     type="button"
-                    class="btn btn-link text-danger p-0"
+                    class="btn btn-link text-primary p-0"
                     title="Estornar Pagamento"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmEstornarModal"
@@ -158,66 +158,16 @@ render_estornar_modal%} {% block content %}
   </div>
 </div>
 
-<div
-  class="modal fade"
-  id="pagamentoModal"
-  tabindex="-1"
-  aria-labelledby="pagamentoModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="pagamentoModalLabel">
-          Registrar Pagamento
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <form method="POST" action="{{ url_for('pagamentos.pagar_conta') }}">
-        <div class="modal-body">
-          {{ pagamento_form.csrf_token }} {{
-          pagamento_form.item_id(class="d-none") }} {{
-          pagamento_form.item_tipo(class="d-none") }} {{
-          pagamento_form.item_descricao(class="d-none") }}
-          <input type="hidden" name="mes_ano" value="{{ form.mes_ano.data }}" />
-
-          <div class="mb-3">{{ render_field(pagamento_form.conta_id) }}</div>
-          <div class="mb-3">
-            {{ render_field(pagamento_form.data_pagamento, attrs={'type':
-            'date', 'max': today}) }}
-          </div>
-          <div class="mb-3">
-            {{ render_field(pagamento_form.valor_pago) }}
-            <div id="valor-pago-help" class="form-text">
-              O valor a ser pago não pode ser alterado. Caso necessite, faça no
-              lançamento original.
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-cinza" data-bs-dismiss="modal">
-            Cancelar
-          </button>
-          {{ pagamento_form.submit(class="btn btn-azul") }}
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-{{ render_estornar_modal( modal_id='confirmEstornarModal',
+{% include 'includes/_modal_pagamento.html' %} {{ render_estornar_modal(
+modal_id='confirmEstornarModal',
 form_action=url_for('pagamentos.estornar_pagamento'), title='Confirmar Estorno',
 body_text='Você tem certeza que deseja estornar este pagamento? Esta ação não
 pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {% endblock %} {%
-block scripts %}
+block scripts %} {{ super() }}
 <script id="json-data-pagamentos" type="application/json">
   {{ contas_json | tojson | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pagamentos.js') }}"></script>
+
 {% endblock %}

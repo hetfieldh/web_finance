@@ -85,7 +85,6 @@ def resumo_mensal():
 def gastos_por_grupo():
     form = GastosCrediarioForm(request.args)
 
-    # Busca anos disponíveis com base nas compras de crediário
     anos_disponiveis = (
         db.session.query(func.extract("year", CrediarioMovimento.data_compra))
         .filter(CrediarioMovimento.usuario_id == current_user.id)
@@ -96,7 +95,6 @@ def gastos_por_grupo():
 
     form.ano.choices = [(ano[0], str(ano[0])) for ano in anos_disponiveis]
 
-    # --- Lógica de Seleção de Ano e Visualização ---
     ano_selecionado = form.ano.data
     if not ano_selecionado and anos_disponiveis:
         ano_selecionado = anos_disponiveis[0][0]
@@ -113,24 +111,19 @@ def gastos_por_grupo():
     titulo_tabela = ""
 
     if ano_selecionado:
-        # 1. Busca os dados dos cards de resumo (sempre)
         dados_destino = get_gastos_crediario_por_destino_anual(ano_selecionado)
 
-        # 2. Busca os dados da tabela principal (condicional)
         if visualizacao_selecionada == "grupo":
             titulo_tabela = f"Gastos por Grupo ({ano_selecionado})"
             dados_tabela = get_gastos_crediario_por_grupo_anual(ano_selecionado)
 
         elif visualizacao_selecionada == "subgrupo":
             titulo_tabela = f"Gastos por Subgrupo ({ano_selecionado})"
-            # --- CHAMADA DE FUNÇÃO CORRIGIDA ---
             dados_tabela = get_gastos_crediario_por_subgrupo_anual(ano_selecionado)
 
         elif visualizacao_selecionada == "fornecedor":
             titulo_tabela = f"Gastos por Fornecedor ({ano_selecionado})"
-            dados_tabela = get_gastos_crediario_por_fornecedor_anual(
-                ano_selecionado
-            )
+            dados_tabela = get_gastos_crediario_por_fornecedor_anual(ano_selecionado)
 
     template_path = "relatorios/gastos_por_grupo.html"
 

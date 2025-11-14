@@ -115,7 +115,8 @@ render_estornar_modal %} {% block content %}
                   {% else %}<span
                     class="badge bg-danger-subtle text-danger-emphasis"
                     >Pendente</span
-                  >{% endif %}
+                  >
+                  {% endif %}
                 </td>
                 <td class="text-center">
                   {% if conta.status not in ['Recebido', 'Pago'] %}
@@ -131,12 +132,12 @@ render_estornar_modal %} {% block content %}
                     data-item-descricao="{{ conta.origem }}"
                     data-conta-sugerida-id="{{ conta.conta_sugerida_id or '' }}"
                   >
-                    <i class="fas fa-check-double fa-sm"></i>
+                    <i class="fas fa-hand-holding-usd fa-sm"></i>
                   </button>
                   {% else %}
                   <button
                     type="button"
-                    class="btn btn-link text-danger p-0"
+                    class="btn btn-link text-primary p-0"
                     title="Estornar Recebimento"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmEstornarModal"
@@ -163,54 +164,12 @@ render_estornar_modal %} {% block content %}
   </div>
 </div>
 
-<div class="modal fade" id="recebimentoModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Registrar Recebimento</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
-      </div>
-      <form
-        method="POST"
-        action="{{ url_for('recebimentos.registrar_recebimento') }}"
-      >
-        <div class="modal-body">
-          {{ recebimento_form.csrf_token }} {{
-          recebimento_form.item_id(class="d-none") }} {{
-          recebimento_form.item_tipo(class="d-none") }} {{
-          recebimento_form.item_descricao(class="d-none") }}
-          <input type="hidden" name="mes_ano" value="{{ form.mes_ano.data }}" />
-          <div class="mb-3">{{ render_field(recebimento_form.conta_id) }}</div>
-          <div class="mb-3">
-            {{ render_field(recebimento_form.data_recebimento, attrs={'type':
-            'date', 'max': today}) }}
-          </div>
-          <div class="mb-3">
-            {{ render_field(recebimento_form.valor_recebido) }}
-            <div class="form-text">
-              O valor a ser recebido não pode ser alterado.
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-cinza" data-bs-dismiss="modal">
-            Cancelar
-          </button>
-          {{ recebimento_form.submit(class="btn btn-azul") }}
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-{{ render_estornar_modal( modal_id='confirmEstornarModal',
+{% include 'includes/_modal_recebimento.html' %} {{ render_estornar_modal(
+modal_id='confirmEstornarModal',
 form_action=url_for('recebimentos.estornar_recebimento'), title='Confirmar
 Estorno', body_text='Você tem certeza que deseja estornar este recebimento? Esta
 ação não pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {%
-endblock %} {% block scripts %}
+endblock %} {% block scripts %} {{ super() }}
 <script id="contas-data" type="application/json">
   {{ contas_para_js | tojson | safe }}
 </script>
@@ -219,4 +178,5 @@ endblock %} {% block scripts %}
 </script>
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/recebimentos.js') }}"></script>
+
 {% endblock %}
