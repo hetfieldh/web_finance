@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { position: "left" },
+              legend: { position: "bottom" },
               title: {
                 display: true,
                 text:
@@ -487,7 +487,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
           },
           plugins: {
-            legend: { position: "top", align: "start" },
+            legend: { position: "bottom", align: "start" },
             tooltip: {
               mode: "index",
               intersect: false,

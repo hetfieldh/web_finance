@@ -65,7 +65,7 @@
 /* --- Reset e Padrões Globais --- */
 body,
 html {
-    overflow: hidden;
+    overflow-x: hidden;
     height: 100%;
 }
 
@@ -117,7 +117,8 @@ h6,
 }
 
 #page-content-wrapper {
-    min-width: 100vw;
+    min-width: 0;
+    width: 100%;
     overflow-y: auto;
     height: 100vh;
 }
@@ -131,7 +132,7 @@ h6,
 /* --- Sidebar --- */
 #sidebar-wrapper {
     min-height: 100vh;
-    margin-left: -15rem;
+    margin-left: -14rem;
     transition: margin .25s ease-out;
     width: 14rem;
     display: flex;
@@ -217,7 +218,6 @@ h6,
     height: 15px;
     line-height: 1.2rem;
     vertical-align: middle;
-    white-space: nowrap;
 }
 
 .table form {
@@ -226,7 +226,8 @@ h6,
 }
 
 .table-responsive {
-    max-width: 1280px;
+    /* max-width: 1280px; */
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
     padding: 0 15px;
@@ -772,11 +773,6 @@ body.login-body {
         margin-left: 0;
     }
 
-    #page-content-wrapper {
-        min-width: 0;
-        width: 100%;
-    }
-
     #wrapper.toggled #sidebar-wrapper {
         margin-left: -14rem;
     }
@@ -829,4 +825,3 @@ body.login-body {
     filter: sepia(1) saturate(5) hue-rotate(-10deg) brightness(0.8);
     transform: scale(1.1);
 }
-
