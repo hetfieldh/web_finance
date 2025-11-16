@@ -88,18 +88,24 @@ def editar_financiamento(id):
     financiamento = Financiamento.query.filter_by(
         id=id, usuario_id=current_user.id
     ).first_or_404()
-    if any(p.status == STATUS_PAGO for p in financiamento.parcelas):
-        flash(
-            "Não é possível editar um financiamento que já possui parcelas pagas.",
-            "danger",
-        )
-        return redirect(url_for("financiamento.listar_financiamentos"))
+
+    has_paid_installments = any(p.status == STATUS_PAGO for p in financiamento.parcelas)
+
     account_choices = conta_service.get_active_accounts_for_user_choices_simple()
     form = EditarFinanciamentoForm(
         obj=financiamento,
         original_nome_financiamento=financiamento.nome_financiamento,
         account_choices=account_choices,
     )
+
+    if has_paid_installments:
+        form.nome_financiamento.render_kw = {"readonly": True}
+        form.conta_id.render_kw = {"disabled": True}
+        form.taxa_juros_anual.render_kw = {"readonly": True}
+        form.data_inicio.render_kw = {"readonly": True}
+        form.prazo_meses.render_kw = {"readonly": True}
+        form.tipo_amortizacao.render_kw = {"disabled": True}
+
     if form.validate_on_submit():
         financiamento.descricao = (
             form.descricao.data.strip() if form.descricao.data else None
@@ -107,8 +113,12 @@ def editar_financiamento(id):
         db.session.commit()
         flash("Financiamento atualizado com sucesso!", "success")
         return redirect(url_for("financiamento.listar_financiamentos"))
+
     return render_template(
-        "financiamentos/edit.html", form=form, financiamento=financiamento
+        "financiamentos/edit.html",
+        form=form,
+        financiamento=financiamento,
+        has_paid_installments=has_paid_installments,
     )
 
 

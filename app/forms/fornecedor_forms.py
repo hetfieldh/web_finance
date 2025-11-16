@@ -29,7 +29,6 @@ class EditarFornecedorForm(CadastroFornecedorForm):
     descricao = TextAreaField(
         "Descrição (Opcional)",
         validators=[Optional()],
-        render_kw={"disabled": True},
     )
 
     submit = SubmitField("Atualizar", render_kw={"style": "display: none;"})
