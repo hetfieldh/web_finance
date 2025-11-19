@@ -5,146 +5,236 @@ render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div
-      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+      class="caixa-sombreada-cinza p-2 d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2"
     >
-      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+      <h5
+        class="mb-0 me-2 d-flex align-items-center"
+        style="color: var(--wf-azul-destaque)"
+      >
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
         Movimentações de Despesas / Receitas
-      </h4>
-      <div>
+      </h5>
+
+      <div class="d-flex w-md-auto justify-content-end gap-2">
         <a
           href="{{ url_for('desp_rec_movimento.adicionar_lancamento_unico') }}"
-          class="btn btn-azul me-2"
+          class="btn btn-azul btn-sm flex-grow-1 flex-md-grow-0"
         >
-          <i class="fas fa-plus-circle"></i> Eventuais
+          <i class="fas fa-plus-circle text-warning me-1"></i> Eventuais
         </a>
         <a
           href="{{ url_for('desp_rec_movimento.gerar_previsao') }}"
-          class="btn btn-amarelo me-2"
+          class="btn btn-amarelo btn-sm flex-grow-1 flex-md-grow-0"
         >
           <i class="fas fa-cogs"></i> Contas Fixas
         </a>
       </div>
     </div>
 
-    <div class="card shadow-sm border-1 mb-2">
+    <div class="card border-0 mb-2">
       <div class="card-body p-1">
         <form
           action="{{ url_for('desp_rec_movimento.listar_movimentos') }}"
           method="get"
-          class="d-flex align-items-end gap-2 flex-wrap"
+          class="d-flex align-items-center justify-content-center gap-2 flex-wrap"
         >
-          <div class="d-flex flex-column">
-            <label for="data_inicial" class="form-label small text-muted mb-0"
-              >Inicial</label
-            >
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              id="data_inicial"
-              name="data_inicial"
-              value="{{ data_inicial if data_inicial else '' }}"
-            />
-          </div>
-          <div class="d-flex flex-column">
-            <label for="data_final" class="form-label small text-muted mb-0"
-              >Final</label
-            >
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              id="data_final"
-              name="data_final"
-              value="{{ data_final if data_final else '' }}"
-            />
-          </div>
-          <div class="d-flex gap-1 align-items-end">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-search"></i>
-            </button>
-            <a
-              href="{{ url_for('desp_rec_movimento.listar_movimentos') }}"
-              class="btn btn-cinza"
-            >
-              <i class="fas fa-eraser"></i>
-            </a>
-          </div>
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            style="width: auto; max-width: 110px"
+            id="data_inicial"
+            name="data_inicial"
+            value="{{ data_inicial if data_inicial else '' }}"
+            title="Data Inicial"
+          />
+
+          <span class="text-muted small">-</span>
+
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            style="width: auto; max-width: 110px"
+            id="data_final"
+            name="data_final"
+            value="{{ data_final if data_final else '' }}"
+            title="Data Final"
+          />
+
+          <button type="submit" class="btn btn-azul btn-sm" title="Filtrar">
+            <i class="fas fa-search"></i>
+          </button>
+
+          <a
+            href="{{ url_for('desp_rec_movimento.listar_movimentos') }}"
+            class="btn btn-cinza btn-sm"
+            title="Limpar Filtros"
+          >
+            <i class="fas fa-eraser"></i>
+          </a>
         </form>
-        <p class="text-muted small mt-1 mb-0">
-          <i class="fas fa-calendar-alt me-1"></i> Selecione o intervalo das
-          datas de vencimento para filtrar
-        </p>
       </div>
     </div>
 
-    <div class="card shadow-sm">
-      <div class="card-body">
+    <div>
+      <div>
         {% if movimentos %}
-        <div class="table-responsive">
-          <table class="table table-striped table-hover sortable-table">
-            <thead>
-              <tr>
-                <th>Vencimento</th>
-                <th>Nome</th>
-                <th>Natureza</th>
-                <th>Valor Previsto</th>
-                <th>Valor Realizado</th>
-                <th>Descrição</th>
-                <th>Status</th>
-                <th class="text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for movimento in movimentos %}
-              <tr>
-                <td>{{ movimento.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                <td>{{ movimento.despesa_receita.nome }}</td>
-                <td>
-                  {% if movimento.despesa_receita.natureza == 'Receita' %}
-                  <span class="text-success fw-semibold"
-                    >{{ movimento.despesa_receita.natureza }}</span
+
+        <div class="table-responsive p-0 d-none d-lg-block">
+          <div class="card border-1">
+            <div class="card-body p-0">
+              <table
+                class="table table-striped table-hover sortable-table mb-0"
+              >
+                <thead>
+                  <tr>
+                    <th>Vencimento</th>
+                    <th>Nome</th>
+                    <th>Natureza</th>
+                    <th>Valor Previsto</th>
+                    <th>Valor Realizado</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for movimento in movimentos %}
+                  <tr>
+                    <td>
+                      {{ movimento.data_vencimento.strftime('%d/%m/%Y') }}
+                    </td>
+                    <td>{{ movimento.despesa_receita.nome }}</td>
+                    <td>
+                      {% if movimento.despesa_receita.natureza == 'Receita' %}
+                      <span class="text-success fw-semibold"
+                        >{{ movimento.despesa_receita.natureza }}</span
+                      >
+                      {% else %}
+                      <span class="text-danger fw-semibold"
+                        >{{ movimento.despesa_receita.natureza }}</span
+                      >
+                      {% endif %}
+                    </td>
+                    <td>{{ movimento.valor_previsto | format_currency }}</td>
+                    <td>
+                      {{ movimento.valor_realizado | format_currency if
+                      movimento.valor_realizado is not none else "-" }}
+                    </td>
+                    <td>
+                      {{ movimento.descricao if movimento.descricao else '-' }}
+                    </td>
+                    <td>
+                      {% if movimento.status == 'Pago' or movimento.status ==
+                      'Recebido' %}
+                      <span
+                        class="badge bg-success-subtle text-success-emphasis"
+                        >{{ movimento.status }}</span
+                      >
+                      {% elif movimento.status == 'Atrasado' %}
+                      <span class="badge bg-danger-subtle text-danger-emphasis"
+                        >{{ movimento.status }}</span
+                      >
+                      {% else %}
+                      <span
+                        class="badge bg-warning-subtle text-warning-emphasis"
+                        >{{ movimento.status }}</span
+                      >
+                      {% endif %}
+                    </td>
+                    <td class="table-actions text-center">
+                      <a
+                        href="{{ url_for('desp_rec_movimento.editar_movimento', id=movimento.id) }}"
+                        class="btn btn-warning me-2"
+                        title="Editar"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-form-action="{{ url_for('desp_rec_movimento.excluir_movimento', id=movimento.id) }}"
+                        title="Excluir"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-lg-none">
+          <div class="list-group">
+            {% for movimento in movimentos %}
+            <div
+              class="list-group-item p-1 border-start mb-1 rounded border-1 border-secondary {% if movimento.despesa_receita.natureza == 'Receita' %}border-success{% else %}border-danger{% endif %}"
+            >
+              <div
+                class="d-flex justify-content-between align-items-center mb-1"
+              >
+                <span
+                  class="fw-medium text-dark text-truncate me-2"
+                  style="max-width: 65%"
+                >
+                  {{ movimento.despesa_receita.nome }}
+                </span>
+                <span
+                  class="fw-bold {% if movimento.despesa_receita.natureza == 'Receita' %}text-success{% else %}text-danger{% endif %}"
+                >
+                  {{ movimento.valor_previsto | format_currency }}
+                </span>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-end">
+                <div class="small text-muted overflow-hidden me-2">
+                  <div class="d-flex align-items-center extra-small mb-1">
+                    <i class="far fa-calendar-alt me-1"></i>{{
+                    movimento.data_vencimento.strftime('%d/%m') }}
+                    <span class="mx-1">|</span>
+
+                    {% if movimento.status in ['Pago', 'Recebido'] %}
+                    <span class="text-success fw-bold" style="font-size: 0.7rem"
+                      >{{ movimento.status }}</span
+                    >
+                    {% elif movimento.status == 'Atrasado' %}
+                    <span class="text-danger fw-bold" style="font-size: 0.7rem"
+                      >{{ movimento.status }}</span
+                    >
+                    {% else %}
+                    <span
+                      class="text-warning fw-bold text-dark"
+                      style="font-size: 0.7rem"
+                      >{{ movimento.status }}</span
+                    >
+                    {% endif %}
+                  </div>
+
+                  {% if movimento.descricao %}
+                  <div
+                    class="fst-italic text-truncate"
+                    style="font-size: 0.75rem; max-width: 200px"
                   >
-                  {% else %}
-                  <span class="text-danger fw-semibold"
-                    >{{ movimento.despesa_receita.natureza }}</span
-                  >
+                    {{ movimento.descricao }}
+                  </div>
                   {% endif %}
-                </td>
-                <td>{{ movimento.valor_previsto | format_currency }}</td>
-                <td>
-                  {{ movimento.valor_realizado | format_currency if
-                  movimento.valor_realizado is not none else "-" }}
-                </td>
-                <td>
-                  {{ movimento.descricao if movimento.descricao else '-' }}
-                </td>
-                <td>
-                  {% if movimento.status == 'Pago' or movimento.status ==
-                  'Recebido' %}
-                  <span class="badge bg-success-subtle text-success-emphasis"
-                    >{{ movimento.status }}</span
-                  >
-                  {% elif movimento.status == 'Atrasado' %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis"
-                    >{{ movimento.status }}</span
-                  >
-                  {% else %}
-                  <span class="badge bg-warning-subtle text-warning-emphasis"
-                    >{{ movimento.status }}</span
-                  >
-                  {% endif %}
-                </td>
-                <td class="table-actions text-center">
+                </div>
+
+                <div class="d-flex gap-1">
                   <a
                     href="{{ url_for('desp_rec_movimento.editar_movimento', id=movimento.id) }}"
-                    class="btn btn-warning me-2"
+                    class="btn btn-outline-secondary btn-sm py-1 px-2"
                     title="Editar"
                   >
                     <i class="fas fa-edit"></i>
                   </a>
                   <button
                     type="button"
-                    class="btn btn-danger"
+                    class="btn btn-outline-danger btn-sm py-1 px-2"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmDeleteModal"
                     data-form-action="{{ url_for('desp_rec_movimento.excluir_movimento', id=movimento.id) }}"
@@ -152,19 +242,25 @@ render_confirm_modal %} {% block content %}
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
+
         {% else %}
-        <p class="text-center">Nenhum lançamento encontrado.</p>
+        <div class="card border-1">
+          <div class="card-body text-center py-4">
+            <p class="text-muted mb-0">Nenhum lançamento encontrado.</p>
+          </div>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
 Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
 não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}

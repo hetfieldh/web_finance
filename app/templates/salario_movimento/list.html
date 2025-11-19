@@ -4,93 +4,150 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2">
-      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2"
+    >
+      <h5
+        class="mb-0 me-2 d-flex align-items-center"
+        style="color: var(--wf-azul-destaque)"
+      >
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
         Movimentações de Salários
-      </h4>
-      <a
-        href="{{ url_for('salario.novo_lancamento_folha') }}"
-        class="btn btn-azul"
-      >
-        <i class="fas fa-plus text-warning me-1"></i> Salário
-      </a>
+      </h5>
+      <div class="d-flex w-md-auto justify-content-end">
+        <a
+          href="{{ url_for('salario.novo_lancamento_folha') }}"
+          class="btn btn-azul btn-sm flex-grow-1 flex-md-grow-0"
+        >
+          <i class="fas fa-plus text-warning me-2"></i> Salário
+        </a>
+      </div>
     </div>
 
-    <div class="card shadow-sm border-1 mb-2">
+    <div class="card border-0 mb-1">
       <div class="card-body p-1">
         <form
           action="{{ url_for('salario.listar_movimentos') }}"
           method="get"
-          class="d-flex align-items-end gap-2 flex-wrap"
+          class="d-flex align-items-center justify-content-center gap-1 flex-wrap"
         >
-          <div class="d-flex flex-column">
-            <label for="data_inicial" class="form-label small text-muted mb-0"
-              >Inicial</label
-            >
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              id="data_inicial"
-              name="data_inicial"
-              value="{{ data_inicial if data_inicial else '' }}"
-            />
-          </div>
-          <div class="d-flex flex-column">
-            <label for="data_final" class="form-label small text-muted mb-0"
-              >Final</label
-            >
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              id="data_final"
-              name="data_final"
-              value="{{ data_final if data_final else '' }}"
-            />
-          </div>
-          <div class="d-flex gap-1 align-items-end">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-search"></i>
-            </button>
-            <a
-              href="{{ url_for('salario.listar_movimentos') }}"
-              class="btn btn-cinza"
-            >
-              <i class="fas fa-eraser"></i>
-            </a>
-          </div>
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            style="width: auto; max-width: 110px"
+            id="data_inicial"
+            name="data_inicial"
+            value="{{ data_inicial if data_inicial else '' }}"
+            title="Data Inicial"
+          />
+
+          <span class="text-muted small">-</span>
+
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            style="width: auto; max-width: 110px"
+            id="data_final"
+            name="data_final"
+            value="{{ data_final if data_final else '' }}"
+            title="Data Final"
+          />
+
+          <button type="submit" class="btn btn-azul btn-sm" title="Filtrar">
+            <i class="fas fa-search"></i>
+          </button>
+
+          <a
+            href="{{ url_for('salario.listar_movimentos') }}"
+            class="btn btn-cinza btn-sm"
+            title="Limpar Filtros"
+          >
+            <i class="fas fa-eraser"></i>
+          </a>
         </form>
       </div>
     </div>
 
-    <div class="card shadow-sm">
-      <div class="card-body">
+    <div>
+      <div>
         {% if movimentos %}
-        <div class="table-responsive">
-          <table class="table table-striped table-hover sortable-table">
-            <thead>
-              <tr>
-                <th>Mês/Ano</th>
-                <th>Previsão de Recebimento</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for movimento in movimentos %}
-              <tr>
-                <td>{{ movimento.mes_referencia }}</td>
-                <td>{{ movimento.data_recebimento.strftime('%d/%m/%Y') }}</td>
-                <td class="table-actions">
+
+        <div class="table-responsive d-none d-lg-block p-0">
+          <div class="card border-1">
+            <div class="card-body p-0">
+              <table
+                class="table table-striped table-hover sortable-table mb-0"
+              >
+                <thead>
+                  <tr>
+                    <th>Mês/Ano</th>
+                    <th>Previsão de Recebimento</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for movimento in movimentos %}
+                  <tr>
+                    <td>{{ movimento.mes_referencia }}</td>
+                    <td>
+                      {{ movimento.data_recebimento.strftime('%d/%m/%Y') }}
+                    </td>
+                    <td class="table-actions">
+                      <a
+                        href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
+                        class="btn btn-amarelo me-2"
+                        title="Visualizar/Gerenciar"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-form-action="{{ url_for('salario.excluir_movimento', id=movimento.id) }}"
+                        title="Excluir"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-lg-none">
+          <div class="list-group">
+            {% for movimento in movimentos %}
+            <div
+              class="list-group-item p-2 border-start mb-1 rounded border-1 border-secondary"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="overflow-hidden me-2">
+                  <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem">
+                    {{ movimento.mes_referencia }}
+                  </h6>
+                  <div class="text-muted extra-small mt-1">
+                    <i class="far fa-calendar-check me-1"></i>
+                    Previsão: {{ movimento.data_recebimento.strftime('%d/%m/%Y')
+                    }}
+                  </div>
+                </div>
+
+                <div class="d-flex gap-1">
                   <a
                     href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
-                    class="btn btn-amarelo me-2"
+                    class="btn btn-outline-warning btn-sm py-1 px-2"
                     title="Visualizar/Gerenciar"
                   >
                     <i class="fas fa-eye"></i>
                   </a>
                   <button
                     type="button"
-                    class="btn btn-danger"
+                    class="btn btn-outline-danger btn-sm py-1 px-2"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmDeleteModal"
                     data-form-action="{{ url_for('salario.excluir_movimento', id=movimento.id) }}"
@@ -98,19 +155,27 @@ render_confirm_modal %} {% block content %}
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
+
         {% else %}
-        <p class="text-center">Nenhuma folha de pagamento lançada ainda.</p>
+        <div class="card border-1">
+          <div class="card-body text-center py-4">
+            <p class="text-muted mb-0">
+              Nenhuma folha de pagamento lançada ainda.
+            </p>
+          </div>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
 Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
 não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}

@@ -404,7 +404,8 @@ h6,
     color: var(--wf-cinza-destaque-hover);
     background-color: var(--wf-cinza-claro);
     border-radius: 5px;
-    box-shadow: 0 1px 3px var(--wf-shadow-50);
+    border: 1px solid var(--wf-shadow-25);
+    /*box-shadow: 0 1px 3px var(--wf-shadow-50);*/
     font-size: 1rem;
 }
 

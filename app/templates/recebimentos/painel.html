@@ -2,7 +2,6 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field,
 render_estornar_modal %} {% block content %}
-
 <div class="row">
   <div class="col-12">
     <div class="caixa-sombreada mb-2">
@@ -11,62 +10,108 @@ render_estornar_modal %} {% block content %}
         >Selecione um mês para realizar recebimentos.</span
       >
     </div>
+
     <div class="card shadow-sm mb-2">
-      <div
-        class="card-body p-2 d-flex justify-content-between align-items-center flex-wrap gap-3"
-      >
-        <form
-          id="form-recebimentos-mes"
-          method="GET"
-          action="{{ url_for('recebimentos.painel') }}"
-          class="d-flex align-items-center"
+      <div class="card-body p-2">
+        <div
+          class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-2"
         >
-          <div class="col-md-2" style="width: 130px">
+          <form
+            id="form-recebimentos-mes"
+            method="GET"
+            action="{{ url_for('recebimentos.painel') }}"
+            class="w-100 w-lg-auto"
+            style="max-width: 100%; max-width: 200px"
+          >
             <div class="input-group">
-              <span class="input-group-text"
-                ><i class="fas fa-calendar-alt"></i
+              <span class="input-group-text bg-light border-secondary-subtle"
+                ><i class="fas fa-calendar-alt text-secondary"></i
               ></span>
-              {{ form.mes_ano(class="form-control form-control-sm fw-semibold
-              text-danger", id="mes_ano_recebimentos") }}
+              {{ form.mes_ano(class="form-control form-control-sm fw-bold
+              text-center text-dark", id="mes_ano_recebimentos",
+              style="font-size: 1rem;") }}
+            </div>
+          </form>
+
+          <div class="d-none d-lg-flex align-items-center text-muted gap-3">
+            <div>
+              Previsto:
+              <strong class="text-primary"
+                >{{ totais.previsto | format_currency }}</strong
+              >
+            </div>
+            <div class="vr"></div>
+            <div>
+              Recebido:
+              <strong class="text-success"
+                >{{ totais.recebido | format_currency }}</strong
+              >
+            </div>
+            <div class="vr"></div>
+            <div>
+              Pendente:
+              <strong class="text-warning text-dark"
+                >{{ totais.pendente | format_currency }}</strong
+              >
             </div>
           </div>
-        </form>
-        <div
-          class="d-flex align-items-center text-muted fs-6 gap-3 flex-wrap justify-content-center"
-        >
-          <span
-            >Total Previsto:
-            <strong class="text-primary"
-              >{{ totais.previsto | format_currency }}</strong
-            ></span
-          >
-          <span class="d-none d-md-inline">|</span>
-          <span
-            >Total Recebido:
-            <strong class="text-success"
-              >{{ totais.recebido | format_currency }}</strong
-            ></span
-          >
-          <span class="d-none d-md-inline">|</span>
-          <span
-            >Pendente:
-            <strong class="text-warning text-dark"
-              >{{ totais.pendente | format_currency }}</strong
-            ></span
-          >
+
+          <div class="d-lg-none w-100">
+            <div class="row g-1 text-center">
+              <div class="col-4">
+                <div class="border rounded p-1 bg-light">
+                  <div
+                    class="extra-small text-muted text-uppercase fw-bold"
+                    style="font-size: 0.65rem"
+                  >
+                    Previsto
+                  </div>
+                  <div class="text-primary fw-bold small">
+                    {{ totais.previsto | format_currency }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border rounded p-1 bg-light">
+                  <div
+                    class="extra-small text-muted text-uppercase fw-bold"
+                    style="font-size: 0.65rem"
+                  >
+                    Recebido
+                  </div>
+                  <div class="text-success fw-bold small">
+                    {{ totais.recebido | format_currency }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border rounded p-1 bg-light">
+                  <div
+                    class="extra-small text-muted text-uppercase fw-bold"
+                    style="font-size: 0.65rem"
+                  >
+                    Pendente
+                  </div>
+                  <div class="text-warning text-dark fw-bold small">
+                    {{ totais.pendente | format_currency }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="card shadow-sm">
+    <div class="card border-0">
       <div class="card-header menu-primario">
         <h5 class="mb-0">
           <i class="fas fa-hand-holding-usd me-2"></i>Valores a Receber
         </h5>
       </div>
-      <div class="card-body">
+      <div class="card-body px-0 pt-2 p-md-3">
         {% if contas %}
-        <div class="table-responsive">
+
+        <div class="table-responsive d-none d-lg-block">
           <table class="table table-striped table-hover sortable-table">
             <thead>
               <tr>
@@ -86,7 +131,6 @@ render_estornar_modal %} {% block content %}
               'Salário Líquido' %} {% set _ =
               attrs.update({'data-folha-tem-fgts': 'true' if
               conta.folha_tem_fgts else 'false'}) %} {% endif %}
-
               <tr data-item-tipo="{{ conta.tipo }}" {{ attrs|xmlattr }}>
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
@@ -104,16 +148,16 @@ render_estornar_modal %} {% block content %}
                 </td>
                 <td class="text-start">{{ conta.recebido_em or '-' }}</td>
                 <td class="text-center">
-                  {% if conta.status in ['Recebido', 'Pago'] %}<span
-                    class="badge bg-success-subtle text-success-emphasis"
+                  {% if conta.status in ['Recebido', 'Pago'] %}
+                  <span class="badge bg-success-subtle text-success-emphasis"
                     >Recebido</span
                   >
-                  {% elif conta.status == 'Parcialmente Recebido' %}<span
-                    class="badge bg-info-subtle text-info-emphasis"
+                  {% elif conta.status == 'Parcialmente Recebido' %}
+                  <span class="badge bg-info-subtle text-info-emphasis"
                     >Parcial</span
                   >
-                  {% else %}<span
-                    class="badge bg-danger-subtle text-danger-emphasis"
+                  {% else %}
+                  <span class="badge bg-danger-subtle text-danger-emphasis"
                     >Pendente</span
                   >
                   {% endif %}
@@ -154,9 +198,99 @@ render_estornar_modal %} {% block content %}
             </tbody>
           </table>
         </div>
+
+        <div class="d-lg-none">
+          {% for conta in contas %} {% set attrs = {} %} {% if conta.tipo ==
+          'Salário Líquido' %} {% set _ = attrs.update({'data-folha-tem-fgts':
+          'true' if conta.folha_tem_fgts else 'false'}) %} {% endif %}
+
+          <div
+            class="card mb-1 border-start border-1 border-success"
+            data-item-tipo="{{ conta.tipo }}"
+            {{
+            attrs|xmlattr
+            }}
+          >
+            <div class="card-body p-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-1"
+              >
+                <div
+                  class="fw-bold text-dark text-truncate me-2"
+                  style="max-width: 65%"
+                >
+                  {{ conta.origem }}
+                </div>
+                <div class="fw-bold text-success text-nowrap">
+                  {{ conta.valor_previsto | format_currency }}
+                </div>
+              </div>
+
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <div class="text-muted extra-small">
+                  <i class="far fa-calendar-alt me-1"></i>{{
+                  conta.vencimento.strftime('%d/%m') }}
+                  <span class="mx-1 text-secondary">|</span>
+                  {{ conta.tipo }}
+                </div>
+
+                {% if conta.status in ['Recebido', 'Pago'] %}
+                <span
+                  class="badge bg-success-subtle text-success-emphasis extra-small"
+                  >Recebido</span
+                >
+                {% elif conta.status == 'Parcialmente Recebido' %}
+                <span
+                  class="badge bg-info-subtle text-info-emphasis extra-small"
+                  >Parcial</span
+                >
+                {% else %}
+                <span
+                  class="badge bg-warning-subtle text-warning-emphasis text-dark extra-small"
+                  >Pendente</span
+                >
+                {% endif %}
+              </div>
+
+              {% if conta.status not in ['Recebido', 'Pago'] %}
+              <button
+                type="button"
+                class="btn btn-success btn-sm w-100 py-1"
+                style="font-size: 0.8rem"
+                data-bs-toggle="modal"
+                data-bs-target="#recebimentoModal"
+                data-item-id="{{ conta.id_original }}"
+                data-item-tipo="{{ conta.tipo }}"
+                data-item-valor="{{ '%.2f'|format(conta.valor_previsto) }}"
+                data-item-descricao="{{ conta.origem }}"
+                data-conta-sugerida-id="{{ conta.conta_sugerida_id or '' }}"
+              >
+                RECEBER
+              </button>
+              {% else %}
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm w-100 py-1"
+                style="font-size: 0.8rem"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmEstornarModal"
+                data-item-id="{{ conta.id_original }}"
+                data-item-tipo="{{ conta.tipo }}"
+                data-mes-ano="{{ form.mes_ano.data }}"
+              >
+                <i class="fas fa-history me-1"></i> Estornar
+              </button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
         {% else %}
-        <p class="text-center alert alert-info">
-          Nenhuma conta a receber encontrada para este mês.
+        <p class="text-center alert alert-info m-3">
+          Nenhuma conta a receber encontrada.
         </p>
         {% endif %}
       </div>
@@ -164,12 +298,12 @@ render_estornar_modal %} {% block content %}
   </div>
 </div>
 
-{% include 'includes/_modal_recebimento.html' %} {{ render_estornar_modal(
-modal_id='confirmEstornarModal',
+{% include 'includes/_modal_recebimento.html' %} {{
+render_estornar_modal(modal_id='confirmEstornarModal',
 form_action=url_for('recebimentos.estornar_recebimento'), title='Confirmar
-Estorno', body_text='Você tem certeza que deseja estornar este recebimento? Esta
-ação não pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {%
-endblock %} {% block scripts %} {{ super() }}
+Estorno', body_text='Deseja estornar este recebimento?',
+confirm_button_text='Sim, Estornar' ) }} {% endblock %} {% block scripts %} {{
+super() }}
 <script id="contas-data" type="application/json">
   {{ contas_para_js | tojson | safe }}
 </script>
@@ -178,5 +312,4 @@ endblock %} {% block scripts %} {{ super() }}
 </script>
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/recebimentos.js') }}"></script>
-
 {% endblock %}

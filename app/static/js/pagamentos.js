@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
         dataInput.value = `${ano}-${mes}-${dia}`;
       }
 
-      if (itemTipo === "Financiamento") {
+      if (itemTipo === "Financiamento" || itemTipo === "Crediário") {
         valorPagoInput.readOnly = false;
         valorPagoInput.style.backgroundColor = "";
         valorPagoInput.style.fontWeight = "normal";

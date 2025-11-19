@@ -4,153 +4,235 @@
 render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada-cinza p-2  d-flex justify-content-between align-items-center mb-2">
-      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+    <div
+      class="caixa-sombreada-cinza p-2 d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2"
+    >
+      <h5
+        class="mb-0 me-2 d-flex align-items-center"
+        style="color: var(--wf-azul-destaque)"
+      >
         <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
         Movimentações Bancárias
-      </h4>
-      <div>
+      </h5>
+      <div class="d-flex w-md-auto justify-content-end gap-2">
         <a
           href="{{ url_for('conta_movimento.adicionar_movimentacao') }}"
-          class="btn btn-azul"
+          class="btn btn-azul btn-sm mx-auto mx-md-0 ms-md-auto"
         >
           <i class="fas fa-plus text-warning me-2"></i> Lançamento
         </a>
       </div>
     </div>
 
-    <div class="card shadow-sm border-1 mb-2">
+    <div class="card border-0 mb-2">
       <div class="card-body p-1">
         <form
           action="{{ url_for('conta_movimento.listar_movimentacoes') }}"
           method="get"
-          class="d-flex align-items-end gap-2 flex-wrap"
+          class="d-flex align-items-center justify-content-center gap-2 flex-wrap"
         >
-          <div class="d-flex flex-column">
-            <label for="data_inicial" class="form-label small text-muted mb-0"
-              >Inicial</label
-            >
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              id="data_inicial"
-              name="data_inicial"
-              value="{{ data_inicial if data_inicial else '' }}"
-            />
-          </div>
-          <div class="d-flex flex-column">
-            <label for="data_final" class="form-label small text-muted mb-0"
-              >Final</label
-            >
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              id="data_final"
-              name="data_final"
-              value="{{ data_final if data_final else '' }}"
-            />
-          </div>
-          <div class="d-flex gap-1 align-items-end">
-            <button type="submit" class="btn btn-azul ">
-              <i class="fas fa-search"></i>
-            </button>
-            <a
-              href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
-              class="btn btn-cinza "
-            >
-              <i class="fas fa-eraser"></i>
-            </a>
-          </div>
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            style="width: auto; max-width: 110px"
+            id="data_inicial"
+            name="data_inicial"
+            value="{{ data_inicial if data_inicial else '' }}"
+            title="Data Inicial"
+          />
+
+          <span class="text-muted small">-</span>
+
+          <input
+            type="date"
+            class="form-control form-control-sm"
+            style="width: auto; max-width: 110px"
+            id="data_final"
+            name="data_final"
+            value="{{ data_final if data_final else '' }}"
+            title="Data Final"
+          />
+
+          <button type="submit" class="btn btn-azul btn-sm" title="Filtrar">
+            <i class="fas fa-search"></i>
+          </button>
+
+          <a
+            href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
+            class="btn btn-cinza btn-sm"
+            title="Limpar Filtros"
+          >
+            <i class="fas fa-eraser"></i>
+          </a>
         </form>
-        <p class="text-muted small mt-1 mb-0">
-          <i class="fas fa-calendar-alt me-1"></i> Selecione o intervalo das
-          datas de movimentação para filtrar
-        </p>
       </div>
     </div>
 
-    <div class="card shadow-sm border-1 mb-2">
-      <div class="card-body p-1">
+    <div>
+      <div>
         {% if movimentacoes %}
-        <div class="table-responsive">
-          <table class="table table-striped table-hover sortable-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Conta</th>
-                <th>Tipo Transação</th>
-                <th>Movimento</th>
-                <th>Data</th>
-                <th>Valor</th>
-                <th>Descrição</th>
-                <th>TIC</th>
-                <th>Registro</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for mov in movimentacoes %}
-              <tr>
-                <td>{{ mov.id }}</td>
-                <td>{{ mov.conta.nome_banco }} ({{ mov.conta.tipo }})</td>
-               <td>{{ mov.tipo_transacao.transacao_tipo }} {{ '(+)' if mov.tipo_transacao.tipo == 'Crédito' else '(-)' }}</td>
-                <td>
-                  {% if mov.tipo_transacao.tipo == 'Crédito' %}
-                  <span class="badge bg-success-subtle text-success-emphasis"
-                    >{{ mov.tipo_transacao.tipo }}</span
-                  >
-                  {% elif mov.tipo_transacao.tipo == 'Débito' %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis"
-                    >{{ mov.tipo_transacao.tipo }}</span
-                  >
-                  {% else %} {{ mov.tipo_transacao.tipo }} {% endif %}
-                </td>
-                <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
-                <td>{{mov.valor | format_currency }}</td>
-                <td>{{ mov.descricao if mov.descricao else '-' }}</td>
-                <td>
-                  {% if mov.id_movimento_relacionado is not none %}
-                  <i
-                    class="fas fa-exchange-alt"
-                    title="Movimentação de Transferência"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                  ></i>
-                  {% endif %}
-                </td>
-                <td>{{ mov.data_criacao.strftime('%d/%m/%Y') }}</td>
-                <td class="table-actions">
-                  <a
-                    href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}"
-                    class="btn btn-warning me-2"
-                    title="Editar"
-                  >
-                    <i class="fas fa-edit"></i>
-                  </a>
-                    <button
+
+        <div class="table-responsive d-none d-lg-block p-0">
+          <div class="card border-1">
+            <div class="card-body p-0">
+              <table
+                class="table table-striped table-hover sortable-table mb-0"
+              >
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Conta</th>
+                    <th>Tipo Transação</th>
+                    <th>Movimento</th>
+                    <th>Data</th>
+                    <th>Valor</th>
+                    <th>Descrição</th>
+                    <th>TIC</th>
+                    <th>Registro</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for mov in movimentacoes %}
+                  <tr>
+                    <td>{{ mov.id }}</td>
+                    <td>{{ mov.conta.nome_banco }} ({{ mov.conta.tipo }})</td>
+                    <td>{{ mov.tipo_transacao.transacao_tipo }}</td>
+                    <td>
+                      {% if mov.tipo_transacao.tipo == 'Crédito' %}
+                      <span
+                        class="badge bg-success-subtle text-success-emphasis"
+                        >{{ mov.tipo_transacao.tipo }}</span
+                      >
+                      {% elif mov.tipo_transacao.tipo == 'Débito' %}
+                      <span class="badge bg-danger-subtle text-danger-emphasis"
+                        >{{ mov.tipo_transacao.tipo }}</span
+                      >
+                      {% else %} {{ mov.tipo_transacao.tipo }} {% endif %}
+                    </td>
+                    <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ mov.valor | format_currency }}</td>
+                    <td>{{ mov.descricao if mov.descricao else '-' }}</td>
+                    <td>
+                      {% if mov.id_movimento_relacionado is not none %}
+                      <i
+                        class="fas fa-exchange-alt"
+                        title="Transferência"
+                        data-bs-toggle="tooltip"
+                      ></i>
+                      {% endif %}
+                    </td>
+                    <td>{{ mov.data_criacao.strftime('%d/%m/%Y') }}</td>
+                    <td class="table-actions">
+                      <a
+                        href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}"
+                        class="btn btn-warning me-2"
+                        title="Editar"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <button
                         type="button"
                         class="btn btn-danger"
                         data-bs-toggle="modal"
                         data-bs-target="#confirmDeleteModal"
                         data-form-action="{{ url_for('conta_movimento.excluir_movimentacao', id=mov.id) }}"
                         title="Excluir"
-                    >
+                      >
                         <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+
+        <div class="d-lg-none">
+          <div class="list-group">
+            {% for mov in movimentacoes %}
+            <div
+              class="list-group-item p-2 border-start mb-2 rounded border-1 border-secondary {% if mov.tipo_transacao.tipo == 'Crédito' %}border-success{% else %}border-danger{% endif %}"
+            >
+              <div
+                class="d-flex justify-content-between align-items-center mb-1"
+              >
+                <span
+                  class="fw-medium text-dark text-truncate me-2"
+                  style="max-width: 65%"
+                >
+                  {{ mov.tipo_transacao.transacao_tipo }}
+                </span>
+                <span
+                  class="fw-bold {% if mov.tipo_transacao.tipo == 'Crédito' %}text-success{% else %}text-danger{% endif %}"
+                >
+                  {{ mov.valor | format_currency }}
+                </span>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-end">
+                <div class="small text-muted overflow-hidden me-2">
+                  <div class="d-flex align-items-center extra-small mb-1">
+                    <i class="far fa-calendar-alt me-1"></i>{{
+                    mov.data_movimento.strftime('%d/%m') }}
+                    <span class="mx-1">|</span>
+                    {{ mov.conta.nome_banco }} {% if
+                    mov.id_movimento_relacionado is not none %}
+                    <i
+                      class="fas fa-exchange-alt ms-2 text-primary"
+                      title="Transferência"
+                    ></i>
+                    {% endif %}
+                  </div>
+                  {% if mov.descricao %}
+                  <div
+                    class="fst-italic text-truncate"
+                    style="font-size: 0.75rem; max-width: 200px"
+                  >
+                    {{ mov.descricao }}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex gap-1">
+                  <a
+                    href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}"
+                    class="btn btn-outline-secondary btn-sm py-1 px-2"
+                    title="Editar"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm py-1 px-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteModal"
+                    data-form-action="{{ url_for('conta_movimento.excluir_movimentacao', id=mov.id) }}"
+                    title="Excluir"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
         {% else %}
-        <p class="text-center">Nenhuma movimentação registrada ainda.</p>
+        <div class="card border-1">
+          <div class="card-body text-center py-4">
+            <p class="text-muted mb-0">Nenhuma movimentação registrada.</p>
+          </div>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
 Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
 não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}

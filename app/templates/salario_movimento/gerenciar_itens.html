@@ -3,31 +3,40 @@
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
 <div class="row">
-  <div class="col-8 mx-auto">
-    <div class="card shadow-sm mb-1">
+  <div class="col-12 col-lg-10 mx-auto">
+    <div class="card mb-2">
       <div
-        class="card-header menu-primario d-flex justify-content-between align-items-center"
+        class="card-header menu-primario d-flex flex-column flex-md-row justify-content-between align-items-center py-1 gap-2"
       >
-        <h5 class="mb-0"><i class="far fa-money-bill-alt fa-lg text-warning mx-2"></i>Salário de {{ movimento.mes_referencia }}</h5>
-        <a
-          href="{{ url_for('salario.listar_movimentos') }}"
-          class="btn btn-cinza"
-        >
-          <i class="fas fa-arrow-left text-warning me-2"></i> Voltar
-        </a>
+        <h5 class="mb-0 d-flex align-items-center">
+          <i class="far fa-money-bill-alt fa-lg text-warning me-1"></i>
+          Salário de {{ movimento.mes_referencia }}
+        </h5>
+        <div class="d-flex w-md-auto justify-content-end">
+          <a
+            href="{{ url_for('salario.listar_movimentos') }}"
+            class="btn btn-light btn-sm text-dark flex-grow-1 flex-md-grow-0"
+          >
+            <i class="fas fa-arrow-left me-1"></i> Voltar
+          </a>
+        </div>
       </div>
     </div>
 
-    <div class="card shadow-sm mb-1">
+    <div class="card mb-2">
       <div class="card-body">
-        <div class="row justify-content-center">
-          <div class="col-md-6">
-            <h5 class="mb-2 text-center">Resumo da Folha</h5>
+        <div class="row">
+          <div class="col-md-6 mb-2 mb-md-0 border-end-md">
+            <h6
+              class="text-secondary fw-bold border-bottom pb-2 mb-2 text-center text-md-start"
+            >
+              <i class="fas fa-list-alt me-1"></i> Resumo da Folha
+            </h6>
             <div class="table-responsive">
-              <table class="table table-sm table-borderless mb-0">
+              <table class="table table-sm table-borderless mb-0 small">
                 <tbody>
                   <tr>
-                    <td>Total de Proventos</td>
+                    <td>Proventos</td>
                     <td
                       class="text-end fw-bold text-success"
                       id="total-proventos"
@@ -36,7 +45,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Total de Descontos</td>
+                    <td>Descontos</td>
                     <td
                       class="text-end fw-bold text-danger"
                       id="total-descontos"
@@ -45,7 +54,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Total de Impostos</td>
+                    <td>Impostos</td>
                     <td
                       class="text-end fw-bold text-danger"
                       id="total-impostos"
@@ -54,7 +63,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Total de Benefícios</td>
+                    <td>Benefícios</td>
                     <td
                       class="text-end fw-bold text-primary"
                       id="total-beneficios"
@@ -63,15 +72,15 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Total de FGTS</td>
+                    <td>FGTS</td>
                     <td class="text-end fw-bold text-secondary" id="total-fgts">
                       {{ totais.fgts | format_currency }}
                     </td>
                   </tr>
-                  <tr>
-                    <td>SALÁRIO LÍQUIDO</td>
+                  <tr class="border-top">
+                    <td class="pt-1 fw-bold">LÍQUIDO A RECEBER</td>
                     <td
-                      class="text-end fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
+                      class="pt-1 text-end h6 mb-0 fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
                       id="total-salario-liquido"
                     >
                       {{ totais.salario_liquido | format_currency }}
@@ -82,17 +91,21 @@
             </div>
           </div>
 
-          <div class="col-md-6 border-start">
-            <h5 class="mb-2 text-center">Resumo Financeiro</h5>
+          <div class="col-md-6">
+            <h6
+              class="text-secondary fw-bold border-bottom pb-1 mb-1 text-center text-md-start"
+            >
+              <i class="fas fa-wallet me-1"></i> Entradas no Caixa
+            </h6>
             <div class="table-responsive">
-              <table class="table table-sm table-borderless mb-0">
+              <table class="table table-sm table-borderless mb-0 small">
                 <tbody>
                   {% set has_salario_items = totais.salario_liquido != 0 %} {%
                   set has_beneficio_items = beneficios_individuais|length > 0 %}
                   {% set has_fgts_items = totais.fgts != 0 %} {% if
                   has_salario_items %}
                   <tr>
-                    <td>SALÁRIO LÍQUIDO</td>
+                    <td>Salário Líquido</td>
                     <td
                       class="text-end fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
                     >
@@ -109,7 +122,7 @@
                   </tr>
                   {% endfor %} {% endif %} {% if has_fgts_items %}
                   <tr>
-                    <td>FGTS</td>
+                    <td>FGTS (Depósito)</td>
                     <td class="text-end fw-bold text-secondary">
                       {{ totais.fgts | format_currency}}
                     </td>
@@ -123,44 +136,45 @@
       </div>
     </div>
 
-    <div class="card shadow-sm">
-      <div class="card-header menu-secundario text-white">
-        <h5 class="mb-0">Adicionar e Gerenciar Verbas</h5>
+    <div class="card">
+      <div class="card-header menu-secundario text-white py-1">
+        <h6 class="mb-0"><i class="fas fa-edit me-2"></i>Gerenciar Verbas</h6>
       </div>
-      <div class="card-body">
+      <div class="card-body p-2 p-md-3">
         {% if not is_locked %}
         <form
           id="form-adicionar-verba"
           method="POST"
           action="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
-          class="mb-2 p-1 border rounded bg-light"
+          class="mb-4 p-2 border rounded bg-light"
         >
           {{ form.csrf_token }}
-          <div class="row align-items-end">
-            <div class="col-md-5">{{ render_field(form.salario_item_id) }}</div>
-            <div class="col-md-2">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-6">
+              {{ render_field(form.salario_item_id) }}
+            </div>
+            <div class="col-7 col-md-4">
               {{ render_field(form.valor, attrs={'type': 'number', 'step':
               '0.01', 'placeholder': '0,00'}) }}
             </div>
-            <div class="col-md-1">
-              <button type="submit" class="btn btn-azul">
-                <i class="fas fa-plus"></i>
+            <div class="col-5 col-md-2 d-grid">
+              <button type="submit" class="btn btn-azul btn-sm">
+                <i class="fas fa-plus me-1"></i> Adicionar
               </button>
             </div>
           </div>
         </form>
         {% else %}
-        <div class="alert alert-warning">
+        <div class="alert alert-warning small mb-3">
           <i class="fas fa-lock me-2"></i>
-          Esta folha de pagamento já foi recebida e não pode mais ser alterada.
-          Para fazer modificações, primeiro estorne o recebimento no Painel de
-          Recebimentos.
+          Folha fechada. Para editar, estorne o recebimento.
         </div>
         {% endif %}
 
-        <h6 class="mt-1">Verbas Lançadas</h6>
-        <div class="table-responsive">
-          <table class="table table-striped">
+        <h6 class="text-secondary border-bottom pb-2 mb-0">Itens Lançados</h6>
+
+        <div class="table-responsive d-none d-lg-block">
+          <table class="table table-striped align-middle mt-2">
             <thead>
               <tr>
                 <th>Verba</th>
@@ -176,32 +190,34 @@
                 <td>
                   {% if item.salario_item.tipo == 'Provento' %}<span
                     class="badge bg-success-subtle text-success-emphasis"
-                    >{{ item.salario_item.tipo }}</span
+                    >Provento</span
                   >
                   {% elif item.salario_item.tipo == 'Benefício' %}<span
                     class="badge bg-info-subtle text-primary-emphasis"
-                    >{{ item.salario_item.tipo }}</span
+                    >Benefício</span
                   >
                   {% elif item.salario_item.tipo == 'Desconto' %}<span
                     class="badge bg-warning-subtle text-warning-emphasis"
-                    >{{ item.salario_item.tipo }}</span
+                    >Desconto</span
                   >
                   {% elif item.salario_item.tipo == 'Imposto' %}<span
                     class="badge bg-danger-subtle text-danger-emphasis"
-                    >{{ item.salario_item.tipo }}</span
+                    >Imposto</span
                   >
                   {% elif item.salario_item.tipo == 'FGTS' %}<span
                     class="badge bg-secondary-subtle text-secondary-emphasis"
-                    >{{ item.salario_item.tipo }}</span
+                    >FGTS</span
                   >
                   {% endif %}
                 </td>
-                <td class="text-end">{{ item.valor | format_currency }}</td>
+                <td class="text-end fw-bold text-dark">
+                  {{ item.valor | format_currency }}
+                </td>
                 <td class="text-center">
                   {% if not is_locked %}
                   <button
                     type="button"
-                    class="btn-excluir-verba p-0 border-0 bg-transparent text-danger"
+                    class="btn-excluir-verba btn btn-outline-danger btn-sm border-0"
                     data-url="{{ url_for('salario.excluir_item_folha', item_id=item.id) }}"
                     data-id="{{ item.id }}"
                     title="Excluir"
@@ -209,22 +225,59 @@
                     <i class="fas fa-trash-alt"></i>
                   </button>
                   {% else %}
-                  <i
-                    class="fas fa-lock text-muted"
-                    title="Bloqueado para edição"
-                  ></i>
+                  <i class="fas fa-lock text-muted" title="Bloqueado"></i>
                   {% endif %}
                 </td>
               </tr>
               {% else %}
               <tr>
-                <td colspan="4" class="text-center text-muted">
-                  Nenhuma verba adicionada a esta folha de pagamento.
+                <td colspan="4" class="text-center text-muted py-3">
+                  Nenhuma verba adicionada.
                 </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
+        </div>
+
+        <div class="d-lg-none mt-2">
+          <div class="list-group" id="lista-verbas-mobile">
+            {% for item in movimento.itens %}
+            <div
+              class="list-group-item p-1 border-start mb-1 rounded border-1 border-secondary {% if item.salario_item.tipo == 'Provento' %}border-success {% elif item.salario_item.tipo == 'Benefício' %}border-info {% elif item.salario_item.tipo == 'Desconto' %}border-warning {% elif item.salario_item.tipo == 'Imposto' %}border-danger {% endif %}"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0 fw-medium text-dark">
+                    {{ item.salario_item.nome }}
+                  </h6>
+                  <small class="text-muted">{{ item.salario_item.tipo }}</small>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                  <span class="fw-bold text-dark"
+                    >{{ item.valor | format_currency }}</span
+                  >
+
+                  {% if not is_locked %}
+                  <button
+                    type="button"
+                    class="btn-excluir-verba btn btn-outline-danger btn-sm py-1 px-2"
+                    data-url="{{ url_for('salario.excluir_item_folha', item_id=item.id) }}"
+                    data-id="{{ item.id }}"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-3 small">
+              Nenhuma verba adicionada.
+            </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>

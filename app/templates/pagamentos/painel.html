@@ -10,62 +10,108 @@ render_estornar_modal %} {% block content %}
         >Selecione um mês para realizar pagamentos.</span
       >
     </div>
-    <div class="card shadow-sm mb-2">
-      <div
-        class="card-body p-2 d-flex justify-content-between align-items-center flex-wrap gap-3"
-      >
-        <form
-          id="form-pagamentos-mes"
-          method="GET"
-          action="{{ url_for('pagamentos.painel') }}"
-          class="d-flex align-items-center"
+
+    <div class="card mb-2">
+      <div class="card-body p-2">
+        <div
+          class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-2"
         >
-          <div class="col-md-2" style="width: 130px">
+          <form
+            id="form-pagamentos-mes"
+            method="GET"
+            action="{{ url_for('pagamentos.painel') }}"
+            class="w-100 w-lg-auto"
+            style="max-width: 100%; max-width: 160px"
+          >
             <div class="input-group">
-              <span class="input-group-text"
-                ><i class="fas fa-calendar-alt"></i
+              <span class="input-group-text bg-light border-secondary-subtle"
+                ><i class="fas fa-calendar-alt text-secondary"></i
               ></span>
-              {{ form.mes_ano(class="form-control form-control-sm fw-semibold
-              text-danger", id="mes_ano_pagamentos") }}
+              {{ form.mes_ano(class="form-control form-control-sm fw-bold
+              text-center text-dark", id="mes_ano_pagamentos", style="font-size:
+              1rem;") }}
+            </div>
+          </form>
+
+          <div class="d-none d-lg-flex align-items-center text-muted gap-3">
+            <div>
+              Previsto:
+              <strong class="text-primary"
+                >{{ totais.previsto | format_currency }}</strong
+              >
+            </div>
+            <div class="vr"></div>
+            <div>
+              Pago:
+              <strong class="text-success"
+                >{{ totais.pago | format_currency }}</strong
+              >
+            </div>
+            <div class="vr"></div>
+            <div>
+              Pendente:
+              <strong class="text-danger"
+                >{{ totais.pendente | format_currency }}</strong
+              >
             </div>
           </div>
-        </form>
-        <div
-          class="d-flex align-items-center text-muted fs-6 gap-3 flex-wrap justify-content-center"
-        >
-          <span
-            >Total Previsto:
-            <strong class="text-primary"
-              >{{ totais.previsto | format_currency }}</strong
-            ></span
-          >
-          <span class="d-none d-md-inline">|</span>
-          <span
-            >Total Pago:
-            <strong class="text-success"
-              >{{ totais.pago | format_currency }}</strong
-            ></span
-          >
-          <span class="d-none d-md-inline">|</span>
-          <span
-            >Pendente:
-            <strong class="text-danger"
-              >{{ totais.pendente | format_currency }}</strong
-            ></span
-          >
+
+          <div class="d-lg-none w-100">
+            <div class="row g-1 text-center">
+              <div class="col-4">
+                <div class="border rounded p-1 bg-light">
+                  <div
+                    class="extra-small text-muted text-uppercase fw-bold"
+                    style="font-size: 0.65rem"
+                  >
+                    Previsto
+                  </div>
+                  <div class="text-primary fw-bold small">
+                    {{ totais.previsto | format_currency }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border rounded p-1 bg-light">
+                  <div
+                    class="extra-small text-muted text-uppercase fw-bold"
+                    style="font-size: 0.65rem"
+                  >
+                    Pago
+                  </div>
+                  <div class="text-success fw-bold small">
+                    {{ totais.pago | format_currency }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border rounded p-1 bg-light">
+                  <div
+                    class="extra-small text-muted text-uppercase fw-bold"
+                    style="font-size: 0.65rem"
+                  >
+                    Pendente
+                  </div>
+                  <div class="text-danger fw-bold small">
+                    {{ totais.pendente | format_currency }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="card shadow-sm">
+    <div class="card border-0">
       <div class="card-header menu-primario">
-        <h5 class="mb-0">
+        <h6 class="mb-0">
           <i class="fas fa-tasks text-warning me-2"></i>Contas a Pagar
-        </h5>
+        </h6>
       </div>
-      <div class="card-body">
+      <div class="card-body px-0 pt-2 p-md-3">
         {% if contas %}
-        <div class="table-responsive">
+
+        <div class="table-responsive d-none d-lg-block">
           <table class="table table-striped table-hover sortable-table">
             <thead>
               <tr>
@@ -85,9 +131,7 @@ render_estornar_modal %} {% block content %}
               <tr>
                 <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
                 <td>{{ conta.origem }}</td>
-                <td>
-                  <span class="text-dark">{{ conta.tipo }}</span>
-                </td>
+                <td><span class="text-dark">{{ conta.tipo }}</span></td>
                 <td class="text-end fw-regular">
                   {{ conta.valor_display | format_currency }}
                 </td>
@@ -116,18 +160,13 @@ render_estornar_modal %} {% block content %}
                 <td class="text-center">
                   {% if conta.status != 'Pago' %} {% if conta.tipo ==
                   'Crediário' and conta.desatualizada %}
-
-                  <div
-                    class="d-flex justify-content-center align-items-center"
-                    style="min-height: 26px;"
-                  >
+                  <div class="d-flex justify-content-center align-items-center">
                     <i
                       class="fas fa-sync-alt fa-lg text-primary"
                       data-bs-toggle="tooltip"
-                      title="Fatura desatualizada! Sincronize as faturas na tela de 'Faturas de Crediário' antes de pagar."
+                      title="Fatura desatualizada!"
                     ></i>
                   </div>
-
                   {% else %}
                   <button
                     type="button"
@@ -162,9 +201,96 @@ render_estornar_modal %} {% block content %}
             </tbody>
           </table>
         </div>
+
+        <div class="d-lg-none">
+          {% for conta in contas %}
+          <div class="card mb-1 border-start border-1 border-danger">
+            <div class="card-body p-2">
+              <div
+                class="d-flex justify-content-between align-items-start mb-1"
+              >
+                <div
+                  class="fw-bold text-dark text-truncate me-2"
+                  style="max-width: 65%"
+                >
+                  {{ conta.origem }}
+                </div>
+                <div class="fw-bold text-danger text-nowrap">
+                  {{ conta.valor_pendente | format_currency }}
+                </div>
+              </div>
+
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <div class="text-muted extra-small">
+                  <i class="far fa-calendar-alt me-1"></i>{{
+                  conta.vencimento.strftime('%d/%m') }}
+                  <span class="mx-1 text-secondary">|</span>
+                  {{ conta.tipo }}
+                </div>
+
+                {% if conta.status == 'Pago' %}
+                <span
+                  class="badge bg-success-subtle text-success-emphasis extra-small"
+                  >Pago</span
+                >
+                {% elif conta.status == 'Atrasado' %}
+                <span
+                  class="badge bg-danger-subtle text-danger-emphasis extra-small"
+                  >Atrasado</span
+                >
+                {% else %}
+                <span
+                  class="badge bg-warning-subtle text-warning-emphasis text-dark extra-small"
+                  >Aberto</span
+                >
+                {% endif %}
+              </div>
+
+              {% if conta.status != 'Pago' %} {% if conta.tipo == 'Crediário'
+              and conta.desatualizada %}
+              <div
+                class="alert alert-primary py-0 px-1 extra-small text-center mb-0"
+              >
+                <i class="fas fa-sync-alt me-1"></i> Sincronizar
+              </div>
+              {% else %}
+              <button
+                type="button"
+                class="btn btn-danger btn-sm w-100 py-1"
+                style="font-size: 0.8rem"
+                data-bs-toggle="modal"
+                data-bs-target="#pagamentoModal"
+                data-item-id="{{ conta.id_original }}"
+                data-item-tipo="{{ conta.tipo }}"
+                data-item-valor="{{ '%.2f'|format(conta.valor_pendente) }}"
+                data-item-descricao="Pagamento: {{ conta.origem }}"
+              >
+                PAGAR
+              </button>
+              {% endif %} {% else %}
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm w-100 py-1"
+                style="font-size: 0.8rem"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmEstornarModal"
+                data-item-id="{{ conta.id_original }}"
+                data-item-tipo="{{ conta.tipo }}"
+                data-mes-ano="{{ form.mes_ano.data }}"
+              >
+                <i class="fas fa-history me-1"></i> Estornar
+              </button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
         {% else %}
-        <p class="text-center alert alert-success">
-          Nenhuma conta a pagar encontrada para este mês. Parabéns!
+        <p class="text-center alert alert-success m-3">
+          Nenhuma conta a pagar encontrada.
         </p>
         {% endif %}
       </div>
@@ -172,16 +298,14 @@ render_estornar_modal %} {% block content %}
   </div>
 </div>
 
-{% include 'includes/_modal_pagamento.html' %} {{ render_estornar_modal(
-modal_id='confirmEstornarModal',
+{% include 'includes/_modal_pagamento.html' %} {{
+render_estornar_modal(modal_id='confirmEstornarModal',
 form_action=url_for('pagamentos.estornar_pagamento'), title='Confirmar Estorno',
-body_text='Você tem certeza que deseja estornar este pagamento? Esta ação não
-pode ser desfeita.', confirm_button_text='Sim, Estornar' ) }} {% endblock %} {%
-block scripts %} {{ super() }}
+body_text='Deseja estornar este pagamento?', confirm_button_text='Sim, Estornar'
+) }} {% endblock %} {% block scripts %} {{ super() }}
 <script id="json-data-pagamentos" type="application/json">
   {{ contas_json | tojson | safe }}
 </script>
 <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pagamentos.js') }}"></script>
-
 {% endblock %}

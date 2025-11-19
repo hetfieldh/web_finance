@@ -5,60 +5,119 @@ render_confirm_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div
-      class="caixa-sombreada-cinza p-2 d-flex justify-content-between align-items-center mb-2"
+      class="caixa-sombreada-cinza p-2 d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2"
     >
-      <h4 class="mb-0 me-2" style="color: var(--wf-azul-destaque)">
+      <h4
+        class="mb-0 me-2 d-flex align-items-center"
+        style="color: var(--wf-azul-destaque)"
+      >
         <i class="fas fa-sitemap fa-lg px-2 text-warning"></i>
         Subgrupos de Crediário
       </h4>
-      <div>
+      <div class="d-flex w-md-auto justify-content-end gap-2">
         <a
           href="{{ url_for('crediario_subgrupo.adicionar_subgrupo') }}"
-          class="btn btn-azul"
+          class="btn btn-azul btn-sm flex-grow-1 flex-md-grow-0"
         >
           <i class="fas fa-plus text-warning me-2"></i> Subgrupo
         </a>
         <a
           href="{{ url_for('crediario.listar_crediarios') }}"
-          class="btn btn-cinza"
+          class="btn btn-cinza btn-sm flex-grow-1 flex-md-grow-0"
         >
           <i class="fas fa-arrow-left text-warning me-1"></i> Voltar
         </a>
       </div>
     </div>
 
-    <div class="card shadow-sm border-1">
-      <div class="card-body">
+    <div>
+      <div>
         {% if subgrupos %}
-        <div class="table-responsive">
-          <table class="table table-striped table-hover sortable-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Subgrupo</th>
-                <th>Grupo Pai</th>
-                <th>Tipo do Grupo</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for sg in subgrupos %}
-              <tr>
-                <td>{{ sg.id }}</td>
-                <td>{{ sg.nome }}</td>
-                <td>{{ sg.grupo.grupo_crediario }}</td>
-                <td>{{ sg.grupo.tipo_grupo_crediario }}</td>
-                <td class="table-actions">
+
+        <div class="table-responsive p-0 d-none d-lg-block">
+          <div class="card border-1">
+            <div class="card-body">
+              <table class="table table-striped table-hover sortable-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Subgrupo</th>
+                    <th>Grupo Pai</th>
+                    <th>Tipo do Grupo</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for sg in subgrupos %}
+                  <tr>
+                    <td>{{ sg.id }}</td>
+                    <td>{{ sg.nome }}</td>
+                    <td>{{ sg.grupo.grupo_crediario }}</td>
+                    <td>{{ sg.grupo.tipo_grupo_crediario }}</td>
+                    <td class="table-actions">
+                      <a
+                        href="{{ url_for('crediario_subgrupo.editar_subgrupo', id=sg.id) }}"
+                        class="btn btn-warning me-2"
+                        title="Editar"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-form-action="{{ url_for('crediario_subgrupo.excluir_subgrupo', id=sg.id) }}"
+                        title="Excluir"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-lg-none">
+          <div class="list-group shadow-sm">
+            {% for sg in subgrupos %}
+            <div
+              class="list-group-item p-2 border-start border-secondary border-1 mb-1 rounded"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="overflow-hidden me-2">
+                  <h6
+                    class="mb-0 fw-medium text-truncate text-dark"
+                    style="font-size: 0.95rem"
+                  >
+                    {{ sg.nome }}
+                  </h6>
+                  <div class="small text-muted text-truncate">
+                    <i class="fas fa-folder-open me-1 fa-xs"></i>{{
+                    sg.grupo.grupo_crediario }}
+                    <span
+                      class="text-secondary ms-1"
+                      style="font-size: 0.75rem"
+                    >
+                      ({{ sg.grupo.tipo_grupo_crediario }})
+                    </span>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-1">
                   <a
                     href="{{ url_for('crediario_subgrupo.editar_subgrupo', id=sg.id) }}"
-                    class="btn btn-warning me-2"
+                    class="btn btn-outline-warning btn-sm py-1 px-2"
                     title="Editar"
                   >
                     <i class="fas fa-edit"></i>
                   </a>
                   <button
                     type="button"
-                    class="btn btn-danger"
+                    class="btn btn-outline-danger btn-sm py-1 px-2"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmDeleteModal"
                     data-form-action="{{ url_for('crediario_subgrupo.excluir_subgrupo', id=sg.id) }}"
@@ -66,19 +125,27 @@ render_confirm_modal %} {% block content %}
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
+
         {% else %}
-        <p class="text-center">Nenhum subgrupo de crediário cadastrado.</p>
+        <div class="card shadow-sm border-1">
+          <div class="card-body text-center py-4">
+            <p class="text-muted mb-0">
+              Nenhum subgrupo de crediário cadastrado.
+            </p>
+          </div>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
 Exclusão', body_text='Tem certeza que deseja excluir este subgrupo? Esta ação
 não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}
