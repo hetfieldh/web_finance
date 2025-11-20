@@ -42,8 +42,7 @@
         method="POST"
         action="{{ url_for('solicitacao.solicitar_acesso') }}"
       >
-        {{ form.csrf_token }}
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="mb-3">
           {{ form.email.label(class="form-label") }}
           {{ form.email(class="form-control", id="email", disabled=limite_atingido) }}

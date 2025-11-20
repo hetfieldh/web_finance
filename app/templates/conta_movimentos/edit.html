@@ -18,8 +18,7 @@
           method="POST"
           action="{{ url_for('conta_movimento.editar_movimentacao', id=movimento.id) }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row">
             <div class="col-md-6 mb-3">{{ render_field(form.conta_id) }}</div>
             <div class="col-md-6 mb-3">

@@ -16,7 +16,7 @@
           method="POST"
           action="{{ url_for('fornecedor.adicionar_fornecedor') }}"
         >
-          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="mb-3">{{ render_field(form.nome) }}</div>
           <div class="mb-3">{{ render_field(form.descricao) }}</div>
 

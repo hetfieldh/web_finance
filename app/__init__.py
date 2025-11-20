@@ -9,6 +9,7 @@ from flask import Flask, app, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFError, CSRFProtect
 
 from config import Config
 
@@ -17,7 +18,7 @@ from .template_filters import format_currency, format_number
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-
+csrf = CSRFProtect()
 
 try:
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
@@ -45,6 +46,7 @@ def create_app(config_class=Config, config_overrides=None):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    csrf.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
     login_manager.login_message = "Faça login para acessar."
@@ -210,5 +212,29 @@ def create_app(config_class=Config, config_overrides=None):
         )
         db.session.rollback()
         return render_template("errors/500.html"), 500
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        user_info = current_user.login if current_user.is_authenticated else "Anônimo"
+        app.logger.warning(
+            f"Erro CSRF: {e.description} em {request.path} por {user_info}"
+        )
+        return render_template("errors/400.html", reason=e.description), 400
+
+    @app.errorhandler(400)
+    def bad_request_error(error):
+        user_info = current_user.login if current_user.is_authenticated else "Anônimo"
+        app.logger.warning(
+            f"Erro 400: Requisição inválida em {request.path} por {user_info}"
+        )
+        return render_template("errors/400.html"), 400
+
+    @app.errorhandler(405)
+    def bad_request_error(error):
+        user_info = current_user.login if current_user.is_authenticated else "Anônimo"
+        app.logger.warning(
+            f"Erro 405: Método não permitido em {request.path} por {user_info}"
+        )
+        return render_template("errors/405.html"), 405
 
     return app

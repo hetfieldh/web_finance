@@ -8,6 +8,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = True  # Modo de produção: False, desenvolvimento: True
     FLASK_ENV = os.environ.get("FLASK_ENV")
 
     LOG_TO_STDOUT = os.environ.get("LOG_TO_STDOUT")

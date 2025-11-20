@@ -17,8 +17,7 @@
           method="POST"
           action="{{ url_for('desp_rec_movimento.gerar_previsao') }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row">
             <div class="col-md-4 mb-3">
               {{ render_field(form.desp_rec_id, attrs={'id':

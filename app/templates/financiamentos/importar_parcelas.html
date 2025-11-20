@@ -96,8 +96,7 @@
           enctype="multipart/form-data"
           action="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="mb-2">{{ render_field(form.csv_file) }}</div>
 
           <div class="mt-1">

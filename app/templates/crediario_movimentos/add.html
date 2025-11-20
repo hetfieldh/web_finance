@@ -16,8 +16,7 @@
           method="POST"
           action="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row">
             <div class="col-md-6 mb-3">
               {{ render_field(form.crediario_id) }}

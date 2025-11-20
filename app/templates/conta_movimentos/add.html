@@ -29,8 +29,7 @@
           action="{{ url_for('conta_movimento.adicionar_movimentacao') }}"
           id="form-movimentacao"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="mb-3">
             <label class="form-label">{{ form.tipo_operacao.label }}</label>
             <div class="d-flex gap-3">

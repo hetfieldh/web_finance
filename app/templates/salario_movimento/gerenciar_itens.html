@@ -148,7 +148,7 @@
           action="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"
           class="mb-4 p-2 border rounded bg-light"
         >
-          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row g-2 align-items-end">
             <div class="col-12 col-md-6">
               {{ render_field(form.salario_item_id) }}

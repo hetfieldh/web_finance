@@ -18,8 +18,7 @@
           method="POST"
           action="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_transacao.id) }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row">
             <div class="col-md-5 mb-3">
               {{ render_field(form.transacao_tipo) }}

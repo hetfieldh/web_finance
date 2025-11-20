@@ -1,4 +1,4 @@
-<!--- app/templates/errors/404.html -->
+<!-- app\templates\errors\400.html -->
 
 {% extends "base.html" %} {% block title %}{% endblock %} {% block page_title
 %}{% endblock %} {% block content %}
@@ -11,14 +11,21 @@
         class="img-fluid error-icon"
       />
     </div>
-    <h1 class="display-1 text-danger fw-bold mb-3">404</h1>
-    <p class="lead text-dark mb-2">Ops! Esta página não existe.</p>
+    <h1 class="display-1 text-danger fw-bold mb-3">400</h1>
+    <h2 class="h4 text-dark mb-3">Ops! Algo deu errado com sua requisição.</h2>
 
     <p class="text-muted mb-4">
-      Verifique o endereço digitado e tente novamente.
+      O servidor não conseguiu processar sua solicitação.
     </p>
 
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
+    <div class="alert alert-warning text-center d-inline-block text-start mb-4">
+      <small
+        ><i class="fas fa-info-circle me-1"></i> Tente recarregar a página
+        anterior e enviar novamente.</small
+      >
+    </div>
+
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
       <a href="{{ url_for('main.dashboard') }}" class="btn btn-cinza">
         <i class="fas fa-home text-warning me-2"></i>Dashboard
       </a>

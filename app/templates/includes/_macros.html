@@ -59,7 +59,13 @@ body_text, confirm_button_text='Confirmar') %}
         >
           Cancelar
         </button>
-        <form id="confirm-form-{{ modal_id }}" method="POST" action="">
+        <form
+          id="form-{{ modal_id }}"
+          method="POST"
+          action="{{ form_action }}"
+          style="display: inline"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <button type="submit" class="btn btn-danger btn-sm">
             {{ confirm_button_text }}
           </button>
@@ -115,6 +121,7 @@ body_text, confirm_button_text) -%}
           action="{{ form_action }}"
           style="display: inline"
         >
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <input
             type="hidden"
             id="{{ modal_id }}-item-id"

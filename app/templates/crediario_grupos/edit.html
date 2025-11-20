@@ -18,7 +18,7 @@
           method="POST"
           action="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo_crediario_obj.id) }}"
         >
-          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
           <div class="row">
             <div class="col-md-7 mb-3">

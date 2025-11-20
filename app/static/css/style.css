@@ -646,16 +646,39 @@ body.login-body {
 
 /* --- Página de Erro --- */
 .error-container {
-    background: var(--wf-white);
-    padding: 3rem;
-    border-radius: 1rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    max-width: 800px;
-    width: 90%;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 2rem auto;
 }
 
 .error-container .error-icon {
     max-width: 150px;
+    height: auto;
+}
+
+/* Ajuste para telas muito pequenas */
+@media (max-width: 576px) {
+    .error-container {
+        width: 95%;
+        /* flex-direction: column; */
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    h1.display-1 {
+        font-size: 5rem;
+    }
+
+    h2.h4 {
+        font-size: 1rem;
+    }
 }
 
 

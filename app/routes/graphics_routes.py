@@ -21,7 +21,6 @@ graphics_bp = Blueprint("graphics", __name__, url_prefix="/graficos")
 @login_required
 def view_graphics():
     hoje = date.today()
-
     todos_financiamentos = (
         Financiamento.query.filter_by(usuario_id=current_user.id)
         .order_by(Financiamento.nome_financiamento.asc())

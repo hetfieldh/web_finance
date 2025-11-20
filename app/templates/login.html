@@ -51,6 +51,7 @@
       {% endif %} {% endwith %}
 
       <form method="POST" action="{{ url_for('auth.login') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="mb-3">
           <label for="login_ou_email" class="form-label"
             >Login ou E-mail:</label

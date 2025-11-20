@@ -25,8 +25,7 @@
           action="{{ url_for('usuario.perfil') }}"
           data-user-id="{{ current_user.id }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row">
             <div class="col-md-6 mb-3">{{ render_field(form.nome) }}</div>
             <div class="col-md-6 mb-3">{{ render_field(form.sobrenome) }}</div>

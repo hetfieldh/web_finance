@@ -28,8 +28,7 @@
           method="POST"
           action="{{ url_for('desp_rec_movimento.editar_movimento', id=movimento.id) }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row mb-3">
             <div class="col-md-4">
               {{ render_field(form.data_vencimento, attrs={'type': 'date'}) }}

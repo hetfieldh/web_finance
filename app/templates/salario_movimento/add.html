@@ -17,7 +17,8 @@
           method="POST"
           action="{{ url_for('salario.novo_lancamento_folha') }}"
         >
-          {{ form.csrf_token }} {{ form.data_recebimento }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {{ form.data_recebimento }}
 
           <div class="row mb-3 align-items-center">
             <div class="col-auto">

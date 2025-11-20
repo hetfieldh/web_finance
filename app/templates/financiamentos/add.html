@@ -13,8 +13,7 @@
           method="POST"
           action="{{ url_for('financiamento.adicionar_financiamento') }}"
         >
-          {{ form.csrf_token }}
-
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="row">
             <div class="col-md-7 mb-3">
               {{ render_field(form.nome_financiamento) }}

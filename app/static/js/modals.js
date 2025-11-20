@@ -1,6 +1,50 @@
 // app/static/js/modals.js
 
-document.addEventListener("DOMContentLoaded", () => {
+// Modal de exclusão
+document.addEventListener("DOMContentLoaded", function () {
+  const confirmDeleteModal = document.getElementById("confirmDeleteModal");
+  if (confirmDeleteModal) {
+    confirmDeleteModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+      const actionUrl = button.getAttribute("data-form-action");
+      const modalForm = confirmDeleteModal.querySelector("form");
+      if (modalForm && actionUrl) {
+        modalForm.action = actionUrl;
+      }
+    });
+  }
+
+  // Modal de estorno
+  const confirmEstornarModal = document.getElementById("confirmEstornarModal");
+  if (confirmEstornarModal) {
+    confirmEstornarModal.addEventListener("show.bs.modal", function (event) {
+      const button = event.relatedTarget;
+      const itemId = button.getAttribute("data-item-id");
+      const itemTipo = button.getAttribute("data-item-tipo");
+      const mesAno = button.getAttribute("data-mes-ano");
+      const formAction = button.getAttribute("data-form-action");
+
+      const modalBodyInputId = confirmEstornarModal.querySelector(
+        "input[name='item_id']"
+      );
+      const modalBodyInputTipo = confirmEstornarModal.querySelector(
+        "input[name='item_tipo']"
+      );
+      const modalBodyInputMesAno = confirmEstornarModal.querySelector(
+        "input[name='mes_ano']"
+      );
+      const modalForm = confirmEstornarModal.querySelector("form");
+
+      if (modalBodyInputId) modalBodyInputId.value = itemId;
+      if (modalBodyInputTipo) modalBodyInputTipo.value = itemTipo;
+      if (modalBodyInputMesAno) modalBodyInputMesAno.value = mesAno;
+      if (modalForm && formAction) {
+        modalForm.action = formAction;
+      }
+    });
+  }
+
+  // Modal de rejeição (Solicitações)
   const rejeicaoModal = document.getElementById("rejeicaoModal");
   if (rejeicaoModal) {
     rejeicaoModal.addEventListener("show.bs.modal", function (event) {
@@ -8,49 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const solicitacaoId = button.getAttribute("data-solicitacao-id");
       const form = rejeicaoModal.querySelector("#form-rejeicao");
       const solicitacaoIdInput = form.querySelector("#solicitacao_id");
-      solicitacaoIdInput.value = solicitacaoId;
-    });
-  }
 
-  const confirmModal = document.getElementById("confirmDeleteModal");
-  if (confirmModal) {
-    confirmModal.addEventListener("show.bs.modal", function (event) {
-      const button = event.relatedTarget;
-
-      const formAction = button.getAttribute("data-form-action");
-
-      const form = confirmModal.querySelector(
-        "#confirm-form-confirmDeleteModal"
-      );
-
-      if (form && formAction) {
-        form.setAttribute("action", formAction);
+      if (solicitacaoIdInput) {
+        solicitacaoIdInput.value = solicitacaoId;
+      } else {
+        const inputByName = form.querySelector('input[name="solicitacao_id"]');
+        if (inputByName) inputByName.value = solicitacaoId;
       }
-    });
-  }
-
-  const confirmEstornarModal = document.getElementById("confirmEstornarModal");
-  if (confirmEstornarModal) {
-    confirmEstornarModal.addEventListener("show.bs.modal", function (event) {
-      const button = event.relatedTarget;
-
-      const itemId = button.getAttribute("data-item-id");
-      const itemTipo = button.getAttribute("data-item-tipo");
-      const mesAno = button.getAttribute("data-mes-ano");
-
-      const modalItemIdInput = confirmEstornarModal.querySelector(
-        "#confirmEstornarModal-item-id"
-      );
-      const modalItemTipoInput = confirmEstornarModal.querySelector(
-        "#confirmEstornarModal-item-tipo"
-      );
-      const modalMesAnoInput = confirmEstornarModal.querySelector(
-        "#confirmEstornarModal-mes-ano"
-      );
-
-      if (modalItemIdInput) modalItemIdInput.value = itemId;
-      if (modalItemTipoInput) modalItemTipoInput.value = itemTipo;
-      if (modalMesAnoInput) modalMesAnoInput.value = mesAno;
     });
   }
 });
