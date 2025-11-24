@@ -61,6 +61,9 @@ render_confirm_modal %} {% block content %}
                     <td>{{ financiamento.prazo_meses }}</td>
                     <td>{{ financiamento.tipo_amortizacao }}</td>
                     <td>
+                      <span style="display: none">
+                        {{ financiamento.data_inicio.strftime('%Y%m%d') }}
+                      </span>
                       {{ financiamento.data_inicio.strftime('%d/%m/%Y') }}
                     </td>
                     <td class="table-actions">

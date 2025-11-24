@@ -1,0 +1,120 @@
+<!-- app\templates\relatorios\crediario_detalhado.html -->
+
+{% extends "base.html" %} {% block content %}
+<div
+  class="caixa-sombreada mb-2 d-flex justify-content-between align-items-center"
+>
+  <div>
+    <span class="text-dark fw-bold">Crediário Detalhado:</span>
+    <span class="text-danger"
+      >Abertura dos Grupos de Crediário por Subgrupo e Loja/Serviço. Ordenado
+      por mês.</span
+    >
+  </div>
+</div>
+
+<div class="container-fluid mt-2 p-0">
+  <div class="card shadow">
+    <div class="card-header menu-primario">
+      <h5 class="mb-0">
+        <i class="fas text-warning fa-chart-pie me-2"></i> Níveis: Grupo >
+        Subgrupo > Fornecedor
+      </h5>
+    </div>
+    <div class="card-body p-1">
+      <div class="table-scroll">
+        <table
+          class="table table-padrao table-sticky-col table-hover"
+          id="tabelaCrediario"
+        >
+          <thead class="thead-light">
+            <tr>
+              <th>Estrutura</th>
+              {% for mes in meses %}
+              <th class="text-center">{{ mes.label }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for grupo_nome, info_grupo in dados.items() %}
+
+            <tr
+              class="table-secondary toggle-row"
+              data-target=".grupo-child-{{ info_grupo.id }}"
+              style="cursor: pointer; font-weight: bold"
+            >
+              <td>
+                <i class="fas fa-plus-square mr-2 text-dark toggle-icon"></i>
+                {{ grupo_nome }}
+              </td>
+              {% for mes in meses %}
+              <td class="text-end text-nowrap">
+                {% set val = info_grupo['total_meses'].get(mes.key, 0) %} {{
+                "{:,.2f}".format(val).replace(',', 'X').replace('.',
+                ',').replace('X', '.') if val > 0 else '-' }}
+              </td>
+              {% endfor %}
+            </tr>
+
+            {% for sub_nome, info_sub in info_grupo['subgrupos'].items() %} {%
+            set unique_sub_id = "{}-{}".format(info_grupo.id, info_sub.id) %}
+
+            <tr
+              class="grupo-child-{{ info_grupo.id }} table-light toggle-row"
+              data-target=".sub-child-{{ unique_sub_id }}"
+              style="display: none; cursor: pointer; font-weight: 600"
+            >
+              <td class="padding-subgrupo">
+                <i
+                  class="fas fa-plus-square mr-2 text-secondary toggle-icon"
+                ></i>
+                {{ sub_nome }}
+              </td>
+
+              {% for mes in meses %}
+              <td class="text-end text-dark text-nowrap">
+                {% set val_sub = info_sub['total_meses'].get(mes.key, 0) %} {{
+                "{:,.2f}".format(val_sub).replace(',', 'X').replace('.',
+                ',').replace('X', '.') if val_sub > 0 else '-' }}
+              </td>
+              {% endfor %}
+            </tr>
+
+            {% for forn_nome, valores_forn in info_sub['fornecedores'].items()
+            %}
+            <tr
+              class="sub-child-{{ unique_sub_id }} bg-white"
+              style="display: none"
+            >
+              <td class="padding-fornecedor">
+                <i class="fas fa-angle-right mr-1 text-muted"></i>
+                {{ forn_nome }}
+              </td>
+
+              {% for mes in meses %}
+              <td
+                class="text-end text-muted text-nowrap"
+                style="font-size: 0.95em"
+              >
+                {% set val_forn = valores_forn.get(mes.key, 0) %} {{
+                "{:,.2f}".format(val_forn).replace(',', 'X').replace('.',
+                ',').replace('X', '.') if val_forn > 0 else '-' }}
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %} {% endfor %} {% endfor %} {% if not dados %}
+            <tr>
+              <td colspan="100%" class="text-center p-3">
+                Nenhum dado encontrado para o período futuro.
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %} {{ super() }}
+<script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
+{% endblock %}

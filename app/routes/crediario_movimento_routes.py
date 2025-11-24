@@ -66,7 +66,7 @@ def listar_movimentos_crediario():
             data_final = date.fromisoformat(data_final_str)
             query = query.filter(CrediarioMovimento.data_compra <= data_final)
     except ValueError:
-        flash("Formato de data inválido. Use AAAA-MM-DD.", "danger")
+        flash("Formato de data inválido. Use DD-MM-AAAA.", "danger")
         return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
 
     if crediario_id:

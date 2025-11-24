@@ -197,10 +197,14 @@
                 <td class="text-center fw-bold text-muted">
                   {{ item.parcela.numero_parcela }}
                 </td>
-                <td class="text-center text-nowrap">
-                  {{ item.parcela.data_vencimento.strftime('%d/%m/%y') }}
+                <td>
+                  <span style="display: none">
+                    {{ item.parcela.data_vencimento.strftime('%Y%m%d') }}
+                  </span>
+                  <span class="text-center d-block">
+                    {{ item.parcela.data_vencimento.strftime('%d/%m/%Y') }}
+                  </span>
                 </td>
-
                 <td class="text-end text-nowrap text-muted">
                   {{ item.parcela.valor_principal | format_currency }}
                 </td>

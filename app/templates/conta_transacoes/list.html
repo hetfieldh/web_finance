@@ -64,7 +64,12 @@ render_confirm_modal %} {% block content %}
                       >
                       {% else %} {{ tipo_t.tipo }} {% endif %}
                     </td>
-                    <td>{{ tipo_t.data_criacao.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <span style="display: none">
+                        {{ tipo_t.data_criacao.strftime('%Y%m%d') }}
+                      </span>
+                      {{ tipo_t.data_criacao.strftime('%d/%m/%Y') }}
+                    </td>
                     <td class="table-actions">
                       <a
                         href="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_t.id) }}"

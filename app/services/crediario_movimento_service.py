@@ -130,6 +130,10 @@ def editar_movimento(movimento, form):
         ):
             valor_total_compra = -abs(valor_total_compra)
 
+        movimento.crediario_id = form.crediario_id.data
+        movimento.fornecedor_id = form.fornecedor_id.data or None
+        movimento.crediario_grupo_id = form.crediario_grupo_id.data or None
+        movimento.crediario_subgrupo_id = form.crediario_subgrupo_id.data or None
         movimento.data_compra = form.data_compra.data
         movimento.valor_total_compra = valor_total_compra
         movimento.data_primeira_parcela = form.data_primeira_parcela.data
@@ -139,7 +143,11 @@ def editar_movimento(movimento, form):
         )
         movimento.destino = form.destino.data
 
-        CrediarioParcela.query.filter_by(crediario_movimento_id=movimento.id).delete()
+        for parcela in movimento.parcelas:
+            db.session.delete(parcela)
+
+        movimento.parcelas = []
+
         db.session.flush()
 
         numero_parcelas = form.numero_parcelas.data
@@ -162,8 +170,10 @@ def editar_movimento(movimento, form):
                 data_vencimento=data_vencimento,
                 valor_parcela=valor,
                 pago=False,
+                crediario_movimento_id=movimento.id,
             )
             movimento.parcelas.append(nova_parcela)
+            db.session.add(nova_parcela)
 
         db.session.commit()
         return True, "Movimento de crediário atualizado com sucesso!"
@@ -188,10 +198,10 @@ def excluir_movimento(movimento_id):
             usuario_id=current_user.id,
             mes_referencia=mes_referencia,
         ).first()
-        if fatura:
+        if fatura and fatura.status in [STATUS_PAGO, STATUS_PARCIAL_PAGO]:
             return (
                 False,
-                f"Não é possível excluir esta compra. A fatura do mês {mes_referencia} já foi gerada.",
+                f"Não é possível excluir esta compra. A fatura do mês {mes_referencia} já foi paga ou está parcialmente paga.",
             )
 
     if any(parcela.pago for parcela in movimento.parcelas):
@@ -201,6 +211,9 @@ def excluir_movimento(movimento_id):
         )
 
     try:
+        for p in movimento.parcelas:
+            db.session.delete(p)
+
         db.session.delete(movimento)
         db.session.commit()
         current_app.logger.info(

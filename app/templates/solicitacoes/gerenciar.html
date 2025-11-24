@@ -42,7 +42,12 @@
                 <tbody>
                   {% for s in solicitacoes %}
                   <tr>
-                    <td>{{ s.data_solicitacao.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <span style="display: none">
+                        {{ s.data_solicitacao.strftime('%Y%m%d') }}
+                      </span>
+                      {{ s.data_solicitacao.strftime('%d/%m/%Y') }}
+                    </td>
                     <td>{{ s.nome }} {{ s.sobrenome }}</td>
                     <td>{{ s.email }}</td>
                     <td>{{ s.justificativa or 'N/A' }}</td>

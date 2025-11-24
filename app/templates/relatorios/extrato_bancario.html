@@ -1,4 +1,4 @@
-<!--- app\templates\relatorios\bancario.html -->
+<!--- app\templates\relatorios\extrato_bancario.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
@@ -9,7 +9,7 @@
       <span class="text-danger">Movimentações da conta no mês.</span>
     </div>
 
-    <div class="card shadow-sm mb-2">
+    <div class="card mb-2">
       <div class="card-body py-2">
         <form
           id="form-extrato-bancario"
@@ -17,7 +17,7 @@
           action="{{ url_for('extrato.extrato_bancario') }}"
         >
           <div class="row align-items-center">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text"
                   ><i class="fas fa-university"></i
@@ -30,7 +30,8 @@
                 <span class="input-group-text"
                   ><i class="fas fa-calendar-alt"></i
                 ></span>
-                {{ form.mes_ano(class="form-control fw-semibold text-danger", id="mes_ano_extratos") }}
+                {{ form.mes_ano(class="form-control fw-semibold text-danger",
+                id="mes_ano_extratos") }}
               </div>
             </div>
           </div>
@@ -104,7 +105,12 @@
             <tbody>
               {% for mov in movimentacoes %}
               <tr>
-                <td>{{mov.data_movimento.strftime('%d/%m/%Y')}}</td>
+                <td>
+                  <span style="display: none">
+                    {{ mov.data_movimento.strftime('%Y%m%d') }}
+                  </span>
+                  {{ mov.data_movimento.strftime('%d/%m/%Y') }}
+                </td>
                 <td>{{ mov.tipo_transacao_nome }}</td>
                 <td>
                   {% if mov.tipo_movimento == 'Crédito' %}

@@ -15,7 +15,7 @@ from app.models.conta_movimento_model import ContaMovimento
 extrato_bp = Blueprint("extrato", __name__, url_prefix="/extratos")
 
 
-@extrato_bp.route("/bancario", methods=["GET"])
+@extrato_bp.route("/extrato_bancario", methods=["GET"])
 @login_required
 def extrato_bancario():
     form = ExtratoBancarioForm(request.args)
@@ -112,7 +112,7 @@ def extrato_bancario():
             flash("Por favor, selecione uma conta válida.", "warning")
 
     return render_template(
-        "relatorios/bancario.html",
+        "relatorios/extrato_bancario.html",
         form=form,
         movimentacoes=movimentacoes,
         saldo_anterior=saldo_anterior,

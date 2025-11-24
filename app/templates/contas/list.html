@@ -83,7 +83,12 @@ render_confirm_modal %} {% block content %}
                       >
                       {% endif %}
                     </td>
-                    <td>{{ conta.data_criacao.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <span style="display: none">
+                        {{ conta.data_criacao.strftime('%Y%m%d') }}
+                      </span>
+                      {{ conta.data_criacao.strftime('%d/%m/%Y') }}
+                    </td>
                     <td class="table-actions">
                       <a
                         href="{{ url_for('conta.editar_conta', id=conta.id) }}"

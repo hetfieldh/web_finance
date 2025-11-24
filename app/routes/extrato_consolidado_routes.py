@@ -14,9 +14,9 @@ extrato_consolidado_bp = Blueprint(
 )
 
 
-@extrato_consolidado_bp.route("/consolidado", methods=["GET"])
+@extrato_consolidado_bp.route("/fluxo_caixa_detalhado", methods=["GET"])
 @login_required
-def extrato_consolidado():
+def fluxo_caixa_detalhado():
     form = ExtratoConsolidadoForm(request.args)
     movimentacoes = []
 
@@ -32,7 +32,7 @@ def extrato_consolidado():
             mes, ano = map(int, mes_ano_str.split("-"))
         except (ValueError, TypeError):
             flash("Formato de data inválido.", "danger")
-            return redirect(url_for("extrato_consolidado.extrato_consolidado"))
+            return redirect(url_for("extrato_consolidado.fluxo_caixa_detalhado"))
 
         kpis = relatorios_service.get_balanco_mensal(current_user.id, ano, mes)
 

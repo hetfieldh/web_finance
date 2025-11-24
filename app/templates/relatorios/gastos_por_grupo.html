@@ -21,7 +21,7 @@
       <div class="col-md-2">{{ render_field(form.visualizacao) }}</div>
       <div class="col-md-1">
         <button type="submit" class="btn btn-azul">
-          <i class="fas fa-filter me-1"></i> Filtrar
+          <i class="fas fa-filter me-1 text-warning"></i> Filtrar
         </button>
       </div>
     </form>
@@ -127,7 +127,7 @@
             <td>
               {% if visualizacao_selecionada == 'grupo' %}
               <a
-                href="{{ url_for('relatorios.detalhe_grupo_crediario', grupo_id=item.id, ano=ano_selecionado) }}"
+                href="{{ url_for('relatorios.crediario_resumo', grupo_id=item.id, ano=ano_selecionado) }}"
                 class="text-decoration-none text-dark fw-semibold"
               >
                 {{ item.nome }}

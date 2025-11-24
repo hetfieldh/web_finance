@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
+  const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
   const btnTotal = document.getElementById("btn-total");
   const tabelaSaldoDevedor = document.getElementById("tabela-saldo-devedor");
   const tabelaTotal = document.getElementById("tabela-total");
@@ -118,5 +118,53 @@ const btnSaldoDevedor = document.getElementById("btn-saldo-devedor");
     btnTotal.addEventListener("click", () => mostrarTabela("total"));
 
     mostrarTabela("saldo-devedor");
+  }
+
+  const toggles = document.querySelectorAll(".toggle-row");
+
+  if (toggles.length > 0) {
+    toggles.forEach((row) => {
+      row.addEventListener("click", function (e) {
+        e.stopPropagation();
+
+        const targetClass = this.getAttribute("data-target");
+        const targets = document.querySelectorAll(targetClass);
+        const icon = this.querySelector(".toggle-icon");
+
+        let isOpening = false;
+
+        targets.forEach((target) => {
+          if (target.style.display === "none") {
+            target.style.display = "table-row";
+            isOpening = true;
+          } else {
+            target.style.display = "none";
+
+            if (target.classList.contains("toggle-row")) {
+              const subTarget = target.getAttribute("data-target");
+              document
+                .querySelectorAll(subTarget)
+                .forEach((subChild) => (subChild.style.display = "none"));
+
+              const subIcon = target.querySelector(".toggle-icon");
+              if (subIcon) {
+                subIcon.classList.remove("fa-minus-square");
+                subIcon.classList.add("fa-plus-square");
+              }
+            }
+          }
+        });
+
+        if (icon) {
+          if (isOpening) {
+            icon.classList.remove("fa-plus-square");
+            icon.classList.add("fa-minus-square");
+          } else {
+            icon.classList.remove("fa-minus-square");
+            icon.classList.add("fa-plus-square");
+          }
+        }
+      });
+    });
   }
 });

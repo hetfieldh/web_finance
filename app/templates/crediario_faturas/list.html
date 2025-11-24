@@ -93,7 +93,7 @@ render_confirm_modal %} {% block content %}
           <input
             type="date"
             class="form-control form-control-sm"
-            style="width: auto; max-width: 110px;"
+            style="width: auto; max-width: 110px"
             name="data_inicial"
             value="{{ data_inicial or '' }}"
           />
@@ -101,7 +101,7 @@ render_confirm_modal %} {% block content %}
           <input
             type="date"
             class="form-control form-control-sm"
-            style="width: auto; max-width: 110px;"
+            style="width: auto; max-width: 110px"
             name="data_final"
             value="{{ data_final or '' }}"
           />
@@ -189,11 +189,15 @@ render_confirm_modal %} {% block content %}
                       </td>
                       <td
                         class="{% if item.destaque_status == 'Atrasado' %}text-danger fw-bold{% endif %}"
-                        data-order="{{ item.fatura.data_vencimento_fatura.strftime('%Y-%m-%d') }}"
                       >
+                        <span style="display: none">
+                          {{
+                          item.fatura.data_vencimento_fatura.strftime('%Y%m%d')
+                          }}
+                        </span>
                         {% if item.destaque_status == 'Atrasado' %}
-                        <i class="fas fa-exclamation-circle me-1"></i> {% endif
-                        %} {{
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        {% endif %} {{
                         item.fatura.data_vencimento_fatura.strftime('%d/%m/%Y')
                         }}
                       </td>
@@ -222,6 +226,9 @@ render_confirm_modal %} {% block content %}
                         {% endif %}
                       </td>
                       <td>
+                        <span style="display: none">
+                          {{ item.fatura.data_criacao.strftime('%Y%m%d') }}
+                        </span>
                         {{ item.fatura.data_criacao.strftime('%d/%m/%Y') }}
                       </td>
                       <td class="table-actions text-center">

@@ -1,6 +1,7 @@
-<!-- app\templates\relatorios\resumo_folha.html -->
+<!-- app\templates\relatorios\resumo_salario.html -->
 
 {% extends "base.html" %} {% block content %}
+
 <div class="row">
   <div class="col-12">
     <div class="caixa-sombreada mb-2">
@@ -15,7 +16,7 @@
         <form
           id="form-resumo-folha"
           method="GET"
-          action="{{ url_for('relatorios.resumo_folha') }}"
+          action="{{ url_for('relatorios.resumo_salario') }}"
         >
           <div class="row align-items-center">
             <div class="col-md-2" style="width: 150px">
@@ -33,28 +34,24 @@
     </div>
 
     {% if dados %}
-    <div class="card border-0 bg-light my-2">
-      <div class="card-body p-0">
-        <div class="table-responsive">
+
+    <div class="card border-1">
+      <div class="card-body p-2">
+        <div class="table-responsive table-scroll">
           <table
-            class="table table-sm table-hover align-middle mb-0"
-            style="
-              font-size: 0.68rem;
-              line-height: 1.1;
-              width: 100%;
-              table-layout: fixed;
-            "
+            id="tabelaResumoSalario"
+            class="table table-padrao table-sticky-col table-hover"
           >
-            <thead class="table-light text-center">
+            <thead class="table-white text-center">
               <tr>
-                <th class="text-start px-1 py-1">Verba</th>
+                <th class="text-start text-dark">Verba</th>
                 {% for mes in dados.meses %}
-                <th class="px-1 py-1" style="min-width: 38px">
+                <th>
                   {{ '%02d'|format(mes) }}/{{ '%02d'|format(ano_selecionado %
                   100) }}
                 </th>
                 {% endfor %}
-                <th class="px-1 py-1" style="min-width: 45px">Total</th>
+                <th>Total</th>
               </tr>
             </thead>
 
@@ -62,75 +59,80 @@
               {% macro render_section(data, title, bg_color, text_color,
               total_data) %} {% if data %}
               <tr class="table-group-divider">
-                <td
-                  colspan="14"
-                  class="fw-semibold {{ bg_color }} px-0 py-0 ps-1"
-                >
+                <td colspan="14" class="fw-semibold {{ bg_color }}">
                   {{ title }}
                 </td>
               </tr>
+
               {% for linha in data %}
               <tr>
-                <td class="ps-2">{{ linha.nome }}</td>
+                <td class="ps-3">{{ linha.nome }}</td>
                 {% for valor in linha.valores_mes %}
-                <td class="text-end {{ text_color }}">
+                <td class="col-valor text-end {{ text_color }}">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}
-                <td class="text-end fw-semibold table-light">
+
+                <td class="col-valor text-end fw-bold table-secondary">
                   {{ linha.total_anual | format_number }}
                 </td>
               </tr>
               {% endfor %}
-              <tr class="{{ bg_color }} fw-semibold">
+
+              <tr class="{{ bg_color }} fw-bold">
                 <td class="ps-1">{{ total_data.nome }}</td>
+
                 {% for valor in total_data.valores_mes %}
-                <td class="text-end">
+                <td class="col-valor text-end">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}
-                <td class="text-end table-light">
+
+                <td class="col-valor text-end table-secondary">
                   {{ total_data.total_anual | format_number }}
                 </td>
               </tr>
+
               {% endif %} {% endmacro %} {{
               render_section(dados.tabela.Provento, 'Proventos',
-              'bg-success-subtle', 'text-success', dados.totais.proventos) }} {{
+              'bg-success-subtle', 'text-dark', dados.totais.proventos) }} {{
               render_section(dados.tabela.Benefício, 'Benefícios',
-              'bg-primary-subtle', 'text-primary', dados.totais.beneficios) }}
-              {{ render_section(dados.tabela.Desconto, 'Descontos',
-              'bg-danger-subtle', 'text-danger', dados.totais.descontos) }} {{
+              'bg-primary-subtle', 'text-dark', dados.totais.beneficios) }} {{
+              render_section(dados.tabela.Desconto, 'Descontos',
+              'bg-danger-subtle', 'text-dark', dados.totais.descontos) }} {{
               render_section(dados.tabela.Imposto, 'Impostos',
-              'bg-warning-subtle', 'text-warning', dados.totais.impostos) }}
+              'bg-warning-subtle', 'text-dark', dados.totais.impostos) }}
 
-              <tr class="table-info fw-semibold table-group-divider">
+              <tr class="table-info fw-bold table-group-divider">
                 <td class="ps-1">{{ dados.salario_liquido.nome }}</td>
+
                 {% for valor in dados.salario_liquido.valores_mes %}
-                <td class="text-end">{{ valor | format_number }}</td>
+                <td class="col-valor text-end">{{ valor | format_number }}</td>
                 {% endfor %}
-                <td class="text-end table-group-driver fw-bold">
+
+                <td class="col-valor text-end fw-bold">
                   {{ dados.salario_liquido.total_anual | format_number }}
                 </td>
               </tr>
 
               {% if dados.tabela.FGTS %}
               <tr class="table-group-divider">
-                <td
-                  colspan="14"
-                  class="fw-semibold bg-secondary-subtle px-0 py-0 ps-1"
-                >
+                <td colspan="14" class="fw-semibold bg-secondary-subtle">
                   FGTS
                 </td>
               </tr>
+
               {% for linha in dados.tabela.FGTS %}
               <tr>
                 <td class="ps-2">{{ linha.nome }}</td>
+
                 {% for valor in linha.valores_mes %}
-                <td class="text-end text-muted">
+                <td class="col-valor text-end text-dark">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}
-                <td class="text-end fw-semibold table-light">
+
+                <td class="col-valor text-end fw-bold table-secondary">
                   {{ linha.total_anual | format_number }}
                 </td>
               </tr>
@@ -142,12 +144,15 @@
     </div>
 
     {% else %}
+
     <div class="alert alert-info text-center mt-3">
       Nenhum dado de folha de pagamento encontrado para o ano selecionado.
     </div>
+
     {% endif %}
   </div>
 </div>
+
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
 {% endblock %}

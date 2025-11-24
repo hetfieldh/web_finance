@@ -12,9 +12,9 @@ from app.services import relatorios_service
 fluxo_caixa_bp = Blueprint("fluxo_caixa", __name__, url_prefix="/fluxo_caixa")
 
 
-@fluxo_caixa_bp.route("/painel", methods=["GET"])
+@fluxo_caixa_bp.route("/fluxo_caixa", methods=["GET"])
 @login_required
-def painel():
+def fluxo_caixa():
     form = FluxoCaixaForm(request.args)
 
     if not form.mes_ano.data:
@@ -29,7 +29,7 @@ def painel():
             mes, ano = map(int, mes_ano_str.split("-"))
         except (ValueError, TypeError):
             flash("Formato de data inválido.", "danger")
-            return redirect(url_for("fluxo_caixa.painel"))
+            return redirect(url_for("fluxo_caixa.fluxo_caixa"))
 
         kpis = relatorios_service.get_balanco_mensal(current_user.id, ano, mes)
         movimentacoes = relatorios_service.get_fluxo_caixa_mensal_consolidado(

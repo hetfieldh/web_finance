@@ -69,7 +69,7 @@ def listar_movimentos():
                 )
             )
         except ValueError:
-            flash("Formato de data inválido. Use AAAA-MM-DD.", "danger")
+            flash("Formato de data inválido. Use DD-MM-AAAA.", "danger")
             return redirect(url_for("desp_rec_movimento.listar_movimentos"))
 
     elif data_inicial_str:
@@ -77,7 +77,7 @@ def listar_movimentos():
             data_inicial = date.fromisoformat(data_inicial_str)
             query = query.filter(DespRecMovimento.data_vencimento >= data_inicial)
         except ValueError:
-            flash("Formato de data inicial inválido. Use AAAA-MM-DD.", "danger")
+            flash("Formato de data inicial inválido. Use DD-MM-AAAA.", "danger")
             return redirect(url_for("desp_rec_movimento.listar_movimentos"))
 
     elif data_final_str:
@@ -85,7 +85,7 @@ def listar_movimentos():
             data_final = date.fromisoformat(data_final_str)
             query = query.filter(DespRecMovimento.data_vencimento <= data_final)
         except ValueError:
-            flash("Formato de data final inválido. Use AAAA-MM-DD.", "danger")
+            flash("Formato de data final inválido. Use DD-MM-AAAA.", "danger")
             return redirect(url_for("desp_rec_movimento.listar_movimentos"))
 
     movimentos = query.order_by(

@@ -1,7 +1,6 @@
-<!--- app\templates\relatorios\detalhe_grupo_crediario.html -->
+<!--- app\templates\relatorios\crediario_resumo.html -->
 
 {% extends "base.html" %} {% block content %}
-
 <div
   class="caixa-sombreada mb-2 d-flex justify-content-between align-items-center"
 >
@@ -45,25 +44,24 @@
       </a>
     </div>
   </div>
+
   <div class="card-body">
     {% if dados.compras %}
 
     <div id="tabela-saldo-devedor">
       <div class="table-responsive">
-        <table class="table table-bordered table-sm table-hover table-striped sortable-table">
-          <thead class="table-light">
+        <table
+          class="table table-padrao table-sticky-col table-hover table-striped sortable-table"
+        >
+          <thead>
             <tr>
-              <th style="min-width: 200px; vertical-align: middle">
-                Loja/Serviço | Detalhes | Data
-              </th>
+              <th>Loja/Serviço | Detalhes | Data</th>
               {% for mes_ano in dados.meses_anos %}
               <th class="text-center">
                 {{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}
               </th>
               {% endfor %}
-              <th class="text-end table-dark" style="vertical-align: middle">
-                Total Devedor
-              </th>
+              <th class="text-end table-dark">Total Devedor</th>
             </tr>
           </thead>
           <tbody>
@@ -91,14 +89,14 @@
               <td
                 class="text-end {% if valor > 0 %}text-danger{% else %}text-muted{% endif %}"
               >
-                {{ valor | format_currency if valor != 0 else '-' }}
+                {{ valor | format_number if valor != 0 else '-' }}
               </td>
               {% if total_compra_devedor.append(total_compra_devedor.pop() +
               valor) %}{% endif %} {% set _ =
               totais_mes_devedor.update({mes_ano:
               totais_mes_devedor.get(mes_ano, 0) + valor}) %} {% endfor %}
               <td class="text-end fw-bold table-active text-danger">
-                {{ total_compra_devedor[0] | format_currency }}
+                {{ total_compra_devedor[0] | format_number }}
               </td>
               {% if total_geral_devedor.append(total_geral_devedor.pop() +
               total_compra_devedor[0]) %}{% endif %}
@@ -110,11 +108,11 @@
               <td>Total Mês:</td>
               {% for mes_ano in dados.meses_anos %}
               <td class="text-end text-danger">
-                {{ totais_mes_devedor.get(mes_ano, 0) | format_currency }}
+                {{ totais_mes_devedor.get(mes_ano, 0) | format_number }}
               </td>
               {% endfor %}
               <td class="text-end text-danger">
-                {{ total_geral_devedor[0] | format_currency }}
+                {{ total_geral_devedor[0] | format_number }}
               </td>
             </tr>
           </tfoot>
@@ -124,20 +122,18 @@
 
     <div id="tabela-total" style="display: none">
       <div class="table-responsive">
-        <table class="table table-bordered table-sm table-hover table-striped sortable-table">
-          <thead class="table-light">
+        <table
+          class="table table-padrao table-sticky-col table-hover table-striped sortable-table"
+        >
+          <thead>
             <tr>
-              <th style="min-width: 200px; vertical-align: middle">
-                Compra (Data)
-              </th>
+              <th>Compra (Data)</th>
               {% for mes_ano in dados.meses_anos %}
               <th class="text-center">
                 {{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}
               </th>
               {% endfor %}
-              <th class="text-end table-dark" style="vertical-align: middle">
-                Total Compra
-              </th>
+              <th class="text-end table-dark">Total Compra</th>
             </tr>
           </thead>
           <tbody>
@@ -164,7 +160,7 @@
               <td
                 class="text-end {% if valor < 0 %}text-success{% elif valor > 0 %}text-danger{% else %}text-muted{% endif %}"
               >
-                {{ valor | format_currency if valor != 0 else '-' }}
+                {{ valor | format_number if valor != 0 else '-' }}
               </td>
               {% if total_compra_total.append(total_compra_total.pop() + valor)
               %}{% endif %} {% set _ = totais_mes_total.update({mes_ano:
@@ -172,7 +168,7 @@
               <td
                 class="text-end fw-bold table-active {% if total_compra_total[0] < 0 %}text-success{% elif total_compra_total[0] > 0 %}text-danger{% endif %}"
               >
-                {{ total_compra_total[0] | format_currency }}
+                {{ total_compra_total[0] | format_number }}
               </td>
               {% if total_geral_total.append(total_geral_total.pop() +
               total_compra_total[0]) %}{% endif %}
@@ -186,13 +182,13 @@
               <td
                 class="text-end {% if totais_mes_total.get(mes_ano, 0) < 0 %}text-success{% elif totais_mes_total.get(mes_ano, 0) > 0 %}text-danger{% endif %}"
               >
-                {{ totais_mes_total.get(mes_ano, 0) | format_currency }}
+                {{ totais_mes_total.get(mes_ano, 0) | format_number }}
               </td>
               {% endfor %}
               <td
                 class="text-end {% if total_geral_total[0] < 0 %}text-success{% elif total_geral_total[0] > 0 %}text-danger{% endif %}"
               >
-                {{ total_geral_total[0] | format_currency }}
+                {{ total_geral_total[0] | format_number }}
               </td>
             </tr>
           </tfoot>
@@ -208,7 +204,6 @@
     {% endif %}
   </div>
 </div>
-
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
 {% endblock %}

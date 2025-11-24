@@ -34,7 +34,7 @@ render_confirm_modal %} {% block content %}
           <input
             type="date"
             class="form-control form-control-sm"
-            style="width: auto; max-width: 110px;"
+            style="width: auto; max-width: 110px"
             id="data_inicial"
             name="data_inicial"
             value="{{ data_inicial if data_inicial else '' }}"
@@ -46,7 +46,7 @@ render_confirm_modal %} {% block content %}
           <input
             type="date"
             class="form-control form-control-sm"
-            style="width: auto; max-width: 110px;"
+            style="width: auto; max-width: 110px"
             id="data_final"
             name="data_final"
             value="{{ data_final if data_final else '' }}"
@@ -82,6 +82,9 @@ render_confirm_modal %} {% block content %}
                   <tr>
                     <th>Mês/Ano</th>
                     <th>Previsão de Recebimento</th>
+                    <th>Salário Líquido</th>
+                    <th>Benefícios</th>
+                    <th>FGTS</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
@@ -90,8 +93,14 @@ render_confirm_modal %} {% block content %}
                   <tr>
                     <td>{{ movimento.mes_referencia }}</td>
                     <td>
+                      <span style="display: none">
+                        {{ movimento.data_recebimento.strftime('%Y%m%d') }}
+                      </span>
                       {{ movimento.data_recebimento.strftime('%d/%m/%Y') }}
                     </td>
+                    <td>{{ movimento.salario_liquido | format_currency }}</td>
+                    <td>{{ movimento.total_beneficios | format_currency }}</td>
+                    <td>{{ movimento.total_fgts }}</td>
                     <td class="table-actions">
                       <a
                         href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"

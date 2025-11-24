@@ -7,7 +7,8 @@
     <div class="caixa-sombreada mb-2">
       <span class="text-dark fw-bold">Resumo do Mês:</span>
       <span class="text-danger"
-        >Visão consolidada do mês. Consulte para verificar a necessidade de aporte.</span
+        >Visão consolidada do mês. Consulte para verificar a necessidade de
+        aporte.</span
       >
     </div>
     <div class="card shadow-sm mb-2">
@@ -24,7 +25,7 @@
                   ><i class="fas fa-calendar-alt"></i
                 ></span>
                 {{ form.mes_ano(class="form-control fw-semibold text-danger",
-              id="mes_ano_resumo") }}
+                id="mes_ano_resumo") }}
               </div>
             </div>
           </div>
@@ -103,7 +104,12 @@
             <tbody>
               {% for item in dados.movimentacoes %}
               <tr>
-                <td>{{ item.data.strftime('%d/%m/%Y') }}</td>
+                <td>
+                  <span style="display: none">
+                    {{ item.data.strftime('%Y%m%d') }}
+                  </span>
+                  {{ item.data.strftime('%d/%m/%Y') }}
+                </td>
                 <td>{{ item.descricao }}</td>
                 <td class="text-center">{{ item.tipo }}</td>
                 <td class="text-center">

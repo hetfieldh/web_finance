@@ -86,7 +86,7 @@ class CadastroContaMovimentoForm(FlaskForm):
     )
 
     conta_destino_id = SelectField(
-        "Conta Destino",
+        "Conta Bancária Destino",
         validators=[Optional()],
         coerce=lambda x: int(x) if x else None,
     )
@@ -124,12 +124,11 @@ class CadastroContaMovimentoForm(FlaskForm):
         query_transferencia = ContaTransacao.query.filter(
             ContaTransacao.usuario_id == current_user.id,
             ContaTransacao.tipo == TIPO_DEBITO,
-            ContaTransacao.transacao_tipo.in_(tipos_desejados)
+            ContaTransacao.transacao_tipo.in_(tipos_desejados),
         ).order_by(ContaTransacao.transacao_tipo.asc())
 
         self.transferencia_tipo_id.choices = [("", "Selecione...")] + [
-            (ct.id, f"{ct.transacao_tipo}")
-            for ct in query_transferencia.all()
+            (ct.id, f"{ct.transacao_tipo}") for ct in query_transferencia.all()
         ]
 
     def validate(self, extra_validators=None):

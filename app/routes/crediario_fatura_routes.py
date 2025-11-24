@@ -50,7 +50,7 @@ def listar_faturas():
             data_final = date.fromisoformat(data_final_str)
             query = query.filter(CrediarioFatura.data_vencimento_fatura <= data_final)
     except ValueError:
-        flash("Formato de data inválido. Use AAAA-MM-DD.", "danger")
+        flash("Formato de data inválido. Use DD-MM-AAAA.", "danger")
         return redirect(url_for("crediario_fatura.listar_faturas"))
 
     faturas = query.order_by(CrediarioFatura.data_vencimento_fatura.asc()).all()

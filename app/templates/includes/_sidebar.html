@@ -110,27 +110,30 @@
                 <i class="fas fa-search-dollar me-2"></i>Consultas
             </a>
             <div class="collapse list-group-flush" id="submenuConsultas">
+                <a href="{{ url_for('relatorios.gastos_por_grupo') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
+                    <i class="fas fa-tags me-2"></i>Crediário Resumo
+                </a>
+                <a href="{{ url_for('relatorios.crediario_detalhado') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
+                    <i class="fas fa-tags me-2"></i>Crediário Detalhado
+                </a>
                 <a href="{{ url_for('extrato.extrato_bancario') }}"
                     class="list-group-item list-group-item-action bg-transparent ps-4">
                     <i class="fas fa-university me-2"></i>Extrato Bancário
                 </a>
-                <a href="{{ url_for('fluxo_caixa.painel')}}"
+                <a href="{{ url_for('fluxo_caixa.fluxo_caixa')}}"
                     class="list-group-item list-group-item-action bg-transparent ps-4">
                     <i class="fas fa-file-invoice-dollar me-2"></i></i>Fluxo Caixa
                 </a>
                 <a
-                    href="{{ url_for('extrato_consolidado.extrato_consolidado') }}"
+                    href="{{ url_for('extrato_consolidado.fluxo_caixa_detalhado') }}"
                     class="list-group-item list-group-item-action bg-transparent ps-4">
-                    <i class="fas fa-chart-bar me-2"></i>Fluxo Detalhado
-                </a>
-                <a href="{{ url_for('relatorios.gastos_por_grupo') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
-                    <i class="fas fa-tags me-2"></i>Gastos no Crediário
+                    <i class="fas fa-chart-bar me-2"></i>Fluxo Caixa Detalhado
                 </a>
                 <a href="{{ url_for('relatorios.resumo_mensal') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
-                    <i class="fas fa-chart-pie me-2"></i>Resumo do Mês
+                    <i class="fas fa-chart-pie me-2"></i>Resumo Mensal
                 </a>
-                <a href="{{ url_for('relatorios.resumo_folha') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
-                  <i class="fas fa-file-alt me-2"></i>Resumo de Folha
+                <a href="{{ url_for('relatorios.resumo_salario') }}" class="list-group-item list-group-item-action bg-transparent ps-4">
+                  <i class="fas fa-file-alt me-2"></i>Resumo Salário
               </a>
             </div>
 

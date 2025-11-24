@@ -71,7 +71,12 @@ render_confirm_modal %} {% block content %}
                       {% else %} {{ grupo.tipo_grupo_crediario }} {% endif %}
                     </td>
                     <td>{{ grupo.descricao if grupo.descricao else '-' }}</td>
-                    <td>{{ grupo.data_criacao.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <span style="display: none">
+                        {{ grupo.data_criacao.strftime('%Y%m%d') }}
+                      </span>
+                      {{ grupo.data_criacao.strftime('%d/%m/%Y') }}
+                    </td>
                     <td class="table-actions">
                       <a
                         href="{{ url_for('crediario_grupo.editar_grupo_crediario', id=grupo.id) }}"

@@ -132,7 +132,12 @@ render_estornar_modal %} {% block content %}
               attrs.update({'data-folha-tem-fgts': 'true' if
               conta.folha_tem_fgts else 'false'}) %} {% endif %}
               <tr data-item-tipo="{{ conta.tipo }}" {{ attrs|xmlattr }}>
-                <td>{{ conta.vencimento.strftime('%d/%m/%Y') }}</td>
+                <td>
+                  <span style="display: none">
+                    {{ conta.vencimento.strftime('%Y%m%d') }}
+                  </span>
+                  {{ conta.vencimento.strftime('%d/%m/%Y') }}
+                </td>
                 <td>{{ conta.origem }}</td>
                 <td><span class="text-dark">{{ conta.tipo }}</span></td>
                 <td class="text-end text-dark">
@@ -142,7 +147,13 @@ render_estornar_modal %} {% block content %}
                   {% if conta.valor_recebido > 0 %} {{ conta.valor_recebido |
                   format_currency }} {% else %} - {% endif %}
                 </td>
+
                 <td class="text-center">
+                  <span style="display: none">
+                    {% if conta.data_pagamento %} {{
+                    conta.data_pagamento.strftime('%Y%m%d') }} {% else %} '-' {%
+                    endif %}
+                  </span>
                   {{ conta.data_pagamento.strftime('%d/%m/%Y') if
                   conta.data_pagamento else '-' }}
                 </td>

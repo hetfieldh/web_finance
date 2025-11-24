@@ -45,7 +45,7 @@ from app.utils import (
 )
 
 
-def get_resumo_folha_anual(user_id, ano):
+def get_resumo_salario_anual(user_id, ano):
     from app.models.salario_item_model import SalarioItem
     from app.models.salario_movimento_item_model import SalarioMovimentoItem
 

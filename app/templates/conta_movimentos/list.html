@@ -110,7 +110,12 @@ render_confirm_modal %} {% block content %}
                       >
                       {% else %} {{ mov.tipo_transacao.tipo }} {% endif %}
                     </td>
-                    <td>{{ mov.data_movimento.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <span style="display: none">
+                        {{ mov.data_movimento.strftime('%Y%m%d') }}
+                      </span>
+                      {{ mov.data_movimento.strftime('%d/%m/%Y') }}
+                    </td>
                     <td>{{ mov.valor | format_currency }}</td>
                     <td>{{ mov.descricao if mov.descricao else '-' }}</td>
                     <td>
@@ -122,7 +127,12 @@ render_confirm_modal %} {% block content %}
                       ></i>
                       {% endif %}
                     </td>
-                    <td>{{ mov.data_criacao.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                      <span style="display: none"
+                        >{{ mov.data_criacao.strftime('%Y%m%d') }}</span
+                      >
+                      {{ mov.data_criacao.strftime('%d/%m/%Y') }}
+                    </td>
                     <td class="table-actions">
                       <a
                         href="{{ url_for('conta_movimento.editar_movimentacao', id=mov.id) }}"

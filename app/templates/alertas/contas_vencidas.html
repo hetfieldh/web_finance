@@ -29,6 +29,9 @@
               {% for item in movimentos %}
               <tr>
                 <td>
+                  <span style="display: none">
+                    {{ item.data.strftime('%Y%m%d') }}
+                  </span>
                   {{ item.data.strftime('%d/%m/%Y') }}
                   <span class="badge bg-danger ms-1">Vencido</span>
                 </td>

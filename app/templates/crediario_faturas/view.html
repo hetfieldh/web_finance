@@ -88,8 +88,8 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header bg-light py-1 border-bottom">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light py-2 border-bottom">
         <h6 class="mb-0 text-secondary fw-bold">
           <i class="fas fa-list me-2"></i>Itens da Fatura
         </h6>
@@ -102,17 +102,35 @@
           >
             <thead class="table-light small text-muted text-uppercase">
               <tr>
-                <th class="ps-3">Descrição da Compra</th>
+                <th class="ps-3 text-nowrap">Data Compra</th>
+                <th>Fornecedor</th>
+                <th>Descrição da Compra</th>
                 <th class="text-center">Parcela</th>
-                <th class="text-center">Vencimento</th>
                 <th class="text-end pe-3">Valor</th>
               </tr>
             </thead>
             <tbody>
               {% for parcela in parcelas_da_fatura %}
               <tr>
-                <td class="ps-3">
-                  <div class="fw-medium text-dark">
+                <td class="ps-3 text-nowrap">
+                  {{ parcela.movimento_pai.data_compra.strftime('%d/%m/%Y') }}
+                </td>
+                <td>
+                  <div
+                    class="text-truncate"
+                    style="max-width: 150px"
+                    title="{{ parcela.movimento_pai.fornecedor.nome if parcela.movimento_pai.fornecedor else 'N/A' }}"
+                  >
+                    {{ parcela.movimento_pai.fornecedor.nome if
+                    parcela.movimento_pai.fornecedor else '-' }}
+                  </div>
+                </td>
+                <td>
+                  <div
+                    class="fw-medium text-dark text-truncate"
+                    style="max-width: 200px"
+                    title="{{ parcela.movimento_pai.descricao }}"
+                  >
                     {{ parcela.movimento_pai.descricao }}
                   </div>
                 </td>
@@ -122,9 +140,6 @@
                     parcela.movimento_pai.numero_parcelas }}
                   </span>
                 </td>
-                <td class="text-center text-nowrap">
-                  {{ parcela.data_vencimento.strftime('%d/%m/%Y') }}
-                </td>
                 <td class="text-end pe-3 fw-bold text-dark">
                   {{ parcela.valor_parcela | format_currency }}
                 </td>
@@ -133,7 +148,7 @@
             </tbody>
             <tfoot class="table-light border-top">
               <tr>
-                <td colspan="3" class="text-end fw-bold text-muted pe-3">
+                <td colspan="4" class="text-end fw-bold text-muted pe-3">
                   Total:
                 </td>
                 <td class="text-end fw-bold text-dark pe-3">

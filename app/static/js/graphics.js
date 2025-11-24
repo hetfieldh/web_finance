@@ -1,41 +1,59 @@
 // app/static/js/graphics.js
 
-document.addEventListener("DOMContentLoaded", function () {
-  const centerTextPlugin = {
-    id: "centerText",
-    afterDraw: function (chart) {
-      if (chart.config.options.plugins.centerText) {
-        const centerConfig = chart.config.options.plugins.centerText;
-        const ctx = chart.ctx;
-        const chartArea = chart.chartArea;
-        ctx.save();
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = `bold ${centerConfig.fontSize || "16px"} ${
-          centerConfig.fontFamily || "Arial"
-        }`;
-        ctx.fillStyle = centerConfig.color || "#495057";
-        const text = centerConfig.text;
-        const textX = (chartArea.left + chartArea.right) / 2;
-        const textY = (chartArea.top + chartArea.bottom) / 2;
-        ctx.fillText(text, textX, textY);
-        if (centerConfig.subText) {
-          ctx.font = `${centerConfig.subFontSize || "9px"} ${
-            centerConfig.subFontFamily || "Arial"
-          }`;
-          ctx.fillStyle = centerConfig.subColor || "#6c757d";
-          ctx.fillText(centerConfig.subText, textX, textY + 15);
-        }
-        ctx.restore();
-      }
-    },
-  };
-  Chart.register(ChartDataLabels, centerTextPlugin);
+window.addEventListener("load", function () {
+  // Pequeno delay apenas para garantir que o layout HTML/CSS finalizou
+  setTimeout(initCharts, 100);
+});
 
+function initCharts() {
+  if (typeof Chart !== "undefined") {
+    // CONFIGURAÇÕES GLOBAIS
+    Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = "#6c757d";
+
+    // --- DESATIVA TODAS AS ANIMAÇÕES ---
+    Chart.defaults.animation = false;
+    Chart.defaults.animations = false;
+
+    Chart.defaults.responsive = true;
+    Chart.defaults.maintainAspectRatio = false;
+
+    // Plugin Texto no Centro
+    const centerTextPlugin = {
+      id: "centerText",
+      afterDraw: function (chart) {
+        if (chart.config.options.plugins.centerText) {
+          const centerConfig = chart.config.options.plugins.centerText;
+          const ctx = chart.ctx;
+          const chartArea = chart.chartArea;
+          ctx.save();
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = `bold ${centerConfig.fontSize || "16px"} ${centerConfig.fontFamily || "Arial"}`;
+          ctx.fillStyle = centerConfig.color || "#495057";
+          const text = centerConfig.text;
+          const textX = (chartArea.left + chartArea.right) / 2;
+          const textY = (chartArea.top + chartArea.bottom) / 2;
+          ctx.fillText(text, textX, textY);
+          if (centerConfig.subText) {
+            ctx.font = `${centerConfig.subFontSize || "9px"} ${centerConfig.subFontFamily || "Arial"}`;
+            ctx.fillStyle = centerConfig.subColor || "#6c757d";
+            ctx.fillText(centerConfig.subText, textX, textY + 15);
+          }
+          ctx.restore();
+        }
+      },
+    };
+    Chart.register(ChartDataLabels, centerTextPlugin);
+  }
+
+  /* --- 1. GRÁFICOS GERAIS (graphics.html) --- */
   const graphicsDataElement = document.getElementById("graphics-data");
   if (graphicsDataElement) {
     const chartData = JSON.parse(graphicsDataElement.textContent);
 
+    // A. Progresso
     const progressoCanvas = document.getElementById("progressoChart");
     if (progressoCanvas && chartData.dados_progresso_valores) {
       const dados = chartData.dados_progresso_valores;
@@ -43,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         style: "currency",
         currency: "BRL",
       }).format(dados.total);
+
       new Chart(progressoCanvas, {
         type: "doughnut",
         data: {
@@ -62,8 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
           ],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
           cutout: "70%",
           plugins: {
             legend: { display: true, position: "left" },
@@ -74,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
+    // B. Saídas
     const saidasCanvas = document.getElementById("saidasChart");
     if (saidasCanvas && chartData.dados_saidas) {
       new Chart(saidasCanvas, {
@@ -100,52 +118,30 @@ document.addEventListener("DOMContentLoaded", function () {
             },
           ],
         },
-        plugins: [ChartDataLabels],
         options: {
           indexAxis: "y",
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { beginAtZero: true, ticks: { display: false } },
-            y: { beginAtZero: true },
-          },
+          scales: { x: { beginAtZero: true, ticks: { display: false } } },
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  if (context.parsed.x !== null) {
-                    label += new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(context.parsed.x);
-                  }
-                  return label;
-                },
-              },
-            },
             datalabels: {
               anchor: "start",
               align: "end",
               color: "#495057",
               font: { weight: "bold" },
-              formatter: function (value, context) {
-                if (value === 0) return "";
-                return new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(value);
-              },
+              formatter: (value) =>
+                value === 0
+                  ? ""
+                  : new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(value),
             },
           },
         },
       });
     }
 
+    // C. Evolução
     const evolucaoCanvas = document.getElementById("evolucaoAnualChart");
     if (evolucaoCanvas && chartData.evolucao_anual) {
       const dadosEvolucao = chartData.evolucao_anual;
@@ -161,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
               borderColor: "rgba(75, 192, 192, 0.8)",
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               fill: true,
-              tension: 0.1,
+              tension: 0.3,
               yAxisID: "yBalan",
             },
             {
@@ -181,8 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
           ],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
           layout: { padding: { top: 20 } },
           scales: {
             yPrincipal: { beginAtZero: true, position: "left" },
@@ -194,29 +188,13 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           plugins: {
             legend: { position: "top" },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  if (context.parsed.y !== null) {
-                    label += new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(context.parsed.y);
-                  }
-                  return label;
-                },
-              },
-            },
             datalabels: { display: false },
           },
         },
       });
     }
 
+    // D. Entradas
     const entradasCanvas = document.getElementById("entradasChart");
     if (entradasCanvas && chartData.dados_entradas) {
       new Chart(entradasCanvas, {
@@ -241,49 +219,30 @@ document.addEventListener("DOMContentLoaded", function () {
             },
           ],
         },
-        plugins: [ChartDataLabels],
         options: {
           indexAxis: "y",
-          responsive: true,
-          maintainAspectRatio: false,
           scales: { x: { beginAtZero: true, ticks: { display: false } } },
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  if (context.parsed.x !== null) {
-                    label += new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(context.parsed.x);
-                  }
-                  return label;
-                },
-              },
-            },
             datalabels: {
               anchor: "start",
               align: "end",
               color: "#495057",
               font: { weight: "bold" },
-              formatter: function (value, context) {
-                if (value === 0) return "";
-                return new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(value);
-              },
+              formatter: (value) =>
+                value === 0
+                  ? ""
+                  : new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(value),
             },
           },
         },
       });
     }
 
+    // E. Financiamento
     const financiamentoCanvas = document.getElementById(
       "financiamentoProgressChart"
     );
@@ -311,45 +270,18 @@ document.addEventListener("DOMContentLoaded", function () {
           ],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
           scales: { y: { beginAtZero: true } },
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  if (context.parsed.y !== null) {
-                    label += new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(context.parsed.y);
-                  }
-                  return label;
-                },
-              },
-            },
-            datalabels: { display: false },
-          },
+          plugins: { datalabels: { display: false } },
         },
-      });
-    }
-
-    const selectFinan = document.getElementById("financiamento_id");
-    if (selectFinan) {
-      selectFinan.addEventListener("change", function () {
-        this.form.submit();
       });
     }
   }
 
-  const summaryCanvas = document.getElementById("financiamentoSummaryChart");
-  if (summaryCanvas) {
-    const summaryDataElement = document.getElementById("summary-data");
-    if (summaryDataElement) {
+  /* --- 2. GRÁFICO RESUMO (graphics_2.html) --- */
+  const summaryDataElement = document.getElementById("summary-data");
+  if (summaryDataElement) {
+    const summaryCanvas = document.getElementById("financiamentoSummaryChart");
+    if (summaryCanvas) {
       const summaryData = JSON.parse(summaryDataElement.textContent);
       if (summaryData && summaryData.labels && summaryData.labels.length > 0) {
         new Chart(summaryCanvas, {
@@ -372,8 +304,6 @@ document.addEventListener("DOMContentLoaded", function () {
             ],
           },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
               legend: { position: "bottom" },
               title: {
@@ -384,20 +314,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   " Parcelas por Status",
                 font: { size: 16, weight: "bold" },
                 position: "top",
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    let label = context.dataset.label || "";
-                    if (label) {
-                      label += ": ";
-                    }
-                    if (context.parsed !== null) {
-                      label += context.parsed;
-                    }
-                    return label;
-                  },
-                },
               },
               datalabels: {
                 color: "#fff",
@@ -417,23 +333,11 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   }
-});
 
-document.addEventListener("DOMContentLoaded", function () {
-  const selectFinan = document.getElementById("financiamento_id");
-  if (selectFinan) {
-    selectFinan.addEventListener("change", function () {
-      this.closest("form").submit();
-    });
-  }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
+  /* --- 3. GRÁFICO EVOLUÇÃO (graphics_3.html) --- */
   const chartDataElement = document.getElementById("evolucao-chart-data");
-
   if (chartDataElement) {
     const chartData = JSON.parse(chartDataElement.textContent);
-
     const evolucaoParcelasCanvas = document.getElementById(
       "evolucaoParcelasChart"
     );
@@ -447,81 +351,84 @@ document.addEventListener("DOMContentLoaded", function () {
         const r = Math.floor(Math.random() * 200);
         const g = Math.floor(Math.random() * 200);
         const b = Math.floor(Math.random() * 200);
-
         dataset.fill = true;
-        dataset.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+        dataset.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
         dataset.borderColor = `rgba(${r}, ${g}, ${b}, 1)`;
         dataset.tension = 0.3;
-        dataset.borderWidth = 1.5;
-        dataset.pointRadius = 0;
-        dataset.pointHoverRadius = 4;
+        dataset.borderWidth = 2;
+        dataset.pointRadius = 2;
+        dataset.pointHoverRadius = 5;
       });
 
       new Chart(evolucaoParcelasCanvas, {
         type: "line",
-        data: {
-          labels: chartData.labels,
-          datasets: chartData.datasets,
-        },
+        data: { labels: chartData.labels, datasets: chartData.datasets },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
           scales: {
             y: {
               beginAtZero: true,
               stacked: true,
               ticks: {
-                callback: function (value) {
-                  return new Intl.NumberFormat("pt-BR", {
+                callback: (value) =>
+                  new Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                     minimumFractionDigits: 0,
-                  }).format(value);
-                },
+                  }).format(value),
               },
             },
-            x: {
-              grid: {
-                display: false,
-              },
-            },
+            x: { grid: { display: false } },
           },
           plugins: {
             legend: { position: "bottom", align: "start" },
-            tooltip: {
-              mode: "index",
-              intersect: false,
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) {
-                    label += ": ";
-                  }
-                  if (context.parsed.y !== null) {
-                    label += new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(context.parsed.y);
-                  }
-                  return label;
-                },
-              },
-            },
             datalabels: { display: false },
           },
-          interaction: {
-            mode: "index",
-            intersect: false,
-          },
+          interaction: { mode: "index", intersect: false },
         },
       });
     }
   }
 
-  const selectGrouping = document.getElementById("grouping_by");
-  if (selectGrouping) {
-    selectGrouping.addEventListener("change", function () {
-      this.closest("form").submit();
-    });
+  // Listeners para Selects
+  const inputsComAutoSubmit = ["financiamento_id", "grouping_by"];
+  inputsComAutoSubmit.forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener("change", function () {
+        this.closest("form").submit();
+      });
+    }
+  });
+}
+
+// Controle de Zoom de Fonte
+let currentChartFontSize = 12;
+function updateChartFont(delta) {
+  let newSize = currentChartFontSize + delta;
+  if (newSize < 8) newSize = 8;
+  if (newSize > 24) newSize = 24;
+  currentChartFontSize = newSize;
+  const labelSpan = document.getElementById("current-font-size");
+  if (labelSpan) labelSpan.textContent = newSize + "px";
+
+  if (window.Chart) {
+    if (window.Chart.defaults) window.Chart.defaults.font.size = newSize;
+    if (window.Chart.instances) {
+      Object.values(window.Chart.instances).forEach((chart) => {
+        if (chart.options.plugins.legend.labels)
+          chart.options.plugins.legend.labels.font = { size: newSize };
+        if (chart.options.plugins.tooltip) {
+          chart.options.plugins.tooltip.bodyFont = { size: newSize };
+          chart.options.plugins.tooltip.titleFont = { size: newSize + 2 };
+        }
+        if (chart.options.scales) {
+          Object.keys(chart.options.scales).forEach((key) => {
+            if (chart.options.scales[key].ticks)
+              chart.options.scales[key].ticks.font = { size: newSize };
+          });
+        }
+        chart.update();
+      });
+    }
   }
-});
+}

@@ -15,7 +15,7 @@
         <form
           id="form-fluxo-caixa"
           method="GET"
-          action="{{ url_for('fluxo_caixa.painel') }}"
+          action="{{ url_for('fluxo_caixa.fluxo_caixa') }}"
         >
           <div class="row align-items-center">
             <div class="col-md-2" style="width: 145px">
@@ -23,8 +23,8 @@
                 <span class="input-group-text"
                   ><i class="fas fa-calendar-alt"></i
                 ></span>
-                {{ form.mes_ano(class="form-control fw-semibold text-danger", id="mes_ano_fluxo_caixa")
-                }}
+                {{ form.mes_ano(class="form-control fw-semibold text-danger",
+                id="mes_ano_fluxo_caixa") }}
               </div>
             </div>
           </div>
@@ -81,7 +81,12 @@
             <tbody>
               {% for mov in movimentacoes %}
               <tr>
-                <td>{{ mov.data.strftime('%d/%m/%Y') }}</td>
+                <td>
+                  <span style="display: none">
+                    {{ mov.data.strftime('%Y%m%d') }}
+                  </span>
+                  {{ mov.data.strftime('%d/%m/%Y') }}
+                </td>
                 <td>{{ mov.origem }}</td>
                 <td>{{ mov.conta }}</td>
                 <td>

@@ -181,15 +181,6 @@ def listar_movimentos():
     data_inicial_str = request.args.get("data_inicial")
     data_final_str = request.args.get("data_final")
 
-    hoje = date.today()
-    if not data_inicial_str and not data_final_str:
-        primeiro_dia = date(hoje.year, hoje.month, 1)
-        ultimo_dia = date(
-            hoje.year, hoje.month, calendar.monthrange(hoje.year, hoje.month)[1]
-        )
-        data_inicial_str = primeiro_dia.isoformat()
-        data_final_str = ultimo_dia.isoformat()
-
     query = (
         db.session.query(SalarioMovimento)
         .outerjoin(SalarioMovimento.itens)
@@ -206,11 +197,12 @@ def listar_movimentos():
         if data_inicial_str:
             data_inicial = date.fromisoformat(data_inicial_str)
             query = query.filter(SalarioMovimento.data_recebimento >= data_inicial)
+
         if data_final_str:
             data_final = date.fromisoformat(data_final_str)
             query = query.filter(SalarioMovimento.data_recebimento <= data_final)
     except ValueError:
-        flash("Formato de data inválido. Use AAAA-MM-DD.", "danger")
+        flash("Formato de data inválido. Use DD-MM-AAAA.", "danger")
         return redirect(url_for("salario.listar_movimentos"))
 
     movimentos = query.order_by(

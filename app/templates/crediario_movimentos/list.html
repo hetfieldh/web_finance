@@ -119,7 +119,12 @@ render_confirm_modal %} {% block content %}
                             <td>{{ mov.crediario_grupo.grupo_crediario if mov.crediario_grupo else 'N/A' }}</td>
                             <td>{{ mov.crediario_subgrupo.nome if mov.crediario_subgrupo else 'N/A' }}</td>
                             <td>{{ mov.destino }}</td>
-                            <td>{{ mov.data_compra.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                              <span style="display: none">
+                                {{ mov.data_compra.strftime('%Y%m%d') }}
+                              </span>
+                              {{ mov.data_compra.strftime('%d/%m/%Y') }}
+                            </td>
                             <td class="{% if mov.valor_total_compra < 0 %}fw-bold text-danger{% else %}text-dark{% endif %}">
                                 {{ mov.valor_total_compra | format_currency }}
                             </td>
@@ -136,7 +141,12 @@ render_confirm_modal %} {% block content %}
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
-                            <td>{{ mov.data_criacao.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                              <span style="display: none">
+                                {{ mov.data_criacao.strftime('%Y%m%d') }}
+                              </span>
+                              {{ mov.data_criacao.strftime('%d/%m/%Y') }}
+                            </td>
                             <td>{{ mov.descricao }}</td>
                         </tr>
                         {% endfor %}
