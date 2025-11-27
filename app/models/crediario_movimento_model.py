@@ -59,4 +59,4 @@ class CrediarioMovimento(db.Model):
     )
 
     def __repr__(self):
-        return f"<CrediarioMovimento {self.descricao} | R$ {self.valor_total_compra} | {self.numero_parcelas}x>"
+        return f"<CrediarioMovimento {self.descricao} | {self.valor_total_compra} | {self.numero_parcelas}x>"

@@ -45,24 +45,24 @@
         <div class="row g-0 text-center align-items-center">
           <div class="col-lg col-md-6">
             <h6 class="text-muted small mb-0">Saldo Anterior</h6>
-            <p class="h6 mb-0">{{ saldo_anterior | format_currency }}</p>
+            <p class="h6 mb-0">{{ saldo_anterior | format_number }}</p>
           </div>
           <div class="col-lg col-md-6">
             <h6 class="text-muted small mb-0">Créditos no Mês</h6>
             <p class="h6 text-success mb-0">
-              {{ total_creditos | format_currency }}
+              {{ total_creditos | format_number }}
             </p>
           </div>
           <div class="col-lg col-md-6 mt-2 mt-lg-0">
             <h6 class="text-muted small mb-0">Débitos no Mês</h6>
             <p class="h6 text-danger mb-0">
-              {{ total_debitos | format_currency }}
+              {{ total_debitos | format_number }}
             </p>
           </div>
           <div class="col-lg col-md-6 mt-2 mt-lg-0">
             <h6 class="text-muted small mb-0">Limite Disponível</h6>
             <p class="h6 mb-0">
-              {{ (limite_conta if limite_conta else 0) | format_currency }}
+              {{ (limite_conta if limite_conta else 0) | format_number }}
             </p>
           </div>
           <div class="col-lg col-md-12 mt-2 mt-lg-0">
@@ -72,7 +72,7 @@
               <div class="card-body p-1">
                 <h6 class="card-title extra-small mb-0">Saldo Final</h6>
                 <p class="card-text h6 fw-bold mb-0">
-                  {{ saldo_final_mes | format_currency }}
+                  {{ saldo_final_mes | format_number }}
                 </p>
               </div>
             </div>
@@ -127,13 +127,13 @@
                   class="text-end {% if mov.tipo_movimento == 'Débito' %}text-danger fw-semibold{% else %}text-success fw-semibold{% endif %}"
                 >
                   {% if mov.tipo_movimento == 'Débito' %}-{% else %}+{% endif
-                  %}{{mov.valor | format_currency }}
+                  %}{{mov.valor | format_number }}
                 </td>
                 <td>{{ mov.descricao if mov.descricao else 'N/A'}}</td>
                 <td
                   class="text-end fw-bold {% if mov.saldo_acumulado < 0 %}text-danger{% endif %}"
                 >
-                  {{mov.saldo_acumulado | format_currency }}
+                  {{mov.saldo_acumulado | format_number }}
                 </td>
               </tr>
               {% endfor %}

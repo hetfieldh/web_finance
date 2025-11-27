@@ -118,9 +118,9 @@ render_confirm_modal %} {% block content %}
                       >
                       {% endif %}
                     </td>
-                    <td>{{ movimento.valor_previsto | format_currency }}</td>
+                    <td>{{ movimento.valor_previsto | format_number }}</td>
                     <td>
-                      {{ movimento.valor_realizado | format_currency if
+                      {{ movimento.valor_realizado | format_number if
                       movimento.valor_realizado is not none else "-" }}
                     </td>
                     <td>
@@ -189,7 +189,7 @@ render_confirm_modal %} {% block content %}
                 <span
                   class="fw-bold {% if movimento.despesa_receita.natureza == 'Receita' %}text-success{% else %}text-danger{% endif %}"
                 >
-                  {{ movimento.valor_previsto | format_currency }}
+                  {{ movimento.valor_previsto | format_number }}
                 </span>
               </div>
 

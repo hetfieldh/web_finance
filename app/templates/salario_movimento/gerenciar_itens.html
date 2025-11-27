@@ -41,7 +41,7 @@
                       class="text-end fw-bold text-success"
                       id="total-proventos"
                     >
-                      {{ totais.proventos | format_currency }}
+                      {{ totais.proventos | format_number }}
                     </td>
                   </tr>
                   <tr>
@@ -50,7 +50,7 @@
                       class="text-end fw-bold text-danger"
                       id="total-descontos"
                     >
-                      {{ totais.descontos | format_currency }}
+                      {{ totais.descontos | format_number }}
                     </td>
                   </tr>
                   <tr>
@@ -59,7 +59,7 @@
                       class="text-end fw-bold text-danger"
                       id="total-impostos"
                     >
-                      {{ totais.impostos | format_currency }}
+                      {{ totais.impostos | format_number }}
                     </td>
                   </tr>
                   <tr>
@@ -68,13 +68,13 @@
                       class="text-end fw-bold text-primary"
                       id="total-beneficios"
                     >
-                      {{ totais.beneficios | format_currency }}
+                      {{ totais.beneficios | format_number }}
                     </td>
                   </tr>
                   <tr>
                     <td>FGTS</td>
                     <td class="text-end fw-bold text-secondary" id="total-fgts">
-                      {{ totais.fgts | format_currency }}
+                      {{ totais.fgts | format_number }}
                     </td>
                   </tr>
                   <tr class="border-top">
@@ -83,7 +83,7 @@
                       class="pt-1 text-end h6 mb-0 fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
                       id="total-salario-liquido"
                     >
-                      {{ totais.salario_liquido | format_currency }}
+                      {{ totais.salario_liquido | format_number }}
                     </td>
                   </tr>
                 </tbody>
@@ -109,7 +109,7 @@
                     <td
                       class="text-end fw-bold {% if totais.salario_liquido >= 0 %}text-success{% else %}text-danger{% endif %}"
                     >
-                      {{ totais.salario_liquido | format_currency }}
+                      {{ totais.salario_liquido | format_number }}
                     </td>
                   </tr>
                   {% endif %} {% if has_beneficio_items %} {% for beneficio in
@@ -117,14 +117,14 @@
                   <tr>
                     <td>{{ beneficio.salario_item.nome }}</td>
                     <td class="text-end fw-bold text-primary">
-                      {{ beneficio.valor | format_currency }}
+                      {{ beneficio.valor | format_number }}
                     </td>
                   </tr>
                   {% endfor %} {% endif %} {% if has_fgts_items %}
                   <tr>
                     <td>FGTS (Depósito)</td>
                     <td class="text-end fw-bold text-secondary">
-                      {{ totais.fgts | format_currency}}
+                      {{ totais.fgts | format_number}}
                     </td>
                   </tr>
                   {% endif %}
@@ -211,7 +211,7 @@
                   {% endif %}
                 </td>
                 <td class="text-end fw-bold text-dark">
-                  {{ item.valor | format_currency }}
+                  {{ item.valor | format_number }}
                 </td>
                 <td class="text-center">
                   {% if not is_locked %}
@@ -256,7 +256,7 @@
 
                 <div class="d-flex align-items-center gap-3">
                   <span class="fw-bold text-dark"
-                    >{{ item.valor | format_currency }}</span
+                    >{{ item.valor | format_number }}</span
                   >
 
                   {% if not is_locked %}

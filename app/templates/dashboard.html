@@ -79,7 +79,7 @@
         <p
           class="card-text h5 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %}"
         >
-          {{ kpis.saldo_operacional | format_currency }}
+          {{ kpis.saldo_operacional | format_number }}
         </p>
       </div>
     </div>
@@ -89,7 +89,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">INVESTIMENTOS</h6>
         <p class="card-text h5 fw-semibold text-success">
-          {{ kpis.saldo_investimentos | format_currency }}
+          {{ kpis.saldo_investimentos | format_number }}
         </p>
       </div>
     </div>
@@ -99,7 +99,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">BENEFÍCIOS</h6>
         <p class="card-text h5 fw-semibold text-secondary">
-          {{ kpis.saldo_beneficios | format_currency }}
+          {{ kpis.saldo_beneficios | format_number }}
         </p>
       </div>
     </div>
@@ -109,7 +109,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">FGTS</h6>
         <p class="card-text h5 fw-semibold text-secondary">
-          {{ kpis.saldo_fgts | format_currency }}
+          {{ kpis.saldo_fgts | format_number }}
         </p>
       </div>
     </div>
@@ -134,7 +134,7 @@
           </span>
         </h6>
         <p class="card-text h5 fw-semibold text-success">
-          {{ kpis.receitas_mes | format_currency }}
+          {{ kpis.receitas_mes | format_number }}
         </p>
       </div>
     </div>
@@ -144,7 +144,7 @@
       <div class="card-body text-center py-1">
         <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
         <p class="card-text h5 fw-semibold text-danger">
-          {{ kpis.despesas_mes | format_currency }}
+          {{ kpis.despesas_mes | format_number }}
         </p>
       </div>
     </div>
@@ -168,7 +168,7 @@
         <p
           class="card-text h5 fw-semibold {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
         >
-          {{ kpis.balanco_mes | format_currency }}
+          {{ kpis.balanco_mes | format_number }}
         </p>
       </div>
     </div>
@@ -214,7 +214,7 @@
               </div>
               <span
                 class="fw-semibold h6 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
-                >{{ conta.saldo_atual | format_currency }}</span
+                >{{ conta.saldo_atual | format_number }}</span
               >
             </div>
           </div>
@@ -263,13 +263,13 @@
             <span
               class="badge rounded-pill bg-danger-subtle text-danger-emphasis"
             >
-              {{ mov.valor | format_currency }}
+              {{ mov.valor | format_number }}
             </span>
             {% else %}
             <span
               class="badge rounded-pill bg-success-subtle text-success-emphasis"
             >
-              {{ mov.valor | format_currency }}
+              {{ mov.valor | format_number }}
             </span>
             {% endif %}
           </li>
@@ -327,12 +327,12 @@
             {% if item.tipo == 'Saída' %}
             <span
               class="badge bg-danger-subtle text-danger-emphasis rounded-pill"
-              >{{ item.valor | format_currency }}</span
+              >{{ item.valor | format_number }}</span
             >
             {% else %}
             <span
               class="badge bg-success-subtle text-success-emphasis rounded-pill"
-              >{{ item.valor | format_currency }}</span
+              >{{ item.valor | format_number }}</span
             >
             {% endif %}
           </li>
@@ -386,7 +386,7 @@
                 </div>
               </div>
               <span class="fw-semibold h6 mb-0 text-danger"
-                >{{ financ.saldo_devedor_atual | format_currency }}</span
+                >{{ financ.saldo_devedor_atual | format_number }}</span
               >
             </div>
           </div>
@@ -408,7 +408,7 @@
                 </div>
               </div>
               <span class="fw-semibold h6 mb-0 text-danger"
-                >{{ cred.saldo_devedor | format_currency }}</span
+                >{{ cred.saldo_devedor | format_number }}</span
               >
             </div>
           </div>

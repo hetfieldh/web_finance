@@ -14,15 +14,12 @@
       <div class="card shadow-sm">
         <div class="card-header menu-primario">
           <h5 class="mb-0">
-            <i class="fas fa-calculator text-warning me-2"></i>Amortização de Financiamento
+            <i class="fas fa-calculator text-warning me-2"></i>Amortização de
+            Financiamento
           </h5>
         </div>
         <div class="card-body">
-          <h6
-            class="caixa-sombreada"
-          >
-            1. Detalhes do Pagamento
-          </h6>
+          <h6 class="caixa-sombreada">1. Detalhes do Pagamento</h6>
 
           <div class="row g-2 mb-2 align-items-end">
             <div class="col-12 col-md-3">
@@ -43,11 +40,7 @@
 
           <hr class="my-2" />
 
-          <h6
-            class="caixa-sombreada"
-          >
-            2. Forma de Amortização
-          </h6>
+          <h6 class="caixa-sombreada">2. Forma de Amortização</h6>
 
           <div class="mb-3">
             {{ render_field(form.estrategia, attrs={'id': 'estrategia_selecao'})
@@ -56,21 +49,17 @@
 
           <hr class="my-2" />
 
-          <h6
-            class="caixa-sombreada"
-          >
-            3. Resumo da Operação
-          </h6>
+          <h6 class="caixa-sombreada">3. Resumo da Operação</h6>
 
           <div id="resumo-amortizacao" class="bg-light p-3 rounded">
             <div class="d-flex justify-content-between">
               <span class="text-muted">Total a Amortizar:</span>
-              <span id="resumo-valor" class="fw-bold text-dark">R$ 0,00</span>
+              <span id="resumo-valor" class="fw-bold text-dark"> 0,00</span>
             </div>
             <div class="d-flex justify-content-between mt-2">
               <span class="text-muted">Saldo Devedor (Depois):</span>
-              <span id="resumo-saldo-depois" class="fw-bold text-danger"
-                >R$ 0,00</span
+              <span id="resumo-saldo-depois" class="fw-bold text-danger">
+                0,00</span
               >
             </div>
             <hr class="my-2" />
@@ -94,8 +83,8 @@
               </div>
               <div class="d-flex justify-content-between mt-2">
                 <span class="text-muted">Economia de Juros (estimado):</span>
-                <span id="resumo-economia-juros" class="fw-bold text-success"
-                  >R$ 0,00</span
+                <span id="resumo-economia-juros" class="fw-bold text-success">
+                  0,00</span
                 >
               </div>
             </div>
@@ -109,8 +98,8 @@
               </div>
               <div class="d-flex justify-content-between mt-2">
                 <span class="text-muted">Redução por Parcela:</span>
-                <span id="resumo-reducao-parcela" class="fw-bold text-info"
-                  >R$ 0,00</span
+                <span id="resumo-reducao-parcela" class="fw-bold text-info">
+                  0,00</span
                 >
               </div>
             </div>
@@ -118,11 +107,7 @@
 
           <hr class="my-2" />
 
-          <h6
-            class="caixa-sombreada"
-          >
-            4. Ação
-          </h6>
+          <h6 class="caixa-sombreada">4. Ação</h6>
 
           <div class="d-flex justify-content-center gap-2">
             <button type="submit" class="btn btn-azul">

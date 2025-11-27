@@ -126,7 +126,7 @@ render_confirm_modal %} {% block content %}
                               {{ mov.data_compra.strftime('%d/%m/%Y') }}
                             </td>
                             <td class="{% if mov.valor_total_compra < 0 %}fw-bold text-danger{% else %}text-dark{% endif %}">
-                                {{ mov.valor_total_compra | format_currency }}
+                                {{ mov.valor_total_compra | format_number }}
                             </td>
                             <td>{{ mov.numero_parcelas }}</td>
                             <td>{{ mov.data_primeira_parcela.strftime('%m-%Y') }}</td>
@@ -166,7 +166,7 @@ render_confirm_modal %} {% block content %}
                             {{ mov.fornecedor.nome if mov.fornecedor else mov.descricao or 'Compra' }}
                         </span>
                         <span class="fw-bold text-danger">
-                            {{ mov.valor_total_compra | format_currency }}
+                            {{ mov.valor_total_compra | format_number }}
                         </span>
                     </div>
 

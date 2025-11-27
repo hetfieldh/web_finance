@@ -37,21 +37,21 @@ render_estornar_modal %} {% block content %}
             <div>
               Previsto:
               <strong class="text-primary"
-                >{{ totais.previsto | format_currency }}</strong
+                >{{ totais.previsto | format_number }}</strong
               >
             </div>
             <div class="vr"></div>
             <div>
               Recebido:
               <strong class="text-success"
-                >{{ totais.recebido | format_currency }}</strong
+                >{{ totais.recebido | format_number }}</strong
               >
             </div>
             <div class="vr"></div>
             <div>
               Pendente:
               <strong class="text-warning text-dark"
-                >{{ totais.pendente | format_currency }}</strong
+                >{{ totais.pendente | format_number }}</strong
               >
             </div>
           </div>
@@ -67,7 +67,7 @@ render_estornar_modal %} {% block content %}
                     Previsto
                   </div>
                   <div class="text-primary fw-bold small">
-                    {{ totais.previsto | format_currency }}
+                    {{ totais.previsto | format_number }}
                   </div>
                 </div>
               </div>
@@ -80,7 +80,7 @@ render_estornar_modal %} {% block content %}
                     Recebido
                   </div>
                   <div class="text-success fw-bold small">
-                    {{ totais.recebido | format_currency }}
+                    {{ totais.recebido | format_number }}
                   </div>
                 </div>
               </div>
@@ -93,7 +93,7 @@ render_estornar_modal %} {% block content %}
                     Pendente
                   </div>
                   <div class="text-warning text-dark fw-bold small">
-                    {{ totais.pendente | format_currency }}
+                    {{ totais.pendente | format_number }}
                   </div>
                 </div>
               </div>
@@ -141,11 +141,11 @@ render_estornar_modal %} {% block content %}
                 <td>{{ conta.origem }}</td>
                 <td><span class="text-dark">{{ conta.tipo }}</span></td>
                 <td class="text-end text-dark">
-                  {{ conta.valor_previsto | format_currency }}
+                  {{ conta.valor_previsto | format_number }}
                 </td>
                 <td class="text-end fw-bold text-success">
                   {% if conta.valor_recebido > 0 %} {{ conta.valor_recebido |
-                  format_currency }} {% else %} - {% endif %}
+                  format_number }} {% else %} - {% endif %}
                 </td>
 
                 <td class="text-center">
@@ -233,7 +233,7 @@ render_estornar_modal %} {% block content %}
                   {{ conta.origem }}
                 </div>
                 <div class="fw-bold text-success text-nowrap">
-                  {{ conta.valor_previsto | format_currency }}
+                  {{ conta.valor_previsto | format_number }}
                 </div>
               </div>
 

@@ -59,7 +59,7 @@
                 ><i class="fas fa-coins fa-fw me-2"></i>Valor Total:</span
               >
               <span class="fs-4 fw-bold text-dark"
-                >{{ fatura.valor_total_fatura | format_currency }}</span
+                >{{ fatura.valor_total_fatura | format_number }}</span
               >
             </div>
             <div class="d-flex justify-content-between align-items-center">
@@ -141,7 +141,7 @@
                   </span>
                 </td>
                 <td class="text-end pe-3 fw-bold text-dark">
-                  {{ parcela.valor_parcela | format_currency }}
+                  {{ parcela.valor_parcela | format_number }}
                 </td>
               </tr>
               {% endfor %}
@@ -152,7 +152,7 @@
                   Total:
                 </td>
                 <td class="text-end fw-bold text-dark pe-3">
-                  {{ fatura.valor_total_fatura | format_currency }}
+                  {{ fatura.valor_total_fatura | format_number }}
                 </td>
               </tr>
             </tfoot>

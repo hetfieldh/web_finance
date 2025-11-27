@@ -3,12 +3,9 @@
 function formatCurrencyJS(value) {
   const number = parseFloat(value);
   if (isNaN(number)) {
-    return "R$ 0,00";
+    return " 0,00";
   }
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(number);
+  return new Intl.NumberFormat("pt-BR").format(number);
 }
 
 document.addEventListener("DOMContentLoaded", function () {

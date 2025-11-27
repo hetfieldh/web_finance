@@ -37,18 +37,18 @@
         <div class="row g-0 text-center align-items-center">
           <div class="col-md-3">
             <h6>Total de Receitas</h6>
-            <p class="h5 text-success">{{ kpis.receitas | format_currency }}</p>
+            <p class="h5 text-success">{{ kpis.receitas | format_number }}</p>
           </div>
           <div class="col-md-3">
             <h6>Total de Despesas</h6>
-            <p class="h5 text-danger">{{ kpis.despesas | format_currency }}</p>
+            <p class="h5 text-danger">{{ kpis.despesas | format_number }}</p>
           </div>
           <div class="col-md-3">
             <h6>Balanço do Mês</h6>
             <p
               class="h5 fw-bold {% if kpis.balanco >= 0 %}text-success{% else %}text-danger{% endif %}"
             >
-              {{ kpis.balanco | format_currency }}
+              {{ kpis.balanco | format_number }}
             </p>
           </div>
           <div class="col-md-3">
@@ -102,7 +102,7 @@
                   {% endif %}
                 </td>
                 <td class="text-end fw-bold">
-                  {{ mov.valor | format_currency }}
+                  {{ mov.valor | format_number }}
                 </td>
               </tr>
               {% endfor %}

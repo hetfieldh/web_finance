@@ -98,8 +98,8 @@ render_confirm_modal %} {% block content %}
                       </span>
                       {{ movimento.data_recebimento.strftime('%d/%m/%Y') }}
                     </td>
-                    <td>{{ movimento.salario_liquido | format_currency }}</td>
-                    <td>{{ movimento.total_beneficios | format_currency }}</td>
+                    <td>{{ movimento.salario_liquido | format_number }}</td>
+                    <td>{{ movimento.total_beneficios | format_number }}</td>
                     <td>{{ movimento.total_fgts }}</td>
                     <td class="table-actions">
                       <a

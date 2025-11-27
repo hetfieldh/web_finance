@@ -75,15 +75,14 @@
 body,
 html {
     overflow-x: hidden;
-    /* Previne scroll horizontal na página inteira */
     height: 100%;
 }
 
 body {
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 0.9rem;
     line-height: 1.5;
     background-color: #f4f6f9;
-    /* Fundo suave para o app */
 }
 
 /* Padronização dos tamanhos de títulos (H1 a H6) para garantir hierarquia visual consistente. */
@@ -711,21 +710,18 @@ body.login-body {
    ========================================================================== */
 
 /* --- 11.1 Wrappers Responsivos --- */
-/* Essencial para tabelas em mobile. O 'overflow-x: auto' permite que a tabela
-   tenha barra de rolagem horizontal sem quebrar o layout da página inteira. */
 .table-responsive,
 .table-scroll {
     display: block;
     width: 100%;
     overflow-x: auto;
+    /* Habilita scroll horizontal */
     -webkit-overflow-scrolling: touch;
+    /* Rolagem suave no iOS */
     margin-bottom: 1rem;
 }
 
-/* --- 11.2 Estrutura da Tabela Padrão (.table-padrao) --- */
-/* Define o estilo base. 'table-layout: auto' permite que as colunas se adaptem
-   ao conteúdo. 'white-space: nowrap' impede que textos quebrem linha, mantendo
-   a tabela compacta. */
+/* --- 11.2 Estrutura da Tabela Padrão --- */
 .table-padrao {
     width: 100%;
     table-layout: auto;
@@ -750,34 +746,14 @@ body.login-body {
     border-bottom: 2px solid var(--wf-border);
 }
 
-/* --- 11.3 Coluna Fixa (Sticky) --- */
-/* Funcionalidade avançada: Fixa a primeira coluna à esquerda enquanto o resto
-   da tabela rola. 'position: sticky' faz a mágica. */
+/* --- 11.3 Coluna Fixa (Sticky) */
 .table-sticky-col th:first-child,
 .table-sticky-col td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 10;
-    background-color: var(--wf-white);
+    min-width: 150px;
     border-right: 1px solid var(--wf-cinza-claro-2);
-
-    /* Largura fixa desktop definida nas variáveis globais */
-    width: var(--wf-table-col-fixa-width-desktop);
-    min-width: var(--wf-table-col-fixa-width-desktop);
-    max-width: var(--wf-table-col-fixa-width-desktop);
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Header da coluna fixa precisa de z-index maior para ficar acima do conteúdo */
-.table-sticky-col thead th:first-child {
-    z-index: 15;
-    background-color: #f8f9fa;
 }
 
 /* --- 11.4 Colunas de Valores --- */
-/* Garante largura mínima para colunas numéricas, facilitando a leitura e o clique. */
 .table-padrao td.col-valor,
 .table-padrao td.text-end {
     width: auto;
@@ -828,7 +804,7 @@ body.login-body {
     color: var(--wf-secondary);
 }
 
-/* Utilitários de Recuo (Indentation) para hierarquia visual */
+/* Utilitários de Recuo */
 .table-padrao .padding-subgrupo {
     padding-left: 30px !important;
 }
@@ -842,11 +818,9 @@ body.login-body {
     cursor: pointer;
 }
 
-/* Correção de cor de fundo para linhas zebradas/hover quando usadas
-   junto com a coluna fixa (Sticky).
-*/
+/* Fundos para Sticky Column - CORES SÓLIDAS PARA NÃO QUEBRAR NO SCROLL */
 .table-hover tbody tr:hover td:first-child {
-    background-color: var(--wf-ultra-light);
+    background-color: var(--wf-ultra-light) !important;
 }
 
 .table-secondary th:first-child,
@@ -859,11 +833,9 @@ body.login-body {
     background-color: #fdfdfe !important;
 }
 
-
 /* --- 11.6 AJUSTES DE TABELA PARA MOBILE --- */
 @media (max-width: 768px) {
 
-    /* Reduz fonte e padding para caber mais dados na tela pequena */
     .table-padrao th,
     .table-padrao td {
         font-size: 0.7rem;
@@ -874,7 +846,6 @@ body.login-body {
         font-size: 0.7rem;
     }
 
-    /* Ajusta a largura da Coluna Fixa para Mobile */
     .table-sticky-col th:first-child,
     .table-sticky-col td:first-child {
         width: var(--wf-table-col-fixa-width-mobile) !important;
@@ -882,7 +853,6 @@ body.login-body {
         max-width: var(--wf-table-col-fixa-width-mobile) !important;
     }
 
-    /* Reduz recuos no mobile para ganhar espaço horizontal */
     .table-padrao .padding-subgrupo {
         padding-left: 15px !important;
     }

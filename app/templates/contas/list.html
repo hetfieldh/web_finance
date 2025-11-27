@@ -61,14 +61,14 @@ render_confirm_modal %} {% block content %}
                     <td>{{ conta.agencia }}</td>
                     <td>{{ conta.conta }}</td>
                     <td>{{ conta.tipo }}</td>
-                    <td>{{ conta.saldo_inicial | format_currency }}</td>
+                    <td>{{ conta.saldo_inicial | format_number }}</td>
                     <td
                       class="{% if conta.saldo_atual < 0 %}text-danger fw-bold{% endif %}"
                     >
-                      {{ conta.saldo_atual | format_currency }}
+                      {{ conta.saldo_atual | format_number }}
                     </td>
                     <td>
-                      {{ conta.limite | format_currency if conta.limite is not
+                      {{ conta.limite | format_number if conta.limite is not
                       none else '-' }}
                     </td>
                     <td>
@@ -161,7 +161,7 @@ render_confirm_modal %} {% block content %}
                   <span
                     class="h5 mb-0 fw-bold {% if conta.saldo_atual < 0 %}text-danger{% else %}text-success{% endif %}"
                   >
-                    {{ conta.saldo_atual | format_currency }}
+                    {{ conta.saldo_atual | format_number }}
                   </span>
                 </div>
 
@@ -171,7 +171,7 @@ render_confirm_modal %} {% block content %}
                 >
                   <span class="extra-small text-muted">Limite:</span>
                   <span class="small text-dark"
-                    >{{ conta.limite | format_currency }}</span
+                    >{{ conta.limite | format_number }}</span
                   >
                 </div>
                 {% endif %}

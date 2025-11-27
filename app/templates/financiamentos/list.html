@@ -52,11 +52,10 @@ render_confirm_modal %} {% block content %}
                     <td>{{ financiamento.nome_financiamento }}</td>
                     <td>{{ financiamento.conta.nome_banco }}</td>
                     <td>
-                      {{ financiamento.valor_total_financiado | format_currency
-                      }}
+                      {{ financiamento.valor_total_financiado | format_number }}
                     </td>
                     <td class="fw-bold text-danger">
-                      {{ financiamento.saldo_devedor_atual | format_currency }}
+                      {{ financiamento.saldo_devedor_atual | format_number }}
                     </td>
                     <td>{{ financiamento.prazo_meses }}</td>
                     <td>{{ financiamento.tipo_amortizacao }}</td>
@@ -135,8 +134,7 @@ render_confirm_modal %} {% block content %}
                       Financiado
                     </div>
                     <div class="fw-medium text-dark">
-                      {{ financiamento.valor_total_financiado | format_currency
-                      }}
+                      {{ financiamento.valor_total_financiado | format_number }}
                     </div>
                   </div>
                   <div class="col-6">
@@ -144,7 +142,7 @@ render_confirm_modal %} {% block content %}
                       Saldo Devedor
                     </div>
                     <div class="fw-bold text-danger">
-                      {{ financiamento.saldo_devedor_atual | format_currency }}
+                      {{ financiamento.saldo_devedor_atual | format_number }}
                     </div>
                   </div>
                 </div>

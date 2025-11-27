@@ -120,8 +120,8 @@ def importar_e_processar_csv(financiamento, csv_file):
             Decimal("0.01")
         ) != financiamento.valor_total_financiado.quantize(Decimal("0.01")):
             message = (
-                f"Erro de validação: O valor total financiado (R$ {financiamento.valor_total_financiado:,.2f}) "
-                f"não corresponde à soma do valor principal das parcelas no arquivo CSV (R$ {soma_principal_csv:,.2f})."
+                f"Erro de validação: O valor total financiado ( {financiamento.valor_total_financiado:,.2f}) "
+                f"não corresponde à soma do valor principal das parcelas no arquivo CSV ( {soma_principal_csv:,.2f})."
             )
             return False, message
 
@@ -182,7 +182,7 @@ def amortizar_parcelas(financiamento, form):
         if valor_amortizacao > saldo_devedor_maximo:
             return (
                 False,
-                f"O valor da amortização não pode exceder o saldo devedor de R$ {saldo_devedor_maximo:,.2f}.",
+                f"O valor da amortização não pode exceder o saldo devedor de  {saldo_devedor_maximo:,.2f}.",
             )
 
         saldo_disponivel = conta_debito.saldo_atual
@@ -191,7 +191,7 @@ def amortizar_parcelas(financiamento, form):
         if valor_amortizacao > saldo_disponivel:
             return (
                 False,
-                f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível: R$ {saldo_disponivel:,.2f}",
+                f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível:  {saldo_disponivel:,.2f}",
             )
 
         tipo_transacao = ContaTransacao.query.filter_by(
@@ -253,12 +253,12 @@ def amortizar_parcelas(financiamento, form):
 
                 parcela.data_pagamento = data_pagamento
                 parcela.movimento_bancario_id = novo_movimento.id
-                obs = f"Amort. de R$ {valor_a_aplicar:,.2f} em {data_pagamento.strftime('%d/%m/%Y')}."
+                obs = f"Amort. de  {valor_a_aplicar:,.2f} em {data_pagamento.strftime('%d/%m/%Y')}."
                 parcela.observacoes = (
                     (parcela.observacoes + "; " + obs) if parcela.observacoes else obs
                 )
 
-            msg = f"Amortização de R$ {valor_amortizacao:,.2f} realizada para reduzir prazo. {parcelas_quitadas} parcelas foram quitadas."
+            msg = f"Amortização de  {valor_amortizacao:,.2f} realizada para reduzir prazo. {parcelas_quitadas} parcelas foram quitadas."
             if parcela_parcial:
                 msg += " Uma parcela foi parcialmente paga."
 
@@ -290,12 +290,12 @@ def amortizar_parcelas(financiamento, form):
                 parcela.valor_principal -= valor_reducao
                 parcela.valor_total_previsto -= valor_reducao
 
-                obs = f"Amort. de R$ {valor_reducao:,.2f} em {data_pagamento.strftime('%d/%m/%Y')} para reduzir valor da parcela."
+                obs = f"Amort. de  {valor_reducao:,.2f} em {data_pagamento.strftime('%d/%m/%Y')} para reduzir valor da parcela."
                 parcela.observacoes = (
                     (parcela.observacoes + "; " + obs) if parcela.observacoes else obs
                 )
 
-            msg = f"Amortização de R$ {valor_amortizacao:,.2f} distribuída para reduzir o valor de {qtd_parcelas} parcelas futuras."
+            msg = f"Amortização de  {valor_amortizacao:,.2f} distribuída para reduzir o valor de {qtd_parcelas} parcelas futuras."
 
         novo_saldo_devedor = db.session.query(
             func.sum(

@@ -110,7 +110,7 @@
                 <span
                   class="h4 mb-0 fw-bold {% if movimento.valor_total_compra < 0 %}text-success{% else %}text-danger{% endif %}"
                 >
-                  {{ movimento.valor_total_compra | format_currency }}
+                  {{ movimento.valor_total_compra | format_number }}
                 </span>
               </li>
             </ul>
@@ -147,7 +147,7 @@
                 </td>
                 <td>{{ parcela.data_vencimento.strftime('%d/%m/%Y') }}</td>
                 <td class="text-end fw-medium text-dark">
-                  {{ parcela.valor_parcela | format_currency }}
+                  {{ parcela.valor_parcela | format_number }}
                 </td>
                 <td class="text-center">
                   {% if parcela.pago %}

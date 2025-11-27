@@ -57,10 +57,7 @@ function initCharts() {
     const progressoCanvas = document.getElementById("progressoChart");
     if (progressoCanvas && chartData.dados_progresso_valores) {
       const dados = chartData.dados_progresso_valores;
-      const totalFormatted = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(dados.total);
+      const totalFormatted = new Intl.NumberFormat("pt-BR").format(dados.total);
 
       new Chart(progressoCanvas, {
         type: "doughnut",
@@ -100,7 +97,7 @@ function initCharts() {
           labels: chartData.dados_saidas.labels,
           datasets: [
             {
-              label: "Valor Gasto (R$)",
+              label: "Valor Gasto ",
               data: chartData.dados_saidas.valores,
               backgroundColor: [
                 "rgba(255, 99, 132, 0.5)",
@@ -129,12 +126,7 @@ function initCharts() {
               color: "#495057",
               font: { weight: "bold" },
               formatter: (value) =>
-                value === 0
-                  ? ""
-                  : new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(value),
+                value === 0 ? "" : new Intl.NumberFormat("pt-BR").format(value),
             },
           },
         },
@@ -152,7 +144,7 @@ function initCharts() {
           datasets: [
             {
               type: "line",
-              label: "Balanço (R$)",
+              label: "Balanço ",
               data: dadosEvolucao.balanco,
               borderColor: "rgba(75, 192, 192, 0.8)",
               backgroundColor: "rgba(75, 192, 192, 0.2)",
@@ -162,14 +154,14 @@ function initCharts() {
             },
             {
               type: "bar",
-              label: "Receitas (R$)",
+              label: "Receitas ",
               data: dadosEvolucao.receitas,
               backgroundColor: "rgba(40, 167, 69, 0.5)",
               yAxisID: "yPrincipal",
             },
             {
               type: "bar",
-              label: "Despesas (R$)",
+              label: "Despesas ",
               data: dadosEvolucao.despesas,
               backgroundColor: "rgba(220, 53, 69, 0.5)",
               yAxisID: "yPrincipal",
@@ -203,7 +195,7 @@ function initCharts() {
           labels: chartData.dados_entradas.labels,
           datasets: [
             {
-              label: "Valor Recebido (R$)",
+              label: "Valor Recebido ",
               data: chartData.dados_entradas.valores,
               backgroundColor: [
                 "rgba(40, 167, 69, 0.5)",
@@ -230,12 +222,7 @@ function initCharts() {
               color: "#495057",
               font: { weight: "bold" },
               formatter: (value) =>
-                value === 0
-                  ? ""
-                  : new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(value),
+                value === 0 ? "" : new Intl.NumberFormat("pt-BR").format(value),
             },
           },
         },
@@ -254,14 +241,14 @@ function initCharts() {
           labels: dadosFinanc.labels,
           datasets: [
             {
-              label: "Valor Previsto (R$)",
+              label: "Valor Previsto ",
               data: dadosFinanc.previsto,
               backgroundColor: "rgba(255, 159, 64, 0.5)",
               borderColor: "rgba(255, 159, 64, 0.6)",
               borderWidth: 1,
             },
             {
-              label: "Valor Realizado (R$)",
+              label: "Valor Realizado ",
               data: dadosFinanc.realizado,
               backgroundColor: "rgba(75, 192, 192, 0.5)",
               borderColor: "rgba(75, 192, 192, 0.6)",
@@ -370,11 +357,7 @@ function initCharts() {
               stacked: true,
               ticks: {
                 callback: (value) =>
-                  new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                    minimumFractionDigits: 0,
-                  }).format(value),
+                  new Intl.NumberFormat("pt-BR").format(value),
               },
             },
             x: { grid: { display: false } },

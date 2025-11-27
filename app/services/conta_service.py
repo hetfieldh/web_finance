@@ -94,8 +94,8 @@ def atualizar_conta(conta, form):
         if saldo_atual < 0 and novo_limite < abs(saldo_atual):
             return (
                 False,
-                f"O limite não pode ser menor que R$ {abs(saldo_atual):.2f}, "
-                f"pois a conta já está negativa em R$ {saldo_atual:.2f}.",
+                f"O limite não pode ser menor que {abs(saldo_atual):.2f}, "
+                f"pois a conta já está negativa em {saldo_atual:.2f}.",
             )
 
         conta.limite = novo_limite
@@ -150,7 +150,7 @@ def get_active_accounts_for_user_choices():
         .all()
     )
     choices = [("", "Selecione...")] + [
-        (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: R$ {c.saldo_atual:.2f})")
+        (c.id, f"{c.nome_banco} - {c.tipo} (Saldo: {c.saldo_atual:.2f})")
         for c in contas_ativas
     ]
     return choices
@@ -216,7 +216,7 @@ def validar_estorno_saldo(conta, valor_a_debitar):
     if valor_a_debitar > saldo_disponivel:
         mensagem = (
             f"Estorno não permitido. Saldo insuficiente na conta {conta.nome_banco}. "
-            f"Saldo disponível (com limite): R$ {saldo_disponivel:.2f}"
+            f"Saldo disponível (com limite): {saldo_disponivel:.2f}"
         )
         return False, mensagem
 

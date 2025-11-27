@@ -14,34 +14,43 @@
 </div>
 
 <div class="card shadow-sm mb-2">
-  <div
-    class="card-header bg-light py-1 d-flex justify-content-between align-items-center"
-  >
-    <h6 class="mb-0 h4 text-dark fw-semibold">
-      <i class="fas fa-table text-danger me-3"></i>{{ dados.grupo_nome }}
-      <span id="titulo-tabela-dinamica" class="text-muted fw-normal"></span>
-    </h6>
-    <div>
-      <button
-        id="btn-saldo-devedor"
-        class="btn btn-sm btn-outline-danger active"
-        onclick="mostrarTabela('saldo-devedor')"
-      >
-        <i class="fas fa-file-invoice-dollar me-1"></i> Saldo Devedor
-      </button>
-      <button
-        id="btn-total"
-        class="btn btn-sm btn-outline-primary"
-        onclick="mostrarTabela('total')"
-      >
-        <i class="fas fa-receipt me-1"></i> Todas Parcelas
-      </button>
-      <a
-        href="{{ url_for('relatorios.gastos_por_grupo') }}"
-        class="btn btn-sm btn-secondary"
-      >
-        <i class="fas fa-arrow-left text-warning me-2"></i> Voltar
-      </a>
+  <div class="card-header bg-light py-1">
+    <div class="d-flex flex-column">
+      <!-- TÍTULO -->
+      <h6 class="mb-2 h6 text-dark fw-semibold d-flex align-items-center">
+        <i class="fas fa-table text-danger me-3"></i>
+        {{ dados.grupo_nome }}
+        <span
+          id="titulo-tabela-dinamica"
+          class="text-muted fw-normal ms-2"
+        ></span>
+      </h6>
+
+      <!-- BOTÕES ABAIXO DO TÍTULO -->
+      <div class="d-flex flex-wrap gap-2">
+        <button
+          id="btn-saldo-devedor"
+          class="btn btn-sm btn-outline-danger active"
+          onclick="mostrarTabela('saldo-devedor')"
+        >
+          <i class="fas fa-file-invoice-dollar me-1"></i> Devedor
+        </button>
+
+        <button
+          id="btn-total"
+          class="btn btn-sm btn-outline-primary"
+          onclick="mostrarTabela('total')"
+        >
+          <i class="fas fa-receipt me-1"></i> Todas
+        </button>
+
+        <a
+          href="{{ url_for('relatorios.gastos_por_grupo') }}"
+          class="btn btn-sm btn-secondary"
+        >
+          <i class="fas fa-arrow-left text-warning me-2"></i> Voltar
+        </a>
+      </div>
     </div>
   </div>
 

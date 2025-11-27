@@ -202,10 +202,10 @@ render_confirm_modal %} {% block content %}
                         }}
                       </td>
                       <td class="fw-bold">
-                        {{item.fatura.valor_total_fatura | format_currency }}
+                        {{item.fatura.valor_total_fatura | format_number }}
                       </td>
                       <td class="text-muted">
-                        {{item.fatura.valor_pago_fatura | format_currency }}
+                        {{item.fatura.valor_pago_fatura | format_number }}
                       </td>
                       <td>
                         {% if item.fatura.status == 'Pago' %}
@@ -300,7 +300,7 @@ render_confirm_modal %} {% block content %}
                       <span
                         class="fw-bold {% if item.destaque_status == 'Atrasado' %}text-danger{% else %}text-primary{% endif %}"
                       >
-                        {{ item.fatura.valor_total_fatura | format_currency }}
+                        {{ item.fatura.valor_total_fatura | format_number }}
                       </span>
                       {% if item.fatura.status == 'Pago' %}
                       <span
@@ -403,44 +403,5 @@ render_confirm_modal %} {% block content %}
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
 Exclusão', body_text='Excluir?', confirm_button_text='Sim' ) }} {% endblock %}
 {% block scripts %} {{ super() }}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const checkboxes = document.querySelectorAll(".item-checkbox");
-    const selectAllDesktop = document.getElementById("select-all-desktop");
-    const selectAllMobile = document.getElementById("select-all-mobile");
-    const btnExcluir = document.getElementById("btn-excluir-massa");
-    const countSpan = document.getElementById("count-selected");
-
-    function updateButtonState() {
-      const count = document.querySelectorAll(".item-checkbox:checked").length;
-      if (countSpan) countSpan.textContent = count;
-
-      if (count > 0) {
-        btnExcluir.classList.remove("d-none");
-      } else {
-        btnExcluir.classList.add("d-none");
-      }
-    }
-
-    function toggleAll(checked) {
-      checkboxes.forEach((cb) => (cb.checked = checked));
-      if (selectAllDesktop) selectAllDesktop.checked = checked;
-      if (selectAllMobile) selectAllMobile.checked = checked;
-      updateButtonState();
-    }
-
-    if (selectAllDesktop)
-      selectAllDesktop.addEventListener("change", (e) =>
-        toggleAll(e.target.checked)
-      );
-    if (selectAllMobile)
-      selectAllMobile.addEventListener("change", (e) =>
-        toggleAll(e.target.checked)
-      );
-
-    checkboxes.forEach((cb) => {
-      cb.addEventListener("change", updateButtonState);
-    });
-  });
-</script>
+<script src="global.js"></script>
 {% endblock %}

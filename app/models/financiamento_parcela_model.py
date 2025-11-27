@@ -60,4 +60,4 @@ class FinanciamentoParcela(db.Model):
     )
 
     def __repr__(self):
-        return f"<Parcela {self.numero_parcela} de {self.financiamento_id} | Total: R$ {self.valor_total_previsto}>"
+        return f"<Parcela {self.numero_parcela} de {self.financiamento_id} | Total: {self.valor_total_previsto}>"

@@ -45,10 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     const formatCurrency = (value) => {
-      return value.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      });
+      return value.toLocaleString("pt-BR");
     };
 
     const atualizarResumo = () => {

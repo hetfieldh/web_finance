@@ -1150,7 +1150,7 @@ def get_gastos_crediario_por_subgrupo_anual(ano):
         return []
 
 
-def get_gastos_crediario_por_fornecedor_anual(ano, limit=20):
+def get_gastos_crediario_por_fornecedor_anual(ano, limit=100):
     try:
         fornecedor_nome = case(
             (Fornecedor.nome != None, Fornecedor.nome),

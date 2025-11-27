@@ -33,4 +33,4 @@ class CrediarioParcela(db.Model):
     )
 
     def __repr__(self):
-        return f"<Parcela {self.numero_parcela} de {self.crediario_movimento_id} | Venc: {self.data_vencimento} | R$ {self.valor_parcela}>"
+        return f"<Parcela {self.numero_parcela} de {self.crediario_movimento_id} | Venc: {self.data_vencimento} | {self.valor_parcela}>"

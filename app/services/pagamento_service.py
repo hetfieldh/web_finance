@@ -156,7 +156,7 @@ def registrar_pagamento(form):
         if valor_pago > saldo_disponivel:
             return (
                 False,
-                f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível (com limite): R$ {saldo_disponivel:.2f}",
+                f"Saldo insuficiente na conta {conta_debito.nome_banco}. Saldo disponível (com limite):  {saldo_disponivel:.2f}",
             )
 
         tipo_transacao_debito = ContaTransacao.query.filter_by(

@@ -67,7 +67,7 @@ render_confirm_modal %} {% block content %}
                       {{ cred.identificador_final if cred.identificador_final
                       else '-' }}
                     </td>
-                    <td>{{cred.limite_total | format_currency }}</td>
+                    <td>{{cred.limite_total | format_number }}</td>
                     <td>{{ cred.dia_vencimento }}</td>
                     <td>
                       {% if cred.ativa %}
@@ -146,7 +146,7 @@ render_confirm_modal %} {% block content %}
                 <div class="col-6 border-end">
                   <div class="extra-small text-muted">Limite Total</div>
                   <div class="fw-bold text-dark">
-                    {{ cred.limite_total | format_currency }}
+                    {{ cred.limite_total | format_number }}
                   </div>
                 </div>
                 <div class="col-6 ps-3">

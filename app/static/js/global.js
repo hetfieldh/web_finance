@@ -1,6 +1,5 @@
-// app/static/js/global.js
-
 document.addEventListener("DOMContentLoaded", () => {
+  // --- Lógica Existente: Sidebar ---
   const sidebarToggle = document.getElementById("sidebarToggle");
   if (sidebarToggle) {
     sidebarToggle.addEventListener("click", () => {
@@ -8,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- Lógica Existente: Tooltips do Bootstrap ---
   var tooltipTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="tooltip"]')
   );
@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 
+  // --- Lógica Existente: Botão Back-to-Top ---
   const backToTopButton = document.getElementById("back-to-top-btn");
   const scrollContainer = document.getElementById("page-content-wrapper");
   if (backToTopButton && scrollContainer) {
@@ -30,6 +31,53 @@ document.addEventListener("DOMContentLoaded", () => {
       scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
+  // ============================================================
+  // NOVA LÓGICA: Seleção em Massa / Checkboxes
+  // ============================================================
+  const checkboxes = document.querySelectorAll(".item-checkbox");
+  const selectAllDesktop = document.getElementById("select-all-desktop");
+  const selectAllMobile = document.getElementById("select-all-mobile");
+  const btnExcluir = document.getElementById("btn-excluir-massa");
+  const countSpan = document.getElementById("count-selected");
+
+  function updateButtonState() {
+    const allChecked = document.querySelectorAll(".item-checkbox:checked");
+
+    const visibleCount = Array.from(allChecked).filter(
+      (cb) => cb.offsetParent !== null
+    ).length;
+
+    if (countSpan) countSpan.textContent = visibleCount;
+
+    if (btnExcluir) {
+      if (visibleCount > 0) {
+        btnExcluir.classList.remove("d-none");
+      } else {
+        btnExcluir.classList.add("d-none");
+      }
+    }
+  }
+
+  function toggleAll(checked) {
+    checkboxes.forEach((cb) => (cb.checked = checked));
+    if (selectAllDesktop) selectAllDesktop.checked = checked;
+    if (selectAllMobile) selectAllMobile.checked = checked;
+    updateButtonState();
+  }
+
+  if (selectAllDesktop)
+    selectAllDesktop.addEventListener("change", (e) =>
+      toggleAll(e.target.checked)
+    );
+  if (selectAllMobile)
+    selectAllMobile.addEventListener("change", (e) =>
+      toggleAll(e.target.checked)
+    );
+
+  checkboxes.forEach((cb) => {
+    cb.addEventListener("change", updateButtonState);
+  });
 });
 
 /**

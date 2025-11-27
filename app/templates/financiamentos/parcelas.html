@@ -48,7 +48,7 @@
                 >Previsto</small
               >
               <span class="h6 fw-semibold text-dark"
-                >{{ resumo_fluxo_caixa.total_previsto | format_currency }}</span
+                >{{ resumo_fluxo_caixa.total_previsto | format_number }}</span
               >
             </div>
           </div>
@@ -59,7 +59,7 @@
                 >Pago</small
               >
               <span class="h6 fw-semibold text-success"
-                >{{ resumo_fluxo_caixa.Pago | format_currency }}</span
+                >{{ resumo_fluxo_caixa.Pago | format_number }}</span
               >
             </div>
           </div>
@@ -70,7 +70,7 @@
                 >Amortizado</small
               >
               <span class="h6 fw-semibold text-info"
-                >{{ resumo_fluxo_caixa.Amortizado | format_currency }}</span
+                >{{ resumo_fluxo_caixa.Amortizado | format_number }}</span
               >
             </div>
           </div>
@@ -81,7 +81,7 @@
                 >Pendente</small
               >
               <span class="h6 fw-semibold text-warning text-dark"
-                >{{ resumo_fluxo_caixa.Pendente | format_currency }}</span
+                >{{ resumo_fluxo_caixa.Pendente | format_number }}</span
               >
             </div>
           </div>
@@ -97,7 +97,7 @@
               <span
                 class="h6 fw-semibold {% if resumo_fluxo_caixa.diferenca > 0 %}text-success{% elif resumo_fluxo_caixa.diferenca < 0 %}text-danger{% endif %}"
               >
-                {{ resumo_fluxo_caixa.diferenca|abs|format_currency }}
+                {{ resumo_fluxo_caixa.diferenca|abs|format_number }}
               </span>
             </div>
           </div>
@@ -116,7 +116,7 @@
                 >Contrato</small
               >
               <span class="h6 fw-semibold text-dark"
-                >{{ resumo_principal.total_contrato | format_currency }}</span
+                >{{ resumo_principal.total_contrato | format_number }}</span
               >
             </div>
           </div>
@@ -127,7 +127,7 @@
                 >Pago (Princ.)</small
               >
               <span class="h6 fw-semibold text-success"
-                >{{ resumo_principal.Pago | format_currency }}</span
+                >{{ resumo_principal.Pago | format_number }}</span
               >
             </div>
           </div>
@@ -138,7 +138,7 @@
                 >Amortizado</small
               >
               <span class="h6 fw-semibold text-info"
-                >{{ resumo_principal.Amortizado | format_currency }}</span
+                >{{ resumo_principal.Amortizado | format_number }}</span
               >
             </div>
           </div>
@@ -149,7 +149,7 @@
                 >Pendente</small
               >
               <span class="h6 fw-semibold text-warning text-dark"
-                >{{ resumo_principal.Pendente | format_currency }}</span
+                >{{ resumo_principal.Pendente | format_number }}</span
               >
             </div>
           </div>
@@ -162,7 +162,7 @@
                 >Saldo Devedor</small
               >
               <span class="h6 fw-bold text-danger"
-                >{{ resumo_principal.saldo_devedor | format_currency }}</span
+                >{{ resumo_principal.saldo_devedor | format_number }}</span
               >
             </div>
           </div>
@@ -206,31 +206,31 @@
                   </span>
                 </td>
                 <td class="text-end text-nowrap text-muted">
-                  {{ item.parcela.valor_principal | format_currency }}
+                  {{ item.parcela.valor_principal | format_number }}
                 </td>
                 <td class="text-end text-nowrap text-muted">
-                  {{ item.parcela.valor_juros | format_currency }}
+                  {{ item.parcela.valor_juros | format_number }}
                 </td>
                 <td class="text-end text-nowrap text-muted">
                   {{ (item.parcela.valor_seguro + item.parcela.valor_seguro_2 +
                   item.parcela.valor_seguro_3 + item.parcela.valor_taxas) |
-                  format_currency }}
+                  format_number }}
                 </td>
 
                 <td class="text-end fw-bold text-dark text-nowrap">
-                  {{ item.parcela.valor_total_previsto | format_currency }}
+                  {{ item.parcela.valor_total_previsto | format_number }}
                 </td>
 
                 <td class="text-end fw-bold text-success text-nowrap">
                   {% if item.parcela.valor_pago %} {{ item.parcela.valor_pago |
-                  format_currency }} {% else %} - {% endif %}
+                  format_number }} {% else %} - {% endif %}
                 </td>
 
                 <td
                   class="text-end fw-bold text-nowrap {{ 'text-secondary' if item.parcela.status in ['Pago', 'Amortizado'] else 'text-danger' }}"
                 >
                   {% if item.parcela.status in ['Pago', 'Amortizado'] %} - {%
-                  else %} {{ item.saldo_devedor_dinamico | format_currency }} {%
+                  else %} {{ item.saldo_devedor_dinamico | format_number }} {%
                   endif %}
                 </td>
 

@@ -4,17 +4,17 @@
 render_estornar_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada mb-2">
+    <div class="caixa-sombreada mb-1">
       <span class="text-dark fw-bold">Painel de Pagamentos:</span>
       <span class="text-danger"
         >Selecione um mês para realizar pagamentos.</span
       >
     </div>
 
-    <div class="card mb-2">
-      <div class="card-body p-2">
+    <div class="card mb-1">
+      <div class="card-body p-1">
         <div
-          class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-2"
+          class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-1"
         >
           <form
             id="form-pagamentos-mes"
@@ -33,25 +33,25 @@ render_estornar_modal %} {% block content %}
             </div>
           </form>
 
-          <div class="d-none d-lg-flex align-items-center text-muted gap-3">
+          <div class="d-none d-lg-flex align-items-center text-muted gap-1">
             <div>
               Previsto:
               <strong class="text-primary"
-                >{{ totais.previsto | format_currency }}</strong
+                >{{ totais.previsto | format_number }}</strong
               >
             </div>
             <div class="vr"></div>
             <div>
               Pago:
               <strong class="text-success"
-                >{{ totais.pago | format_currency }}</strong
+                >{{ totais.pago | format_number }}</strong
               >
             </div>
             <div class="vr"></div>
             <div>
               Pendente:
               <strong class="text-danger"
-                >{{ totais.pendente | format_currency }}</strong
+                >{{ totais.pendente | format_number }}</strong
               >
             </div>
           </div>
@@ -67,7 +67,7 @@ render_estornar_modal %} {% block content %}
                     Previsto
                   </div>
                   <div class="text-primary fw-bold small">
-                    {{ totais.previsto | format_currency }}
+                    {{ totais.previsto | format_number }}
                   </div>
                 </div>
               </div>
@@ -80,7 +80,7 @@ render_estornar_modal %} {% block content %}
                     Pago
                   </div>
                   <div class="text-success fw-bold small">
-                    {{ totais.pago | format_currency }}
+                    {{ totais.pago | format_number }}
                   </div>
                 </div>
               </div>
@@ -93,7 +93,7 @@ render_estornar_modal %} {% block content %}
                     Pendente
                   </div>
                   <div class="text-danger fw-bold small">
-                    {{ totais.pendente | format_currency }}
+                    {{ totais.pendente | format_number }}
                   </div>
                 </div>
               </div>
@@ -108,7 +108,7 @@ render_estornar_modal %} {% block content %}
           <i class="fas fa-tasks text-warning me-2"></i>Contas a Pagar
         </h6>
       </div>
-      <div class="card-body px-0 pt-2 p-md-3">
+      <div class="card-body px-0 pt-1 p-md-3">
         {% if contas %}
 
         <div class="table-responsive d-none d-lg-block">
@@ -138,11 +138,11 @@ render_estornar_modal %} {% block content %}
                 <td>{{ conta.origem }}</td>
                 <td><span class="text-dark">{{ conta.tipo }}</span></td>
                 <td class="text-end fw-regular">
-                  {{ conta.valor_display | format_currency }}
+                  {{ conta.valor_display | format_number }}
                 </td>
                 <td class="text-end fw-bold text-success">
                   {% if conta.valor_pago > 0 %} {{ conta.valor_pago |
-                  format_currency }} {% else %} - {% endif %}
+                  format_number }} {% else %} - {% endif %}
                 </td>
                 <td class="text-center">
                   <span style="display: none">
@@ -226,7 +226,7 @@ render_estornar_modal %} {% block content %}
                   {{ conta.origem }}
                 </div>
                 <div class="fw-bold text-danger text-nowrap">
-                  {{ conta.valor_pendente | format_currency }}
+                  {{ conta.valor_pendente | format_number }}
                 </div>
               </div>
 

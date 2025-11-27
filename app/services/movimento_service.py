@@ -54,7 +54,7 @@ def registrar_movimento(form):
             if valor > saldo_disponivel:
                 return (
                     False,
-                    f"Saldo e limite insuficientes na conta {conta_origem.nome_banco}. Saldo disponível: R$ {saldo_disponivel:.2f}",
+                    f"Saldo e limite insuficientes na conta {conta_origem.nome_banco}. Saldo disponível:  {saldo_disponivel:.2f}",
                 )
 
         descricao_final = descricao_manual

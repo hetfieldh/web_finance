@@ -41,7 +41,7 @@
             <p
               class="card-text h5 fw-semibold {% if dados.saldo_inicial >= 0 %}text-info{% else %}text-danger{% endif %}"
             >
-              {{ dados.saldo_inicial | format_currency }}
+              {{ dados.saldo_inicial | format_number }}
             </p>
           </div>
         </div>
@@ -51,7 +51,7 @@
           <div class="card-body text-center">
             <h6 class="card-title text-muted small">TOTAL DE RECEITAS</h6>
             <p class="card-text h5 fw-semibold text-success">
-              {{ dados.total_receitas | format_currency }}
+              {{ dados.total_receitas | format_number }}
             </p>
           </div>
         </div>
@@ -61,7 +61,7 @@
           <div class="card-body text-center">
             <h6 class="card-title text-muted small">TOTAL DE DESPESAS</h6>
             <p class="card-text h5 fw-semibold text-danger">
-              {{ dados.total_despesas | format_currency }}
+              {{ dados.total_despesas | format_number }}
             </p>
           </div>
         </div>
@@ -75,7 +75,7 @@
             <p
               class="card-text h5 fw-bold {% if dados.saldo_final_previsto >= 0 %}text-primary{% else %}text-danger{% endif %}"
             >
-              {{ dados.saldo_final_previsto | format_currency }}
+              {{ dados.saldo_final_previsto | format_number }}
             </p>
           </div>
         </div>
@@ -126,7 +126,7 @@
                 <td
                   class="text-end fw-semibold {% if item.tipo == 'Receita' %}text-success{% else %}text-danger{% endif %}"
                 >
-                  {{ item.valor | format_currency }}
+                  {{ item.valor | format_number }}
                 </td>
               </tr>
               {% else %}

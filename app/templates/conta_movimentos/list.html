@@ -116,7 +116,7 @@ render_confirm_modal %} {% block content %}
                       </span>
                       {{ mov.data_movimento.strftime('%d/%m/%Y') }}
                     </td>
-                    <td>{{ mov.valor | format_currency }}</td>
+                    <td>{{ mov.valor | format_number }}</td>
                     <td>{{ mov.descricao if mov.descricao else '-' }}</td>
                     <td>
                       {% if mov.id_movimento_relacionado is not none %}
@@ -178,7 +178,7 @@ render_confirm_modal %} {% block content %}
                 <span
                   class="fw-bold {% if mov.tipo_transacao.tipo == 'Crédito' %}text-success{% else %}text-danger{% endif %}"
                 >
-                  {{ mov.valor | format_currency }}
+                  {{ mov.valor | format_number }}
                 </span>
               </div>
 

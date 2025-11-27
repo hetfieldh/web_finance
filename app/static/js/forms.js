@@ -293,19 +293,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const parcelasSelecionadas = document.querySelectorAll(
         ".parcela-checkbox:checked"
       ).length;
-      resumoValor.textContent = valorTotal.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      });
+      resumoValor.textContent = valorTotal.toLocaleString("pt-BR");
       resumoParcelas.textContent = parcelasSelecionadas;
       if (parcelasSelecionadas > 0 && valorTotal > 0) {
         const valorPorParcela = valorTotal / parcelasSelecionadas;
-        resumoValorParcela.textContent = valorPorParcela.toLocaleString(
-          "pt-BR",
-          { style: "currency", currency: "BRL" }
-        );
+        resumoValorParcela.textContent =
+          valorPorParcela.toLocaleString("pt-BR");
       } else {
-        resumoValorParcela.textContent = "R$ 0,00";
+        resumoValorParcela.textContent = " 0,00";
       }
     }
 

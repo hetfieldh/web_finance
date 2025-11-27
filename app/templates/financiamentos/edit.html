@@ -31,7 +31,7 @@
               <input
                 type="text"
                 class="form-control"
-                value="{{ financiamento.valor_total_financiado | format_currency }}"
+                value="{{ financiamento.valor_total_financiado | format_number }}"
                 readonly
               />
             </div>
@@ -40,7 +40,7 @@
               <input
                 type="text"
                 class="form-control"
-                value="{{ financiamento.saldo_devedor_atual | format_currency }}"
+                value="{{ financiamento.saldo_devedor_atual | format_number }}"
                 readonly
               />
             </div>

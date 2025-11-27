@@ -36,7 +36,7 @@
                   <span class="badge bg-danger ms-1">Vencido</span>
                 </td>
                 <td>{{ item.descricao }}</td>
-                <td class="text-end">{{ item.valor | format_currency }}</td>
+                <td class="text-end">{{ item.valor | format_number }}</td>
                 <td class="text-center">
                   {% if item.natureza == 'Despesa' %}
                   <span class="badge bg-danger-subtle text-danger-emphasis"
@@ -131,7 +131,7 @@
             <span
               class="h5 mb-0 {% if item.natureza == 'Despesa' %}text-danger{% else %}text-success{% endif %}"
             >
-              {{ item.valor | format_currency }}
+              {{ item.valor | format_number }}
             </span>
             <div class="text-end">
               <small class="text-muted fw-bold">
