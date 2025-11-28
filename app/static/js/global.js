@@ -114,5 +114,6 @@ $(document).ready(function () {
     searching: false,
     info: false,
     responsive: true,
+    order: [],
   });
 });

@@ -119,7 +119,11 @@ def adicionar_movimento_crediario():
         success, message = adicionar_movimento(form)
         if success:
             flash(message, "success")
-            return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
+            return redirect(
+                url_for(
+                    "crediario_movimento.listar_movimentos_crediario", trigger_sync=1
+                )
+            )
         else:
             flash(message, "danger")
 
@@ -176,7 +180,12 @@ def excluir_movimento_crediario(id):
     else:
         flash(message, "danger")
 
-    return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
+    if success:
+        return redirect(
+            url_for("crediario_movimento.listar_movimentos_crediario", trigger_sync=1)
+        )
+    else:
+        return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
 
 
 @crediario_movimento_bp.route("/detalhes/<int:id>")
