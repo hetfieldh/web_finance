@@ -20,6 +20,7 @@ from app.utils import (
     STATUS_PARCIAL_RECEBIDO,
     STATUS_PENDENTE,
     STATUS_RECEBIDO,
+    FormChoices,
 )
 
 
@@ -46,6 +47,7 @@ def get_contas_a_receber_por_mes(ano, mes):
                 "id_original": receita.id,
                 "origem": receita.despesa_receita.nome,
                 "tipo": NATUREZA_RECEITA,
+                "categoria": "Receita",
                 "vencimento": receita.data_vencimento,
                 "valor_previsto": receita.valor_previsto,
                 "valor_recebido": receita.valor_realizado or Decimal(0),
@@ -77,8 +79,9 @@ def get_contas_a_receber_por_mes(ano, mes):
             lista_contas.append(
                 {
                     "id_original": salario.id,
-                    "origem": f"SALÁRIO REF. {salario.mes_referencia}",
-                    "tipo": "Salário Líquido",
+                    "origem": f"FOLHA REF. {salario.mes_referencia}",
+                    "tipo": salario.tipo,
+                    "categoria": "Salário",
                     "vencimento": salario.data_recebimento,
                     "valor_previsto": salario_liquido,
                     "valor_recebido": salario_liquido if is_pago else Decimal(0),
@@ -93,6 +96,7 @@ def get_contas_a_receber_por_mes(ano, mes):
                     "folha_tem_fgts": folha_tem_fgts,
                 }
             )
+
         beneficios_itens = [
             item for item in salario.itens if item.salario_item.tipo == "Benefício"
         ]
@@ -107,6 +111,7 @@ def get_contas_a_receber_por_mes(ano, mes):
                     "id_original": item_beneficio.id,
                     "origem": item_beneficio.salario_item.nome,
                     "tipo": "Benefício",
+                    "categoria": "Benefício",
                     "vencimento": salario.data_recebimento,
                     "valor_previsto": item_beneficio.valor,
                     "valor_recebido": (
@@ -180,6 +185,8 @@ def registrar_recebimento(form):
         conta_credito.saldo_atual += valor_recebido
         db.session.flush()
 
+        tipos_folha = [t.value for t in FormChoices.TipoFolha]
+
         if item_tipo == NATUREZA_RECEITA:
             item = DespRecMovimento.query.get(item_id)
             item.status = STATUS_RECEBIDO
@@ -187,7 +194,7 @@ def registrar_recebimento(form):
             item.data_pagamento = form.data_recebimento.data
             item.movimento_bancario_id = novo_movimento.id
 
-        elif item_tipo == "Salário Líquido":
+        elif item_tipo in tipos_folha:
             item = SalarioMovimento.query.get(item_id)
             item.movimento_bancario_salario_id = novo_movimento.id
             _processar_fgts(item, form.data_recebimento.data, tipo_transacao_credito)
@@ -213,6 +220,8 @@ def estornar_recebimento(item_id, item_tipo):
         item_a_atualizar = None
         movimento_bancario_id = None
 
+        tipos_folha = [t.value for t in FormChoices.TipoFolha]
+
         if item_tipo == "Receita":
             item_a_atualizar = DespRecMovimento.query.get(item_id)
             if item_a_atualizar:
@@ -222,13 +231,14 @@ def estornar_recebimento(item_id, item_tipo):
                 item_a_atualizar.data_pagamento = None
                 item_a_atualizar.movimento_bancario_id = None
 
-        elif item_tipo == "Salário Líquido":
+        elif item_tipo in tipos_folha:
             item_a_atualizar = SalarioMovimento.query.get(item_id)
             if item_a_atualizar:
                 movimento_bancario_id = item_a_atualizar.movimento_bancario_salario_id
                 item_a_atualizar.movimento_bancario_salario_id = None
                 _estornar_fgts(item_a_atualizar)
                 _atualizar_status_folha(item_a_atualizar)
+
         elif item_tipo == "Benefício":
             item_a_atualizar = SalarioMovimentoItem.query.get(item_id)
             if item_a_atualizar:

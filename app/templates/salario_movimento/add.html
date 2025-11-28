@@ -10,32 +10,44 @@
       </div>
       <div class="card-body">
         <p class="caixa-sombreada">
-          Selecione o mês de referência da folha de pagamento. O vencimento será
-          sempre no 5° dia útil do mês posterior.
+          Selecione o tipo e a referência.
+          <br />
+          <small class="text-muted"
+            >* Mensal: Vencimento automático (5° dia útil do mês
+            seguinte).</small
+          ><br />
+          <small class="text-muted"
+            >* Outros: Informe a data de recebimento.</small
+          >
         </p>
         <form
           method="POST"
           action="{{ url_for('salario.novo_lancamento_folha') }}"
         >
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          {{ form.data_recebimento }}
 
-          <div class="row mb-3 align-items-center">
-            <div class="col-auto">
-              {{ form.mes_referencia.label(class="form-label mb-0") }}
+          <div class="row mb-3 g-3">
+            <div class="col-md-6">
+              {{ render_field(form.tipo, attrs={'id': 'tipo_folha'}) }}
             </div>
-            <div class="col">
-              {{ form.mes_referencia(class="form-control input-normal",
-              id="mes_referencia") }} {% if form.mes_referencia.errors %}
-              <div class="text-danger mt-1">
-                <small>
-                  {% for error in form.mes_referencia.errors %} {{ error }}<br />
-                  {% endfor %}
-                </small>
+
+            <div class="col-md-6">
+              {{ form.mes_referencia.label(class="form-label mb-0 small") }} {{
+              form.mes_referencia(class="form-control form-control-sm",
+              id="mes_referencia", type="month") }} {% if
+              form.mes_referencia.errors %}
+              <div class="text-danger mt-1 small">
+                {% for error in form.mes_referencia.errors %} {{ error }}<br />
+                {% endfor %}
               </div>
               {% endif %}
             </div>
+
+            <div class="col-md-6" id="container_data_recebimento">
+              {{ render_field(form.data_recebimento, attrs={'type': 'date'}) }}
+            </div>
           </div>
+
           <div class="mt-1">
             {{ form.submit(class="btn btn-azul") }}
             <a

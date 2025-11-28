@@ -222,11 +222,11 @@ def listar_movimentos():
 def novo_lancamento_folha():
     form = CabecalhoFolhaForm()
     if form.validate_on_submit():
-        data_recebimento_obj = datetime.strptime(
-            form.data_recebimento.data, "%Y-%m-%d"
-        ).date()
+
         success, message, movimento = criar_folha_pagamento(
-            form.mes_referencia.data, data_recebimento_obj
+            mes_referencia=form.mes_referencia.data,
+            tipo_folha=form.tipo.data,
+            data_recebimento_form=form.data_recebimento.data,
         )
         if success:
             flash(message, "success")

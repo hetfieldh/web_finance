@@ -17,6 +17,17 @@ class SalarioMovimento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     mes_referencia = db.Column(db.String(7), nullable=False)
+
+    tipo = db.Column(
+        db.Enum(
+            *(item.value for item in FormChoices.TipoFolha),
+            name="tipo_folha_enum",
+        ),
+        nullable=False,
+        default=FormChoices.TipoFolha.MENSAL.value,
+        server_default=FormChoices.TipoFolha.MENSAL.value,
+    )
+
     data_recebimento = db.Column(db.Date, nullable=False)
 
     movimento_bancario_salario_id = db.Column(
@@ -64,12 +75,12 @@ class SalarioMovimento(db.Model):
 
     __table_args__ = (
         UniqueConstraint(
-            "usuario_id", "mes_referencia", name="_usuario_mes_referencia_uc"
+            "usuario_id", "mes_referencia", "tipo", name="_usuario_mes_tipo_uc"
         ),
     )
 
     def __repr__(self):
-        return f"<SalarioMovimento Mês: {self.mes_referencia} | Status: {self.status}>"
+        return f"<SalarioMovimento Mês: {self.mes_referencia} | Tipo: {self.tipo} | Status: {self.status}>"
 
     @property
     def salario_liquido(self):

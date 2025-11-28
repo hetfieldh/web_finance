@@ -24,7 +24,7 @@ render_confirm_modal %} {% block content %}
       </div>
     </div>
 
-    <div class="card border-0 mb-2">
+    <div class="card border-0 bg-transparent mb-2">
       <div class="card-body p-1">
         <form
           action="{{ url_for('conta_movimento.listar_movimentacoes') }}"
@@ -41,7 +41,7 @@ render_confirm_modal %} {% block content %}
             title="Data Inicial"
           />
 
-          <span class="text-muted small">-</span>
+          <span class="text-muted p-0 small">-</span>
 
           <input
             type="date"

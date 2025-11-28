@@ -90,13 +90,23 @@ class EditarSalarioItemForm(FlaskForm):
 
 
 class CabecalhoFolhaForm(FlaskForm):
+    tipo = SelectField(
+        "Tipo de Folha",
+        choices=FormChoices.get_choices(FormChoices.TipoFolha),
+        validators=[DataRequired("Selecione o tipo de folha.")],
+        default=FormChoices.TipoFolha.MENSAL.value,
+    )
     mes_referencia = StringField(
         "Mês de Referência: ",
         validators=[DataRequired("O mês de referência é obrigatório.")],
         render_kw={"placeholder": "Selecione..."},
     )
-    data_recebimento = HiddenField()
-    submit = SubmitField("Adicionar Verbas")
+    data_recebimento = DateField(
+        "Data de Recebimento",
+        validators=[DataRequired("A data de recebimento é obrigatória.")],
+    )
+
+    submit = SubmitField("Criar Folha")
 
 
 class AdicionarItemFolhaForm(FlaskForm):

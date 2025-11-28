@@ -22,6 +22,7 @@ from app.services import conta_service, recebimento_service, salario_service
 from app.services.recebimento_service import (
     estornar_recebimento as estornar_recebimento_service,
 )
+from app.utils import FormChoices
 
 recebimentos_bp = Blueprint("recebimentos", __name__, url_prefix="/recebimentos")
 
@@ -109,6 +110,20 @@ def registrar_recebimento():
             "danger",
         )
         return redirect(request.referrer or url_for("main.dashboard"))
+
+    tipos_folha = [t.value for t in FormChoices.TipoFolha]
+
+    if form.item_tipo.data in tipos_folha:
+        can_proceed, msg = salario_service.verificar_regras_recebimento(
+            form.item_id.data
+        )
+
+        if not can_proceed:
+            flash(msg, "danger")
+            return redirect(request.referrer or url_for("main.dashboard"))
+
+        if msg:
+            flash(msg, "warning")
 
     try:
         success, message = recebimento_service.registrar_recebimento(form)

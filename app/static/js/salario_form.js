@@ -1,64 +1,46 @@
 // app/static/js/salario_form.js
 
 document.addEventListener("DOMContentLoaded", function () {
-  const mesReferenciaInput = document.getElementById("mes_referencia");
+  const tipoFolhaSelect = document.getElementById("tipo_folha");
+  const containerData = document.getElementById("container_data_recebimento");
+  const inputData = containerData ? containerData.querySelector("input") : null;
 
-  if (mesReferenciaInput) {
-    function getFifthBusinessDay(year, month) {
-      let date = new Date(year, month, 1);
-      let businessDays = 0;
+  function toggleDataField() {
+    if (!tipoFolhaSelect || !containerData) return;
 
-      while (businessDays < 5) {
-        let dayOfWeek = date.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-          businessDays++;
-        }
-        if (businessDays < 5) {
-          date.setDate(date.getDate() + 1);
+    if (tipoFolhaSelect.value === "Mensal") {
+      containerData.style.display = "none";
+
+      if (inputData) {
+        inputData.required = false;
+
+        if (!inputData.value) {
+          inputData.value = new Date().toISOString().split("T")[0];
         }
       }
-      return date;
-    }
+    } else {
+      containerData.style.display = "block";
 
-    $("#mes_referencia")
-      .datepicker({
-        format: "mm-yyyy",
-        startView: "months",
-        minViewMode: "months",
-        language: "pt-BR",
-        autoclose: true,
-      })
-      .on("changeDate", function (e) {
-        const selectedDate = e.date;
-        if (selectedDate) {
-          const year = selectedDate.getFullYear();
-          const month = selectedDate.getMonth();
-          const receiptDate = getFifthBusinessDay(year, month + 1);
-          const receiptYear = receiptDate.getFullYear();
-          const receiptMonth = String(receiptDate.getMonth() + 1).padStart(
-            2,
-            "0"
-          );
-          const receiptDay = String(receiptDate.getDate()).padStart(2, "0");
-          const formattedReceiptDate = `${receiptYear}-${receiptMonth}-${receiptDay}`;
-          const dataRecebimentoInput =
-            document.getElementById("data_recebimento");
-          if (dataRecebimentoInput) {
-            dataRecebimentoInput.value = formattedReceiptDate;
-          }
-        }
-      });
+      if (inputData) {
+        inputData.required = true;
+      }
+    }
   }
 
-  const tipoSelect = document.getElementById("tipo");
+  if (tipoFolhaSelect) {
+    tipoFolhaSelect.addEventListener("change", toggleDataField);
+    toggleDataField();
+  }
+
+  const tipoItemSelect = document.getElementById("tipo");
   const contaDestinoField = document.getElementById("conta_destino_id");
 
-  if (tipoSelect && contaDestinoField) {
+  if (tipoItemSelect && contaDestinoField) {
     const contaDestinoContainer =
       contaDestinoField.closest(".mb-3") || contaDestinoField.parentElement;
 
     function toggleContaDestinoField() {
-      if (tipoSelect.value === "Benefício") {
+      if (tipoItemSelect.value === "Benefício") {
         contaDestinoContainer.style.display = "block";
       } else {
         contaDestinoContainer.style.display = "none";
@@ -68,6 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     toggleContaDestinoField();
 
-    tipoSelect.addEventListener("change", toggleContaDestinoField);
+    tipoItemSelect.addEventListener("change", toggleContaDestinoField);
   }
 });

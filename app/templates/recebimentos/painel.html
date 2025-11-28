@@ -1,27 +1,27 @@
-<!--- app\templates\recebimentos\painel.html -->
+<!-- app\templates\recebimentos\painel.html -->
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field,
 render_estornar_modal %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="caixa-sombreada mb-2">
+    <div class="caixa-sombreada mb-1">
       <span class="text-dark fw-bold">Painel de Recebimentos:</span>
       <span class="text-danger"
         >Selecione um mês para realizar recebimentos.</span
       >
     </div>
 
-    <div class="card shadow-sm mb-2">
-      <div class="card-body p-2">
+    <div class="card shadow-sm mb-1">
+      <div class="card-body p-1">
         <div
-          class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-2"
+          class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-1"
         >
           <form
             id="form-recebimentos-mes"
             method="GET"
             action="{{ url_for('recebimentos.painel') }}"
             class="w-100 w-lg-auto"
-            style="max-width: 100%; max-width: 200px"
+            style="max-width: 100%; max-width: 160px"
           >
             <div class="input-group">
               <span class="input-group-text bg-light border-secondary-subtle"
@@ -55,57 +55,15 @@ render_estornar_modal %} {% block content %}
               >
             </div>
           </div>
-
-          <div class="d-lg-none w-100">
-            <div class="row g-1 text-center">
-              <div class="col-4">
-                <div class="border rounded p-1 bg-light">
-                  <div
-                    class="extra-small text-muted text-uppercase fw-bold"
-                    style="font-size: 0.65rem"
-                  >
-                    Previsto
-                  </div>
-                  <div class="text-primary fw-bold small">
-                    {{ totais.previsto | format_number }}
-                  </div>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="border rounded p-1 bg-light">
-                  <div
-                    class="extra-small text-muted text-uppercase fw-bold"
-                    style="font-size: 0.65rem"
-                  >
-                    Recebido
-                  </div>
-                  <div class="text-success fw-bold small">
-                    {{ totais.recebido | format_number }}
-                  </div>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="border rounded p-1 bg-light">
-                  <div
-                    class="extra-small text-muted text-uppercase fw-bold"
-                    style="font-size: 0.65rem"
-                  >
-                    Pendente
-                  </div>
-                  <div class="text-warning text-dark fw-bold small">
-                    {{ totais.pendente | format_number }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
+
     <div class="card border-0">
       <div class="card-header menu-primario">
         <h5 class="mb-0">
-          <i class="fas fa-hand-holding-usd me-2"></i>Valores a Receber
+          <i class="fas fa-hand-holding-usd text-warning me-2"></i>Valores a
+          Receber
         </h5>
       </div>
       <div class="card-body px-0 pt-2 p-md-3">
@@ -127,19 +85,28 @@ render_estornar_modal %} {% block content %}
               </tr>
             </thead>
             <tbody>
-              {% for conta in contas %} {% set attrs = {} %} {% if conta.tipo ==
-              'Salário Líquido' %} {% set _ =
+              {% for conta in contas %} {% set attrs = {} %} {% if
+              conta.categoria == 'Salário' %} {% set _ =
               attrs.update({'data-folha-tem-fgts': 'true' if
               conta.folha_tem_fgts else 'false'}) %} {% endif %}
-              <tr data-item-tipo="{{ conta.tipo }}" {{ attrs|xmlattr }}>
+
+              <tr
+                data-item-tipo="{{ conta.tipo }}"
+                data-categoria="{{ conta.categoria or '' }}"
+                {{
+                attrs|xmlattr
+                }}
+              >
                 <td>
-                  <span style="display: none">
-                    {{ conta.vencimento.strftime('%Y%m%d') }}
-                  </span>
+                  <span style="display: none"
+                    >{{ conta.vencimento.strftime('%Y%m%d') }}</span
+                  >
                   {{ conta.vencimento.strftime('%d/%m/%Y') }}
                 </td>
                 <td>{{ conta.origem }}</td>
+
                 <td><span class="text-dark">{{ conta.tipo }}</span></td>
+
                 <td class="text-end text-dark">
                   {{ conta.valor_previsto | format_number }}
                 </td>
@@ -211,13 +178,14 @@ render_estornar_modal %} {% block content %}
         </div>
 
         <div class="d-lg-none">
-          {% for conta in contas %} {% set attrs = {} %} {% if conta.tipo ==
-          'Salário Líquido' %} {% set _ = attrs.update({'data-folha-tem-fgts':
-          'true' if conta.folha_tem_fgts else 'false'}) %} {% endif %}
+          {% for conta in contas %} {% set attrs = {} %} {% if conta.categoria
+          == 'Salário' %} {% set _ = attrs.update({'data-folha-tem-fgts': 'true'
+          if conta.folha_tem_fgts else 'false'}) %} {% endif %}
 
           <div
             class="card mb-1 border-start border-1 border-success"
             data-item-tipo="{{ conta.tipo }}"
+            data-categoria="{{ conta.categoria or '' }}"
             {{
             attrs|xmlattr
             }}
@@ -246,7 +214,6 @@ render_estornar_modal %} {% block content %}
                   <span class="mx-1 text-secondary">|</span>
                   {{ conta.tipo }}
                 </div>
-
                 {% if conta.status in ['Recebido', 'Pago'] %}
                 <span
                   class="badge bg-success-subtle text-success-emphasis extra-small"

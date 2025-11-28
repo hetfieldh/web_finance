@@ -63,6 +63,13 @@ TIPO_MOVIMENTACAO_TRANSFERENCIA = "transferencia"
 TIPO_PIX = "PIX"
 TIPO_TRANSFERENCIA = "TRANSFERÊNCIA"
 
+# Constantes TIPO FOLHA
+TIPO_FOLHA_MENSAL = "Mensal"
+TIPO_FOLHA_RESCISAO = "Rescisão"
+TIPO_FOLHA_DECIMO_TERCEIRO = "13° Salário"
+TIPO_FOLHA_FERIAS = "Férias"
+TIPO_FOLHA_PLR = "PLR"
+
 
 # OPÇÕES PARA FORMULÁRIOS (SELECT CHOICES) USANDO ENUM
 class FormChoices:
@@ -153,6 +160,13 @@ class FormChoices:
     class TipoTransfInterContas(Enum):
         PIX = TIPO_PIX
         TRANSFERENCIA = TIPO_TRANSFERENCIA
+
+    class TipoFolha(Enum):
+        MENSAL = TIPO_FOLHA_MENSAL
+        RESCISAO = TIPO_FOLHA_RESCISAO
+        DECIMO_TERCEIRO = TIPO_FOLHA_DECIMO_TERCEIRO
+        FERIAS = TIPO_FOLHA_FERIAS
+        PLR = TIPO_FOLHA_PLR
 
     @classmethod
     def get_choices(cls, enum_class):

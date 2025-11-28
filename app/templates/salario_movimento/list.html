@@ -24,7 +24,7 @@ render_confirm_modal %} {% block content %}
       </div>
     </div>
 
-    <div class="card border-0 mb-1">
+    <div class="card border-0 bg-transparent mb-1">
       <div class="card-body p-1">
         <form
           action="{{ url_for('salario.listar_movimentos') }}"
@@ -41,7 +41,7 @@ render_confirm_modal %} {% block content %}
             title="Data Inicial"
           />
 
-          <span class="text-muted small">-</span>
+          <span class="text-muted p-1 small">-</span>
 
           <input
             type="date"
@@ -81,6 +81,7 @@ render_confirm_modal %} {% block content %}
                 <thead>
                   <tr>
                     <th>Mês/Ano</th>
+                    <th>Tipo</th>
                     <th>Previsão de Recebimento</th>
                     <th>Salário Líquido</th>
                     <th>Benefícios</th>
@@ -91,7 +92,20 @@ render_confirm_modal %} {% block content %}
                 <tbody>
                   {% for movimento in movimentos %}
                   <tr>
-                    <td>{{ movimento.mes_referencia }}</td>
+                    <td>
+                      {% if movimento.mes_referencia and '-' in
+                      movimento.mes_referencia %} {% set partes =
+                      movimento.mes_referencia.split('-') %} {{ partes[1] }}/{{
+                      partes[0] }} {% else %} {{ movimento.mes_referencia }} {%
+                      endif %}
+                    </td>
+                    <td>
+                      <span
+                        class="badge {% if movimento.tipo == 'Mensal' %}bg-success-subtle text-success-emphasis{% else %}badge bg-info-subtle text-info-emphasis{% endif %}"
+                      >
+                        {{ movimento.tipo }}
+                      </span>
+                    </td>
                     <td>
                       <span style="display: none">
                         {{ movimento.data_recebimento.strftime('%Y%m%d') }}
@@ -138,6 +152,9 @@ render_confirm_modal %} {% block content %}
                 <div class="overflow-hidden me-2">
                   <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem">
                     {{ movimento.mes_referencia }}
+                    <small class="text-muted ms-1"
+                      >({{ movimento.tipo }})</small
+                    >
                   </h6>
                   <div class="text-muted extra-small mt-1">
                     <i class="far fa-calendar-check me-1"></i>

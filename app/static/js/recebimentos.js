@@ -10,30 +10,27 @@ function formatCurrencyJS(value) {
 
 document.addEventListener("DOMContentLoaded", function () {
   const fgtsInfoElement = document.getElementById("fgts-info-data");
-  if (fgtsInfoElement) {
-    const fgtsInfo = JSON.parse(fgtsInfoElement.textContent);
-    const hasFgtsAccount = fgtsInfo.has_account;
 
-    const salarioRow = document.querySelector(
-      "tr[data-item-tipo='Salário Líquido']"
+  if (fgtsInfoElement) {
+    const salarioRows = document.querySelectorAll(
+      "tr[data-categoria='Salário']"
     );
 
-    if (salarioRow) {
+    salarioRows.forEach((salarioRow) => {
+      const itemTipo = salarioRow.getAttribute("data-item-tipo");
       const folhaTemFgts =
         salarioRow.getAttribute("data-folha-tem-fgts") === "true";
 
-      if (!hasFgtsAccount || !folhaTemFgts) {
+      if (itemTipo === "Mensal" && !folhaTemFgts) {
         const actionsCell = salarioRow.querySelector("td:last-child");
+
         if (actionsCell) {
           let title = "Recebimento bloqueado.";
-          if (!hasFgtsAccount) {
-            title +=
-              " Motivo: Nenhuma conta bancária do tipo FGTS foi cadastrada.";
-          } else if (!folhaTemFgts) {
-            title +=
-              " Motivo: A folha de pagamento não possui um item de FGTS com valor.";
-          }
+          title +=
+            " Motivo: A folha de pagamento (Mensal) não possui um item de FGTS com valor.";
+
           const lockIcon = actionsCell.querySelector(".fa-lock");
+
           if (!lockIcon) {
             actionsCell.innerHTML = `<i class="fas fa-lock text-danger" data-bs-toggle="tooltip" title="${title}"></i>`;
           } else {
@@ -42,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
       }
-    }
+    });
   }
 
   var tooltipTriggerList = [].slice.call(
@@ -76,31 +73,29 @@ document.addEventListener("DOMContentLoaded", function () {
   const contasDataElement = document.getElementById("contas-data");
 
   if (!recebimentoModal || !contasDataElement) {
-    console.error(
-      "Elementos essenciais (modal ou script de dados das contas) não encontrados."
-    );
     return;
   }
 
   const todasAsContas = JSON.parse(contasDataElement.textContent);
 
+  const contasPadrao = [
+    "Corrente",
+    "Poupança",
+    "Digital",
+    "Investimento",
+    "Caixinha",
+    "Dinheiro",
+  ];
+
   const regrasDeFiltro = {
-    "Salário Líquido": [
-      "Corrente",
-      "Poupança",
-      "Digital",
-      "Investimento",
-      "Caixinha",
-      "Dinheiro",
-    ],
-    Receita: [
-      "Corrente",
-      "Poupança",
-      "Digital",
-      "Investimento",
-      "Caixinha",
-      "Dinheiro",
-    ],
+    Mensal: contasPadrao,
+    "13° Salário": contasPadrao,
+    Férias: contasPadrao,
+    PLR: contasPadrao,
+    Rescisão: contasPadrao,
+    "Salário Líquido": contasPadrao,
+
+    Receita: contasPadrao,
     Benefício: ["Benefício"],
     FGTS: ["FGTS"],
   };
@@ -144,17 +139,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const itemId = button.getAttribute("data-item-id");
     const itemValor = button.getAttribute("data-item-valor");
     const itemDescricao = button.getAttribute("data-item-descricao");
-    const itemIdInput = modalForm.querySelector('input[name="item_id"]');
-    const itemTipoInput = modalForm.querySelector('input[name="item_tipo"]');
-    const valorRecebidoInput = modalForm.querySelector(
-      'input[name="valor_recebido"]'
-    );
-    const itemDescricaoInput = modalForm.querySelector(
-      'input[name="item_descricao"]'
-    );
-    if (itemIdInput) itemIdInput.value = itemId;
-    if (itemTipoInput) itemTipoInput.value = itemTipo;
-    if (valorRecebidoInput) valorRecebidoInput.value = itemValor;
-    if (itemDescricaoInput) itemDescricaoInput.value = itemDescricao;
+
+    modalForm.querySelector('input[name="item_id"]').value = itemId;
+    modalForm.querySelector('input[name="item_tipo"]').value = itemTipo;
+    modalForm.querySelector('input[name="valor_recebido"]').value = itemValor;
+    modalForm.querySelector('input[name="item_descricao"]').value =
+      itemDescricao;
   });
 });

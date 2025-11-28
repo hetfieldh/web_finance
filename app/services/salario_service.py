@@ -1,5 +1,8 @@
 # app/services/salario_service.py
 
+from datetime import date
+
+from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_login import current_user
 
@@ -7,22 +10,46 @@ from app import db
 from app.models.salario_item_model import SalarioItem
 from app.models.salario_movimento_item_model import SalarioMovimentoItem
 from app.models.salario_movimento_model import SalarioMovimento
+from app.utils import FormChoices
 
 
-def criar_folha_pagamento(mes_referencia, data_recebimento):
+def get_quinto_dia_util(ano, mes):
+    data_base = date(ano, mes, 1) + relativedelta(months=1)
+    dia = 1
+    dias_uteis = 0
+
+    while dias_uteis < 5:
+        data_atual = date(data_base.year, data_base.month, dia)
+        if data_atual.weekday() < 5:
+            dias_uteis += 1
+
+        if dias_uteis < 5:
+            dia += 1
+
+    return date(data_base.year, data_base.month, dia)
+
+
+def criar_folha_pagamento(mes_referencia, tipo_folha, data_recebimento_form):
     movimento_existente = SalarioMovimento.query.filter_by(
-        usuario_id=current_user.id, mes_referencia=mes_referencia
+        usuario_id=current_user.id, mes_referencia=mes_referencia, tipo=tipo_folha
     ).first()
 
     if movimento_existente:
-        msg = f"Já existe uma folha de pagamento para o mês {mes_referencia}."
+        msg = f"Já existe uma folha do tipo '{tipo_folha}' para o mês {mes_referencia}."
         return False, msg, movimento_existente
 
     try:
+        data_final = data_recebimento_form
+
+        if tipo_folha == FormChoices.TipoFolha.MENSAL.value:
+            ano, mes = map(int, mes_referencia.split("-"))
+            data_final = get_quinto_dia_util(ano, mes)
+
         novo_movimento = SalarioMovimento(
             usuario_id=current_user.id,
             mes_referencia=mes_referencia,
-            data_recebimento=data_recebimento,
+            tipo=tipo_folha,
+            data_recebimento=data_final,
         )
         db.session.add(novo_movimento)
         db.session.commit()
@@ -156,3 +183,31 @@ def has_fgts_salario_item():
         ).first()
         is not None
     )
+
+
+def verificar_regras_recebimento(movimento_id):
+    movimento = SalarioMovimento.query.get(movimento_id)
+    if not movimento:
+        return False, "Movimento não encontrado."
+
+    tem_fgts = any(
+        item.salario_item.tipo == FormChoices.TipoSalarioItem.FGTS.value
+        and item.valor > 0
+        for item in movimento.itens
+    )
+
+    if movimento.tipo == FormChoices.TipoFolha.MENSAL.value:
+        if not tem_fgts:
+            return (
+                False,
+                "Recebimento bloqueado: A folha 'Mensal' deve possuir um item de FGTS com valor.",
+            )
+
+    else:
+        if not tem_fgts:
+            return (
+                True,
+                "ATENÇÃO: Esta folha não possui FGTS. Caso seja necessário, estorne o pagamento e ajuste.",
+            )
+
+    return True, None

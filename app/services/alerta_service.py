@@ -107,7 +107,7 @@ def _formatar_item_salario(item):
     )
     return {
         "data": item.data_recebimento,
-        "descricao": f"SALÁRIO REF. {item.mes_referencia}",
+        "descricao": f"FOLHA REF. {item.mes_referencia}",
         "valor": item.salario_liquido,
         "natureza": NATUREZA_RECEITA,
         "id_original": item.id,
@@ -115,6 +115,20 @@ def _formatar_item_salario(item):
         "valor_para_modal": item.salario_liquido,
         "conta_sugerida_id": None,
         "folha_tem_fgts": folha_tem_fgts,
+    }
+
+
+def _formatar_item_beneficio(item):
+    return {
+        "data": item.movimento_pai.data_recebimento,
+        "descricao": f"{item.salario_item.nome} (Ref: {item.movimento_pai.mes_referencia})",
+        "valor": item.valor,
+        "natureza": NATUREZA_RECEITA,
+        "id_original": item.id,
+        "tipo_item": "Benefício",
+        "valor_para_modal": item.valor,
+        "conta_sugerida_id": item.salario_item.id_conta_destino,
+        "folha_tem_fgts": True,
     }
 
 
@@ -169,8 +183,24 @@ def get_contas_vencidas():
         SalarioMovimento.data_recebimento < hoje,
         SalarioMovimento.status.in_(STATUS_NAO_RECEBIDO),
     ).all()
-    salarios_filtrados = [s for s in salarios_query if s.salario_liquido > 0]
+
+    salarios_filtrados = [
+        s
+        for s in salarios_query
+        if s.salario_liquido > 0 and s.movimento_bancario_salario_id is None
+    ]
     movimentos.extend([_formatar_item_salario(s) for s in salarios_filtrados])
+
+    beneficios_pendentes = []
+    for s in salarios_query:
+        for item in s.itens:
+            if (
+                item.salario_item.tipo == "Benefício"
+                and item.movimento_bancario_id is None
+            ):
+                beneficios_pendentes.append(item)
+
+    movimentos.extend([_formatar_item_beneficio(b) for b in beneficios_pendentes])
 
     movimentos.sort(key=lambda x: x["data"])
     return movimentos
@@ -228,8 +258,24 @@ def get_contas_a_vencer(dias=7):
         SalarioMovimento.data_recebimento.between(hoje, data_limite),
         SalarioMovimento.status.in_(STATUS_NAO_RECEBIDO),
     ).all()
-    salarios_filtrados = [s for s in salarios_query if s.salario_liquido > 0]
+
+    salarios_filtrados = [
+        s
+        for s in salarios_query
+        if s.salario_liquido > 0 and s.movimento_bancario_salario_id is None
+    ]
     movimentos.extend([_formatar_item_salario(s) for s in salarios_filtrados])
+
+    beneficios_pendentes = []
+    for s in salarios_query:
+        for item in s.itens:
+            if (
+                item.salario_item.tipo == "Benefício"
+                and item.movimento_bancario_id is None
+            ):
+                beneficios_pendentes.append(item)
+
+    movimentos.extend([_formatar_item_beneficio(b) for b in beneficios_pendentes])
 
     movimentos.sort(key=lambda x: x["data"])
     return movimentos
