@@ -6,9 +6,9 @@
   <div class="col-12">
     <div class="caixa-sombreada mb-2">
       <span class="text-dark fw-bold">Resumo da Folha:</span>
-      <span class="text-danger"
-        >Visão anual consolidada dos salários, exibidos mês a mês.</span
-      >
+      <span class="text-danger small d-block d-md-inline">
+        Visão anual consolidada dos salários.
+      </span>
     </div>
 
     <div class="card shadow-sm mb-2">
@@ -19,7 +19,7 @@
           action="{{ url_for('relatorios.resumo_salario') }}"
         >
           <div class="row align-items-center">
-            <div class="col-md-2" style="width: 150px">
+            <div class="col-6 col-md-3 col-lg-2">
               <div class="input-group">
                 <span class="input-group-text"
                   ><i class="fas fa-calendar-alt"></i
@@ -35,23 +35,28 @@
 
     {% if dados %}
 
-    <div class="card border-1">
-      <div class="card-body p-2">
+    <div class="card border-1 d-none d-lg-block">
+      <div class="card-body p-0">
         <div class="table-responsive table-scroll">
           <table
             id="tabelaResumoSalario"
-            class="table table-padrao table-hover"
+            class="table table-padrao table-hover mb-0"
           >
-            <thead class="table-white text-center">
+            <thead class="table-light text-center sticky-top">
               <tr>
-                <th class="text-start text-dark">Verba</th>
+                <th
+                  class="text-start text-dark bg-light"
+                  style="min-width: 200px"
+                >
+                  Verba
+                </th>
                 {% for mes in dados.meses %}
-                <th>
+                <th style="min-width: 100px">
                   {{ '%02d'|format(mes) }}/{{ '%02d'|format(ano_selecionado %
                   100) }}
                 </th>
                 {% endfor %}
-                <th>Total</th>
+                <th class="bg-light fw-bold">Total</th>
               </tr>
             </thead>
 
@@ -59,80 +64,84 @@
               {% macro render_section(data, title, bg_color, text_color,
               total_data) %} {% if data %}
               <tr class="table-group-divider">
-                <td colspan="14" class="fw-semibold {{ bg_color }}">
+                <td
+                  colspan="14"
+                  class="fw-bold text-uppercase {{ bg_color }}"
+                  style="letter-spacing: 0.5px"
+                >
                   {{ title }}
                 </td>
               </tr>
 
               {% for linha in data %}
               <tr>
-                <td class="ps-3">{{ linha.nome }}</td>
+                <td class="ps-3 border-end">{{ linha.nome }}</td>
                 {% for valor in linha.valores_mes %}
                 <td class="col-valor text-end {{ text_color }}">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}
-
-                <td class="col-valor text-end fw-bold table-secondary">
+                <td
+                  class="col-valor text-end fw-bold table-secondary border-start"
+                >
                   {{ linha.total_anual | format_number }}
                 </td>
               </tr>
               {% endfor %}
 
-              <tr class="{{ bg_color }} fw-bold">
-                <td class="ps-1">{{ total_data.nome }}</td>
-
+              <tr class="{{ bg_color }} fw-bold border-top border-2">
+                <td class="ps-3 fst-italic">TOTAL {{ title|upper }}</td>
                 {% for valor in total_data.valores_mes %}
                 <td class="col-valor text-end">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}
-
-                <td class="col-valor text-end table-secondary">
+                <td class="col-valor text-end table-secondary border-start">
                   {{ total_data.total_anual | format_number }}
                 </td>
               </tr>
-
               {% endif %} {% endmacro %} {{
               render_section(dados.tabela.Provento, 'Proventos',
-              'bg-success-subtle', 'text-dark', dados.totais.proventos) }} {{
+              'bg-success-subtle', 'text-success', dados.totais.proventos) }} {{
               render_section(dados.tabela.Benefício, 'Benefícios',
-              'bg-primary-subtle', 'text-dark', dados.totais.beneficios) }} {{
-              render_section(dados.tabela.Desconto, 'Descontos',
-              'bg-danger-subtle', 'text-dark', dados.totais.descontos) }} {{
+              'bg-primary-subtle', 'text-primary', dados.totais.beneficios) }}
+              {{ render_section(dados.tabela.Desconto, 'Descontos',
+              'bg-danger-subtle', 'text-danger', dados.totais.descontos) }} {{
               render_section(dados.tabela.Imposto, 'Impostos',
               'bg-warning-subtle', 'text-dark', dados.totais.impostos) }}
 
-              <tr class="table-info fw-bold table-group-divider">
-                <td class="ps-1">{{ dados.salario_liquido.nome }}</td>
-
+              <tr
+                class="table-info fw-bold table-group-divider border-top border-3 border-info"
+              >
+                <td class="ps-3 text-uppercase">LÍQUIDO A RECEBER</td>
                 {% for valor in dados.salario_liquido.valores_mes %}
                 <td class="col-valor text-end">{{ valor | format_number }}</td>
                 {% endfor %}
-
-                <td class="col-valor text-end fw-bold">
+                <td class="col-valor text-end fw-bold bg-info text-white">
                   {{ dados.salario_liquido.total_anual | format_number }}
                 </td>
               </tr>
 
               {% if dados.tabela.FGTS %}
               <tr class="table-group-divider">
-                <td colspan="14" class="fw-semibold bg-secondary-subtle">
-                  FGTS
+                <td
+                  colspan="14"
+                  class="fw-bold bg-light text-muted small text-uppercase"
+                >
+                  FGTS (Informativo)
                 </td>
               </tr>
-
               {% for linha in dados.tabela.FGTS %}
               <tr>
-                <td class="ps-2">{{ linha.nome }}</td>
-
+                <td class="ps-3 text-muted">{{ linha.nome }}</td>
                 {% for valor in linha.valores_mes %}
-                <td class="col-valor text-end text-dark">
+                <td class="col-valor text-end text-muted small">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}
-
-                <td class="col-valor text-end fw-bold table-secondary">
+                <td
+                  class="col-valor text-end fw-bold text-muted bg-light border-start"
+                >
                   {{ linha.total_anual | format_number }}
                 </td>
               </tr>
@@ -143,10 +152,116 @@
       </div>
     </div>
 
+    <div class="d-lg-none">
+      {% macro render_mobile_card(data, title, bg_header, text_color,
+      total_data, icon) %} {% if data %}
+      <div class="card mb-3 shadow-sm border-0">
+        <div
+          class="card-header {{ bg_header }} fw-bold d-flex justify-content-between align-items-center"
+        >
+          <span><i class="{{ icon }} me-2"></i>{{ title }}</span>
+          <span class="badge bg-white {{ text_color }} border"
+            >{{ total_data.total_anual | format_number }}</span
+          >
+        </div>
+        <div class="card-body p-0">
+          <div
+            class="accordion accordion-flush"
+            id="accordion{{ title|replace(' ', '') }}"
+          >
+            {% for linha in data %}
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed py-2 px-3"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapse{{ title|replace(' ', '') }}{{ loop.index }}"
+                >
+                  <div class="d-flex justify-content-between w-100 me-2">
+                    <span class="small fw-semibold">{{ linha.nome }}</span>
+                    <span class="small fw-bold {{ text_color }}"
+                      >{{ linha.total_anual | format_number }}</span
+                    >
+                  </div>
+                </button>
+              </h2>
+              <div
+                id="collapse{{ title|replace(' ', '') }}{{ loop.index }}"
+                class="accordion-collapse collapse"
+                data-bs-parent="#accordion{{ title|replace(' ', '') }}"
+              >
+                <div class="accordion-body bg-light p-2">
+                  <div class="d-flex overflow-auto pb-2 gap-2">
+                    {% for i in range(12) %} {% set valor = linha.valores_mes[i]
+                    %} {% if valor != 0 %}
+                    <div
+                      class="card border-0 shadow-sm flex-shrink-0 text-center p-2"
+                      style="min-width: 80px"
+                    >
+                      <span
+                        class="d-block extra-small text-muted text-uppercase"
+                        >{{ dados.meses_nomes[i] if dados.meses_nomes else (i+1)
+                        }}</span
+                      >
+                      <span class="d-block fw-bold small {{ text_color }}">
+                        {{ valor | format_number }}
+                      </span>
+                    </div>
+                    {% endif %} {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %} {% endmacro %} {{ render_mobile_card(dados.tabela.Provento,
+      'Proventos', 'bg-success text-white', 'text-success',
+      dados.totais.proventos, 'fas fa-plus-circle') }} {{
+      render_mobile_card(dados.tabela.Desconto, 'Descontos', 'bg-danger
+      text-white', 'text-danger', dados.totais.descontos, 'fas fa-minus-circle')
+      }} {{ render_mobile_card(dados.tabela.Imposto, 'Impostos', 'bg-warning
+      text-dark', 'text-dark', dados.totais.impostos, 'fas
+      fa-file-invoice-dollar') }} {{ render_mobile_card(dados.tabela.Benefício,
+      'Benefícios', 'bg-primary text-white', 'text-primary',
+      dados.totais.beneficios, 'fas fa-hand-holding-heart') }}
+
+      <div class="card mb-3 shadow border-2 border-info">
+        <div
+          class="card-header bg-info text-white fw-bold text-center text-uppercase"
+        >
+          <i class="fas fa-wallet me-2"></i>Salário Líquido Total
+        </div>
+        <div class="card-body text-center py-4">
+          <h2 class="display-6 fw-bold text-info mb-0">
+            {{ dados.salario_liquido.total_anual | format_number }}
+          </h2>
+          <small class="text-muted"
+            >Acumulado do ano {{ ano_selecionado }}</small
+          >
+        </div>
+        <div class="card-footer bg-light p-2">
+          <div class="d-flex overflow-auto pb-1 gap-2">
+            {% for i in range(12) %} {% set valor =
+            dados.salario_liquido.valores_mes[i] %} {% if valor > 0 %}
+            <div
+              class="badge bg-white text-info border border-info p-2 flex-shrink-0 fw-normal"
+            >
+              {{ dados.meses_nomes[i] }}:
+              <strong>{{ valor | format_number }}</strong>
+            </div>
+            {% endif %} {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
     {% else %}
 
     <div class="alert alert-info text-center mt-3">
-      Nenhum dado de folha de pagamento encontrado para o ano selecionado.
+      Nenhuma informação de folha encontrada para o ano selecionado.
     </div>
 
     {% endif %}

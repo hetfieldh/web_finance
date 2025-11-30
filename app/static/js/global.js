@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Lógica Existente: Sidebar ---
   const sidebarToggle = document.getElementById("sidebarToggle");
   if (sidebarToggle) {
     sidebarToggle.addEventListener("click", () => {
@@ -7,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Lógica Existente: Tooltips do Bootstrap ---
   var tooltipTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="tooltip"]')
   );
@@ -15,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 
-  // --- Lógica Existente: Botão Back-to-Top ---
   const backToTopButton = document.getElementById("back-to-top-btn");
   const scrollContainer = document.getElementById("page-content-wrapper");
   if (backToTopButton && scrollContainer) {
@@ -32,9 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ============================================================
-  // NOVA LÓGICA: Seleção em Massa / Checkboxes
-  // ============================================================
   const checkboxes = document.querySelectorAll(".item-checkbox");
   const selectAllDesktop = document.getElementById("select-all-desktop");
   const selectAllMobile = document.getElementById("select-all-mobile");

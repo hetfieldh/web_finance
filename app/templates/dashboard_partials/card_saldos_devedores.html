@@ -1,0 +1,54 @@
+<!-- app\templates\dashboard_partials\card_saldos_devedores.html -->
+
+<div class="card shadow-sm h-100">
+  <div class="card-header bg-light py-2">
+    <h6 class="fw-bold mb-0 text-secondary small text-uppercase">
+      <i class="fas fa-hand-holding-usd me-1"></i> Saldos Devedores
+    </h6>
+  </div>
+  <div class="card-body p-2" style="overflow-y: auto; max-height: 400px">
+    <div class="d-flex flex-column gap-2">
+      {% set tem_divida = false %} {% if financiamentos %} {% for financ in
+      financiamentos %} {% if financ.saldo_devedor_atual > 0 %} {% set
+      tem_divida = true %}
+      <div
+        class="d-flex justify-content-between align-items-center border-bottom pb-2"
+      >
+        <div>
+          <div class="fw-bold text-dark small">
+            {{ financ.nome_financiamento }}
+          </div>
+          <div class="badge bg-secondary-subtle text-secondary extra-small">
+            Financiamento
+          </div>
+        </div>
+        <span class="fw-bold text-danger small"
+          >{{ financ.saldo_devedor_atual | format_number }}</span
+        >
+      </div>
+      {% endif %} {% endfor %} {% endif %} {% if crediarios %} {% for cred in
+      crediarios %} {% if cred.saldo_devedor > 0 %} {% set tem_divida = true %}
+      <div
+        class="d-flex justify-content-between align-items-center border-bottom pb-2"
+      >
+        <div>
+          <div class="fw-bold text-dark small">{{ cred.nome_crediario }}</div>
+          <div
+            class="badge bg-warning-subtle text-warning-emphasis extra-small"
+          >
+            Crediário
+          </div>
+        </div>
+        <span class="fw-bold text-danger small"
+          >{{ cred.saldo_devedor | format_number }}</span
+        >
+      </div>
+      {% endif %} {% endfor %} {% endif %} {% if not tem_divida %}
+      <div class="text-center py-4">
+        <i class="fas fa-smile text-success fa-2x mb-2 opacity-50"></i>
+        <p class="text-muted small mb-0">Nenhuma dívida ativa.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

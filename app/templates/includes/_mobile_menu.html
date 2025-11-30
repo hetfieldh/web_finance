@@ -1,0 +1,306 @@
+<!-- app\templates\includes\_mobile_menu.html -->
+
+<div class="modal fade" id="mobileMenuModal" tabindex="-1">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content bg-light">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-secondary">
+          <i class="fas fa-th text-warning me-2"></i>Menu Principal
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body mt-2">
+        <div class="container-fluid px-0">
+          <div class="row g-2 mb-4">
+            <div class="col-12">
+              <a
+                href="{{ url_for('main.dashboard') }}"
+                class="text-decoration-none text-dark d-flex align-items-center p-3 rounded border shadow-sm bg-white"
+              >
+                <i class="fas fa-tachometer-alt fa-2x text-primary me-3"></i>
+                <span class="h6 mb-0 fw-bold">Dashboard</span>
+              </a>
+            </div>
+          </div>
+
+          <h6 class="text-muted text-uppercase small fw-bold mb-2 ps-1">
+            <i class="fas fa-pencil-alt me-1"></i> Lançamentos
+          </h6>
+          <div class="row row-cols-3 g-2 mb-4">
+            <div class="col">
+              <a
+                href="{{ url_for('conta_movimento.listar_movimentacoes') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-exchange-alt fa-lg text-success mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Bancário</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-shopping-cart fa-lg text-warning mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Crediário</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('desp_rec_movimento.listar_movimentos') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-calendar-alt fa-lg text-info mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Desp/Rec</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('crediario_fatura.listar_faturas') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-receipt fa-lg text-secondary mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Faturas</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('financiamento.listar_financiamentos') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-hand-holding-usd fa-lg text-danger mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Financ.</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('salario.listar_movimentos') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-money-check-alt fa-lg text-success mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Salário</span
+                >
+              </a>
+            </div>
+          </div>
+
+          <h6 class="text-muted text-uppercase small fw-bold mb-2 ps-1">
+            <i class="fas fa-cogs me-1"></i> Cadastros
+          </h6>
+          <div class="row row-cols-3 g-2 mb-4">
+            <div class="col">
+              <a
+                href="{{ url_for('conta.listar_contas') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-wallet fa-lg text-primary mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Contas</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('crediario.listar_crediarios') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-credit-card fa-lg text-warning mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Cartões</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('desp_rec.listar_cadastros') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-money-check-alt fa-lg text-info mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Tipos D/R</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('fornecedor.listar_fornecedores') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-store fa-lg text-danger mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Lojas</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('salario.listar_itens') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i
+                  class="fas fa-file-invoice-dollar fa-lg text-success mb-2"
+                ></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Itens Sal.</span
+                >
+              </a>
+            </div>
+
+            {% if current_user.is_admin %}
+            <div class="col">
+              <a
+                href="{{ url_for('usuario.listar_usuarios') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-users fa-lg text-dark mb-2"></i>
+                <span class="small fw-bold lh-1" style="font-size: 0.75rem"
+                  >Usuários</span
+                >
+              </a>
+            </div>
+            {% endif %}
+          </div>
+
+          <h6 class="text-muted text-uppercase small fw-bold mb-2 ps-1">
+            <i class="fas fa-chart-line me-1"></i> Painéis
+          </h6>
+          <div class="row row-cols-2 g-2 mb-4">
+            <div class="col">
+              <a
+                href="{{ url_for('pagamentos.painel') }}"
+                class="text-decoration-none text-dark d-flex align-items-center p-2 rounded border shadow-sm bg-white"
+              >
+                <i class="fas fa-calendar-check fa-fw text-danger me-2"></i>
+                <span class="small fw-bold">Pagamentos</span>
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('recebimentos.painel') }}"
+                class="text-decoration-none text-dark d-flex align-items-center p-2 rounded border shadow-sm bg-white"
+              >
+                <i class="fas fa-hand-holding-usd fa-fw text-success me-2"></i>
+                <span class="small fw-bold">Recebimentos</span>
+              </a>
+            </div>
+          </div>
+
+          <h6 class="text-muted text-uppercase small fw-bold mb-2 ps-1">
+            <i class="fas fa-search-dollar me-1"></i> Consultas
+          </h6>
+          <div class="row row-cols-3 g-2 mb-4">
+            <div class="col">
+              <a
+                href="{{ url_for('relatorios.gastos_por_grupo') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-tags text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Resumo Cred.</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('relatorios.crediario_detalhado') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-list text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Detalhe Cred.</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('extrato.extrato_bancario') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-university text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Extrato</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('fluxo_caixa.fluxo_caixa')}}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-file-invoice-dollar text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Fluxo Caixa</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('extrato_consolidado.fluxo_caixa_detalhado') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-chart-bar text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Fluxo Det.</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('relatorios.resumo_mensal') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-chart-pie text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Resumo Mês</span
+                >
+              </a>
+            </div>
+            <div class="col">
+              <a
+                href="{{ url_for('relatorios.resumo_salario') }}"
+                class="text-decoration-none text-dark d-flex flex-column align-items-center justify-content-center p-2 rounded border shadow-sm bg-white h-100 text-center"
+              >
+                <i class="fas fa-file-alt text-secondary mb-2"></i>
+                <span class="small fw-bold" style="font-size: 0.7rem"
+                  >Resumo Sal.</span
+                >
+              </a>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 mb-4">
+            <a
+              href="{{ url_for('auth.logout') }}"
+              class="btn btn-outline-danger"
+            >
+              <i class="fas fa-sign-out-alt me-2"></i>Sair do Sistema
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 justify-content-center py-2 bg-light">
+        <small class="text-muted" style="font-size: 0.7rem"
+          >Web Finance Mobile</small
+        >
+      </div>
+    </div>
+  </div>
+</div>

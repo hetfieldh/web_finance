@@ -3,18 +3,20 @@
 {% extends "base.html" %} {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="card mb-3">
+    <div class="card mb-2 border-0 shadow-sm">
       <div
         class="card-header menu-primario p-2 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2"
       >
-        <h5 class="mb-0 d-flex align-items-center">
+        <h5
+          class="mb-0 d-flex align-items-center h6 h5-md fw-bold"
+        >
           <i class="fas fa-chart-pie text-warning me-2"></i>Resumo do
           Financiamento
         </h5>
         <div class="d-flex w-md-auto justify-content-end">
           <a
             href="{{ url_for('financiamento.listar_financiamentos') }}"
-            class="btn btn-light btn-sm text-dark flex-grow-1 flex-md-grow-0"
+            class="btn btn-light btn-sm w-md-auto"
           >
             <i class="fas fa-arrow-left me-1"></i> Voltar
           </a>
@@ -22,80 +24,74 @@
       </div>
 
       {% if financiamento and financiamento.descricao %}
-      <div
-        class="px-1 py-1 fst-italic border-bottom"
-        style="
-          background-color: var(--wf-box-bg2);
-          color: var(--wf-texto-positivo);
-        "
-      >
-        <i class="fas fa-info-circle me-2"></i>
+      <div class="px-1 py-1 fst-italic border-bottom bg-white small text-muted">
+        <i class="fas fa-info-circle me-1 text-info"></i>
         {{ financiamento.descricao }}
       </div>
       {% endif %}
 
-      <div class="card-body">
+      <div class="card-body p-1">
         <div class="caixa-sombreada mb-2">
           <span class="text-dark fw-bold">Visão:</span>
           <span class="text-danger">Fluxo de Caixa (Total das Parcelas)</span>
         </div>
 
-        <div class="row row-cols-2 row-cols-md-5 g-1 text-center mb-3">
-          <div class="col">
+        <div class="row g-1 text-center mb-2">
+          <div class="col-4 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Previsto</small
               >
-              <span class="h6 fw-semibold text-dark"
+              <span class="d-block fw-semibold text-dark small"
                 >{{ resumo_fluxo_caixa.total_previsto | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-4 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Pago</small
               >
-              <span class="h6 fw-semibold text-success"
+              <span class="d-block fw-semibold text-success small"
                 >{{ resumo_fluxo_caixa.Pago | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-4 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Amortizado</small
               >
-              <span class="h6 fw-semibold text-info"
+              <span class="d-block fw-semibold text-info small"
                 >{{ resumo_fluxo_caixa.Amortizado | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-6 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Pendente</small
               >
-              <span class="h6 fw-semibold text-warning text-dark"
+              <span class="d-block fw-semibold text-warning text-dark small"
                 >{{ resumo_fluxo_caixa.Pendente | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-6 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
               >
                 {% if resumo_fluxo_caixa.diferenca > 0 %} Economia {% elif
-                resumo_fluxo_caixa.diferenca < 0 %} Custo Extra {% else %}
-                Diferença {% endif %}
+                resumo_fluxo_caixa.diferenca < 0 %} Extra {% else %} Dif. {%
+                endif %}
               </small>
               <span
-                class="h6 fw-semibold {% if resumo_fluxo_caixa.diferenca > 0 %}text-success{% elif resumo_fluxo_caixa.diferenca < 0 %}text-danger{% endif %}"
+                class="d-block fw-semibold small {% if resumo_fluxo_caixa.diferenca > 0 %}text-success{% elif resumo_fluxo_caixa.diferenca < 0 %}text-danger{% endif %}"
               >
                 {{ resumo_fluxo_caixa.diferenca|abs|format_number }}
               </span>
@@ -108,60 +104,60 @@
           <span class="text-danger">Principal (Amortização da Dívida)</span>
         </div>
 
-        <div class="row row-cols-2 row-cols-md-5 g-1 text-center">
-          <div class="col">
+        <div class="row g-1 text-center">
+          <div class="col-4 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Contrato</small
               >
-              <span class="h6 fw-semibold text-dark"
+              <span class="d-block fw-semibold text-dark small"
                 >{{ resumo_principal.total_contrato | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-4 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
-                >Pago (Princ.)</small
+                >Pago</small
               >
-              <span class="h6 fw-semibold text-success"
+              <span class="d-block fw-semibold text-success small"
                 >{{ resumo_principal.Pago | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-4 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Amortizado</small
               >
-              <span class="h6 fw-semibold text-info"
+              <span class="d-block fw-semibold text-info small"
                 >{{ resumo_principal.Amortizado | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-6 col-md">
             <div class="p-2 border rounded bg-light h-100">
               <small
                 class="text-muted d-block text-uppercase extra-small fw-bold"
                 >Pendente</small
               >
-              <span class="h6 fw-semibold text-warning text-dark"
+              <span class="d-block fw-semibold text-warning text-dark small"
                 >{{ resumo_principal.Pendente | format_number }}</span
               >
             </div>
           </div>
-          <div class="col">
+          <div class="col-6 col-md">
             <div
               class="p-2 border border-danger rounded bg-danger-subtle h-100"
             >
               <small
                 class="text-danger d-block text-uppercase extra-small fw-bold"
-                >Saldo Devedor</small
+                >Saldo Dev.</small
               >
-              <span class="h6 fw-bold text-danger"
+              <span class="d-block fw-bold text-danger small"
                 >{{ resumo_principal.saldo_devedor | format_number }}</span
               >
             </div>
@@ -170,10 +166,11 @@
       </div>
     </div>
 
-    <div class="card p-0">
+    <div class="card shadow-sm">
       <div class="card-body p-0">
         {% if parcelas_com_saldo_dinamico %}
-        <div class="table-responsive">
+
+        <div class="table-responsive d-none d-lg-block">
           <table
             class="table table-sm table-striped table-hover sortable-table align-middle mb-0"
           >
@@ -197,43 +194,37 @@
                 <td class="text-center fw-bold text-muted">
                   {{ item.parcela.numero_parcela }}
                 </td>
-                <td>
-                  <span style="display: none">
-                    {{ item.parcela.data_vencimento.strftime('%Y%m%d') }}
-                  </span>
-                  <span class="text-center d-block">
-                    {{ item.parcela.data_vencimento.strftime('%d/%m/%Y') }}
-                  </span>
+                <td class="text-center">
+                  <span style="display: none"
+                    >{{ item.parcela.data_vencimento.strftime('%Y%m%d') }}</span
+                  >
+                  {{ item.parcela.data_vencimento.strftime('%d/%m/%Y') }}
                 </td>
-                <td class="text-end text-nowrap text-muted">
+                <td class="text-end text-muted">
                   {{ item.parcela.valor_principal | format_number }}
                 </td>
-                <td class="text-end text-nowrap text-muted">
+                <td class="text-end text-muted">
                   {{ item.parcela.valor_juros | format_number }}
                 </td>
-                <td class="text-end text-nowrap text-muted">
+                <td class="text-end text-muted">
                   {{ (item.parcela.valor_seguro + item.parcela.valor_seguro_2 +
                   item.parcela.valor_seguro_3 + item.parcela.valor_taxas) |
                   format_number }}
                 </td>
-
-                <td class="text-end fw-bold text-dark text-nowrap">
+                <td class="text-end fw-bold text-dark">
                   {{ item.parcela.valor_total_previsto | format_number }}
                 </td>
-
-                <td class="text-end fw-bold text-success text-nowrap">
+                <td class="text-end fw-bold text-success">
                   {% if item.parcela.valor_pago %} {{ item.parcela.valor_pago |
                   format_number }} {% else %} - {% endif %}
                 </td>
-
                 <td
-                  class="text-end fw-bold text-nowrap {{ 'text-secondary' if item.parcela.status in ['Pago', 'Amortizado'] else 'text-danger' }}"
+                  class="text-end fw-bold {{ 'text-secondary' if item.parcela.status in ['Pago', 'Amortizado'] else 'text-danger' }}"
                 >
                   {% if item.parcela.status in ['Pago', 'Amortizado'] %} - {%
                   else %} {{ item.saldo_devedor_dinamico | format_number }} {%
                   endif %}
                 </td>
-
                 <td class="text-center">
                   {% if item.parcela.status == 'Pago' %}
                   <span
@@ -269,6 +260,64 @@
             </tbody>
           </table>
         </div>
+
+        <div class="d-lg-none">
+          <ul class="list-group list-group-flush">
+            {% for item in parcelas_com_saldo_dinamico %}
+            <li
+              class="list-group-item p-1 border-start border-1 {% if item.parcela.status == 'Pago' %}border-grey{% elif item.parcela.status == 'Atrasado' %}border-grey{% else %}border-grey{% endif %}"
+            >
+              <div
+                class="d-flex justify-content-between align-items-center mb-1"
+              >
+                <span class="badge bg-light text-dark border">
+                  # {{ item.parcela.numero_parcela }}
+                </span>
+                <span class="fw-bold text-dark">
+                  {{ item.parcela.valor_total_previsto | format_number }}
+                </span>
+              </div>
+
+              <div
+                class="d-flex justify-content-between align-items-center mb-1"
+              >
+                <span class="small text-muted">
+                  <i class="far fa-calendar-alt me-1"></i>{{
+                  item.parcela.data_vencimento.strftime('%d/%m/%y') }}
+                </span>
+                {% if item.parcela.status == 'Pago' %}
+                <span
+                  class="badge bg-success-subtle text-success-emphasis extra-small"
+                  >Pago</span
+                >
+                {% elif item.parcela.status == 'Atrasado' %}
+                <span
+                  class="badge bg-danger-subtle text-danger-emphasis extra-small"
+                  >Atrasado</span
+                >
+                {% else %}
+                <span
+                  class="badge bg-secondary-subtle text-secondary-emphasis extra-small"
+                  >{{ item.parcela.status }}</span
+                >
+                {% endif %}
+              </div>
+
+              {% if item.parcela.status not in ['Pago', 'Amortizado'] %}
+              <div class="d-flex justify-content-end border-top pt-1 mt-1">
+                <small class="text-danger extra-small fw-bold me-1"
+                  >Saldo Dev:</small
+                >
+                <span class="text-danger small fw-bold"
+                  >{{ item.saldo_devedor_dinamico | format_number }}</span
+                >
+              </div>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
         {% else %}
         <div class="alert alert-warning text-center m-3">
           Nenhuma parcela encontrada.

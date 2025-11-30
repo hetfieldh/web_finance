@@ -235,7 +235,7 @@ render_confirm_modal %} {% block content %}
                         <a
                           href="{{ url_for('crediario_fatura.visualizar_fatura', id=item.fatura.id) }}"
                           class="btn btn-amarelo me-2"
-                          ><i class="fas fa-eye"></i
+                          ><i class="fas fa-eye text-danger"></i
                         ></a>
                       </td>
                     </tr>
@@ -335,9 +335,9 @@ render_confirm_modal %} {% block content %}
                       </div>
                       <a
                         href="{{ url_for('crediario_fatura.visualizar_fatura', id=item.fatura.id) }}"
-                        class="btn btn-outline-warning btn-sm py-1 px-2"
+                        class="btn btn-sm py-1 px-2"
                       >
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye text-danger"></i>
                       </a>
                     </div>
                   </div>
@@ -402,6 +402,3 @@ render_confirm_modal %} {% block content %}
 
 {{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
 Exclusão', body_text='Excluir?', confirm_button_text='Sim' ) }} {% endblock %}
-{% block scripts %} {{ super() }}
-<script src="global.js"></script>
-{% endblock %}

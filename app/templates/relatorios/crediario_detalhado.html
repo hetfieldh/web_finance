@@ -1,37 +1,40 @@
 <!-- app\templates\relatorios\crediario_detalhado.html -->
 
 {% extends "base.html" %} {% block content %}
+
 <div
-  class="caixa-sombreada mb-2 d-flex justify-content-between align-items-center"
+  class="caixa-sombreada mb-2 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2"
 >
   <div>
-    <span class="text-dark fw-bold">Crediário Detalhado:</span>
-    <span class="text-danger"
-      >Abertura dos Grupos de Crediário por Subgrupo e Loja/Serviço. Ordenado
-      por mês.</span
+    <span class="text-dark fw-bold"
+      ><i class="fas fa-list-ol me-2"></i>Crediário Detalhado:</span
+    >
+    <span class="text-secondary small d-block d-md-inline"
+      >Abertura por Grupo > Subgrupo > Loja.</span
     >
   </div>
 </div>
 
 <div class="container-fluid mt-2 p-0">
-  <div class="card shadow">
-    <div class="card-header menu-primario">
-      <h5 class="mb-0">
-        <i class="fas text-warning fa-chart-pie me-2"></i> Níveis: Grupo >
-        Subgrupo > Fornecedor
-      </h5>
+  <div class="card shadow d-none d-lg-block">
+    <div class="card-header menu-primario py-2">
+      <h6 class="mb-0 text-white">
+        <i class="fas fa-table me-2"></i> Visão Hierárquica
+      </h6>
     </div>
-    <div class="card-body p-1">
-      <div class="table-scroll">
+    <div class="card-body p-0">
+      <div class="table-scroll" style="max-height: 75vh">
         <table
-          class="table table-padrao table-sticky-col table-hover"
+          class="table table-sm table-hover table-bordered mb-0"
           id="tabelaCrediario"
         >
-          <thead class="thead-light">
+          <thead class="table-light sticky-top" style="z-index: 5">
             <tr>
-              <th>Estrutura</th>
+              <th style="min-width: 250px" class="ps-3">Estrutura</th>
               {% for mes in meses %}
-              <th class="text-center">{{ mes.label }}</th>
+              <th class="text-center bg-light" style="min-width: 100px">
+                {{ mes.label }}
+              </th>
               {% endfor %}
             </tr>
           </thead>
@@ -43,8 +46,8 @@
               data-target=".grupo-child-{{ info_grupo.id }}"
               style="cursor: pointer; font-weight: bold"
             >
-              <td>
-                <i class="fas fa-plus-square mr-2 text-dark toggle-icon"></i>
+              <td class="ps-3">
+                <i class="fas fa-plus-square me-2 text-dark toggle-icon"></i>
                 {{ grupo_nome }}
               </td>
               {% for mes in meses %}
@@ -64,13 +67,15 @@
               data-target=".sub-child-{{ unique_sub_id }}"
               style="display: none; cursor: pointer; font-weight: 600"
             >
-              <td class="padding-subgrupo">
+              <td
+                class="ps-5"
+                style="border-left: 4px solid var(--wf-azul-destaque)"
+              >
                 <i
-                  class="fas fa-plus-square mr-2 text-secondary toggle-icon"
+                  class="fas fa-caret-right me-2 text-secondary toggle-icon"
                 ></i>
                 {{ sub_nome }}
               </td>
-
               {% for mes in meses %}
               <td class="text-end text-dark text-nowrap">
                 {% set val_sub = info_sub['total_meses'].get(mes.key, 0) %} {{
@@ -86,16 +91,15 @@
               class="sub-child-{{ unique_sub_id }} bg-white"
               style="display: none"
             >
-              <td class="padding-fornecedor">
-                <i class="fas fa-angle-right mr-1 text-muted"></i>
-                {{ forn_nome }}
-              </td>
-
-              {% for mes in meses %}
               <td
-                class="text-end text-muted text-nowrap"
-                style="font-size: 0.95em"
+                class="ps-5 text-muted fst-italic small"
+                style="padding-left: 3.5rem !important"
               >
+                <i class="fas fa-store me-1 text-muted opacity-50"></i> {{
+                forn_nome }}
+              </td>
+              {% for mes in meses %}
+              <td class="text-end text-muted text-nowrap small">
                 {% set val_forn = valores_forn.get(mes.key, 0) %} {{
                 "{:,.2f}".format(val_forn).replace(',', 'X').replace('.',
                 ',').replace('X', '.') if val_forn > 0 else '-' }}
@@ -104,7 +108,7 @@
             </tr>
             {% endfor %} {% endfor %} {% endfor %} {% if not dados %}
             <tr>
-              <td colspan="100%" class="text-center p-3">
+              <td colspan="100%" class="text-center p-4 text-muted">
                 Nenhum dado encontrado para o período futuro.
               </td>
             </tr>
@@ -114,7 +118,174 @@
       </div>
     </div>
   </div>
+
+  <div class="d-lg-none">
+    {% if not dados %}
+    <div class="alert alert-info text-center shadow-sm">
+      Nenhum dado encontrado.
+    </div>
+    {% endif %}
+
+    <div class="accordion" id="accordionCrediarioMobile">
+      {% for grupo_nome, info_grupo in dados.items() %}
+      <div class="accordion-item mb-2 border shadow-sm rounded overflow-hidden">
+        <h2 class="accordion-header" id="heading-{{ info_grupo.id }}">
+          <button
+            class="accordion-button collapsed fw-bold text-dark bg-white"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-{{ info_grupo.id }}"
+          >
+            {{ grupo_nome }}
+          </button>
+        </h2>
+
+        <div
+          id="collapse-{{ info_grupo.id }}"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionCrediarioMobile"
+        >
+          <div class="accordion-body bg-light p-2">
+            <div class="mb-3">
+              <h6
+                class="text-muted extra-small text-uppercase fw-bold mb-1 ms-1"
+              >
+                Totais do Grupo (Meses)
+              </h6>
+              <div class="d-flex overflow-auto pb-2 gap-2">
+                {% for mes in meses %} {% set val =
+                info_grupo['total_meses'].get(mes.key, 0) %}
+                <div
+                  class="card border-0 shadow-sm flex-shrink-0 text-center p-2"
+                  style="min-width: 85px"
+                >
+                  <span class="d-block extra-small text-muted text-uppercase"
+                    >{{ mes.label }}</span
+                  >
+                  <span class="d-block fw-bold text-primary small">
+                    {{ "{:,.0f}".format(val).replace(',', '.') if val > 0 else
+                    '-' }}
+                  </span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <h6 class="text-muted extra-small text-uppercase fw-bold mb-1 ms-1">
+              Detalhamento por Subgrupo
+            </h6>
+            <div
+              class="accordion accordion-flush"
+              id="subAccordion-{{ info_grupo.id }}"
+            >
+              {% for sub_nome, info_sub in info_grupo['subgrupos'].items() %}
+              <div class="accordion-item border rounded mb-1">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed py-2 px-3 small"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseSub-{{ info_grupo.id }}-{{ info_sub.id }}"
+                  >
+                    <span class="fw-semibold">{{ sub_nome }}</span>
+                  </button>
+                </h2>
+                <div
+                  id="collapseSub-{{ info_grupo.id }}-{{ info_sub.id }}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#subAccordion-{{ info_grupo.id }}"
+                >
+                  <div class="accordion-body p-2 bg-white">
+                    <div
+                      class="d-flex overflow-auto pb-2 mb-2 gap-2 border-bottom"
+                    >
+                      {% for mes in meses %} {% set val_sub =
+                      info_sub['total_meses'].get(mes.key, 0) %} {% if val_sub >
+                      0 %}
+                      <div
+                        class="badge bg-light text-dark border flex-shrink-0 fw-normal"
+                      >
+                        {{ mes.label }}:
+                        <strong
+                          >{{ "{:,.0f}".format(val_sub).replace(',', '.')
+                          }}</strong
+                        >
+                      </div>
+                      {% endif %} {% endfor %}
+                    </div>
+
+                    <ul class="list-group list-group-flush list-group-sm">
+                      {% for forn_nome, valores_forn in
+                      info_sub['fornecedores'].items() %}
+                      <li
+                        class="list-group-item px-0 py-1 d-flex justify-content-between align-items-center"
+                      >
+                        <span
+                          class="text-muted small text-truncate"
+                          style="max-width: 60%"
+                          >{{ forn_nome }}</span
+                        >
+                        {% set ns = namespace(total_forn=0) %} {% for v in
+                        valores_forn.values() %}{% set ns.total_forn =
+                        ns.total_forn + v %}{% endfor %}
+                        <span
+                          class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill"
+                          >Total: {{
+                          "{:,.0f}".format(ns.total_forn).replace(',', '.')
+                          }}</span
+                        >
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
+
 {% endblock %} {% block scripts %} {{ super() }}
-<script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
+
+<script>
+  $(document).ready(function () {
+    $(".toggle-row").click(function () {
+      var target = $(this).data("target");
+      var icon = $(this).find(".toggle-icon");
+
+      // Alterna visibilidade
+      $(target).toggle();
+
+      // Alterna ícone
+      if ($(target).is(":visible")) {
+        icon
+          .removeClass("fa-plus-square fa-caret-right")
+          .addClass("fa-minus-square fa-caret-down");
+      } else {
+        // Se estiver fechando, fecha também os filhos recursivamente
+        if (target.startsWith(".grupo-child")) {
+          var childrenRows = $(target);
+          childrenRows.each(function () {
+            var childTarget = $(this).data("target");
+            if (childTarget) {
+              $(childTarget).hide();
+              $(this)
+                .find(".toggle-icon")
+                .removeClass("fa-minus-square fa-caret-down")
+                .addClass("fa-plus-square fa-caret-right");
+            }
+          });
+        }
+        icon
+          .removeClass("fa-minus-square fa-caret-down")
+          .addClass("fa-plus-square fa-caret-right");
+      }
+    });
+  });
+</script>
 {% endblock %}

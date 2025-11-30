@@ -117,7 +117,7 @@ render_confirm_modal %} {% block content %}
           <div class="list-group border-0">
             {% for item in itens %}
             <div
-              class="list-group-item p-2 border-start mb-2 border-1 rounded {% if item.tipo == 'Provento' %}border-success {% elif item.tipo == 'Benefício' %}border-info {% elif item.tipo == 'Desconto' %}border-warning {% elif item.tipo == 'Imposto' %}border-danger {% else %}border-secondary{% endif %}"
+              class="list-group-item p-1 border-start mb-1 border-1 rounded {% if item.tipo == 'Provento' %}border-grey{% elif item.tipo == 'Benefício' %}border-grey {% elif item.tipo == 'Desconto' %}border-grey{% elif item.tipo == 'Imposto' %}border-grey{% else %}border-grey{% endif %}"
             >
               <div class="d-flex justify-content-between align-items-center">
                 <div class="overflow-hidden me-2">

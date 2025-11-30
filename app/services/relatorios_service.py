@@ -77,6 +77,20 @@ def get_resumo_salario_anual(user_id, ano):
             verbas[item.nome] = item.tipo
 
     meses = range(1, 13)
+    meses_nomes = [
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Set",
+        "Out",
+        "Nov",
+        "Dez",
+    ]
     categorias_desejadas = ["Provento", "Benefício", "Desconto", "Imposto", "FGTS"]
     tabela = {cat: [] for cat in categorias_desejadas}
 
@@ -141,6 +155,7 @@ def get_resumo_salario_anual(user_id, ano):
         },
         "salario_liquido": salario_liquido,
         "meses": meses,
+        "meses_nomes": meses_nomes,
     }
 
 

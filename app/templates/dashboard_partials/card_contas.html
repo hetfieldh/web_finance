@@ -1,0 +1,43 @@
+<!-- app\templates\dashboard_partials\card_contas.html -->
+
+<div class="card shadow-sm h-100">
+  <div class="card-header bg-light py-2">
+    <h6 class="fw-bold mb-0 text-secondary small text-uppercase">
+      <i class="fas fa-wallet me-1"></i> Contas Bancárias
+    </h6>
+  </div>
+  <div class="card-body p-2" style="overflow-y: auto; max-height: 400px">
+    {% if contas_do_usuario %}
+    <div class="d-flex flex-column gap-2">
+      {% for conta in contas_do_usuario %}
+      <div
+        class="d-flex justify-content-between align-items-center border-bottom pb-2"
+      >
+        <div class="d-flex align-items-center overflow-hidden">
+          <div
+            class="rounded-circle bg-light p-2 me-2 flex-shrink-0 text-secondary"
+          >
+            <i class="fas fa-university"></i>
+          </div>
+          <div class="text-truncate">
+            <div
+              class="fw-bold text-dark small text-truncate"
+              style="max-width: 120px"
+            >
+              {{ conta.nome_banco }}
+            </div>
+            <div class="text-muted extra-small">{{ conta.tipo }}</div>
+          </div>
+        </div>
+        <span
+          class="fw-bold small {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
+          >{{ conta.saldo_atual | format_number }}</span
+        >
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-muted small my-3">Nenhuma conta cadastrada.</p>
+    {% endif %}
+  </div>
+</div>
