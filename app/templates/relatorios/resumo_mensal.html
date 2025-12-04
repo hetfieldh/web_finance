@@ -83,7 +83,7 @@
 
       <div class="col-6 col-lg-3">
         <div
-          class="card h-100 shadow-sm border-2 {% if dados.saldo_final_previsto >= 0 %}border-primary bg-primary-subtle{% else %}border-danger bg-danger-subtle{% endif %}"
+          class="card h-100 shadow-sm border-2 {% if dados.saldo_final_previsto >= 0 %}border-success bg-success-subtle{% else %}border-danger bg-danger-subtle{% endif %}"
         >
           <div class="card-body text-center p-2">
             <h6
@@ -92,7 +92,7 @@
               Saldo Final
             </h6>
             <p
-              class="card-text h5 fw-bold {% if dados.saldo_final_previsto >= 0 %}text-primary{% else %}text-danger{% endif %} mb-0"
+              class="card-text h5 fw-bold {% if dados.saldo_final_previsto >= 0 %}text-success{% else %}text-danger{% endif %} mb-0"
             >
               {{ dados.saldo_final_previsto | format_number }}
             </p>
@@ -109,7 +109,7 @@
       </div>
 
       <div class="card-body p-0 p-md-3">
-        <div class="table-responsive d-none d-md-block">
+        <div class="table-responsive d-none d-md-block p-0">
           <table class="table table-striped table-hover sortable-table mb-0">
             <thead>
               <tr>

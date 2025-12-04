@@ -115,7 +115,7 @@ def registrar_pagamento():
         )
         flash(f"Erro ao registrar pagamento: {str(e)}", "danger")
 
-    return redirect(request.referrer or url_for("main.dashboard"))
+    return redirect(url_for("pagamentos.painel"))
 
 
 @pagamentos_bp.route("/estornar", methods=["POST"])
@@ -131,4 +131,4 @@ def estornar_pagamento():
     else:
         flash(message, "danger")
 
-    return redirect(request.referrer or url_for("pagamentos.painel", mes_ano=mes_ano))
+    return redirect(url_for("pagamentos.painel", mes_ano=mes_ano))

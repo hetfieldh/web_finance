@@ -222,18 +222,36 @@ def listar_movimentos():
 def novo_lancamento_folha():
     form = CabecalhoFolhaForm()
     if form.validate_on_submit():
+        try:
+            mes_ref_str = form.mes_referencia.data
+            mes_referencia_date = datetime.strptime(
+                f"01/{mes_ref_str}", "%d/%m/%Y"
+            ).date()
 
-        success, message, movimento = criar_folha_pagamento(
-            mes_referencia=form.mes_referencia.data,
-            tipo_folha=form.tipo.data,
-            data_recebimento_form=form.data_recebimento.data,
-        )
-        if success:
-            flash(message, "success")
-            return redirect(url_for("salario.gerenciar_itens_folha", id=movimento.id))
-        else:
-            flash(message, "warning")
-            return redirect(url_for("salario.listar_movimentos"))
+            data_recebimento_date = None
+            if form.tipo.data != "Mensal" and form.data_recebimento.data:
+                data_recebimento_date = datetime.strptime(
+                    form.data_recebimento.data, "%d/%m/%Y"
+                ).date()
+
+            success, message, movimento = criar_folha_pagamento(
+                mes_referencia=mes_referencia_date,
+                tipo_folha=form.tipo.data,
+                data_recebimento_form=data_recebimento_date,
+            )
+            if success:
+                flash(message, "success")
+                return redirect(
+                    url_for("salario.gerenciar_itens_folha", id=movimento.id)
+                )
+            else:
+                flash(message, "warning")
+                return redirect(url_for("salario.listar_movimentos"))
+        except ValueError as e:
+            flash(f"Erro no formato das datas: {str(e)}", "danger")
+        except Exception as e:
+            current_app.logger.error(f"Erro ao criar folha: {e}", exc_info=True)
+            flash(f"Erro inesperado: {str(e)}", "danger")
 
     return render_template(
         "salario_movimento/add.html", form=form, title="Nova Folha de Pagamento"

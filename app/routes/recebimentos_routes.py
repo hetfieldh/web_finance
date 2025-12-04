@@ -137,7 +137,7 @@ def registrar_recebimento():
         )
         flash(f"Erro ao registrar recebimento: {str(e)}", "danger")
 
-    return redirect(request.referrer or url_for("main.dashboard"))
+    return redirect(url_for("recebimentos.painel"))
 
 
 @recebimentos_bp.route("/estornar", methods=["POST"])
@@ -153,4 +153,4 @@ def estornar_recebimento():
     else:
         flash(message, "danger")
 
-    return redirect(request.referrer or url_for("recebimentos.painel", mes_ano=mes_ano))
+    return redirect(url_for("recebimentos.painel", mes_ano=mes_ano))

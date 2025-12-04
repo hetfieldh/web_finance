@@ -1,6 +1,20 @@
-// app/static/js/salario_form.js
+// app\static\js\salario_form.js
 
 document.addEventListener("DOMContentLoaded", function () {
+  const mesReferenciaInput = document.getElementById("mes_referencia");
+
+  if (mesReferenciaInput) {
+    $(mesReferenciaInput).datepicker({
+      format: "mm/yyyy",
+      startView: "months",
+      minViewMode: "months",
+      maxViewMode: "years",
+      language: "pt-BR",
+      autoclose: true,
+      orientation: "bottom auto",
+    });
+  }
+
   const tipoFolhaSelect = document.getElementById("tipo_folha");
   const containerData = document.getElementById("container_data_recebimento");
   const inputData = containerData ? containerData.querySelector("input") : null;
@@ -8,15 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function toggleDataField() {
     if (!tipoFolhaSelect || !containerData) return;
 
-    if (tipoFolhaSelect.value === "Mensal") {
+    if (tipoFolhaSelect.value === "Mensal" || tipoFolhaSelect.value === "") {
       containerData.style.display = "none";
 
       if (inputData) {
         inputData.required = false;
-
-        if (!inputData.value) {
-          inputData.value = new Date().toISOString().split("T")[0];
-        }
       }
     } else {
       containerData.style.display = "block";
@@ -49,7 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     toggleContaDestinoField();
-
     tipoItemSelect.addEventListener("change", toggleContaDestinoField);
   }
 });

@@ -51,7 +51,7 @@
                   Verba
                 </th>
                 {% for mes in dados.meses %}
-                <th style="min-width: 100px">
+                <th style="min-width: 50px">
                   {{ '%02d'|format(mes) }}/{{ '%02d'|format(ano_selecionado %
                   100) }}
                 </th>
@@ -126,16 +126,16 @@
               <tr class="table-group-divider">
                 <td
                   colspan="14"
-                  class="fw-bold bg-light text-muted small text-uppercase"
+                  class="fw-bold bg-light text-dark small text-uppercase"
                 >
-                  FGTS (Informativo)
+                  FGTS
                 </td>
               </tr>
               {% for linha in dados.tabela.FGTS %}
               <tr>
-                <td class="ps-3 text-muted">{{ linha.nome }}</td>
+                <td class="ps-3 text-dark">{{ linha.nome }}</td>
                 {% for valor in linha.valores_mes %}
-                <td class="col-valor text-end text-muted small">
+                <td class="col-valor text-end text-dark small">
                   {{ valor | format_number if valor != 0 else '-' }}
                 </td>
                 {% endfor %}

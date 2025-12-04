@@ -6,7 +6,7 @@
   <div class="col-md-8 mx-auto">
     <div class="card shadow-sm">
       <div class="card-header menu-primario">
-        <h5 class="mb-0">Adicionar Folha de Pagamento</h5>
+        <h5 class="mb-0">Adicionar Salário / Eventos de Folha</h5>
       </div>
       <div class="card-body">
         <p class="caixa-sombreada">
@@ -26,25 +26,37 @@
         >
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-          <div class="row mb-3 g-3">
-            <div class="col-md-6">
+          <div class="row g-3 mb-2">
+            <div class="col-md-4">
               {{ render_field(form.tipo, attrs={'id': 'tipo_folha'}) }}
             </div>
 
-            <div class="col-md-6">
-              {{ form.mes_referencia.label(class="form-label mb-0 small") }} {{
-              form.mes_referencia(class="form-control form-control-sm",
-              id="mes_referencia", type="month") }} {% if
-              form.mes_referencia.errors %}
-              <div class="text-danger mt-1 small">
-                {% for error in form.mes_referencia.errors %} {{ error }}<br />
-                {% endfor %}
+            <div class="col-6 col-md-2">
+              <div class="mb-3">
+                <label class="form-label mb-1 small" for="mes_referencia"
+                  >Mês de Referência</label
+                >
+                <div class="input-group input-group-sm">
+                  <span
+                    class="input-group-text bg-light border-secondary-subtle"
+                  >
+                    <i class="fas fa-calendar-alt text-secondary"></i>
+                  </span>
+                  {{ form.mes_referencia(class="form-control form-control-sm",
+                  id="mes_referencia") }}
+                </div>
+                {% if form.mes_referencia.errors %}
+                <div class="text-danger mt-1 small">
+                  {% for error in form.mes_referencia.errors %} {{ error }}<br />
+                  {% endfor %}
+                </div>
+                {% endif %}
               </div>
-              {% endif %}
             </div>
 
-            <div class="col-md-6" id="container_data_recebimento">
-              {{ render_field(form.data_recebimento, attrs={'type': 'date'}) }}
+            <div class="col-6 col-md-2" id="container_data_recebimento">
+              {{ render_field(form.data_recebimento, attrs={'id':
+              'data_recebimento'}) }}
             </div>
           </div>
 

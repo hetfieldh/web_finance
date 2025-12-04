@@ -1,6 +1,7 @@
 # app/forms/conta_movimento_forms.py
 
 from datetime import date
+from decimal import Decimal
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -67,7 +68,7 @@ class CadastroContaMovimentoForm(FlaskForm):
         "Valor",
         validators=[
             InputRequired("O valor é obrigatório."),
-            NumberRange(min=0.01, message="O valor deve ser maior que zero."),
+            NumberRange(min=Decimal("0.01"), message="O valor deve ser maior que zero."),
         ],
         places=2,
     )

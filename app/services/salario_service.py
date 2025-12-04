@@ -30,24 +30,36 @@ def get_quinto_dia_util(ano, mes):
 
 
 def criar_folha_pagamento(mes_referencia, tipo_folha, data_recebimento_form):
+    if isinstance(mes_referencia, date):
+        mes_referencia_db = mes_referencia.strftime("%Y-%m")
+        ano_ref, mes_ref = mes_referencia.year, mes_referencia.month
+    else:
+        mes_referencia_db = mes_referencia
+        try:
+            ano_ref, mes_ref = map(int, mes_referencia.split("-"))
+        except ValueError:
+            current_app.logger.error(
+                f"Formato inválido de mês de referência: {mes_referencia}"
+            )
+            return False, "Formato de mês inválido.", None
+
     movimento_existente = SalarioMovimento.query.filter_by(
-        usuario_id=current_user.id, mes_referencia=mes_referencia, tipo=tipo_folha
+        usuario_id=current_user.id, mes_referencia=mes_referencia_db, tipo=tipo_folha
     ).first()
 
     if movimento_existente:
-        msg = f"Já existe uma folha do tipo '{tipo_folha}' para o mês {mes_referencia}."
+        msg = f"Já existe uma folha do tipo '{tipo_folha}' para o mês {mes_referencia_db}."
         return False, msg, movimento_existente
 
     try:
         data_final = data_recebimento_form
 
         if tipo_folha == FormChoices.TipoFolha.MENSAL.value:
-            ano, mes = map(int, mes_referencia.split("-"))
-            data_final = get_quinto_dia_util(ano, mes)
+            data_final = get_quinto_dia_util(ano_ref, mes_ref)
 
         novo_movimento = SalarioMovimento(
             usuario_id=current_user.id,
-            mes_referencia=mes_referencia,
+            mes_referencia=mes_referencia_db,
             tipo=tipo_folha,
             data_recebimento=data_final,
         )

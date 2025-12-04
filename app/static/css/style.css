@@ -265,13 +265,13 @@ h6,
 
 /* Badges */
 .badge {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     padding: 0.25em 0.5em;
 }
 
 /* Listas */
 .list-group-item {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--wf-text-light);
 }
 
@@ -519,14 +519,14 @@ h6,
 .input-maior {
     text-align: center;
     margin: 0;
-    padding: 0.1rem;
+    padding: 0;
     color: var(--wf-azul-destaque) !important;
     background-color: transparent !important;
 }
 
 .input-compacto {
     width: 80px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     border: 1px solid var(--wf-secondary);
 }

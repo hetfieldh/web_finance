@@ -71,7 +71,7 @@
 
 <div class="row g-1 mb-1">
   <div class="col-6 col-md-3">
-    <div class="card conta-hover h-100">
+    <div class="card conta-hover">
       <div class="card-body text-center py-2 px-1">
         <h6 class="card-title text-muted extra-small mb-1">
           SALDO OPERACIONAL
@@ -85,7 +85,7 @@
     </div>
   </div>
   <div class="col-6 col-md-3">
-    <div class="card conta-hover h-100">
+    <div class="card conta-hover">
       <div class="card-body text-center py-2 px-1">
         <h6 class="card-title text-muted extra-small mb-1">INVESTIMENTOS</h6>
         <p class="card-text h6 fw-semibold text-success mb-0">
@@ -95,7 +95,7 @@
     </div>
   </div>
   <div class="col-6 col-md-3">
-    <div class="card conta-hover h-100">
+    <div class="card conta-hover">
       <div class="card-body text-center py-2 px-1">
         <h6 class="card-title text-muted extra-small mb-1">BENEFÍCIOS</h6>
         <p class="card-text h6 fw-semibold text-secondary mb-0">
@@ -105,7 +105,7 @@
     </div>
   </div>
   <div class="col-6 col-md-3">
-    <div class="card conta-hover h-100">
+    <div class="card conta-hover">
       <div class="card-body text-center py-2 px-1">
         <h6 class="card-title text-muted extra-small mb-1">FGTS</h6>
         <p class="card-text h6 fw-semibold text-secondary mb-0">
@@ -192,7 +192,7 @@
 
 <div class="d-none d-lg-flex row g-1">
   <div class="col-lg-3">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">
           Contas Bancárias
@@ -242,7 +242,7 @@
   </div>
 
   <div class="col-lg-3">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">
           Últimas Movimentações Bancárias
@@ -291,7 +291,7 @@
   </div>
 
   <div class="col-lg-3">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <form
           id="form-movimentos-mes"
@@ -347,7 +347,7 @@
   </div>
 
   <div class="col-lg-3">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm">
       <div class="card-header bg-light">
         <h6 class="fw-semibold mb-0 text-secondary">
           Saldos Devedores
@@ -481,7 +481,7 @@
           <ul class="list-group list-group-flush">
             {% for conta in contas_do_usuario %}
             <li
-              class="list-group-item p-3 d-flex justify-content-between align-items-center"
+              class="list-group-item p-1 d-flex justify-content-between align-items-center"
             >
               <div class="d-flex align-items-center">
                 <div class="rounded-circle bg-light p-2 me-3 text-secondary">
@@ -500,7 +500,7 @@
             {% endfor %}
           </ul>
           {% else %}
-          <p class="text-center p-3 text-muted">Nenhuma conta.</p>
+          <p class="text-center p-1 text-muted">Nenhuma conta.</p>
           {% endif %}
         </div>
       </div>
@@ -517,7 +517,7 @@
           <ul class="list-group list-group-flush">
             {% for item in proximos_movimentos %}
             <li
-              class="list-group-item p-3 d-flex justify-content-between align-items-center"
+              class="list-group-item p-1 d-flex justify-content-between align-items-center"
             >
               <div class="overflow-hidden me-2">
                 <div class="fw-bold text-dark text-truncate">
@@ -552,7 +552,7 @@
           {% if ultimos_movimentos %}
           <ul class="list-group list-group-flush">
             {% for mov in ultimos_movimentos %}
-            <li class="list-group-item p-3">
+            <li class="list-group-item p-1">
               <div
                 class="d-flex justify-content-between align-items-center mb-1"
               >
@@ -574,7 +574,7 @@
             {% endfor %}
           </ul>
           {% else %}
-          <p class="text-center p-3 text-muted">Sem movimentações.</p>
+          <p class="text-center p-1 text-muted">Sem movimentações.</p>
           {% endif %}
         </div>
       </div>
@@ -588,7 +588,7 @@
             financ in financiamentos %} {% if financ.saldo_devedor_atual > 0 %}
             {% set tem_divida_mobile = true %}
             <li
-              class="list-group-item p-3 d-flex justify-content-between align-items-center"
+              class="list-group-item p-1 d-flex justify-content-between align-items-center"
             >
               <div>
                 <div class="fw-bold text-dark">
@@ -606,7 +606,7 @@
             in crediarios %} {% if cred.saldo_devedor > 0 %} {% set
             tem_divida_mobile = true %}
             <li
-              class="list-group-item p-3 d-flex justify-content-between align-items-center"
+              class="list-group-item p-1 d-flex justify-content-between align-items-center"
             >
               <div>
                 <div class="fw-bold text-dark">{{ cred.nome_crediario }}</div>
@@ -636,7 +636,6 @@
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 <script>
-  // Script específico para o Datepicker do Mobile na aba Vencimentos
   document
     .getElementById("mes_ano_mobile")
     ?.addEventListener("change", function () {

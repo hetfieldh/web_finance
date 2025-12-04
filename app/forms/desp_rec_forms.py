@@ -1,6 +1,7 @@
 # app\forms\desp_rec_forms.py
 
 from datetime import date
+from decimal import Decimal
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -118,7 +119,7 @@ class GerarPrevisaoForm(FlaskForm):
         "Valor Mensal",
         validators=[
             InputRequired("O valor previsto é obrigatório."),
-            NumberRange(min=0.01, message="O valor deve ser maior que zero."),
+            NumberRange(min=Decimal("0.01"), message="O valor deve ser maior que zero."),
         ],
         places=2,
     )
@@ -195,7 +196,7 @@ class LancamentoUnicoForm(FlaskForm):
         "Valor",
         validators=[
             InputRequired("O valor é obrigatório."),
-            NumberRange(min=0.01, message="O valor deve ser maior que zero."),
+            NumberRange(min=Decimal("0.01"), message="O valor deve ser maior que zero."),
         ],
         places=2,
     )

@@ -1,6 +1,7 @@
 # app/forms/salario_forms.py
 
-from datetime import date
+from datetime import date, datetime
+from decimal import Decimal
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -90,23 +91,40 @@ class EditarSalarioItemForm(FlaskForm):
 
 
 class CabecalhoFolhaForm(FlaskForm):
+    _choices_raw = FormChoices.get_choices(FormChoices.TipoFolha)
+    _choices_clean = [c for c in _choices_raw if c[0]]
+
     tipo = SelectField(
         "Tipo de Folha",
-        choices=FormChoices.get_choices(FormChoices.TipoFolha),
+        choices=[("", "Selecione...")] + _choices_clean,
         validators=[DataRequired("Selecione o tipo de folha.")],
-        default=FormChoices.TipoFolha.MENSAL.value,
     )
+
     mes_referencia = StringField(
-        "Mês de Referência: ",
+        "Mês de Referência",
         validators=[DataRequired("O mês de referência é obrigatório.")],
-        render_kw={"placeholder": "Selecione..."},
+        render_kw={"placeholder": "Selecione...", "autocomplete": "off"},
     )
-    data_recebimento = DateField(
+
+    data_recebimento = StringField(
         "Data de Recebimento",
-        validators=[DataRequired("A data de recebimento é obrigatória.")],
+        validators=[Optional()],
+        render_kw={"placeholder": "dd/mm/aaaa", "autocomplete": "off"},
     )
 
     submit = SubmitField("Criar Folha")
+
+    def validate_data_recebimento(self, field):
+        if self.tipo.data != "Mensal" and self.tipo.data != "":
+            if not field.data:
+                raise ValidationError(
+                    "A data de recebimento é obrigatória para este tipo de folha."
+                )
+
+            try:
+                datetime.strptime(field.data, "%d/%m/%Y")
+            except ValueError:
+                raise ValidationError("Data inválida. Use o formato dd/mm/aaaa.")
 
 
 class AdicionarItemFolhaForm(FlaskForm):
@@ -119,7 +137,7 @@ class AdicionarItemFolhaForm(FlaskForm):
         "Valor",
         validators=[
             InputRequired("O valor é obrigatório."),
-            NumberRange(min=0.01, message="O valor deve ser maior que zero."),
+           NumberRange(min=Decimal("0.01"), message="O valor deve ser maior que zero."),
         ],
         places=2,
     )
