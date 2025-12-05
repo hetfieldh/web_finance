@@ -168,10 +168,10 @@ def get_resumo_mensal(user_id, ano, mes):
 
     from app.models.conta_model import Conta
 
-    saldo_inicial = db.session.query(func.sum(ContaMovimento.valor)).join(Conta).filter(
+    saldo_operacional_atual = db.session.query(func.sum(Conta.saldo_atual)).filter(
         Conta.usuario_id == user_id,
-        Conta.tipo.in_(["Corrente", "Poupança", "Outros"]),
-        ContaMovimento.data_movimento < data_inicio_mes,
+        Conta.saldo_operacional.is_(True),
+        Conta.ativa.is_(True),
     ).scalar() or Decimal("0.00")
 
     movimentacoes = []
@@ -318,10 +318,10 @@ def get_resumo_mensal(user_id, ano, mes):
 
     movimentacoes.sort(key=lambda x: x["data"])
 
-    saldo_final_previsto = (saldo_inicial + total_receitas) - total_despesas
+    saldo_final_previsto = (saldo_operacional_atual + total_receitas) - total_despesas
 
     return {
-        "saldo_inicial": saldo_inicial,
+        "saldo_inicial": saldo_operacional_atual,
         "total_receitas": total_receitas,
         "total_despesas": total_despesas,
         "saldo_final_previsto": saldo_final_previsto,
