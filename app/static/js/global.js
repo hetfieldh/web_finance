@@ -6,9 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  var tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  );
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
@@ -38,9 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateButtonState() {
     const allChecked = document.querySelectorAll(".item-checkbox:checked");
 
-    const visibleCount = Array.from(allChecked).filter(
-      (cb) => cb.offsetParent !== null
-    ).length;
+    const visibleCount = Array.from(allChecked).filter((cb) => cb.offsetParent !== null).length;
 
     if (countSpan) countSpan.textContent = visibleCount;
 
@@ -60,14 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
     updateButtonState();
   }
 
-  if (selectAllDesktop)
-    selectAllDesktop.addEventListener("change", (e) =>
-      toggleAll(e.target.checked)
-    );
-  if (selectAllMobile)
-    selectAllMobile.addEventListener("change", (e) =>
-      toggleAll(e.target.checked)
-    );
+  if (selectAllDesktop) selectAllDesktop.addEventListener("change", (e) => toggleAll(e.target.checked));
+  if (selectAllMobile) selectAllMobile.addEventListener("change", (e) => toggleAll(e.target.checked));
 
   checkboxes.forEach((cb) => {
     cb.addEventListener("change", updateButtonState);
@@ -89,7 +79,7 @@ function inicializarDatepickerMesAno(selector, onChangeCallback) {
         minViewMode: "months",
         language: "pt-BR",
         autoclose: true,
-        orientation: "bottom right",
+        orientation: "bottom right"
       })
       .on("changeDate", function (e) {
         if (typeof onChangeCallback === "function") {
@@ -102,12 +92,12 @@ function inicializarDatepickerMesAno(selector, onChangeCallback) {
 $(document).ready(function () {
   $(".sortable-table").DataTable({
     language: {
-      url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json",
+      url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
     },
     paging: false,
     searching: false,
     info: false,
     responsive: true,
-    order: [],
+    order: []
   });
 });

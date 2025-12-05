@@ -2,43 +2,33 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-6 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header bg-warning">
-        <h5 class="mb-0 d-flex align-items-center">
-          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
-          <span class="flex-grow-1 text-center">
-            Editar Tipo de Transação: {{ tipo_transacao.transacao_tipo }}
-          </span>
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_transacao.id) }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-5 mb-3">
-              {{ render_field(form.transacao_tipo) }}
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning">
+          <h5 class="mb-0 d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
+            <span class="flex-grow-1 text-center">Editar Tipo de Transação: {{ tipo_transacao.transacao_tipo }}</span>
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('conta_transacao.editar_tipo_transacao', id=tipo_transacao.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row">
+              <div class="col-md-5 mb-3">{{ render_field(form.transacao_tipo) }}</div>
+              <div class="col-md-3 mb-3">{{ render_field(form.tipo) }}</div>
             </div>
-            <div class="col-md-3 mb-3">{{ render_field(form.tipo) }}</div>
-          </div>
 
-          <div class="mt-1">
-            <button type="submit" class="btn btn-amarelo">
-              <i class="fas fa-save"></i> {{ form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('conta_transacao.listar_tipos_transacao') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+            <div class="mt-1">
+              <button type="submit" class="btn btn-amarelo">
+                <i class="fas fa-save"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('conta_transacao.listar_tipos_transacao') }}" class="btn btn-cinza">Cancelar</a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         minViewMode: "months",
         language: "pt-BR",
         autoclose: true,
-        orientation: "bottom auto",
+        orientation: "bottom auto"
       })
       .on("changeDate", function (e) {
         document.getElementById("form-pagamentos-mes").submit();
@@ -20,9 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pagamentoModal = document.getElementById("pagamentoModal");
   const jsonDataElement = document.getElementById("contas-data");
 
-  const todasAsContas = jsonDataElement
-    ? JSON.parse(jsonDataElement.textContent)
-    : [];
+  const todasAsContas = jsonDataElement ? JSON.parse(jsonDataElement.textContent) : [];
 
   if (pagamentoModal && jsonDataElement) {
     const tiposDeContaPermitidosParaPagamento = [
@@ -31,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "Digital",
       "Investimento",
       "Caixinha",
-      "Dinheiro",
+      "Dinheiro"
     ];
 
     function formatCurrency(value) {
@@ -45,9 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pagamentoModal.addEventListener("show.bs.modal", function (event) {
       const button = event.relatedTarget;
       const modalForm = pagamentoModal.querySelector("form");
-      const contaSelectInput = modalForm.querySelector(
-        'select[name="conta_id"]'
-      );
+      const contaSelectInput = modalForm.querySelector('select[name="conta_id"]');
 
       if (contaSelectInput) {
         contaSelectInput.innerHTML = '<option value="">Selecione...</option>';
@@ -61,9 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const saldoLimite = conta.limite;
           const optionText = `${conta.nome} (${
             conta.tipo
-          }) - Saldo: ${formatCurrency(saldoDisponivel)} | Limite: ${formatCurrency(
-            saldoLimite
-          )} `;
+          }) - Saldo: ${formatCurrency(saldoDisponivel)} | Limite: ${formatCurrency(saldoLimite)} `;
           const option = new Option(optionText, conta.id);
           contaSelectInput.add(option);
         });
@@ -76,11 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       modalForm.querySelector('input[name="item_id"]').value = itemId;
       modalForm.querySelector('input[name="item_tipo"]').value = itemTipo;
-      modalForm.querySelector('input[name="item_descricao"]').value =
-        itemDescricao;
-      const valorPagoInput = modalForm.querySelector(
-        'input[name="valor_pago"]'
-      );
+      modalForm.querySelector('input[name="item_descricao"]').value = itemDescricao;
+      const valorPagoInput = modalForm.querySelector('input[name="valor_pago"]');
       const valorPagoHelp = document.getElementById("valor-pago-help");
 
       valorPagoInput.value = itemValor;

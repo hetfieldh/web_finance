@@ -20,29 +20,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (formAmortizacao) {
     const valorAmortizacaoInput = document.getElementById("valor_amortizacao");
     const estrategiaSelect = document.getElementById("estrategia_selecao");
-    const saldoDevedorAtual = parseFloat(
-      formAmortizacao.dataset.saldoDevedorAtual
-    );
+    const saldoDevedorAtual = parseFloat(formAmortizacao.dataset.saldoDevedorAtual);
 
     const resumoValor = document.getElementById("resumo-valor");
     const resumoSaldoDepois = document.getElementById("resumo-saldo-depois");
     const resumoPrazoDiv = document.getElementById("resumo-prazo");
     const resumoParcelaDiv = document.getElementById("resumo-parcela");
-    const resumoEconomiaJuros = document.getElementById(
-      "resumo-economia-juros"
-    );
-    const resumoParcelasQuitadasLista = document.getElementById(
-      "resumo-parcelas-quitadas-lista"
-    );
-    const resumoAmortizacaoParcialDetalhe = document.getElementById(
-      "resumo-amortizacao-parcial-detalhe"
-    );
-    const resumoParcelasAfetadas = document.getElementById(
-      "resumo-parcelas-afetadas"
-    );
-    const resumoReducaoParcela = document.getElementById(
-      "resumo-reducao-parcela"
-    );
+    const resumoEconomiaJuros = document.getElementById("resumo-economia-juros");
+    const resumoParcelasQuitadasLista = document.getElementById("resumo-parcelas-quitadas-lista");
+    const resumoAmortizacaoParcialDetalhe = document.getElementById("resumo-amortizacao-parcial-detalhe");
+    const resumoParcelasAfetadas = document.getElementById("resumo-parcelas-afetadas");
+    const resumoReducaoParcela = document.getElementById("resumo-reducao-parcela");
 
     const formatCurrency = (value) => {
       return value.toLocaleString("pt-BR");
@@ -58,9 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       resumoValor.textContent = formatCurrency(valorAmortizar);
-      resumoSaldoDepois.textContent = formatCurrency(
-        saldoDevedorAtual - valorAmortizar
-      );
+      resumoSaldoDepois.textContent = formatCurrency(saldoDevedorAtual - valorAmortizar);
 
       if (estrategia === "prazo") {
         resumoPrazoDiv.style.display = "block";
@@ -101,10 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
         resumoPrazoDiv.style.display = "none";
         resumoParcelaDiv.style.display = "block";
 
-        const qtdParcelas =
-          typeof parcelasParcela !== "undefined" ? parcelasParcela.length : 0;
-        const reducaoPorParcela =
-          qtdParcelas > 0 ? valorAmortizar / qtdParcelas : 0;
+        const qtdParcelas = typeof parcelasParcela !== "undefined" ? parcelasParcela.length : 0;
+        const reducaoPorParcela = qtdParcelas > 0 ? valorAmortizar / qtdParcelas : 0;
 
         resumoParcelasAfetadas.textContent = qtdParcelas;
         resumoReducaoParcela.textContent = formatCurrency(reducaoPorParcela);

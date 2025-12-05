@@ -13,9 +13,7 @@ $(document).ready(function () {
 
     // Alterna ícone
     if ($(target).is(":visible")) {
-      icon
-        .removeClass("fa-plus-square fa-caret-right")
-        .addClass("fa-minus-square fa-caret-down");
+      icon.removeClass("fa-plus-square fa-caret-right").addClass("fa-minus-square fa-caret-down");
     } else {
       // Se estiver fechando (recolhendo) um Grupo, fecha também os Subgrupos filhos recursivamente
       if (target && target.startsWith(".grupo-child")) {
@@ -32,9 +30,7 @@ $(document).ready(function () {
           }
         });
       }
-      icon
-        .removeClass("fa-minus-square fa-caret-down")
-        .addClass("fa-plus-square fa-caret-right");
+      icon.removeClass("fa-minus-square fa-caret-down").addClass("fa-plus-square fa-caret-right");
     }
   });
 });

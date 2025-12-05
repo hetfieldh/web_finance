@@ -1,36 +1,18 @@
 <!-- app\templates\includes\_modal_pagamento.html -->
 
-<div
-  class="modal fade"
-  id="pagamentoModal"
-  tabindex="-1"
-  aria-labelledby="pagamentoModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="pagamentoModal" tabindex="-1" aria-labelledby="pagamentoModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
         <div class="position-relative w-100">
-          <i
-            class="fas fa-2x fa-dollar-sign text-white position-absolute start-0 top-50 translate-middle-y ms-2"
-          ></i>
+          <i class="fas fa-2x fa-dollar-sign text-white position-absolute start-0 top-50 translate-middle-y ms-2"></i>
 
-          <h4 class="modal-title text-center m-0" id="pagamentoModalLabel">
-            Registrar Pagamento
-          </h4>
+          <h4 class="modal-title text-center m-0" id="pagamentoModalLabel">Registrar Pagamento</h4>
         </div>
 
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form
-        method="POST"
-        action="{{ url_for('pagamentos.registrar_pagamento') }}"
-      >
+      <form method="POST" action="{{ url_for('pagamentos.registrar_pagamento') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="modal-body">
           <input type="hidden" id="item_id" name="item_id" />
@@ -38,52 +20,36 @@
           <input type="hidden" id="item_descricao" name="item_descricao" />
 
           <div class="mb-3">
-            <label for="data_pagamento" class="form-label"
-              >Data do Pagamento <span class="text-danger">*</span></label
-            >
-            <input
-              type="date"
-              class="form-control"
-              id="data_pagamento"
-              name="data_pagamento"
-              value=""
-              required
-            />
+            <label for="data_pagamento" class="form-label">
+              Data do Pagamento
+              <span class="text-danger">*</span>
+            </label>
+            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="" required />
           </div>
 
           <div class="mb-3">
-            <label for="valor_pago" class="form-label"
-              >Valor Pago <span class="text-danger">*</span></label
-            >
-            <input
-              type="number"
-              step="0.01"
-              class="form-control"
-              id="valor_pago"
-              name="valor_pago"
-              required
-            />
+            <label for="valor_pago" class="form-label">
+              Valor Pago
+              <span class="text-danger">*</span>
+            </label>
+            <input type="number" step="0.01" class="form-control" id="valor_pago" name="valor_pago" required />
           </div>
 
           <div class="mb-3">
-            <label for="conta_id" class="form-label"
-              >Pagar com <span class="text-danger">*</span></label
-            >
+            <label for="conta_id" class="form-label">
+              Pagar com
+              <span class="text-danger">*</span>
+            </label>
             <select class="form-select" id="conta_id" name="conta_id" required>
               <option value="">Selecione...</option>
             </select>
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancelar
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-danger">
-            <i class="fas fa-check me-2"></i>Confirmar Pagamento
+            <i class="fas fa-check me-2"></i>
+            Confirmar Pagamento
           </button>
         </div>
       </form>

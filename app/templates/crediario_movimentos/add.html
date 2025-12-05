@@ -2,76 +2,64 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-8 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="px-2 fas fa-plus fa-lg text-warning"></i>Lançamento de
-          Crediário
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              {{ render_field(form.crediario_id) }}
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header menu-primario">
+          <h5 class="mb-0">
+            <i class="px-2 fas fa-plus fa-lg text-warning"></i>
+            Lançamento de Crediário
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('crediario_movimento.adicionar_movimento_crediario') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row">
+              <div class="col-md-6 mb-3">{{ render_field(form.crediario_id) }}</div>
+              <div class="col-md-6 mb-3">{{ render_field(form.fornecedor_id) }}</div>
             </div>
-            <div class="col-md-6 mb-3">
-              {{ render_field(form.fornecedor_id) }}
-            </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              {{ render_field(form.crediario_grupo_id) }}
+            <div class="row">
+              <div class="col-md-4 mb-3">{{ render_field(form.crediario_grupo_id) }}</div>
+              <div class="col-md-4 mb-3">{{ render_field(form.crediario_subgrupo_id) }}</div>
+              <div class="col-md-4 mb-3">{{ render_field(form.destino) }}</div>
             </div>
-            <div class="col-md-4 mb-3">
-              {{ render_field(form.crediario_subgrupo_id) }}
-            </div>
-            <div class="col-md-4 mb-3">{{ render_field(form.destino) }}</div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.data_compra, attrs={'type': 'date'}) }}
+            <div class="row">
+              <div class="col-md-3 mb-3">{{ render_field(form.data_compra, attrs={'type': 'date'}) }}</div>
+              <div class="col-md-3 mb-3">
+                {{
+                  render_field(form.valor_total_compra, attrs={'type': 'number',
+                  'step': '0.01'})
+                }}
+              </div>
+              <div class="col-md-3 mb-3">{{ render_field(form.data_primeira_parcela) }}</div>
+              <div class="col-md-3 mb-3">
+                {{
+                  render_field(form.numero_parcelas, attrs={'type': 'number',
+                  'min': '1'})
+                }}
+              </div>
             </div>
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.valor_total_compra, attrs={'type': 'number',
-              'step': '0.01'}) }}
+            <div class="row">
+              <div class="mb-3">{{ render_field(form.descricao) }}</div>
             </div>
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.data_primeira_parcela) }}
-            </div>
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.numero_parcelas, attrs={'type': 'number',
-              'min': '1'}) }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="mb-3">{{ render_field(form.descricao) }}</div>
-          </div>
 
-          <div class="mt-1">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-save text-warning me-2"></i>
-              {{ form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+            <div class="mt-1">
+              <button type="submit" class="btn btn-azul">
+                <i class="fas fa-save text-warning me-2"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('crediario_movimento.listar_movimentos_crediario') }}" class="btn btn-cinza">
+                Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/forms.js') }}"></script>
 {% endblock %}

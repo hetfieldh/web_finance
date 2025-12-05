@@ -2,78 +2,60 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-8 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header bg-warning">
-        <h5 class="mb-0 d-flex align-items-center">
-          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
-          <span class="flex-grow-1 text-center">
-            Editar Financiamento: {{ financiamento.nome_financiamento }}
-          </span>
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('financiamento.editar_financiamento', id=financiamento.id) }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-7 mb-3">
-              {{ render_field(form.nome_financiamento) }}
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning">
+          <h5 class="mb-0 d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
+            <span class="flex-grow-1 text-center">Editar Financiamento: {{ financiamento.nome_financiamento }}</span>
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('financiamento.editar_financiamento', id=financiamento.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row">
+              <div class="col-md-7 mb-3">{{ render_field(form.nome_financiamento) }}</div>
+              <div class="col-md-5 mb-3">{{ render_field(form.conta_id) }}</div>
             </div>
-            <div class="col-md-5 mb-3">{{ render_field(form.conta_id) }}</div>
-          </div>
-          <div class="row">
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Valor Financiado</label>
-              <input
-                type="text"
-                class="form-control"
-                value="{{ financiamento.valor_total_financiado | format_number }}"
-                readonly
-              />
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Valor Financiado</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ financiamento.valor_total_financiado | format_number }}"
+                  readonly
+                />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Saldo Devedor Atual</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ financiamento.saldo_devedor_atual | format_number }}"
+                  readonly
+                />
+              </div>
+              <div class="col-md-3 mb-3">{{ render_field(form.taxa_juros_anual) }}</div>
             </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Saldo Devedor Atual</label>
-              <input
-                type="text"
-                class="form-control"
-                value="{{ financiamento.saldo_devedor_atual | format_number }}"
-                readonly
-              />
+            <div class="row">
+              <div class="col-md-3 mb-3">{{ render_field(form.data_inicio) }}</div>
+              <div class="col-md-3 mb-3">{{ render_field(form.prazo_meses) }}</div>
+              <div class="col-md-3 mb-3">{{ render_field(form.tipo_amortizacao) }}</div>
             </div>
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.taxa_juros_anual) }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.data_inicio) }}
-            </div>
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.prazo_meses) }}
-            </div>
-            <div class="col-md-3 mb-3">
-              {{ render_field(form.tipo_amortizacao) }}
-            </div>
-          </div>
-          <div class="mb-3">{{ render_field(form.descricao) }}</div>
+            <div class="mb-3">{{ render_field(form.descricao) }}</div>
 
-          <div class="mt-1">
-            <button type="submit" class="btn btn-amarelo">
-              <i class="fas fa-save"></i> {{ form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('financiamento.listar_financiamentos') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+            <div class="mt-1">
+              <button type="submit" class="btn btn-amarelo">
+                <i class="fas fa-save"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('financiamento.listar_financiamentos') }}" class="btn btn-cinza">Cancelar</a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

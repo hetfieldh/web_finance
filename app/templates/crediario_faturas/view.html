@@ -1,217 +1,196 @@
 <!--- app/templates/crediario_faturas/view.html -->
 
-{% extends "base.html" %} {% block content %}
-<div class="row">
-  <div class="col-12 col-lg-10 mx-auto">
-    <div
-      class="caixa-sombreada-cinza p-1 d-flex flex-column flex-md-row justify-content-between align-items-center mb-1 gap-1"
-    >
-      <h5
-        class="mb-0 me-2 d-flex align-items-center"
-        style="color: var(--wf-azul-destaque)"
+{% extends "base.html" %}
+{% block content %}
+  <div class="row">
+    <div class="col-12 col-lg-10 mx-auto">
+      <div
+        class="caixa-sombreada-cinza p-1 d-flex flex-column flex-md-row justify-content-between align-items-center mb-1 gap-1"
       >
-        <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
-        Detalhes da Fatura
-      </h5>
-      <div class="d-flex w-md-auto justify-content-end">
-        <a
-          href="{{ url_for('crediario_fatura.listar_faturas') }}"
-          class="btn btn-secondary btn-sm flex-grow-1 flex-md-grow-0"
-        >
-          <i class="fas fa-arrow-left text-warning me-2"></i> Voltar
-        </a>
-      </div>
-    </div>
-
-    <div
-      class="card mb-1 border-start border-4 {% if fatura.status == 'Pago' %}border-success{% elif fatura.status == 'Atrasado' %}border-danger{% else %}border-secondary{% endif %} shadow-sm"
-    >
-      <div class="card-body py-3">
-        <div class="row g-1 align-items-center">
-          <div class="col-12 col-md-6 border-end-md">
-            <h6 class="text-muted extra-small text-uppercase fw-bold mb-2">
-              Dados da Fatura
-            </h6>
-            <div class="mb-1">
-              <span class="d-block h5 fw-bold text-dark mb-0"
-                >{{ fatura.crediario.nome_crediario }}</span
-              >
-              <span class="small text-muted">
-                Referência:
-                <span class="fw-semibold text-dark">
-                  {% set partes = fatura.mes_referencia.split('-') %}{{
-                  partes[1] }}/{{ partes[0] }}
-                </span>
-              </span>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <div class="d-flex justify-content-between align-items-end">
-              <div>
-                <h6 class="text-muted extra-small text-uppercase fw-bold mb-1">
-                  Valor Total
-                </h6>
-                <span class="h3 fw-bold text-dark mb-0"
-                  >{{ fatura.valor_total_fatura | format_number }}</span
-                >
-              </div>
-              <div class="text-end">
-                {% if fatura.status == 'Pago' %}
-                <span
-                  class="badge bg-success-subtle text-success-emphasis border border-success px-3 py-2 rounded-pill"
-                  >PAGO</span
-                >
-                {% elif fatura.status == 'Atrasado' %}
-                <span
-                  class="badge bg-danger-subtle text-danger-emphasis border border-danger px-3 py-2 rounded-pill"
-                  >ATRASADO</span
-                >
-                {% else %}
-                <span
-                  class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary px-3 py-2 rounded-pill"
-                  >{{ fatura.status }}</span
-                >
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card shadow-sm">
-      <div class="card-header menu-primario text-white py-2">
-        <h6 class="mb-0">
-          <i class="fas fa-list-ol me-2 text-warning"></i>Itens da Fatura
-        </h6>
-      </div>
-
-      <div class="card-body p-0">
-        {% if parcelas_da_fatura %}
-
-        <div class="table-responsive d-none d-md-block">
-          <table
-            class="table table-sm table-striped table-hover align-middle mb-0"
+        <h5 class="mb-0 me-2 d-flex align-items-center" style="color: var(--wf-azul-destaque)">
+          <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
+          Detalhes da Fatura
+        </h5>
+        <div class="d-flex w-md-auto justify-content-end">
+          <a
+            href="{{ url_for('crediario_fatura.listar_faturas') }}"
+            class="btn btn-secondary btn-sm flex-grow-1 flex-md-grow-0"
           >
-            <thead class="table-light small text-muted text-uppercase">
-              <tr>
-                <th class="ps-3 text-nowrap">Data Compra</th>
-                <th>Fornecedor</th>
-                <th>Descrição</th>
-                <th class="text-center">Parc.</th>
-                <th class="text-end pe-3">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for parcela in parcelas_da_fatura %}
-              <tr>
-                <td class="ps-3 text-nowrap">
-                  {{ parcela.movimento_pai.data_compra.strftime('%d/%m/%Y') }}
-                </td>
-                <td>
-                  <div
-                    class="text-truncate"
-                    style="max-width: 150px"
-                    title="{{ parcela.movimento_pai.fornecedor.nome }}"
-                  >
-                    {{ parcela.movimento_pai.fornecedor.nome if
-                    parcela.movimento_pai.fornecedor else '-' }}
-                  </div>
-                </td>
-                <td>
-                  <div
-                    class="text-truncate"
-                    style="max-width: 250px"
-                    title="{{ parcela.movimento_pai.descricao }}"
-                  >
-                    {{ parcela.movimento_pai.descricao }}
-                  </div>
-                </td>
-                <td class="text-center">
-                  <span class="badge bg-light text-dark border"
-                    >{{ parcela.numero_parcela }}/{{
-                    parcela.movimento_pai.numero_parcelas }}</span
-                  >
-                </td>
-                <td class="text-end pe-3 fw-bold text-dark">
-                  {{ parcela.valor_parcela | format_number }}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot class="table-light border-top">
-              <tr>
-                <td colspan="4" class="text-end fw-bold text-muted pe-3">
-                  TOTAL
-                </td>
-                <td class="text-end fw-bold text-dark pe-3 fs-6">
-                  {{ fatura.valor_total_fatura | format_number }}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+            <i class="fas fa-arrow-left text-warning me-2"></i>
+            Voltar
+          </a>
         </div>
+      </div>
 
-        <div class="d-md-none">
-          <ul class="list-group list-group-flush">
-            {% for parcela in parcelas_da_fatura %}
-            <li class="list-group-item p-1 border-bottom">
-              <div
-                class="d-flex justify-content-between align-items-start mb-2"
-              >
-                <div class="me-2" style="overflow: hidden">
-                  <span class="d-block fw-bold text-dark text-truncate">
-                    {{ parcela.movimento_pai.descricao }}
+      <div
+        class="card mb-1 border-start border-4 {% if fatura.status == 'Pago' %}border-success{% elif fatura.status == 'Atrasado' %}border-danger{% else %}border-secondary{% endif %} shadow-sm"
+      >
+        <div class="card-body py-3">
+          <div class="row g-1 align-items-center">
+            <div class="col-12 col-md-6 border-end-md">
+              <h6 class="text-muted extra-small text-uppercase fw-bold mb-2">Dados da Fatura</h6>
+              <div class="mb-1">
+                <span class="d-block h5 fw-bold text-dark mb-0">{{ fatura.crediario.nome_crediario }}</span>
+                <span class="small text-muted">
+                  Referência:
+                  <span class="fw-semibold text-dark">
+                    {% set partes = fatura.mes_referencia.split('-') %}{{ partes[1] }}/{{ partes[0] }}
                   </span>
-                  <span class="small text-muted d-block text-truncate">
-                    <i class="fas fa-store me-1"></i> {{
-                    parcela.movimento_pai.fornecedor.nome if
-                    parcela.movimento_pai.fornecedor else 'Fornecedor não inf.'
-                    }}
-                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="d-flex justify-content-between align-items-end">
+                <div>
+                  <h6 class="text-muted extra-small text-uppercase fw-bold mb-1">Valor Total</h6>
+                  <span class="h3 fw-bold text-dark mb-0">{{ fatura.valor_total_fatura | format_number }}</span>
                 </div>
-                <span class="fs-6 fw-bold text-dark text-nowrap">
-                  {{ parcela.valor_parcela | format_number }}
-                </span>
+                <div class="text-end">
+                  {% if fatura.status == 'Pago' %}
+                    <span
+                      class="badge bg-success-subtle text-success-emphasis border border-success px-3 py-2 rounded-pill"
+                    >
+                      PAGO
+                    </span>
+                  {% elif fatura.status == 'Atrasado' %}
+                    <span
+                      class="badge bg-danger-subtle text-danger-emphasis border border-danger px-3 py-2 rounded-pill"
+                    >
+                      ATRASADO
+                    </span>
+                  {% else %}
+                    <span
+                      class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary px-3 py-2 rounded-pill"
+                    >
+                      {{ fatura.status }}
+                    </span>
+                  {% endif %}
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge bg-light text-secondary border fw-normal">
-                  <i class="far fa-calendar-alt me-1"></i> {{
-                  parcela.movimento_pai.data_compra.strftime('%d/%m/%y') }}
-                </span>
-                <span
-                  class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill"
-                >
-                  Parcela {{ parcela.numero_parcela }}/{{
-                  parcela.movimento_pai.numero_parcelas }}
-                </span>
-              </div>
-            </li>
-            {% endfor %}
-
-            <li class="list-group-item bg-light p-1 border-top">
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-bold text-muted text-uppercase small"
-                  >Total da Fatura</span
-                >
-                <span class="h5 fw-bold text-dark mb-0"
-                  >{{ fatura.valor_total_fatura | format_number }}</span
-                >
-              </div>
-            </li>
-          </ul>
+      <div class="card shadow-sm">
+        <div class="card-header menu-primario text-white py-2">
+          <h6 class="mb-0">
+            <i class="fas fa-list-ol me-2 text-warning"></i>
+            Itens da Fatura
+          </h6>
         </div>
 
-        {% else %}
-        <div class="text-center py-2 text-muted">
-          <i class="far fa-file-alt fa-2x mb-2 opacity-50"></i>
-          <p class="mb-0">Nenhuma parcela associada a esta fatura.</p>
+        <div class="card-body p-0">
+          {% if parcelas_da_fatura %}
+            <div class="table-responsive d-none d-md-block">
+              <table class="table table-sm table-striped table-hover align-middle mb-0">
+                <thead class="table-light small text-muted text-uppercase">
+                  <tr>
+                    <th class="ps-3 text-nowrap">Data Compra</th>
+                    <th>Fornecedor</th>
+                    <th>Descrição</th>
+                    <th class="text-center">Parc.</th>
+                    <th class="text-end pe-3">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for parcela in parcelas_da_fatura %}
+                    <tr>
+                      <td class="ps-3 text-nowrap">{{ parcela.movimento_pai.data_compra.strftime('%d/%m/%Y') }}</td>
+                      <td>
+                        <div
+                          class="text-truncate"
+                          style="max-width: 150px"
+                          title="{{ parcela.movimento_pai.fornecedor.nome }}"
+                        >
+                          {{
+                            parcela.movimento_pai.fornecedor.nome if
+                            parcela.movimento_pai.fornecedor else '-'
+                          }}
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="text-truncate"
+                          style="max-width: 250px"
+                          title="{{ parcela.movimento_pai.descricao }}"
+                        >
+                          {{ parcela.movimento_pai.descricao }}
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <span class="badge bg-light text-dark border">
+                          {{ parcela.numero_parcela }}/{{ parcela.movimento_pai.numero_parcelas }}
+                        </span>
+                      </td>
+                      <td class="text-end pe-3 fw-bold text-dark">{{ parcela.valor_parcela | format_number }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot class="table-light border-top">
+                  <tr>
+                    <td colspan="4" class="text-end fw-bold text-muted pe-3">TOTAL</td>
+                    <td class="text-end fw-bold text-dark pe-3 fs-6">
+                      {{ fatura.valor_total_fatura | format_number }}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="d-md-none">
+              <ul class="list-group list-group-flush">
+                {% for parcela in parcelas_da_fatura %}
+                  <li class="list-group-item p-1 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div class="me-2" style="overflow: hidden">
+                        <span class="d-block fw-bold text-dark text-truncate">
+                          {{ parcela.movimento_pai.descricao }}
+                        </span>
+                        <span class="small text-muted d-block text-truncate">
+                          <i class="fas fa-store me-1"></i>
+                          {{
+                            parcela.movimento_pai.fornecedor.nome if
+                            parcela.movimento_pai.fornecedor else 'Fornecedor não inf.'
+                          }}
+                        </span>
+                      </div>
+                      <span class="fs-6 fw-bold text-dark text-nowrap">
+                        {{ parcela.valor_parcela | format_number }}
+                      </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge bg-light text-secondary border fw-normal">
+                        <i class="far fa-calendar-alt me-1"></i>
+                        {{ parcela.movimento_pai.data_compra.strftime('%d/%m/%y') }}
+                      </span>
+                      <span
+                        class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill"
+                      >
+                        Parcela {{ parcela.numero_parcela }}/{{ parcela.movimento_pai.numero_parcelas }}
+                      </span>
+                    </div>
+                  </li>
+                {% endfor %}
+
+                <li class="list-group-item bg-light p-1 border-top">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-muted text-uppercase small">Total da Fatura</span>
+                    <span class="h5 fw-bold text-dark mb-0">{{ fatura.valor_total_fatura | format_number }}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          {% else %}
+            <div class="text-center py-2 text-muted">
+              <i class="far fa-file-alt fa-2x mb-2 opacity-50"></i>
+              <p class="mb-0">Nenhuma parcela associada a esta fatura.</p>
+            </div>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

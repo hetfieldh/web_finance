@@ -2,46 +2,35 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-6 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="px-2 fas fa-plus fa-lg text-warning"></i>Cadastro de Grupo
-          de Crediário
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('crediario_grupo.adicionar_grupo_crediario') }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-7 mb-3">
-              {{ render_field(form.grupo_crediario) }}
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header menu-primario">
+          <h5 class="mb-0">
+            <i class="px-2 fas fa-plus fa-lg text-warning"></i>
+            Cadastro de Grupo de Crediário
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('crediario_grupo.adicionar_grupo_crediario') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row">
+              <div class="col-md-7 mb-3">{{ render_field(form.grupo_crediario) }}</div>
+              <div class="col-md-5 mb-3">{{ render_field(form.tipo_grupo_crediario) }}</div>
             </div>
-            <div class="col-md-5 mb-3">
-              {{ render_field(form.tipo_grupo_crediario) }}
+
+            <div class="mb-3">{{ render_field(form.descricao) }}</div>
+
+            <div class="mt-1">
+              <button type="submit" class="btn btn-azul">
+                <i class="fas fa-save text-warning me-1"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}" class="btn btn-cinza">Cancelar</a>
             </div>
-          </div>
-
-          <div class="mb-3">{{ render_field(form.descricao) }}</div>
-
-          <div class="mt-1">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-save text-warning me-1"></i> {{
-              form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('crediario_grupo.listar_grupos_crediario') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

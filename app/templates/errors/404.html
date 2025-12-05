@@ -1,28 +1,27 @@
 <!--- app/templates/errors/404.html -->
 
-{% extends "base.html" %} {% block title %}{% endblock %} {% block page_title
-%}{% endblock %} {% block content %}
-<div>
-  <div class="error-container">
-    <div class="mb-4">
-      <img
-        src="{{ url_for('static', filename='images/error-icon.png') }}"
-        alt="Ícone de Erro"
-        class="img-fluid error-icon"
-      />
-    </div>
-    <h1 class="display-1 text-danger fw-bold mb-3">404</h1>
-    <p class="lead text-dark mb-2">Ops! Esta página não existe.</p>
+{% extends "base.html" %} {% block title %}{% endblock %} {% block page_title %}{% endblock %}
+{% block content %}
+  <div>
+    <div class="error-container">
+      <div class="mb-4">
+        <img
+          src="{{ url_for('static', filename='images/error-icon.png') }}"
+          alt="Ícone de Erro"
+          class="img-fluid error-icon"
+        />
+      </div>
+      <h1 class="display-1 text-danger fw-bold mb-3">404</h1>
+      <p class="lead text-dark mb-2">Ops! Esta página não existe.</p>
 
-    <p class="text-muted mb-4">
-      Verifique o endereço digitado e tente novamente.
-    </p>
+      <p class="text-muted mb-4">Verifique o endereço digitado e tente novamente.</p>
 
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
-      <a href="{{ url_for('main.dashboard') }}" class="btn btn-cinza">
-        <i class="fas fa-home text-warning me-2"></i>Dashboard
-      </a>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-3">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-cinza">
+          <i class="fas fa-home text-warning me-2"></i>
+          Dashboard
+        </a>
+      </div>
     </div>
   </div>
-</div>
 {% endblock %}

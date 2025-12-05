@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
       minViewMode: "months",
       language: "pt-BR",
       autoclose: true,
-      orientation: "bottom right",
+      orientation: "bottom right"
     })
     .on("changeDate", function (e) {
       document.getElementById("form-movimentos-mes").submit();
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
       weekday: "long",
       year: "numeric",
       month: "long",
-      day: "numeric",
+      day: "numeric"
     };
     dataAtualElement.textContent = hoje.toLocaleDateString("pt-BR", options);
   }

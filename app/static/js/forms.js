@@ -39,32 +39,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const dataMovimento = document.getElementById("container-data_movimento");
     const valor = document.getElementById("container-valor");
     const descricao = document.getElementById("container-descricao");
-    const simplesFields = document.getElementById(
-      "movimentacao_simples_fields"
-    );
+    const simplesFields = document.getElementById("movimentacao_simples_fields");
     const transferenciaFields = document.getElementById("transferencia_fields");
     const placeholders = {
       simples: {
         conta_id: document.getElementById("placeholder-simples-conta_id"),
-        data_movimento: document.getElementById(
-          "placeholder-simples-data_movimento"
-        ),
+        data_movimento: document.getElementById("placeholder-simples-data_movimento"),
         valor: document.getElementById("placeholder-simples-valor"),
-        descricao: document.getElementById("placeholder-simples-descricao"),
+        descricao: document.getElementById("placeholder-simples-descricao")
       },
       transferencia: {
         conta_id: document.getElementById("placeholder-transf-conta_origem"),
-        data_movimento: document.getElementById(
-          "placeholder-transf-data_movimento"
-        ),
+        data_movimento: document.getElementById("placeholder-transf-data_movimento"),
         valor: document.getElementById("placeholder-transf-valor"),
-        descricao: document.getElementById("placeholder-transf-descricao"),
-      },
+        descricao: document.getElementById("placeholder-transf-descricao")
+      }
     };
     function moverCampos() {
-      const tipoSelecionado = formMovimentacao.querySelector(
-        'input[name="tipo_operacao"]:checked'
-      ).value;
+      const tipoSelecionado = formMovimentacao.querySelector('input[name="tipo_operacao"]:checked').value;
       if (tipoSelecionado === "simples") {
         simplesFields.style.display = "block";
         transferenciaFields.style.display = "none";
@@ -82,30 +74,22 @@ document.addEventListener("DOMContentLoaded", () => {
         placeholders.transferencia.valor.appendChild(valor);
         placeholders.transferencia.descricao.appendChild(descricao);
         contaId.querySelector("label").textContent = "Conta Origem";
-        descricao.querySelector("label").textContent =
-          "Descrição da Transferência (opcional)";
+        descricao.querySelector("label").textContent = "Descrição da Transferência (opcional)";
       }
     }
-    formMovimentacao
-      .querySelectorAll('input[name="tipo_operacao"]')
-      .forEach((radio) => {
-        radio.addEventListener("change", moverCampos);
-      });
+    formMovimentacao.querySelectorAll('input[name="tipo_operacao"]').forEach((radio) => {
+      radio.addEventListener("change", moverCampos);
+    });
     moverCampos();
   }
 
   const contaOrigemSelect = document.querySelector("select#conta_id");
-  const contaDestinoSelect = document.querySelector(
-    "#transferencia_fields select[name='conta_destino_id']"
-  );
+  const contaDestinoSelect = document.querySelector("#transferencia_fields select[name='conta_destino_id']");
   if (contaOrigemSelect && contaDestinoSelect) {
     const atualizarContaDestino = () => {
       const selectedOrigemId = contaOrigemSelect.value;
       for (const option of contaDestinoSelect.options) {
-        option.style.display =
-          option.value === selectedOrigemId && option.value !== ""
-            ? "none"
-            : "block";
+        option.style.display = option.value === selectedOrigemId && option.value !== "" ? "none" : "block";
       }
       if (contaDestinoSelect.value === selectedOrigemId) {
         contaDestinoSelect.value = "";
@@ -142,9 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (formLancamentoUnico) {
     const vencimentosDataElement = document.getElementById("vencimentos-data");
     if (vencimentosDataElement) {
-      const vencimentosMap = JSON.parse(
-        vencimentosDataElement.textContent || "{}"
-      );
+      const vencimentosMap = JSON.parse(vencimentosDataElement.textContent || "{}");
       const despRecSelect = document.getElementById("desp_rec_id");
       const dataVencimentoInput = document.getElementById("data_vencimento");
       if (despRecSelect && dataVencimentoInput) {
@@ -171,13 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const formGerarPrevisao = document.getElementById("form-gerar-previsao");
   if (formGerarPrevisao) {
-    const vencimentosDataElement = document.getElementById(
-      "vencimentos-previsao-data"
-    );
+    const vencimentosDataElement = document.getElementById("vencimentos-previsao-data");
     if (vencimentosDataElement) {
-      const vencimentosMap = JSON.parse(
-        vencimentosDataElement.textContent || "{}"
-      );
+      const vencimentosMap = JSON.parse(vencimentosDataElement.textContent || "{}");
       const despRecSelect = document.getElementById("desp_rec_id_previsao");
       const dataInicioInput = document.getElementById("data_inicio_previsao");
       if (despRecSelect && dataInicioInput) {
@@ -186,9 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const diaVencimento = vencimentosMap[selectedId];
           if (diaVencimento) {
             const hoje = new Date();
-            const dataAtualNoCampo = dataInicioInput.value
-              ? new Date(dataInicioInput.value + "T00:00:00")
-              : hoje;
+            const dataAtualNoCampo = dataInicioInput.value ? new Date(dataInicioInput.value + "T00:00:00") : hoje;
             let ano = dataAtualNoCampo.getFullYear();
             let mes = dataAtualNoCampo.getMonth() + 1;
             let ultimoDiaDoMes = new Date(ano, mes, 0).getDate();
@@ -206,9 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (senhaInput) {
     const confirmarSenhaInput = document.getElementById("confirmar_senha");
     const toggleSenhaBtn = document.getElementById("toggleSenha");
-    const toggleConfirmarSenhaBtn = document.getElementById(
-      "toggleConfirmarSenha"
-    );
+    const toggleConfirmarSenhaBtn = document.getElementById("toggleConfirmarSenha");
     const strengthBar = document.getElementById("password-strength-bar");
     const strengthText = document.getElementById("password-strength-text");
 
@@ -233,10 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (toggleConfirmarSenhaBtn && confirmarSenhaInput) {
       toggleConfirmarSenhaBtn.addEventListener("click", () => {
-        togglePasswordVisibility(
-          confirmarSenhaInput,
-          "toggleConfirmarSenhaIcon"
-        );
+        togglePasswordVisibility(confirmarSenhaInput, "toggleConfirmarSenhaIcon");
       });
     }
 
@@ -290,15 +261,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function atualizarResumo() {
       const valorTotal = parseFloat(valorAmortizacaoInput.value) || 0;
-      const parcelasSelecionadas = document.querySelectorAll(
-        ".parcela-checkbox:checked"
-      ).length;
+      const parcelasSelecionadas = document.querySelectorAll(".parcela-checkbox:checked").length;
       resumoValor.textContent = valorTotal.toLocaleString("pt-BR");
       resumoParcelas.textContent = parcelasSelecionadas;
       if (parcelasSelecionadas > 0 && valorTotal > 0) {
         const valorPorParcela = valorTotal / parcelasSelecionadas;
-        resumoValorParcela.textContent =
-          valorPorParcela.toLocaleString("pt-BR");
+        resumoValorParcela.textContent = valorPorParcela.toLocaleString("pt-BR");
       } else {
         resumoValorParcela.textContent = " 0,00";
       }
@@ -313,8 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function styleSelectedTransacao() {
     if (!transacaoSelect) return;
 
-    const selectedOption =
-      transacaoSelect.options[transacaoSelect.selectedIndex];
+    const selectedOption = transacaoSelect.options[transacaoSelect.selectedIndex];
 
     resetSelect.style();
 
@@ -347,9 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const grupoCrediarioSelect = document.getElementById("crediario_grupo_id");
-  const subgrupoCrediarioSelect = document.getElementById(
-    "crediario_subgrupo_id"
-  );
+  const subgrupoCrediarioSelect = document.getElementById("crediario_subgrupo_id");
 
   if (grupoCrediarioSelect && subgrupoCrediarioSelect) {
     grupoCrediarioSelect.addEventListener("change", function () {
@@ -376,15 +341,11 @@ document.addEventListener("DOMContentLoaded", () => {
           subgrupoCrediarioSelect.innerHTML = "";
 
           if (data.length === 0) {
-            subgrupoCrediarioSelect.add(
-              new Option("Nenhum subgrupo encontrado", "")
-            );
+            subgrupoCrediarioSelect.add(new Option("Nenhum subgrupo encontrado", ""));
           } else {
             subgrupoCrediarioSelect.add(new Option("Selecione...", ""));
             data.forEach((subgrupo) => {
-              subgrupoCrediarioSelect.add(
-                new Option(subgrupo.nome, subgrupo.id)
-              );
+              subgrupoCrediarioSelect.add(new Option(subgrupo.nome, subgrupo.id));
             });
             subgrupoCrediarioSelect.disabled = false;
           }

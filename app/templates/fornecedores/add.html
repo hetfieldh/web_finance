@@ -2,38 +2,31 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-6 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="px-2 fas fa-plus fa-lg text-warning"></i>Adicionar
-          Loja/Serviço
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('fornecedor.adicionar_fornecedor') }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="mb-3">{{ render_field(form.nome) }}</div>
-          <div class="mb-3">{{ render_field(form.descricao) }}</div>
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header menu-primario">
+          <h5 class="mb-0">
+            <i class="px-2 fas fa-plus fa-lg text-warning"></i>
+            Adicionar Loja/Serviço
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('fornecedor.adicionar_fornecedor') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="mb-3">{{ render_field(form.nome) }}</div>
+            <div class="mb-3">{{ render_field(form.descricao) }}</div>
 
-          <div class="mt-1">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-save text-warning me-2"></i>
-              {{ form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('fornecedor.listar_fornecedores') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+            <div class="mt-1">
+              <button type="submit" class="btn btn-azul">
+                <i class="fas fa-save text-warning me-2"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('fornecedor.listar_fornecedores') }}" class="btn btn-cinza">Cancelar</a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

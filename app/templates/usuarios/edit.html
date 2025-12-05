@@ -1,127 +1,121 @@
 <!--- app/templates/usuarios/edit.html -->
 
-{% extends "base.html" %} {% from "includes/_macros.html" import render_field,
-render_checkbox %} {% block content %}
-<div class="row">
-  <div class="col-md-8 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header bg-warning">
-        <h5 class="mb-0 d-flex align-items-center">
-          <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
-          <span class="flex-grow-1 text-center">
-            Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}
-          </span>
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-6 mb-3">{{ render_field(form.nome) }}</div>
-            <div class="col-md-6 mb-3">{{ render_field(form.sobrenome) }}</div>
-          </div>
-          <div class="row">
-            <div class="col-md-7 mb-3">
-              {{ render_field(form.email, attrs={'id': 'email'}) }}
-              <div id="email-feedback" class="form-text mt-1"></div>
+{% extends "base.html" %}
+{%
+  from "includes/_macros.html" import render_field,
+  render_checkbox
+%}
+{% block content %}
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning">
+          <h5 class="mb-0 d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-lg mx-2 text-dark"></i>
+            <span class="flex-grow-1 text-center">Editar Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}</span>
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('usuario.editar_usuario', id=usuario.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row">
+              <div class="col-md-6 mb-3">{{ render_field(form.nome) }}</div>
+              <div class="col-md-6 mb-3">{{ render_field(form.sobrenome) }}</div>
             </div>
-            <div class="col-md-5 mb-3">
-              {{ render_field(form.login, attrs={'id': 'login'}) }}
-              <div id="login-feedback" class="form-text mt-1"></div>
+            <div class="row">
+              <div class="col-md-7 mb-3">
+                {{ render_field(form.email, attrs={'id': 'email'}) }}
+                <div id="email-feedback" class="form-text mt-1"></div>
+              </div>
+              <div class="col-md-5 mb-3">
+                {{ render_field(form.login, attrs={'id': 'login'}) }}
+                <div id="login-feedback" class="form-text mt-1"></div>
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              {{ form.senha.label(class="form-label") }}
-              <div class="input-group">
-                {{ form.senha(class="form-control", id="senha",
-                placeholder="Deixe em branco para manter a senha atual") }}
-                <button
-                  class="btn btn-cinza"
-                  type="button"
-                  id="toggleSenha"
-                  title="Mostrar/Ocultar Senha"
-                >
-                  <i class="fas fa-eye" id="toggleSenhaIcon"></i>
-                </button>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                {{ form.senha.label(class="form-label") }}
+                <div class="input-group">
+                  {{
+                    form.senha(class="form-control", id="senha",
+                    placeholder="Deixe em branco para manter a senha atual")
+                  }}
+                  <button class="btn btn-cinza" type="button" id="toggleSenha" title="Mostrar/Ocultar Senha">
+                    <i class="fas fa-eye" id="toggleSenhaIcon"></i>
+                  </button>
+                </div>
+                <div class="progress mt-2" style="height: 5px">
+                  <div
+                    id="password-strength-bar"
+                    class="progress-bar"
+                    role="progressbar"
+                    style="width: 0%"
+                    aria-valuenow="0"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+                <small id="password-strength-text" class="form-text text-muted"></small>
+                {% if form.senha.errors %}
+                  <div class="text-danger">{% for error in form.senha.errors %}{{ error }}{% endfor %}</div>
+                {% endif %}
               </div>
-              <div class="progress mt-2" style="height: 5px">
-                <div
-                  id="password-strength-bar"
-                  class="progress-bar"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
+              <div class="col-md-6 mb-3">
+                {{ form.confirmar_senha.label(class="form-label") }}
+                <div class="input-group">
+                  {{
+                    form.confirmar_senha(class="form-control",
+                    id="confirmar_senha", placeholder="Repita a nova senha")
+                  }}
+                  <button class="btn btn-cinza" type="button" id="toggleConfirmarSenha" title="Mostrar/Ocultar Senha">
+                    <i class="fas fa-eye" id="toggleConfirmarSenhaIcon"></i>
+                  </button>
+                </div>
+                {% if form.confirmar_senha.errors %}
+                  <div class="text-danger">
+                    {% for error in form.confirmar_senha.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
-              <small
-                id="password-strength-text"
-                class="form-text text-muted"
-              ></small>
-              {% if form.senha.errors %}
-              <div class="text-danger">
-                {% for error in form.senha.errors %}{{ error }}{% endfor %}
-              </div>
+            </div>
+            <div class="mb-1 form-check">
+              {{ form.is_active(class="form-check-input", disabled=is_self_edit) }}
+              {{ form.is_active.label(class="form-check-label") }}
+              {%
+                if
+                is_self_edit
+              %}
+                <small class="form-text text-muted ms-2">(Você não pode inativar sua própria conta)</small>
               {% endif %}
             </div>
-            <div class="col-md-6 mb-3">
-              {{ form.confirmar_senha.label(class="form-label") }}
-              <div class="input-group">
-                {{ form.confirmar_senha(class="form-control",
-                id="confirmar_senha", placeholder="Repita a nova senha") }}
-                <button
-                  class="btn btn-cinza"
-                  type="button"
-                  id="toggleConfirmarSenha"
-                  title="Mostrar/Ocultar Senha"
-                >
-                  <i class="fas fa-eye" id="toggleConfirmarSenhaIcon"></i>
-                </button>
-              </div>
-              {% if form.confirmar_senha.errors %}
-              <div class="text-danger">
-                {% for error in form.confirmar_senha.errors %}{{ error }}{%
-                endfor %}
-              </div>
+            <div class="mb-3 form-check">
+              {{ form.is_admin(class="form-check-input", disabled=is_self_edit) }}
+              {{ form.is_admin.label(class="form-check-label") }}
+              {%
+                if
+                is_self_edit
+              %}
+                <small class="form-text text-muted ms-2">
+                  (Você não pode remover seu próprio privilégio de administrador)
+                </small>
               {% endif %}
             </div>
-          </div>
-          <div class="mb-1 form-check">
-            {{ form.is_active(class="form-check-input", disabled=is_self_edit)
-            }} {{ form.is_active.label(class="form-check-label") }} {% if
-            is_self_edit %}<small class="form-text text-muted ms-2"
-              >(Você não pode inativar sua própria conta)</small
-            >{% endif %}
-          </div>
-          <div class="mb-3 form-check">
-            {{ form.is_admin(class="form-check-input", disabled=is_self_edit) }}
-            {{ form.is_admin.label(class="form-check-label") }} {% if
-            is_self_edit %}<small class="form-text text-muted ms-2"
-              >(Você não pode remover seu próprio privilégio de
-              administrador)</small
-            >{% endif %}
-          </div>
-          <div class="mt-1">
-            <button type="submit" class="btn btn-amarelo">
-              <i class="fas fa-save"></i> {{ form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('usuario.listar_usuarios') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+            <div class="mt-1">
+              <button type="submit" class="btn btn-amarelo">
+                <i class="fas fa-save"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('usuario.listar_usuarios') }}" class="btn btn-cinza">Cancelar</a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ajax-forms.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ajax-forms.js') }}"></script>
 {% endblock %}

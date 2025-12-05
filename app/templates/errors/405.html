@@ -1,35 +1,39 @@
 <!-- app\templates\errors\405.html -->
 
-{% extends "base.html" %} {% block title %}{% endblock %} {% block
-page_title %}{% endblock %} {% block content %}
-<div>
-  <div class="error-container">
-    <div class="mb-4">
-      <img
-        src="{{ url_for('static', filename='images/error-icon.png') }}"
-        alt="Ícone de Erro"
-        class="img-fluid error-icon"
-      />
-    </div>
-    <h1 class="display-1 text-danger fw-bold mb-3">405</h1>
-    <h2 class="h4 text-dark mb-3">Método não permitido.</h2>
+{% extends "base.html" %} {% block title %}{% endblock %}
+{%
+  block
+  page_title
+%}
+{% endblock %}
+{% block content %}
+  <div>
+    <div class="error-container">
+      <div class="mb-4">
+        <img
+          src="{{ url_for('static', filename='images/error-icon.png') }}"
+          alt="Ícone de Erro"
+          class="img-fluid error-icon"
+        />
+      </div>
+      <h1 class="display-1 text-danger fw-bold mb-3">405</h1>
+      <h2 class="h4 text-dark mb-3">Método não permitido.</h2>
 
-    <p class="text-muted mb-4">
-      O navegador tentou acessar esta página de uma maneira que não é aceita.
-    </p>
+      <p class="text-muted mb-4">O navegador tentou acessar esta página de uma maneira que não é aceita.</p>
 
-    <div class="alert alert-warning text-center d-inline-block text-start mb-4">
-      <small
-        ><i class="fas fa-wrench me-1"></i> Se você estava tentando excluir ou
-        salvar algo, recarregue a página anterior e tente novamente.</small
-      >
-    </div>
+      <div class="alert alert-warning text-center d-inline-block text-start mb-4">
+        <small>
+          <i class="fas fa-wrench me-1"></i>
+          Se você estava tentando excluir ou salvar algo, recarregue a página anterior e tente novamente.
+        </small>
+      </div>
 
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-      <a href="{{ url_for('main.dashboard') }}" class="btn btn-cinza">
-        <i class="fas fa-home text-warning me-2"></i>Dashboard
-      </a>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-cinza">
+          <i class="fas fa-home text-warning me-2"></i>
+          Dashboard
+        </a>
+      </div>
     </div>
   </div>
-</div>
 {% endblock %}

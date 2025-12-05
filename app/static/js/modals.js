@@ -24,15 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const mesAno = button.getAttribute("data-mes-ano");
       const formAction = button.getAttribute("data-form-action");
 
-      const modalBodyInputId = confirmEstornarModal.querySelector(
-        "input[name='item_id']"
-      );
-      const modalBodyInputTipo = confirmEstornarModal.querySelector(
-        "input[name='item_tipo']"
-      );
-      const modalBodyInputMesAno = confirmEstornarModal.querySelector(
-        "input[name='mes_ano']"
-      );
+      const modalBodyInputId = confirmEstornarModal.querySelector("input[name='item_id']");
+      const modalBodyInputTipo = confirmEstornarModal.querySelector("input[name='item_tipo']");
+      const modalBodyInputMesAno = confirmEstornarModal.querySelector("input[name='mes_ano']");
       const modalForm = confirmEstornarModal.querySelector("form");
 
       if (modalBodyInputId) modalBodyInputId.value = itemId;

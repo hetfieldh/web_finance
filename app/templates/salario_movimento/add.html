@@ -2,77 +2,67 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-8 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">Adicionar Salário / Eventos de Folha</h5>
-      </div>
-      <div class="card-body">
-        <p class="caixa-sombreada">
-          Selecione o tipo e a referência.
-          <br />
-          <small class="text-muted"
-            >* Mensal: Vencimento automático (5° dia útil do mês
-            seguinte).</small
-          ><br />
-          <small class="text-muted"
-            >* Outros: Informe a data de recebimento.</small
-          >
-        </p>
-        <form
-          method="POST"
-          action="{{ url_for('salario.novo_lancamento_folha') }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header menu-primario">
+          <h5 class="mb-0">Adicionar Salário / Eventos de Folha</h5>
+        </div>
+        <div class="card-body">
+          <p class="caixa-sombreada">
+            Selecione o tipo e a referência.
+            <br />
+            <small class="text-muted">* Mensal: Vencimento automático (5° dia útil do mês seguinte).</small>
+            <br />
+            <small class="text-muted">* Outros: Informe a data de recebimento.</small>
+          </p>
+          <form method="POST" action="{{ url_for('salario.novo_lancamento_folha') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-          <div class="row g-3 mb-2">
-            <div class="col-md-4">
-              {{ render_field(form.tipo, attrs={'id': 'tipo_folha'}) }}
-            </div>
+            <div class="row g-3 mb-2">
+              <div class="col-md-4">{{ render_field(form.tipo, attrs={'id': 'tipo_folha'}) }}</div>
 
-            <div class="col-6 col-md-2">
-              <div class="mb-3">
-                <label class="form-label mb-1 small" for="mes_referencia"
-                  >Mês de Referência</label
-                >
-                <div class="input-group input-group-sm">
-                  <span
-                    class="input-group-text bg-light border-secondary-subtle"
-                  >
-                    <i class="fas fa-calendar-alt text-secondary"></i>
-                  </span>
-                  {{ form.mes_referencia(class="form-control form-control-sm",
-                  id="mes_referencia") }}
+              <div class="col-6 col-md-2">
+                <div class="mb-3">
+                  <label class="form-label mb-1 small" for="mes_referencia">Mês de Referência</label>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-secondary-subtle">
+                      <i class="fas fa-calendar-alt text-secondary"></i>
+                    </span>
+                    {{
+                      form.mes_referencia(class="form-control form-control-sm",
+                      id="mes_referencia")
+                    }}
+                  </div>
+                  {% if form.mes_referencia.errors %}
+                    <div class="text-danger mt-1 small">
+                      {% for error in form.mes_referencia.errors %}
+                        {{ error }}
+                        <br />
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </div>
-                {% if form.mes_referencia.errors %}
-                <div class="text-danger mt-1 small">
-                  {% for error in form.mes_referencia.errors %} {{ error }}<br />
-                  {% endfor %}
-                </div>
-                {% endif %}
+              </div>
+
+              <div class="col-6 col-md-2" id="container_data_recebimento">
+                {{
+                  render_field(form.data_recebimento, attrs={'id':
+                  'data_recebimento'})
+                }}
               </div>
             </div>
 
-            <div class="col-6 col-md-2" id="container_data_recebimento">
-              {{ render_field(form.data_recebimento, attrs={'id':
-              'data_recebimento'}) }}
+            <div class="mt-1">
+              {{ form.submit(class="btn btn-azul") }}
+              <a href="{{ url_for('salario.listar_movimentos') }}" class="btn btn-cinza">Cancelar</a>
             </div>
-          </div>
-
-          <div class="mt-1">
-            {{ form.submit(class="btn btn-azul") }}
-            <a
-              href="{{ url_for('salario.listar_movimentos') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/salario_form.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/salario_form.js') }}"></script>
 {% endblock %}

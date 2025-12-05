@@ -12,22 +12,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const fgtsInfoElement = document.getElementById("fgts-info-data");
 
   if (fgtsInfoElement) {
-    const salarioRows = document.querySelectorAll(
-      "tr[data-categoria='Salário']"
-    );
+    const salarioRows = document.querySelectorAll("tr[data-categoria='Salário']");
 
     salarioRows.forEach((salarioRow) => {
       const itemTipo = salarioRow.getAttribute("data-item-tipo");
-      const folhaTemFgts =
-        salarioRow.getAttribute("data-folha-tem-fgts") === "true";
+      const folhaTemFgts = salarioRow.getAttribute("data-folha-tem-fgts") === "true";
 
       if (itemTipo === "Mensal" && !folhaTemFgts) {
         const actionsCell = salarioRow.querySelector("td:last-child");
 
         if (actionsCell) {
           let title = "Recebimento bloqueado.";
-          title +=
-            " Motivo: A folha de pagamento (Mensal) não possui um item de FGTS com valor.";
+          title += " Motivo: A folha de pagamento (Mensal) não possui um item de FGTS com valor.";
 
           const lockIcon = actionsCell.querySelector(".fa-lock");
 
@@ -42,9 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  var tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  );
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
@@ -54,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     startView: "months",
     minViewMode: "months",
     language: "pt-BR",
-    autoclose: true,
+    autoclose: true
   });
 
   $("#mes_ano_recebimentos").on("changeDate", function () {
@@ -78,14 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const todasAsContas = JSON.parse(contasDataElement.textContent);
 
-  const contasPadrao = [
-    "Corrente",
-    "Poupança",
-    "Digital",
-    "Investimento",
-    "Caixinha",
-    "Dinheiro",
-  ];
+  const contasPadrao = ["Corrente", "Poupança", "Digital", "Investimento", "Caixinha", "Dinheiro"];
 
   const regrasDeFiltro = {
     Mensal: contasPadrao,
@@ -95,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
     Rescisão: contasPadrao,
     Receita: contasPadrao,
     Benefício: ["Benefício"],
-    FGTS: ["FGTS"],
+    FGTS: ["FGTS"]
   };
 
   recebimentoModal.addEventListener("show.bs.modal", function (event) {
@@ -118,9 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (contaSelectInput) {
       contaSelectInput.innerHTML = '<option value="">Selecione...</option>';
       const tiposPermitidos = regrasDeFiltro[itemTipo] || [];
-      const contasFiltradas = todasAsContas.filter((conta) =>
-        tiposPermitidos.includes(conta.tipo)
-      );
+      const contasFiltradas = todasAsContas.filter((conta) => tiposPermitidos.includes(conta.tipo));
 
       contasFiltradas.forEach((conta) => {
         const saldoFormatado = formatCurrencyJS(conta.saldo_atual);
@@ -141,7 +126,6 @@ document.addEventListener("DOMContentLoaded", function () {
     modalForm.querySelector('input[name="item_id"]').value = itemId;
     modalForm.querySelector('input[name="item_tipo"]').value = itemTipo;
     modalForm.querySelector('input[name="valor_recebido"]').value = itemValor;
-    modalForm.querySelector('input[name="item_descricao"]').value =
-      itemDescricao;
+    modalForm.querySelector('input[name="item_descricao"]').value = itemDescricao;
   });
 });

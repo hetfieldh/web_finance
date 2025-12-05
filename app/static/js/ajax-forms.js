@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fetch(this.action, {
         method: "POST",
         body: formData,
-        headers: { "X-Requested-With": "XMLHttpRequest" },
+        headers: { "X-Requested-With": "XMLHttpRequest" }
       })
         .then((response) => {
           if (!response.ok) {
@@ -23,14 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then((data) => {
           if (data.success) {
-            const valorInput = formAdicionarVerba.querySelector(
-              'input[name="valor"]'
-            );
+            const valorInput = formAdicionarVerba.querySelector('input[name="valor"]');
             if (valorInput) valorInput.value = "";
 
-            const selectItem = formAdicionarVerba.querySelector(
-              'select[name="salario_item_id"]'
-            );
+            const selectItem = formAdicionarVerba.querySelector('select[name="salario_item_id"]');
             if (selectItem) selectItem.selectedIndex = 0;
 
             location.reload();
@@ -41,10 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         .catch((error) => {
           console.error("Erro na requisição AJAX:", error);
-          alert(
-            "Erro ao adicionar verba: " +
-              (error.message || "Verifique os dados e tente novamente.")
-          );
+          alert("Erro ao adicionar verba: " + (error.message || "Verifique os dados e tente novamente."));
         });
     });
   }
@@ -55,15 +48,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!target) return;
 
       if (confirm("Tem certeza que deseja remover esta verba?")) {
-        const csrfToken = document.querySelector(
-          'input[name="csrf_token"]'
-        ).value;
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
         fetch(target.dataset.url, {
           method: "POST",
           headers: {
             "X-Requested-With": "XMLHttpRequest",
-            "X-CSRFToken": csrfToken,
-          },
+            "X-CSRFToken": csrfToken
+          }
         })
           .then((response) => response.json())
           .then((data) => {
@@ -100,8 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let userIdToExclude = null;
       if (form && form.action) {
         const actionUrl = form.action;
-        const match =
-          actionUrl.match(/\/editar\/(\d+)/) || actionUrl.match(/\/perfil/);
+        const match = actionUrl.match(/\/editar\/(\d+)/) || actionUrl.match(/\/perfil/);
         if (match && match[1]) {
           userIdToExclude = match[1];
         } else if (match && actionUrl.includes("/perfil")) {
@@ -110,9 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(
-          value
-        )}`;
+        let url = `/usuarios/check-field?field_name=${fieldName}&value=${encodeURIComponent(value)}`;
         if (userIdToExclude) {
           url += `&user_id=${userIdToExclude}`;
         }
@@ -163,9 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
           try {
-            const response = await fetch(
-              `/solicitacao/check-email?email=${encodeURIComponent(email)}`
-            );
+            const response = await fetch(`/solicitacao/check-email?email=${encodeURIComponent(email)}`);
             const data = await response.json();
 
             if (data.exists) {
@@ -196,19 +182,13 @@ document.addEventListener("DOMContentLoaded", () => {
               disableFormFields(false);
             }
           } catch (error) {
-            console.error(
-              "Erro na verificação de e-mail de solicitação:",
-              error
-            );
+            console.error("Erro na verificação de e-mail de solicitação:", error);
             emailFeedback.innerHTML = "";
             disableFormFields(false);
           }
         };
 
-        emailInput.addEventListener(
-          "input",
-          debounce(checkEmailSolicitacao, 500)
-        );
+        emailInput.addEventListener("input", debounce(checkEmailSolicitacao, 500));
       } else {
         emailInput.addEventListener(
           "keyup",

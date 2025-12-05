@@ -2,41 +2,33 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-6 mx-auto">
-    <div class="card shadow-sm">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          <i class="px-2 fas fa-plus fa-lg text-warning"></i>Cadastro de Tipo de
-          Transação
-        </h5>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{ url_for('conta_transacao.adicionar_tipo_transacao') }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="row">
-            <div class="col-md-5 mb-3">
-              {{ render_field(form.transacao_tipo) }}
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header menu-primario">
+          <h5 class="mb-0">
+            <i class="px-2 fas fa-plus fa-lg text-warning"></i>
+            Cadastro de Tipo de Transação
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('conta_transacao.adicionar_tipo_transacao') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row">
+              <div class="col-md-5 mb-3">{{ render_field(form.transacao_tipo) }}</div>
+              <div class="col-md-3 mb-3">{{ render_field(form.tipo) }}</div>
             </div>
-            <div class="col-md-3 mb-3">{{ render_field(form.tipo) }}</div>
-          </div>
 
-          <div class="mt-1">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-save text-warning me-1"></i> {{ form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('conta_transacao.listar_tipos_transacao') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
+            <div class="mt-1">
+              <button type="submit" class="btn btn-azul">
+                <i class="fas fa-save text-warning me-1"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('conta_transacao.listar_tipos_transacao') }}" class="btn btn-cinza">Cancelar</a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

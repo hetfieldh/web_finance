@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         minViewMode: "months",
         language: "pt-BR",
         autoclose: true,
-        orientation: "bottom auto",
+        orientation: "bottom auto"
       })
       .on("changeDate", function (e) {
         document.getElementById("form-fluxo-caixa").submit();

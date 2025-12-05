@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
       maxViewMode: "years",
       language: "pt-BR",
       autoclose: true,
-      orientation: "bottom auto",
+      orientation: "bottom auto"
     });
   }
 
@@ -46,8 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const contaDestinoField = document.getElementById("conta_destino_id");
 
   if (tipoItemSelect && contaDestinoField) {
-    const contaDestinoContainer =
-      contaDestinoField.closest(".mb-3") || contaDestinoField.parentElement;
+    const contaDestinoContainer = contaDestinoField.closest(".mb-3") || contaDestinoField.parentElement;
 
     function toggleContaDestinoField() {
       if (tipoItemSelect.value === "Benefício") {

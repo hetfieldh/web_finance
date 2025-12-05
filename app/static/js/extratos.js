@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
           minViewMode: "months",
           language: "pt-BR",
           autoclose: true,
-          orientation: "bottom auto",
+          orientation: "bottom auto"
         })
         .on("changeDate", function (e) {
           formExtratoBancario.submit();
@@ -29,9 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  const formExtratoConsolidado = document.getElementById(
-    "form-extrato-consolidado"
-  );
+  const formExtratoConsolidado = document.getElementById("form-extrato-consolidado");
   if (formExtratoConsolidado) {
     const selectMesConsolidado = document.getElementById("mes_ano_consolidado");
 
@@ -43,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
           minViewMode: "months",
           language: "pt-BR",
           autoclose: true,
-          orientation: "bottom auto",
+          orientation: "bottom auto"
         })
         .on("changeDate", function (e) {
           formExtratoConsolidado.submit();
@@ -63,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
           minViewMode: "months",
           language: "pt-BR",
           autoclose: true,
-          orientation: "bottom auto",
+          orientation: "bottom auto"
         })
         .on("changeDate", function (e) {
           formResumoMensal.submit();
@@ -112,9 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (btnSaldoDevedor && btnTotal) {
-    btnSaldoDevedor.addEventListener("click", () =>
-      mostrarTabela("saldo-devedor")
-    );
+    btnSaldoDevedor.addEventListener("click", () => mostrarTabela("saldo-devedor"));
     btnTotal.addEventListener("click", () => mostrarTabela("total"));
 
     mostrarTabela("saldo-devedor");
@@ -142,9 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (target.classList.contains("toggle-row")) {
               const subTarget = target.getAttribute("data-target");
-              document
-                .querySelectorAll(subTarget)
-                .forEach((subChild) => (subChild.style.display = "none"));
+              document.querySelectorAll(subTarget).forEach((subChild) => (subChild.style.display = "none"));
 
               const subIcon = target.querySelector(".toggle-icon");
               if (subIcon) {

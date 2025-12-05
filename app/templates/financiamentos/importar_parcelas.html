@@ -2,119 +2,154 @@
 
 {% extends "base.html" %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-<div class="row">
-  <div class="col-md-10 mx-auto">
-    <div class="card shadow-sm mb-2">
-      <div class="card-header menu-primario">
-        <h5 class="mb-0">
-          Financiamento: {{ financiamento.nome_financiamento }}
-        </h5>
+  <div class="row">
+    <div class="col-md-10 mx-auto">
+      <div class="card shadow-sm mb-2">
+        <div class="card-header menu-primario">
+          <h5 class="mb-0">Financiamento: {{ financiamento.nome_financiamento }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <p class="mb-1">
+                <strong>Valor Total:</strong>
+                {{ "%.2f"|format(financiamento.valor_total_financiado) }}
+              </p>
+              <p class="mb-1">
+                <strong>Prazo:</strong>
+                {{ financiamento.prazo_meses }} meses
+              </p>
+            </div>
+            <div class="col-md-4">
+              <p class="mb-1">
+                <strong>Conta Associada:</strong>
+                {{ financiamento.conta.nome_banco }}
+              </p>
+              <p class="mb-1">
+                <strong>Taxa Anual:</strong>
+                {{ "%.4f"|format(financiamento.taxa_juros_anual) }}%
+              </p>
+            </div>
+            <div class="col-md-4">
+              <p class="mb-1">
+                <strong>Data de Início:</strong>
+                {{ financiamento.data_inicio.strftime('%d/%m/%Y') }}
+              </p>
+              <p class="mb-0">
+                <strong>Amortização:</strong>
+                {{ financiamento.tipo_amortizacao }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4">
-            <p class="mb-1">
-              <strong>Valor Total:</strong> {{
-              "%.2f"|format(financiamento.valor_total_financiado) }}
+
+      <div class="card shadow-sm">
+        <div class="card-header menu-secundario">
+          <h5 class="mb-0">Instruções e Upload do Arquivo</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" role="alert">
+            <h6 class="alert-heading">Atenção ao Formato do Arquivo CSV!</h6>
+            <p>
+              O arquivo .csv deve conter um cabeçalho e as seguintes
+              <strong>15 colunas</strong>
+              , exatamente nesta ordem:
             </p>
-            <p class="mb-1">
-              <strong>Prazo:</strong> {{ financiamento.prazo_meses }} meses
-            </p>
-          </div>
-          <div class="col-md-4">
-            <p class="mb-1">
-              <strong>Conta Associada:</strong> {{
-              financiamento.conta.nome_banco }}
-            </p>
-            <p class="mb-1">
-              <strong>Taxa Anual:</strong> {{
-              "%.4f"|format(financiamento.taxa_juros_anual) }}%
-            </p>
-          </div>
-          <div class="col-md-4">
-            <p class="mb-1">
-              <strong>Data de Início:</strong> {{
-              financiamento.data_inicio.strftime('%d/%m/%Y') }}
-            </p>
+            <ul>
+              <li>
+                <strong>numero_parcela</strong>
+                (Ex: 1)
+              </li>
+              <li>
+                <strong>data_vencimento</strong>
+                (Ex: DD-MM-AAAA)
+              </li>
+              <li>
+                <strong>valor_principal</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>valor_juros</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>valor_seguro</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>valor_seguro_2</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>valor_seguro_3</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>valor_taxas</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>multa</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>mora</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>ajustes</strong>
+                (Ex: 0.00)
+              </li>
+              <li>
+                <strong>valor_total_previsto</strong>
+                (será recalculado pelo sistema)
+              </li>
+              <li>
+                <strong>saldo_devedor</strong>
+                (será recalculado pelo sistema)
+              </li>
+              <li>
+                <strong>data_pagamento</strong>
+                (Formato: DD-MM-AAAA. Deixe em branco se a parcela estiver pendente)
+              </li>
+              <li>
+                <strong>valor_pago</strong>
+                (Formato numérico. Deixe em branco se a parcela estiver pendente)
+              </li>
+              <li>
+                <strong>observacoes</strong>
+                (Texto opcional)
+              </li>
+            </ul>
+            <hr />
             <p class="mb-0">
-              <strong>Amortização:</strong> {{ financiamento.tipo_amortizacao }}
+              O sistema irá definir o status da parcela como "Paga" automaticamente se uma data de pagamento for
+              fornecida.
             </p>
           </div>
+
+          <form
+            method="POST"
+            enctype="multipart/form-data"
+            action="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}"
+          >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="mb-2">{{ render_field(form.csv_file) }}</div>
+
+            <div class="mt-1">
+              <button type="submit" class="btn btn-azul">
+                <i class="fas fa-upload text-warning me-2"></i>
+                {{ form.submit.label.text }}
+              </button>
+              <a href="{{ url_for('financiamento.listar_financiamentos') }}" class="btn btn-cinza">Cancelar</a>
+            </div>
+          </form>
         </div>
-      </div>
-    </div>
-
-    <div class="card shadow-sm">
-      <div class="card-header menu-secundario">
-        <h5 class="mb-0">Instruções e Upload do Arquivo</h5>
-      </div>
-      <div class="card-body">
-        <div class="alert alert-info" role="alert">
-          <h6 class="alert-heading">Atenção ao Formato do Arquivo CSV!</h6>
-          <p>
-            O arquivo .csv deve conter um cabeçalho e as seguintes
-            <strong>15 colunas</strong>, exatamente nesta ordem:
-          </p>
-          <ul>
-            <li><strong>numero_parcela</strong> (Ex: 1)</li>
-            <li><strong>data_vencimento</strong> (Ex: DD-MM-AAAA)</li>
-            <li><strong>valor_principal</strong> (Ex: 0.00)</li>
-            <li><strong>valor_juros</strong> (Ex: 0.00)</li>
-            <li><strong>valor_seguro</strong> (Ex: 0.00)</li>
-            <li><strong>valor_seguro_2</strong> (Ex: 0.00)</li>
-            <li><strong>valor_seguro_3</strong> (Ex: 0.00)</li>
-            <li><strong>valor_taxas</strong> (Ex: 0.00)</li>
-            <li><strong>multa</strong> (Ex: 0.00)</li>
-            <li><strong>mora</strong> (Ex: 0.00)</li>
-            <li><strong>ajustes</strong> (Ex: 0.00)</li>
-            <li>
-              <strong>valor_total_previsto</strong> (será recalculado pelo
-              sistema)
-            </li>
-            <li>
-              <strong>saldo_devedor</strong> (será recalculado pelo sistema)
-            </li>
-            <li>
-              <strong>data_pagamento</strong> (Formato: DD-MM-AAAA. Deixe em
-              branco se a parcela estiver pendente)
-            </li>
-            <li>
-              <strong>valor_pago</strong> (Formato numérico. Deixe em branco se
-              a parcela estiver pendente)
-            </li>
-            <li><strong>observacoes</strong> (Texto opcional)</li>
-          </ul>
-          <hr />
-          <p class="mb-0">
-            O sistema irá definir o status da parcela como "Paga"
-            automaticamente se uma data de pagamento for fornecida.
-          </p>
-        </div>
-
-        <form
-          method="POST"
-          enctype="multipart/form-data"
-          action="{{ url_for('financiamento.importar_parcelas', id=financiamento.id) }}"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="mb-2">{{ render_field(form.csv_file) }}</div>
-
-          <div class="mt-1">
-            <button type="submit" class="btn btn-azul">
-              <i class="fas fa-upload text-warning me-2"></i> {{
-              form.submit.label.text }}
-            </button>
-            <a
-              href="{{ url_for('financiamento.listar_financiamentos') }}"
-              class="btn btn-cinza"
-              >Cancelar</a
-            >
-          </div>
-        </form>
       </div>
     </div>
   </div>
-</div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/financiamento.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/financiamento.js') }}"></script>
 {% endblock %}

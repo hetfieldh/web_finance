@@ -43,7 +43,7 @@ function initCharts() {
           }
           ctx.restore();
         }
-      },
+      }
     };
     Chart.register(ChartDataLabels, centerTextPlugin);
   }
@@ -70,21 +70,21 @@ function initCharts() {
                 "rgba(40, 167, 69, 0.7)",
                 "rgba(23, 162, 184, 0.7)",
                 "rgba(255, 193, 7, 0.7)",
-                "rgba(220, 53, 69, 0.7)",
+                "rgba(220, 53, 69, 0.7)"
               ],
               borderColor: ["#ffffff"],
-              borderWidth: 2,
-            },
-          ],
+              borderWidth: 2
+            }
+          ]
         },
         options: {
           cutout: "70%",
           plugins: {
             legend: { display: true, position: "left" },
             centerText: { text: totalFormatted, subText: "Obrigações do Mês" },
-            datalabels: { display: false },
-          },
-        },
+            datalabels: { display: false }
+          }
+        }
       });
     }
 
@@ -103,17 +103,17 @@ function initCharts() {
                 "rgba(255, 99, 132, 0.5)",
                 "rgba(54, 162, 235, 0.5)",
                 "rgba(255, 206, 86, 0.5)",
-                "rgba(75, 192, 192, 0.5)",
+                "rgba(75, 192, 192, 0.5)"
               ],
               borderColor: [
                 "rgba(255, 99, 132, 0.6)",
                 "rgba(54, 162, 235, 0.6)",
                 "rgba(255, 206, 86, 0.6)",
-                "rgba(75, 192, 192, 0.6)",
+                "rgba(75, 192, 192, 0.6)"
               ],
-              borderWidth: 1,
-            },
-          ],
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           indexAxis: "y",
@@ -125,11 +125,10 @@ function initCharts() {
               align: "end",
               color: "#495057",
               font: { weight: "bold" },
-              formatter: (value) =>
-                value === 0 ? "" : new Intl.NumberFormat("pt-BR").format(value),
-            },
-          },
-        },
+              formatter: (value) => (value === 0 ? "" : new Intl.NumberFormat("pt-BR").format(value))
+            }
+          }
+        }
       });
     }
 
@@ -150,23 +149,23 @@ function initCharts() {
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               fill: true,
               tension: 0.3,
-              yAxisID: "yBalan",
+              yAxisID: "yBalan"
             },
             {
               type: "bar",
               label: "Receitas ",
               data: dadosEvolucao.receitas,
               backgroundColor: "rgba(40, 167, 69, 0.5)",
-              yAxisID: "yPrincipal",
+              yAxisID: "yPrincipal"
             },
             {
               type: "bar",
               label: "Despesas ",
               data: dadosEvolucao.despesas,
               backgroundColor: "rgba(220, 53, 69, 0.5)",
-              yAxisID: "yPrincipal",
-            },
-          ],
+              yAxisID: "yPrincipal"
+            }
+          ]
         },
         options: {
           layout: { padding: { top: 20 } },
@@ -175,14 +174,14 @@ function initCharts() {
             yBalan: {
               beginAtZero: true,
               position: "right",
-              grid: { drawOnChartArea: false },
-            },
+              grid: { drawOnChartArea: false }
+            }
           },
           plugins: {
             legend: { position: "top" },
-            datalabels: { display: false },
-          },
-        },
+            datalabels: { display: false }
+          }
+        }
       });
     }
 
@@ -197,19 +196,11 @@ function initCharts() {
             {
               label: "Valor Recebido ",
               data: chartData.dados_entradas.valores,
-              backgroundColor: [
-                "rgba(40, 167, 69, 0.5)",
-                "rgba(23, 162, 184, 0.5)",
-                "rgba(108, 117, 125, 0.5)",
-              ],
-              borderColor: [
-                "rgba(40, 167, 69, 0.6)",
-                "rgba(23, 162, 184, 0.6)",
-                "rgba(108, 117, 125, 0.6)",
-              ],
-              borderWidth: 1,
-            },
-          ],
+              backgroundColor: ["rgba(40, 167, 69, 0.5)", "rgba(23, 162, 184, 0.5)", "rgba(108, 117, 125, 0.5)"],
+              borderColor: ["rgba(40, 167, 69, 0.6)", "rgba(23, 162, 184, 0.6)", "rgba(108, 117, 125, 0.6)"],
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           indexAxis: "y",
@@ -221,18 +212,15 @@ function initCharts() {
               align: "end",
               color: "#495057",
               font: { weight: "bold" },
-              formatter: (value) =>
-                value === 0 ? "" : new Intl.NumberFormat("pt-BR").format(value),
-            },
-          },
-        },
+              formatter: (value) => (value === 0 ? "" : new Intl.NumberFormat("pt-BR").format(value))
+            }
+          }
+        }
       });
     }
 
     // E. Financiamento
-    const financiamentoCanvas = document.getElementById(
-      "financiamentoProgressChart"
-    );
+    const financiamentoCanvas = document.getElementById("financiamentoProgressChart");
     if (financiamentoCanvas && chartData.progresso_financiamento) {
       const dadosFinanc = chartData.progresso_financiamento;
       new Chart(financiamentoCanvas, {
@@ -245,21 +233,21 @@ function initCharts() {
               data: dadosFinanc.previsto,
               backgroundColor: "rgba(255, 159, 64, 0.5)",
               borderColor: "rgba(255, 159, 64, 0.6)",
-              borderWidth: 1,
+              borderWidth: 1
             },
             {
               label: "Valor Realizado ",
               data: dadosFinanc.realizado,
               backgroundColor: "rgba(75, 192, 192, 0.5)",
               borderColor: "rgba(75, 192, 192, 0.6)",
-              borderWidth: 1,
-            },
-          ],
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           scales: { y: { beginAtZero: true } },
-          plugins: { datalabels: { display: false } },
-        },
+          plugins: { datalabels: { display: false } }
+        }
       });
     }
   }
@@ -283,39 +271,33 @@ function initCharts() {
                   "rgba(108, 117, 125, 0.7)",
                   "rgba(40, 167, 69, 0.7)",
                   "rgba(23, 162, 184, 0.7)",
-                  "rgba(220, 53, 69, 0.7)",
+                  "rgba(220, 53, 69, 0.7)"
                 ],
                 borderColor: "#fff",
-                borderWidth: 2,
-              },
-            ],
+                borderWidth: 2
+              }
+            ]
           },
           options: {
             plugins: {
               legend: { position: "bottom" },
               title: {
                 display: true,
-                text:
-                  "Distribuição de " +
-                  summaryData.total +
-                  " Parcelas por Status",
+                text: "Distribuição de " + summaryData.total + " Parcelas por Status",
                 font: { size: 16, weight: "bold" },
-                position: "top",
+                position: "top"
               },
               datalabels: {
                 color: "#fff",
                 font: { weight: "bold" },
                 formatter: (value, ctx) => {
-                  const total = ctx.chart.data.datasets[0].data.reduce(
-                    (a, b) => a + b,
-                    0
-                  );
+                  const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                   const percentage = ((value / total) * 100).toFixed(1) + "%";
                   return `${value}\n(${percentage})`;
-                },
-              },
-            },
-          },
+                }
+              }
+            }
+          }
         });
       }
     }
@@ -325,15 +307,9 @@ function initCharts() {
   const chartDataElement = document.getElementById("evolucao-chart-data");
   if (chartDataElement) {
     const chartData = JSON.parse(chartDataElement.textContent);
-    const evolucaoParcelasCanvas = document.getElementById(
-      "evolucaoParcelasChart"
-    );
+    const evolucaoParcelasCanvas = document.getElementById("evolucaoParcelasChart");
 
-    if (
-      evolucaoParcelasCanvas &&
-      chartData.datasets &&
-      chartData.datasets.length > 0
-    ) {
+    if (evolucaoParcelasCanvas && chartData.datasets && chartData.datasets.length > 0) {
       chartData.datasets.forEach((dataset) => {
         const r = Math.floor(Math.random() * 200);
         const g = Math.floor(Math.random() * 200);
@@ -356,18 +332,17 @@ function initCharts() {
               beginAtZero: true,
               stacked: true,
               ticks: {
-                callback: (value) =>
-                  new Intl.NumberFormat("pt-BR").format(value),
-              },
+                callback: (value) => new Intl.NumberFormat("pt-BR").format(value)
+              }
             },
-            x: { grid: { display: false } },
+            x: { grid: { display: false } }
           },
           plugins: {
             legend: { position: "bottom", align: "start" },
-            datalabels: { display: false },
+            datalabels: { display: false }
           },
-          interaction: { mode: "index", intersect: false },
-        },
+          interaction: { mode: "index", intersect: false }
+        }
       });
     }
   }
@@ -398,16 +373,14 @@ function updateChartFont(delta) {
     if (window.Chart.defaults) window.Chart.defaults.font.size = newSize;
     if (window.Chart.instances) {
       Object.values(window.Chart.instances).forEach((chart) => {
-        if (chart.options.plugins.legend.labels)
-          chart.options.plugins.legend.labels.font = { size: newSize };
+        if (chart.options.plugins.legend.labels) chart.options.plugins.legend.labels.font = { size: newSize };
         if (chart.options.plugins.tooltip) {
           chart.options.plugins.tooltip.bodyFont = { size: newSize };
           chart.options.plugins.tooltip.titleFont = { size: newSize + 2 };
         }
         if (chart.options.scales) {
           Object.keys(chart.options.scales).forEach((key) => {
-            if (chart.options.scales[key].ticks)
-              chart.options.scales[key].ticks.font = { size: newSize };
+            if (chart.options.scales[key].ticks) chart.options.scales[key].ticks.font = { size: newSize };
           });
         }
         chart.update();

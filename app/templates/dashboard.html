@@ -2,646 +2,564 @@
 
 {% extends 'base.html' %} {% from "includes/_macros.html" import render_field %}
 {% block content %}
-
-<div class="d-flex justify-content-between align-items-center mb-2">
-  <div>
-    <h4 class="text-secondary mb-0 h5 h4-md">
-      Bem-vindo(a),
-      <span class="text-dark fw-semibold"
-        >{{ current_user.nome or current_user.login }}!</span
-      >
-    </h4>
-    <p id="data-atual" class="text-muted small mb-0"></p>
-  </div>
-  <div class="d-flex align-items-center">
-    {% if contas_vencidas_count > 0 %}
-    <a
-      href="{{ url_for('main.contas_vencidas') }}"
-      class="btn btn-lg btn-transparent text-danger me-2 p-1"
-      title="{{ contas_vencidas_count }} conta(s) vencida(s)"
-      data-bs-toggle="tooltip"
-    >
-      <span class="position-relative">
-        <i class="fas fa-exclamation-triangle fa-2x"></i>
-        <span
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          style="font-size: 0.6rem"
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+      <h4 class="text-secondary mb-0 h5 h4-md">
+        Bem-vindo(a),
+        <span class="text-dark fw-semibold">{{ current_user.nome or current_user.login }}!</span>
+      </h4>
+      <p id="data-atual" class="text-muted small mb-0"></p>
+    </div>
+    <div class="d-flex align-items-center">
+      {% if contas_vencidas_count > 0 %}
+        <a
+          href="{{ url_for('main.contas_vencidas') }}"
+          class="btn btn-lg btn-transparent text-danger me-2 p-1"
+          title="{{ contas_vencidas_count }} conta(s) vencida(s)"
+          data-bs-toggle="tooltip"
         >
-          {{ contas_vencidas_count }}
-        </span>
-      </span>
-    </a>
-    {% endif %} {% if contas_a_vencer_count > 0 %}
-    <a
-      href="{{ url_for('main.contas_a_vencer') }}"
-      class="btn btn-lg btn-transparent text-warning me-2 p-1"
-      title="{{ contas_a_vencer_count }} conta(s) a vencer"
-      data-bs-toggle="tooltip"
-    >
-      <span class="position-relative">
-        <i class="fas fa-hand-holding-usd fa-2x"></i>
-        <span
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          style="font-size: 0.6rem"
-        >
-          {{ contas_a_vencer_count }}
-        </span>
-      </span>
-    </a>
-    {% endif %} {% if current_user.is_admin and pending_requests > 0 %}
-    <a
-      href="{{ url_for('solicitacao.gerenciar_solicitacoes') }}"
-      class="btn btn-lg btn-transparent text-info me-2 p-1"
-      title="Solicitações"
-      data-bs-toggle="tooltip"
-    >
-      <span class="position-relative">
-        <i class="fas fa-user-plus fa-2x"></i>
-        <span
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          style="font-size: 0.6rem"
-        >
-          {{ pending_requests }}
-        </span>
-      </span>
-    </a>
-    {% endif %}
-  </div>
-</div>
-
-<div class="row g-1 mb-1">
-  <div class="col-6 col-md-3">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-2 px-1">
-        <h6 class="card-title text-muted extra-small mb-1">
-          SALDO OPERACIONAL
-        </h6>
-        <p
-          class="card-text h6 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %} mb-0"
-        >
-          {{ kpis.saldo_operacional | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-2 px-1">
-        <h6 class="card-title text-muted extra-small mb-1">INVESTIMENTOS</h6>
-        <p class="card-text h6 fw-semibold text-success mb-0">
-          {{ kpis.saldo_investimentos | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-2 px-1">
-        <h6 class="card-title text-muted extra-small mb-1">BENEFÍCIOS</h6>
-        <p class="card-text h6 fw-semibold text-secondary mb-0">
-          {{ kpis.saldo_beneficios | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-2 px-1">
-        <h6 class="card-title text-muted extra-small mb-1">FGTS</h6>
-        <p class="card-text h6 fw-semibold text-secondary mb-0">
-          {{ kpis.saldo_fgts | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="d-none d-lg-flex row g-1 mb-1">
-  <div class="col-md-4">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-1">
-        <h6 class="card-title text-muted small">
-          RECEITAS DO MÊS
-          <span
-            style="font-size: 0.7em; color: var(--wf-info); font-style: italic"
-            >(Exceto benefícios)</span
-          >
-        </h6>
-        <p class="card-text h5 fw-semibold text-success">
-          {{ kpis.receitas_mes | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-1">
-        <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
-        <p class="card-text h5 fw-semibold text-danger">
-          {{ kpis.despesas_mes | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card conta-hover">
-      <div class="card-body text-center py-1">
-        <h6 class="card-title text-muted small">
-          SALDO
-          <span
-            style="font-size: 0.7em; color: var(--wf-info); font-style: italic"
-            >(Receitas - Despesas)</span
-          >
-        </h6>
-        <p
-          class="card-text h5 fw-semibold {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
-        >
-          {{ kpis.balanco_mes | format_number }}
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="d-lg-none card mb-3 border-0 shadow-sm mt-1">
-  <div class="card-body p-2">
-    <div class="row g-0 text-center divide-cols">
-      <div class="col-4">
-        <h6 class="text-muted extra-small fw-bold mb-0">RECEITAS</h6>
-        <span class="d-block fw-bold text-success small mb-0"
-          >{{ kpis.receitas_mes | format_number }}</span
-        >
-      </div>
-      <div class="col-4 border-start border-end">
-        <h6 class="text-muted extra-small fw-bold mb-0">DESPESAS</h6>
-        <span class="d-block fw-bold text-danger small mb-0"
-          >{{ kpis.despesas_mes | format_number }}</span
-        >
-      </div>
-      <div class="col-4">
-        <h6 class="text-muted extra-small fw-bold mb-0">SALDO</h6>
-        <span
-          class="d-block fw-bold small mb-0 {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
-        >
-          {{ kpis.balanco_mes | format_number }}
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="d-none d-lg-flex row g-1">
-  <div class="col-lg-3">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <h6 class="fw-semibold mb-0 text-secondary">
-          Contas Bancárias
-          <span
-            style="font-size: 0.6em; color: var(--wf-info); font-style: italic"
-            >(Ativas c/ saldo)</span
-          >
-        </h6>
-      </div>
-      <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
-        {% if contas_do_usuario %}
-        <div class="d-flex flex-column gap-1">
-          {% for conta in contas_do_usuario %}
-          <div class="card conta-hover">
-            <div
-              class="card-body p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="d-flex align-items-center">
-                <i
-                  class="fas fa-wallet fa-lg text-secondary opacity-50 me-2"
-                ></i>
-                <div>
-                  <div class="fw-semibold extra-small">
-                    {{ conta.nome_banco }}
-                  </div>
-                  <div class="text-muted extra-small">{{ conta.tipo }}</div>
-                </div>
-              </div>
-              <span
-                class="fw-semibold h6 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
-              >
-                {{ conta.saldo_atual | format_number }}
-              </span>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center p-1">
-          <p class="text-muted small mb-0">
-            Nenhuma conta bancária cadastrada.
-          </p>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-
-  <div class="col-lg-3">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <h6 class="fw-semibold mb-0 text-secondary">
-          Últimas Movimentações Bancárias
-        </h6>
-      </div>
-      <div class="card-body p-0" style="overflow-y: auto; max-height: 500px">
-        {% if ultimos_movimentos %}
-        <ul class="list-group list-group-flush itens-lista">
-          {% for mov in ultimos_movimentos %}
-          <li
-            class="list-group-item py-1 d-flex justify-content-between align-items-center small"
-          >
-            <div>
-              {% set title_text = mov.descricao or 'N/A' %}
-              <div
-                class="fw-semibold text-dark extra-small-2"
-                title="{{ title_text }}"
-              >
-                {{ title_text | truncate(35) }}
-              </div>
-              <div class="text-muted extra-small-3">
-                <i class="fas fa-calendar-alt me-1"></i>{{
-                mov.data_movimento.strftime('%d/%m') }}
-                <i class="fas fa-university ms-2 me-1"></i>{{
-                mov.conta.nome_banco ~ ' | ' ~ mov.conta.tipo | truncate(10) }}
-              </div>
-            </div>
+          <span class="position-relative">
+            <i class="fas fa-exclamation-triangle fa-2x"></i>
             <span
-              class="badge rounded-pill {% if mov.tipo_transacao.tipo == 'Débito' %}bg-danger-subtle text-danger-emphasis{% else %}bg-success-subtle text-success-emphasis{% endif %}"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="font-size: 0.6rem"
             >
-              {{ mov.valor | format_number }}
+              {{ contas_vencidas_count }}
             </span>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <div class="text-center p-1">
-          <i class="fas fa-info-circle fa-2x text-muted mb-1"></i>
-          <p class="text-muted small mb-0">
-            Nenhuma movimentação bancária encontrada.
+          </span>
+        </a>
+      {% endif %}
+      {% if contas_a_vencer_count > 0 %}
+        <a
+          href="{{ url_for('main.contas_a_vencer') }}"
+          class="btn btn-lg btn-transparent text-warning me-2 p-1"
+          title="{{ contas_a_vencer_count }} conta(s) a vencer"
+          data-bs-toggle="tooltip"
+        >
+          <span class="position-relative">
+            <i class="fas fa-hand-holding-usd fa-2x"></i>
+            <span
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="font-size: 0.6rem"
+            >
+              {{ contas_a_vencer_count }}
+            </span>
+          </span>
+        </a>
+      {% endif %}
+      {% if current_user.is_admin and pending_requests > 0 %}
+        <a
+          href="{{ url_for('solicitacao.gerenciar_solicitacoes') }}"
+          class="btn btn-lg btn-transparent text-info me-2 p-1"
+          title="Solicitações"
+          data-bs-toggle="tooltip"
+        >
+          <span class="position-relative">
+            <i class="fas fa-user-plus fa-2x"></i>
+            <span
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="font-size: 0.6rem"
+            >
+              {{ pending_requests }}
+            </span>
+          </span>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-1 mb-1">
+    <div class="col-6 col-md-3">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-2 px-1">
+          <h6 class="card-title text-muted extra-small mb-1">SALDO OPERACIONAL</h6>
+          <p
+            class="card-text h6 fw-semibold {% if kpis.saldo_operacional >= 0 %}text-success{% else %}text-danger{% endif %} mb-0"
+          >
+            {{ kpis.saldo_operacional | format_number }}
           </p>
         </div>
-        {% endif %}
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-2 px-1">
+          <h6 class="card-title text-muted extra-small mb-1">INVESTIMENTOS</h6>
+          <p class="card-text h6 fw-semibold text-success mb-0">{{ kpis.saldo_investimentos | format_number }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-2 px-1">
+          <h6 class="card-title text-muted extra-small mb-1">BENEFÍCIOS</h6>
+          <p class="card-text h6 fw-semibold text-secondary mb-0">{{ kpis.saldo_beneficios | format_number }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-2 px-1">
+          <h6 class="card-title text-muted extra-small mb-1">FGTS</h6>
+          <p class="card-text h6 fw-semibold text-secondary mb-0">{{ kpis.saldo_fgts | format_number }}</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="col-lg-3">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <form
-          id="form-movimentos-mes"
-          method="GET"
-          class="d-flex align-items-center justify-content-between"
-        >
-          <h6 class="fw-semibold mb-0 text-secondary">
-            Próximos Vencimentos em:
+  <div class="d-none d-lg-flex row g-1 mb-1">
+    <div class="col-md-4">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-1">
+          <h6 class="card-title text-muted small">
+            RECEITAS DO MÊS
+            <span style="font-size: 0.7em; color: var(--wf-info); font-style: italic">(Exceto benefícios)</span>
           </h6>
-          {{ form_movimentos.mes_ano(class="form-control form-control-xs
-          input-compacto", id="mes_ano_dashboard") }}
-        </form>
+          <p class="card-text h5 fw-semibold text-success">{{ kpis.receitas_mes | format_number }}</p>
+        </div>
       </div>
-      <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
-        {% if proximos_movimentos %}
-        <ul class="list-group list-group-flush itens-lista">
-          {% for item in proximos_movimentos %}
-          <li
-            class="list-group-item py-1 d-flex justify-content-between align-items-center small"
+    </div>
+    <div class="col-md-4">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-1">
+          <h6 class="card-title text-muted small">DESPESAS DO MÊS</h6>
+          <p class="card-text h5 fw-semibold text-danger">{{ kpis.despesas_mes | format_number }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card conta-hover">
+        <div class="card-body text-center py-1">
+          <h6 class="card-title text-muted small">
+            SALDO
+            <span style="font-size: 0.7em; color: var(--wf-info); font-style: italic">(Receitas - Despesas)</span>
+          </h6>
+          <p
+            class="card-text h5 fw-semibold {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
           >
-            <div>
-              <div
-                class="fw-semibold text-dark extra-small-2"
-                title="{{ item.descricao }}"
-              >
-                {{ item.descricao | truncate(25) }}
-              </div>
-              <div class="text-muted extra-small-3">
-                <span style="display: none"
-                  >{{ item.data.strftime('%Y%m%d') }}</span
-                >
-                {{ item.data.strftime('%d/%m/%Y') }}
-              </div>
-            </div>
-            <span
-              class="badge rounded-pill {% if item.tipo == 'Saída' %}bg-danger-subtle text-danger-emphasis{% else %}bg-success-subtle text-success-emphasis{% endif %}"
-            >
-              {{ item.valor | format_number }}
-            </span>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <div class="text-center p-1">
-          <i class="fas fa-check-circle fa-2x text-success mb-1"></i>
-          <p class="text-muted small mb-0">
-            Não há nada em aberto para este mês.
+            {{ kpis.balanco_mes | format_number }}
           </p>
         </div>
-        {% endif %}
       </div>
     </div>
   </div>
 
-  <div class="col-lg-3">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <h6 class="fw-semibold mb-0 text-secondary">
-          Saldos Devedores
+  <div class="d-lg-none card mb-3 border-0 shadow-sm mt-1">
+    <div class="card-body p-2">
+      <div class="row g-0 text-center divide-cols">
+        <div class="col-4">
+          <h6 class="text-muted extra-small fw-bold mb-0">RECEITAS</h6>
+          <span class="d-block fw-bold text-success small mb-0">{{ kpis.receitas_mes | format_number }}</span>
+        </div>
+        <div class="col-4 border-start border-end">
+          <h6 class="text-muted extra-small fw-bold mb-0">DESPESAS</h6>
+          <span class="d-block fw-bold text-danger small mb-0">{{ kpis.despesas_mes | format_number }}</span>
+        </div>
+        <div class="col-4">
+          <h6 class="text-muted extra-small fw-bold mb-0">SALDO</h6>
           <span
-            style="font-size: 0.6em; color: var(--wf-info); font-style: italic"
-            >(Ativos)</span
+            class="d-block fw-bold small mb-0 {% if kpis.balanco_mes >= 0 %}text-success{% else %}text-danger{% endif %}"
           >
-        </h6>
-      </div>
-      <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
-        <div class="d-flex flex-column gap-1">
-          {% if financiamentos %} {% for financ in financiamentos %} {% if
-          financ.saldo_devedor_atual > 0 %}
-          <div class="card conta-hover">
-            <div
-              class="card-body p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="d-flex align-items-center">
-                <i
-                  class="fas fa-file-invoice-dollar fa-lg text-secondary opacity-50 me-2"
-                ></i>
-                <div>
-                  <div class="fw-semibold extra-small">
-                    {{ financ.nome_financiamento }}
-                  </div>
-                  <div class="text-muted extra-small">Financiamento</div>
-                </div>
-              </div>
-              <span class="fw-semibold h6 mb-0 text-danger"
-                >{{ financ.saldo_devedor_atual | format_number }}</span
-              >
-            </div>
-          </div>
-          {% endif %} {% endfor %} {% endif %} {% if crediarios %} {% for cred
-          in crediarios %} {% if cred.saldo_devedor > 0 %}
-          <div class="card conta-hover">
-            <div
-              class="card-body p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="d-flex align-items-center">
-                <i
-                  class="fas fa-credit-card fa-lg text-secondary opacity-50 me-2"
-                ></i>
-                <div>
-                  <div class="fw-semibold extra-small">
-                    {{ cred.nome_crediario }}
-                  </div>
-                  <div class="text-muted extra-small">Crediário</div>
-                </div>
-              </div>
-              <span class="fw-semibold h6 mb-0 text-danger"
-                >{{ cred.saldo_devedor | format_number }}</span
-              >
-            </div>
-          </div>
-          {% endif %} {% endfor %} {% endif %} {% if not financiamentos and not
-          crediarios%}
-          <div class="text-center p-1">
-            <p class="text-muted extra-small mb-0">
-              Nenhum saldo devedor encontrado.
-            </p>
-          </div>
-          {% endif %}
+            {{ kpis.balanco_mes | format_number }}
+          </span>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="d-lg-none">
-  <ul
-    class="nav nav-pills nav-fill mb-3 bg-white rounded shadow-sm p-1 gap-1"
-    id="dashboardTabs"
-    role="tablist"
-  >
-    <li class="nav-item" role="presentation">
-      <button
-        class="nav-link active py-2 small fw-bold"
-        id="tab-contas"
-        data-bs-toggle="tab"
-        data-bs-target="#content-contas"
-        type="button"
-        role="tab"
-      >
-        <i class="fas fa-wallet d-block mb-1"></i> Contas
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button
-        class="nav-link py-2 small fw-bold"
-        id="tab-vencimentos"
-        data-bs-toggle="tab"
-        data-bs-target="#content-vencimentos"
-        type="button"
-        role="tab"
-      >
-        <i class="fas fa-calendar-alt d-block mb-1"></i> Vencim.
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button
-        class="nav-link py-2 small fw-bold"
-        id="tab-movimentos"
-        data-bs-toggle="tab"
-        data-bs-target="#content-movimentos"
-        type="button"
-        role="tab"
-      >
-        <i class="fas fa-exchange-alt d-block mb-1"></i> Últimos
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button
-        class="nav-link py-2 small fw-bold"
-        id="tab-dividas"
-        data-bs-toggle="tab"
-        data-bs-target="#content-dividas"
-        type="button"
-        role="tab"
-      >
-        <i class="fas fa-file-invoice-dollar d-block mb-1"></i> Dívidas
-      </button>
-    </li>
-  </ul>
-
-  <div class="tab-content" id="dashboardTabsContent">
-    <div class="tab-pane fade show active" id="content-contas" role="tabpanel">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
+  <div class="d-none d-lg-flex row g-1">
+    <div class="col-lg-3">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h6 class="fw-semibold mb-0 text-secondary">
+            Contas Bancárias
+            <span style="font-size: 0.6em; color: var(--wf-info); font-style: italic">(Ativas c/ saldo)</span>
+          </h6>
+        </div>
+        <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
           {% if contas_do_usuario %}
-          <ul class="list-group list-group-flush">
-            {% for conta in contas_do_usuario %}
-            <li
-              class="list-group-item p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="d-flex align-items-center">
-                <div class="rounded-circle bg-light p-2 me-3 text-secondary">
-                  <i class="fas fa-university"></i>
+            <div class="d-flex flex-column gap-1">
+              {% for conta in contas_do_usuario %}
+                <div class="card conta-hover">
+                  <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-wallet fa-lg text-secondary opacity-50 me-2"></i>
+                      <div>
+                        <div class="fw-semibold extra-small">{{ conta.nome_banco }}</div>
+                        <div class="text-muted extra-small">{{ conta.tipo }}</div>
+                      </div>
+                    </div>
+                    <span
+                      class="fw-semibold h6 mb-0 {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
+                    >
+                      {{ conta.saldo_atual | format_number }}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <div class="fw-bold text-dark">{{ conta.nome_banco }}</div>
-                  <div class="text-muted small">{{ conta.tipo }}</div>
-                </div>
-              </div>
-              <span
-                class="fw-bold {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}"
-                >{{ conta.saldo_atual | format_number }}</span
-              >
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p class="text-center p-1 text-muted">Nenhuma conta.</p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-pane fade" id="content-vencimentos" role="tabpanel">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-2">
-          {{ form_movimentos.mes_ano(class="form-control form-control-sm
-          text-center fw-bold border-secondary", id="mes_ano_mobile") }}
-        </div>
-        <div class="card-body p-0">
-          {% if proximos_movimentos %}
-          <ul class="list-group list-group-flush">
-            {% for item in proximos_movimentos %}
-            <li
-              class="list-group-item p-1 d-flex justify-content-between align-items-center"
-            >
-              <div class="overflow-hidden me-2">
-                <div class="fw-bold text-dark text-truncate">
-                  {{ item.descricao }}
-                </div>
-                <div class="text-muted small">
-                  {{ item.data.strftime('%d/%m') }}
-                </div>
-              </div>
-              <span
-                class="badge rounded-pill {% if item.tipo == 'Saída' %}bg-danger-subtle text-danger-emphasis{% else %}bg-success-subtle text-success-emphasis{% endif %}"
-                >{{ item.valor | format_number }}</span
-              >
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <div class="text-center py-5">
-            <i
-              class="fas fa-check-circle text-success fa-3x mb-2 opacity-50"
-            ></i>
-            <p class="text-muted">Nada para este mês!</p>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-pane fade" id="content-movimentos" role="tabpanel">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-          {% if ultimos_movimentos %}
-          <ul class="list-group list-group-flush">
-            {% for mov in ultimos_movimentos %}
-            <li class="list-group-item p-1">
-              <div
-                class="d-flex justify-content-between align-items-center mb-1"
-              >
-                <span class="fw-bold text-dark text-truncate"
-                  >{{ mov.descricao or 'N/A' }}</span
-                >
-                <span
-                  class="fw-bold {% if mov.tipo_transacao.tipo == 'Débito' %}text-danger{% else %}text-success{% endif %}"
-                  >{{ mov.valor | format_number }}</span
-                >
-              </div>
-              <div class="d-flex justify-content-between small text-muted">
-                <span
-                  >{{ mov.data_movimento.strftime('%d/%m') }} • {{
-                  mov.conta.nome_banco }}</span
-                >
-              </div>
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p class="text-center p-1 text-muted">Sem movimentações.</p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-pane fade" id="content-dividas" role="tabpanel">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-          <ul class="list-group list-group-flush">
-            {% set tem_divida_mobile = false %} {% if financiamentos %} {% for
-            financ in financiamentos %} {% if financ.saldo_devedor_atual > 0 %}
-            {% set tem_divida_mobile = true %}
-            <li
-              class="list-group-item p-1 d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div class="fw-bold text-dark">
-                  {{ financ.nome_financiamento }}
-                </div>
-                <div class="badge bg-secondary-subtle text-secondary border">
-                  Financiamento
-                </div>
-              </div>
-              <span class="fw-bold text-danger"
-                >{{ financ.saldo_devedor_atual | format_number }}</span
-              >
-            </li>
-            {% endif %} {% endfor %} {% endif %} {% if crediarios %} {% for cred
-            in crediarios %} {% if cred.saldo_devedor > 0 %} {% set
-            tem_divida_mobile = true %}
-            <li
-              class="list-group-item p-1 d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div class="fw-bold text-dark">{{ cred.nome_crediario }}</div>
-                <div
-                  class="badge bg-warning-subtle text-warning-emphasis border"
-                >
-                  Crediário
-                </div>
-              </div>
-              <span class="fw-bold text-danger"
-                >{{ cred.saldo_devedor | format_number }}</span
-              >
-            </li>
-            {% endif %} {% endfor %} {% endif %} {% if not tem_divida_mobile %}
-            <div class="text-center py-5">
-              <i class="fas fa-smile text-success fa-3x mb-2 opacity-50"></i>
-              <p class="text-muted">Sem dívidas ativas!</p>
+              {% endfor %}
             </div>
+          {% else %}
+            <div class="text-center p-1">
+              <p class="text-muted small mb-0">Nenhuma conta bancária cadastrada.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h6 class="fw-semibold mb-0 text-secondary">Últimas Movimentações Bancárias</h6>
+        </div>
+        <div class="card-body p-0" style="overflow-y: auto; max-height: 500px">
+          {% if ultimos_movimentos %}
+            <ul class="list-group list-group-flush itens-lista">
+              {% for mov in ultimos_movimentos %}
+                <li class="list-group-item py-1 d-flex justify-content-between align-items-center small">
+                  <div>
+                    {% set title_text = mov.descricao or 'N/A' %}
+                    <div class="fw-semibold text-dark extra-small-2" title="{{ title_text }}">
+                      {{ title_text | truncate(35) }}
+                    </div>
+                    <div class="text-muted extra-small-3">
+                      <i class="fas fa-calendar-alt me-1"></i>
+                      {{ mov.data_movimento.strftime('%d/%m') }}
+                      <i class="fas fa-university ms-2 me-1"></i>
+                      {{ mov.conta.nome_banco ~ ' | ' ~ mov.conta.tipo | truncate(10) }}
+                    </div>
+                  </div>
+                  <span
+                    class="badge rounded-pill {% if mov.tipo_transacao.tipo == 'Débito' %}bg-danger-subtle
+                    text-danger-emphasis{% else %}bg-success-subtle text-success-emphasis{% endif %}"
+                  >
+                    {{ mov.valor | format_number }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-center p-1">
+              <i class="fas fa-info-circle fa-2x text-muted mb-1"></i>
+              <p class="text-muted small mb-0">Nenhuma movimentação bancária encontrada.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <form id="form-movimentos-mes" method="GET" class="d-flex align-items-center justify-content-between">
+            <h6 class="fw-semibold mb-0 text-secondary">Próximos Vencimentos em:</h6>
+            {{
+              form_movimentos.mes_ano(class="form-control form-control-xs
+              input-compacto", id="mes_ano_dashboard")
+            }}
+          </form>
+        </div>
+        <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
+          {% if proximos_movimentos %}
+            <ul class="list-group list-group-flush itens-lista">
+              {% for item in proximos_movimentos %}
+                <li class="list-group-item py-1 d-flex justify-content-between align-items-center small">
+                  <div>
+                    <div class="fw-semibold text-dark extra-small-2" title="{{ item.descricao }}">
+                      {{ item.descricao | truncate(25) }}
+                    </div>
+                    <div class="text-muted extra-small-3">
+                      <span style="display: none">{{ item.data.strftime('%Y%m%d') }}</span>
+                      {{ item.data.strftime('%d/%m/%Y') }}
+                    </div>
+                  </div>
+                  <span
+                    class="badge rounded-pill {% if item.tipo == 'Saída' %}bg-danger-subtle text-danger-emphasis{% else %}bg-success-subtle
+                    text-success-emphasis{% endif %}"
+                  >
+                    {{ item.valor | format_number }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-center p-1">
+              <i class="fas fa-check-circle fa-2x text-success mb-1"></i>
+              <p class="text-muted small mb-0">Não há nada em aberto para este mês.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h6 class="fw-semibold mb-0 text-secondary">
+            Saldos Devedores
+            <span style="font-size: 0.6em; color: var(--wf-info); font-style: italic">(Ativos)</span>
+          </h6>
+        </div>
+        <div class="card-body p-1" style="overflow-y: auto; max-height: 500px">
+          <div class="d-flex flex-column gap-1">
+            {% if financiamentos %}{% for financ in financiamentos %}{%
+              if
+              financ.saldo_devedor_atual > 0
+            %}
+              <div class="card conta-hover">
+                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-file-invoice-dollar fa-lg text-secondary opacity-50 me-2"></i>
+                    <div>
+                      <div class="fw-semibold extra-small">{{ financ.nome_financiamento }}</div>
+                      <div class="text-muted extra-small">Financiamento</div>
+                    </div>
+                  </div>
+                  <span class="fw-semibold h6 mb-0 text-danger">{{ financ.saldo_devedor_atual | format_number }}</span>
+                </div>
+              </div>
+            {% endif %}{% endfor %}{% endif %}
+            {% if crediarios %}{%
+              for cred
+              in crediarios
+            %}
+              {% if cred.saldo_devedor > 0 %}
+                <div class="card conta-hover">
+                  <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-credit-card fa-lg text-secondary opacity-50 me-2"></i>
+                      <div>
+                        <div class="fw-semibold extra-small">{{ cred.nome_crediario }}</div>
+                        <div class="text-muted extra-small">Crediário</div>
+                      </div>
+                    </div>
+                    <span class="fw-semibold h6 mb-0 text-danger">{{ cred.saldo_devedor | format_number }}</span>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}{% endif %}
+            {%
+              if not financiamentos and not
+              crediarios
+            %}
+              <div class="text-center p-1">
+                <p class="text-muted extra-small mb-0">Nenhum saldo devedor encontrado.</p>
+              </div>
             {% endif %}
-          </ul>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-<script>
-  document
-    .getElementById("mes_ano_mobile")
-    ?.addEventListener("change", function () {
+  <div class="d-lg-none">
+    <ul class="nav nav-pills nav-fill mb-3 bg-white rounded shadow-sm p-1 gap-1" id="dashboardTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active py-2 small fw-bold"
+          id="tab-contas"
+          data-bs-toggle="tab"
+          data-bs-target="#content-contas"
+          type="button"
+          role="tab"
+        >
+          <i class="fas fa-wallet d-block mb-1"></i>
+          Contas
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link py-2 small fw-bold"
+          id="tab-vencimentos"
+          data-bs-toggle="tab"
+          data-bs-target="#content-vencimentos"
+          type="button"
+          role="tab"
+        >
+          <i class="fas fa-calendar-alt d-block mb-1"></i>
+          Vencim.
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link py-2 small fw-bold"
+          id="tab-movimentos"
+          data-bs-toggle="tab"
+          data-bs-target="#content-movimentos"
+          type="button"
+          role="tab"
+        >
+          <i class="fas fa-exchange-alt d-block mb-1"></i>
+          Últimos
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link py-2 small fw-bold"
+          id="tab-dividas"
+          data-bs-toggle="tab"
+          data-bs-target="#content-dividas"
+          type="button"
+          role="tab"
+        >
+          <i class="fas fa-file-invoice-dollar d-block mb-1"></i>
+          Dívidas
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="dashboardTabsContent">
+      <div class="tab-pane fade show active" id="content-contas" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            {% if contas_do_usuario %}
+              <ul class="list-group list-group-flush">
+                {% for conta in contas_do_usuario %}
+                  <li class="list-group-item p-1 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-light p-2 me-3 text-secondary">
+                        <i class="fas fa-university"></i>
+                      </div>
+                      <div>
+                        <div class="fw-bold text-dark">{{ conta.nome_banco }}</div>
+                        <div class="text-muted small">{{ conta.tipo }}</div>
+                      </div>
+                    </div>
+                    <span class="fw-bold {% if conta.saldo_atual >= 0 %}text-success{% else %}text-danger{% endif %}">
+                      {{ conta.saldo_atual | format_number }}
+                    </span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-center p-1 text-muted">Nenhuma conta.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="content-vencimentos" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white py-2">
+            {{
+              form_movimentos.mes_ano(class="form-control form-control-sm
+              text-center fw-bold border-secondary", id="mes_ano_mobile")
+            }}
+          </div>
+          <div class="card-body p-0">
+            {% if proximos_movimentos %}
+              <ul class="list-group list-group-flush">
+                {% for item in proximos_movimentos %}
+                  <li class="list-group-item p-1 d-flex justify-content-between align-items-center">
+                    <div class="overflow-hidden me-2">
+                      <div class="fw-bold text-dark text-truncate">{{ item.descricao }}</div>
+                      <div class="text-muted small">{{ item.data.strftime('%d/%m') }}</div>
+                    </div>
+                    <span
+                      class="badge rounded-pill {% if item.tipo == 'Saída' %}bg-danger-subtle text-danger-emphasis{% else %}bg-success-subtle
+                      text-success-emphasis{% endif %}"
+                    >
+                      {{ item.valor | format_number }}
+                    </span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="text-center py-5">
+                <i class="fas fa-check-circle text-success fa-3x mb-2 opacity-50"></i>
+                <p class="text-muted">Nada para este mês!</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="content-movimentos" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            {% if ultimos_movimentos %}
+              <ul class="list-group list-group-flush">
+                {% for mov in ultimos_movimentos %}
+                  <li class="list-group-item p-1">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="fw-bold text-dark text-truncate">{{ mov.descricao or 'N/A' }}</span>
+                      <span
+                        class="fw-bold {% if mov.tipo_transacao.tipo == 'Débito' %}text-danger{% else %}text-success{% endif %}"
+                      >
+                        {{ mov.valor | format_number }}
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                      <span>{{ mov.data_movimento.strftime('%d/%m') }} • {{ mov.conta.nome_banco }}</span>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-center p-1 text-muted">Sem movimentações.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="content-dividas" role="tabpanel">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              {% set tem_divida_mobile = false %}
+              {% if financiamentos %}{%
+                for
+                financ in financiamentos
+              %}
+                {% if financ.saldo_devedor_atual > 0 %}
+                  {% set tem_divida_mobile = true %}
+                  <li class="list-group-item p-1 d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="fw-bold text-dark">{{ financ.nome_financiamento }}</div>
+                      <div class="badge bg-secondary-subtle text-secondary border">Financiamento</div>
+                    </div>
+                    <span class="fw-bold text-danger">{{ financ.saldo_devedor_atual | format_number }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}{% endif %}
+              {% if crediarios %}{%
+                for cred
+                in crediarios
+              %}
+                {% if cred.saldo_devedor > 0 %}
+                  {%
+                    set
+                    tem_divida_mobile = true
+                  %}
+                  <li class="list-group-item p-1 d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="fw-bold text-dark">{{ cred.nome_crediario }}</div>
+                      <div class="badge bg-warning-subtle text-warning-emphasis border">Crediário</div>
+                    </div>
+                    <span class="fw-bold text-danger">{{ cred.saldo_devedor | format_number }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}{% endif %}
+              {% if not tem_divida_mobile %}
+                <div class="text-center py-5">
+                  <i class="fas fa-smile text-success fa-3x mb-2 opacity-50"></i>
+                  <p class="text-muted">Sem dívidas ativas!</p>
+                </div>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script>
+    document.getElementById("mes_ano_mobile")?.addEventListener("change", function () {
       const url = new URL(window.location.href);
       url.searchParams.set("mes_ano", this.value);
       window.location.href = url.toString();
     });
-</script>
+  </script>
 {% endblock %}

@@ -1,372 +1,351 @@
 <!--- app\templates\relatorios\crediario_resumo.html -->
 
-{% extends "base.html" %} {% block content %}
-
-<div
-  class="caixa-sombreada mb-2 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2"
->
-  <div>
-    <span class="text-dark fw-bold"
-      ><i class="fas fa-tags me-2"></i>Detalhes do Grupo:</span
-    >
-    <span class="text-secondary small d-block d-md-inline">
-      {{ dados.grupo_nome }} ({{ dados.ano }})
-    </span>
-  </div>
-</div>
-
-<div class="card shadow-sm mb-2">
-  <div class="card-header bg-light py-2">
-    <div
-      class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2"
-    >
-      <h6 class="mb-0 h6 text-dark fw-semibold d-flex align-items-center">
-        <i class="fas fa-table text-danger me-2"></i>
-        Visão Analítica
-        <span
-          id="titulo-tabela-dinamica"
-          class="text-muted fw-normal ms-2 small"
-        ></span>
-      </h6>
-
-      <div class="d-none d-md-flex flex-wrap gap-2">
-        <button
-          id="btn-saldo-devedor"
-          class="btn btn-sm btn-outline-danger active"
-          onclick="mostrarTabela('saldo-devedor')"
-        >
-          <i class="fas fa-file-invoice-dollar me-1"></i> Devedor
-        </button>
-        <button
-          id="btn-total"
-          class="btn btn-sm btn-outline-primary"
-          onclick="mostrarTabela('total')"
-        >
-          <i class="fas fa-receipt me-1"></i> Todas
-        </button>
-        <a
-          href="{{ url_for('relatorios.gastos_por_grupo') }}"
-          class="btn btn-sm btn-secondary"
-        >
-          <i class="fas fa-arrow-left me-1"></i> Voltar
-        </a>
-      </div>
-
-      <div class="d-md-none w-100">
-        <a
-          href="{{ url_for('relatorios.gastos_por_grupo') }}"
-          class="btn btn-sm btn-outline-secondary w-100"
-        >
-          <i class="fas fa-arrow-left me-2"></i> Voltar para Grupos
-        </a>
-      </div>
+{% extends "base.html" %}
+{% block content %}
+  <div
+    class="caixa-sombreada mb-2 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2"
+  >
+    <div>
+      <span class="text-dark fw-bold">
+        <i class="fas fa-tags me-2"></i>
+        Detalhes do Grupo:
+      </span>
+      <span class="text-secondary small d-block d-md-inline">{{ dados.grupo_nome }} ({{ dados.ano }})</span>
     </div>
   </div>
 
-  <div class="card-body p-0 p-md-3">
-    {% if dados.compras %}
+  <div class="card shadow-sm mb-2">
+    <div class="card-header bg-light py-2">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+        <h6 class="mb-0 h6 text-dark fw-semibold d-flex align-items-center">
+          <i class="fas fa-table text-danger me-2"></i>
+          Visão Analítica
+          <span id="titulo-tabela-dinamica" class="text-muted fw-normal ms-2 small"></span>
+        </h6>
 
-    <div class="d-none d-md-block">
-      <div id="tabela-saldo-devedor">
-        <div class="table-responsive">
-          <table
-            class="table table-padrao table-sticky-col table-hover table-striped sortable-table mb-0"
+        <div class="d-none d-md-flex flex-wrap gap-2">
+          <button
+            id="btn-saldo-devedor"
+            class="btn btn-sm btn-outline-danger active"
+            onclick="mostrarTabela('saldo-devedor')"
           >
-            <thead>
-              <tr>
-                <th>Loja/Serviço | Detalhes | Data</th>
-                {% for mes_ano in dados.meses_anos %}
-                <th class="text-center">
-                  {{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}
-                </th>
-                {% endfor %}
-                <th class="text-end table-dark">Total Devedor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% set totais_mes_devedor = {} %} {% set total_geral_devedor = [0]
-              %} {% for compra in dados.compras %} {% set total_compra_devedor =
-              [0] %}
-              <tr>
-                <td>
-                  <div title="ID: {{ compra.id }}">
-                    {% if compra.fornecedor_nome %}
-                    <span
-                      class="fw-semibold"
-                      style="color: var(--wf-azul-destaque)"
-                      >{{ compra.fornecedor_nome }}</span
-                    >
-                    {% endif %}
-                    <span class="text-muted small"
-                      >({{ compra.descricao }}) em {{
-                      compra.data_compra.strftime('%d/%m/%Y') }}</span
-                    >
-                  </div>
-                </td>
-                {% for mes_ano in dados.meses_anos %} {% set valor =
-                dados.dados_saldo_devedor.get(compra.chave, {}).get(mes_ano, 0)
-                %}
-                <td
-                  class="text-end {% if valor > 0 %}text-danger{% else %}text-muted{% endif %}"
-                >
-                  {{ valor | format_number if valor != 0 else '-' }}
-                </td>
-                {% if total_compra_devedor.append(total_compra_devedor.pop() +
-                valor) %}{% endif %} {% set _ =
-                totais_mes_devedor.update({mes_ano:
-                totais_mes_devedor.get(mes_ano, 0) + valor}) %} {% endfor %}
-                <td class="text-end fw-bold table-active text-danger">
-                  {{ total_compra_devedor[0] | format_number }}
-                </td>
-                {% if total_geral_devedor.append(total_geral_devedor.pop() +
-                total_compra_devedor[0]) %}{% endif %}
-              </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot>
-              <tr class="table-dark fw-bold">
-                <td>Total Mês:</td>
-                {% for mes_ano in dados.meses_anos %}
-                <td class="text-end text-danger">
-                  {{ totais_mes_devedor.get(mes_ano, 0) | format_number }}
-                </td>
-                {% endfor %}
-                <td class="text-end text-danger">
-                  {{ total_geral_devedor[0] | format_number }}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+            <i class="fas fa-file-invoice-dollar me-1"></i>
+            Devedor
+          </button>
+          <button id="btn-total" class="btn btn-sm btn-outline-primary" onclick="mostrarTabela('total')">
+            <i class="fas fa-receipt me-1"></i>
+            Todas
+          </button>
+          <a href="{{ url_for('relatorios.gastos_por_grupo') }}" class="btn btn-sm btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Voltar
+          </a>
         </div>
-      </div>
 
-      <div id="tabela-total" style="display: none">
-        <div class="table-responsive">
-          <table
-            class="table table-padrao table-sticky-col table-hover table-striped sortable-table mb-0"
-          >
-            <thead>
-              <tr>
-                <th>Compra (Data)</th>
-                {% for mes_ano in dados.meses_anos %}
-                <th class="text-center">
-                  {{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}
-                </th>
-                {% endfor %}
-                <th class="text-end table-dark">Total Compra</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% set totais_mes_total = {} %} {% set total_geral_total = [0] %}
-              {% for compra in dados.compras %} {% set total_compra_total = [0]
-              %}
-              <tr>
-                <td>
-                  <div title="ID: {{ compra.id }}">
-                    {% if compra.fornecedor_nome %}
-                    <span
-                      class="fw-semibold"
-                      style="color: var(--wf-azul-destaque)"
-                      >{{ compra.fornecedor_nome }}</span
-                    >
-                    {% endif %}
-                    <span class="text-muted small"
-                      >({{ compra.descricao }}) em {{
-                      compra.data_compra.strftime('%d/%m/%Y') }}</span
-                    >
-                  </div>
-                </td>
-                {% for mes_ano in dados.meses_anos %} {% set valor =
-                dados.dados_total.get(compra.chave, {}).get(mes_ano, 0) %}
-                <td
-                  class="text-end {% if valor < 0 %}text-success{% elif valor > 0 %}text-danger{% else %}text-muted{% endif %}"
-                >
-                  {{ valor | format_number if valor != 0 else '-' }}
-                </td>
-                {% if total_compra_total.append(total_compra_total.pop() +
-                valor) %}{% endif %} {% set _ =
-                totais_mes_total.update({mes_ano: totais_mes_total.get(mes_ano,
-                0) + valor}) %} {% endfor %}
-                <td
-                  class="text-end fw-bold table-active {% if total_compra_total[0] < 0 %}text-success{% elif total_compra_total[0] > 0 %}text-danger{% endif %}"
-                >
-                  {{ total_compra_total[0] | format_number }}
-                </td>
-                {% if total_geral_total.append(total_geral_total.pop() +
-                total_compra_total[0]) %}{% endif %}
-              </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot>
-              <tr class="table-dark fw-bold">
-                <td>Total Mês:</td>
-                {% for mes_ano in dados.meses_anos %}
-                <td
-                  class="text-end {% if totais_mes_total.get(mes_ano, 0) < 0 %}text-success{% elif totais_mes_total.get(mes_ano, 0) > 0 %}text-danger{% endif %}"
-                >
-                  {{ totais_mes_total.get(mes_ano, 0) | format_number }}
-                </td>
-                {% endfor %}
-                <td
-                  class="text-end {% if total_geral_total[0] < 0 %}text-success{% elif total_geral_total[0] > 0 %}text-danger{% endif %}"
-                >
-                  {{ total_geral_total[0] | format_number }}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+        <div class="d-md-none w-100">
+          <a href="{{ url_for('relatorios.gastos_por_grupo') }}" class="btn btn-sm btn-outline-secondary w-100">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar para Grupos
+          </a>
         </div>
       </div>
     </div>
 
-    <div class="d-md-none bg-light">
-      <div class="accordion accordion-flush" id="accordionComprasMobile">
-        {% for compra in dados.compras %}
-        <div
-          class="accordion-item border-bottom mb-2 shadow-sm rounded overflow-hidden"
-        >
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button collapsed py-2 px-3 bg-white"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseMobile{{ loop.index }}"
-            >
-              <div class="d-flex flex-column w-100">
-                <div
-                  class="d-flex justify-content-between align-items-center mb-1"
-                >
-                  <span
-                    class="fw-bold text-dark text-truncate me-2"
-                    style="max-width: 65%"
-                  >
-                    {{ compra.fornecedor_nome or compra.descricao }}
-                  </span>
-                  {% set total_dev = namespace(value=0) %} {% for mes_ano in
-                  dados.meses_anos %} {% set v =
-                  dados.dados_saldo_devedor.get(compra.chave, {}).get(mes_ano,
-                  0) %} {% set total_dev.value = total_dev.value + v %} {%
-                  endfor %}
-                  <span
-                    class="badge bg-danger-subtle text-danger border border-danger fw-bold"
-                  >
-                    {{ total_dev.value | format_number }}
-                  </span>
-                </div>
-                <div
-                  class="small text-muted d-flex justify-content-between pe-3"
-                >
-                  <span
-                    ><i class="far fa-calendar-alt me-1"></i>{{
-                    compra.data_compra.strftime('%d/%m/%y') }}</span
-                  >
-                  <span
-                    class="fst-italic text-truncate"
-                    style="max-width: 120px"
-                    >{{ compra.descricao }}</span
-                  >
-                </div>
-              </div>
-            </button>
-          </h2>
-          <div
-            id="collapseMobile{{ loop.index }}"
-            class="accordion-collapse collapse"
-            data-bs-parent="#accordionComprasMobile"
-          >
-            <div class="accordion-body bg-light p-2">
-              <ul class="nav nav-tabs nav-fill small mb-2" role="tablist">
-                <li class="nav-item">
-                  <a
-                    class="nav-link active py-1"
-                    data-bs-toggle="tab"
-                    href="#tabDevedor{{ loop.index }}"
-                    role="tab"
-                  >
-                    <i class="fas fa-file-invoice-dollar text-danger me-1"></i>
-                    Devedor
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a
-                    class="nav-link py-1"
-                    data-bs-toggle="tab"
-                    href="#tabTotal{{ loop.index }}"
-                    role="tab"
-                  >
-                    <i class="fas fa-receipt text-primary me-1"></i> Total
-                  </a>
-                </li>
-              </ul>
+    <div class="card-body p-0 p-md-3">
+      {% if dados.compras %}
+        <div class="d-none d-md-block">
+          <div id="tabela-saldo-devedor">
+            <div class="table-responsive">
+              <table class="table table-padrao table-sticky-col table-hover table-striped sortable-table mb-0">
+                <thead>
+                  <tr>
+                    <th>Loja/Serviço | Detalhes | Data</th>
+                    {% for mes_ano in dados.meses_anos %}
+                      <th class="text-center">{{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}</th>
+                    {% endfor %}
+                    <th class="text-end table-dark">Total Devedor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set totais_mes_devedor = {} %} {% set total_geral_devedor = [0] %}
+                  {% for compra in dados.compras %}
+                    {%
+                      set total_compra_devedor =
+                      [0]
+                    %}
+                    <tr>
+                      <td>
+                        <div title="ID: {{ compra.id }}">
+                          {% if compra.fornecedor_nome %}
+                            <span class="fw-semibold" style="color: var(--wf-azul-destaque)">
+                              {{ compra.fornecedor_nome }}
+                            </span>
+                          {% endif %}
+                          <span class="text-muted small">
+                            ({{ compra.descricao }}) em {{ compra.data_compra.strftime('%d/%m/%Y') }}
+                          </span>
+                        </div>
+                      </td>
+                      {% for mes_ano in dados.meses_anos %}
+                        {%
+                          set valor =
+                          dados.dados_saldo_devedor.get(compra.chave, {}).get(mes_ano, 0)
+                        %}
+                        <td class="text-end {% if valor > 0 %}text-danger{% else %}text-muted{% endif %}">
+                          {{ valor | format_number if valor != 0 else '-' }}
+                        </td>
+                        {%
+                          if total_compra_devedor.append(total_compra_devedor.pop() +
+                          valor)
+                        %}
+                        {% endif %}
+                        {%
+                          set _ =
+                          totais_mes_devedor.update({mes_ano:
+                          totais_mes_devedor.get(mes_ano, 0) + valor})
+                        %}
+                      {% endfor %}
+                      <td class="text-end fw-bold table-active text-danger">
+                        {{ total_compra_devedor[0] | format_number }}
+                      </td>
+                      {%
+                        if total_geral_devedor.append(total_geral_devedor.pop() +
+                        total_compra_devedor[0])
+                      %}
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr class="table-dark fw-bold">
+                    <td>Total Mês:</td>
+                    {% for mes_ano in dados.meses_anos %}
+                      <td class="text-end text-danger">{{ totais_mes_devedor.get(mes_ano, 0) | format_number }}</td>
+                    {% endfor %}
+                    <td class="text-end text-danger">{{ total_geral_devedor[0] | format_number }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
 
-              <div class="tab-content">
-                <div
-                  class="tab-pane fade show active"
-                  id="tabDevedor{{ loop.index }}"
-                  role="tabpanel"
-                >
-                  <div class="d-flex overflow-auto pb-2 gap-2">
-                    {% for mes_ano in dados.meses_anos %} {% set val =
-                    dados.dados_saldo_devedor.get(compra.chave, {}).get(mes_ano,
-                    0) %} {% if val != 0 %}
-                    <div
-                      class="card border-danger shadow-sm flex-shrink-0 text-center p-2"
-                      style="min-width: 80px; background-color: #fff5f5"
-                    >
-                      <span class="d-block extra-small text-muted"
-                        >{{ mes_ano.split('-')[1] }}/{{
-                        mes_ano.split('-')[0][-2:] }}</span
+          <div id="tabela-total" style="display: none">
+            <div class="table-responsive">
+              <table class="table table-padrao table-sticky-col table-hover table-striped sortable-table mb-0">
+                <thead>
+                  <tr>
+                    <th>Compra (Data)</th>
+                    {% for mes_ano in dados.meses_anos %}
+                      <th class="text-center">{{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}</th>
+                    {% endfor %}
+                    <th class="text-end table-dark">Total Compra</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set totais_mes_total = {} %} {% set total_geral_total = [0] %}
+                  {% for compra in dados.compras %}
+                    {% set total_compra_total = [0] %}
+                    <tr>
+                      <td>
+                        <div title="ID: {{ compra.id }}">
+                          {% if compra.fornecedor_nome %}
+                            <span class="fw-semibold" style="color: var(--wf-azul-destaque)">
+                              {{ compra.fornecedor_nome }}
+                            </span>
+                          {% endif %}
+                          <span class="text-muted small">
+                            ({{ compra.descricao }}) em {{ compra.data_compra.strftime('%d/%m/%Y') }}
+                          </span>
+                        </div>
+                      </td>
+                      {% for mes_ano in dados.meses_anos %}
+                        {%
+                          set valor =
+                          dados.dados_total.get(compra.chave, {}).get(mes_ano, 0)
+                        %}
+                        <td
+                          class="text-end {% if valor < 0 %}text-success{% elif valor > 0 %}text-danger{% else %}text-muted{% endif %}"
+                        >
+                          {{ valor | format_number if valor != 0 else '-' }}
+                        </td>
+                        {%
+                          if total_compra_total.append(total_compra_total.pop() +
+                          valor)
+                        %}
+                        {% endif %}
+                        {%
+                          set _ =
+                          totais_mes_total.update({mes_ano: totais_mes_total.get(mes_ano,
+                          0) + valor})
+                        %}
+                      {% endfor %}
+                      <td
+                        class="text-end fw-bold table-active {% if total_compra_total[0] < 0 %}text-success{% elif total_compra_total[0] > 0 %}text-danger{% endif %}"
                       >
-                      <span class="d-block fw-bold text-danger small">
-                        {{ "{:,.0f}".format(val).replace(',', '.') }}
-                      </span>
-                    </div>
-                    {% endif %} {% endfor %}
-                  </div>
-                </div>
-
-                <div
-                  class="tab-pane fade"
-                  id="tabTotal{{ loop.index }}"
-                  role="tabpanel"
-                >
-                  <div class="d-flex overflow-auto pb-2 gap-2">
-                    {% for mes_ano in dados.meses_anos %} {% set val =
-                    dados.dados_total.get(compra.chave, {}).get(mes_ano, 0) %}
-                    {% if val != 0 %}
-                    <div
-                      class="card border-primary shadow-sm flex-shrink-0 text-center p-2"
-                      style="min-width: 80px; background-color: #f0f8ff"
-                    >
-                      <span class="d-block extra-small text-muted"
-                        >{{ mes_ano.split('-')[1] }}/{{
-                        mes_ano.split('-')[0][-2:] }}</span
+                        {{ total_compra_total[0] | format_number }}
+                      </td>
+                      {%
+                        if total_geral_total.append(total_geral_total.pop() +
+                        total_compra_total[0])
+                      %}
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr class="table-dark fw-bold">
+                    <td>Total Mês:</td>
+                    {% for mes_ano in dados.meses_anos %}
+                      <td
+                        class="text-end {% if totais_mes_total.get(mes_ano, 0) < 0 %}text-success{% elif totais_mes_total.get(mes_ano, 0) > 0 %}text-danger{% endif %}"
                       >
-                      <span class="d-block fw-bold text-primary small">
-                        {{ "{:,.0f}".format(val).replace(',', '.') }}
-                      </span>
-                    </div>
-                    {% endif %} {% endfor %}
-                  </div>
-                </div>
-              </div>
+                        {{ totais_mes_total.get(mes_ano, 0) | format_number }}
+                      </td>
+                    {% endfor %}
+                    <td
+                      class="text-end {% if total_geral_total[0] < 0 %}text-success{% elif total_geral_total[0] > 0 %}text-danger{% endif %}"
+                    >
+                      {{ total_geral_total[0] | format_number }}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
         </div>
-        {% endfor %}
-      </div>
-    </div>
 
-    {% else %}
-    <div class="p-3">
-      <p class="text-center alert alert-warning mb-0">
-        Nenhuma compra encontrada para o grupo "{{ dados.grupo_nome }}" no ano
-        de {{ dados.ano }}.
-      </p>
+        <div class="d-md-none bg-light">
+          <div class="accordion accordion-flush" id="accordionComprasMobile">
+            {% for compra in dados.compras %}
+              <div class="accordion-item border-bottom mb-2 shadow-sm rounded overflow-hidden">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed py-2 px-3 bg-white"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseMobile{{ loop.index }}"
+                  >
+                    <div class="d-flex flex-column w-100">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-dark text-truncate me-2" style="max-width: 65%">
+                          {{ compra.fornecedor_nome or compra.descricao }}
+                        </span>
+                        {% set total_dev = namespace(value=0) %}
+                        {%
+                          for mes_ano in
+                          dados.meses_anos
+                        %}
+                          {%
+                            set v =
+                            dados.dados_saldo_devedor.get(compra.chave, {}).get(mes_ano,
+                            0)
+                          %}
+                          {% set total_dev.value = total_dev.value + v %}
+                        {% endfor %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger fw-bold">
+                          {{ total_dev.value | format_number }}
+                        </span>
+                      </div>
+                      <div class="small text-muted d-flex justify-content-between pe-3">
+                        <span>
+                          <i class="far fa-calendar-alt me-1"></i>
+                          {{ compra.data_compra.strftime('%d/%m/%y') }}
+                        </span>
+                        <span class="fst-italic text-truncate" style="max-width: 120px">{{ compra.descricao }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+                <div
+                  id="collapseMobile{{ loop.index }}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#accordionComprasMobile"
+                >
+                  <div class="accordion-body bg-light p-2">
+                    <ul class="nav nav-tabs nav-fill small mb-2" role="tablist">
+                      <li class="nav-item">
+                        <a
+                          class="nav-link active py-1"
+                          data-bs-toggle="tab"
+                          href="#tabDevedor{{ loop.index }}"
+                          role="tab"
+                        >
+                          <i class="fas fa-file-invoice-dollar text-danger me-1"></i>
+                          Devedor
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link py-1" data-bs-toggle="tab" href="#tabTotal{{ loop.index }}" role="tab">
+                          <i class="fas fa-receipt text-primary me-1"></i>
+                          Total
+                        </a>
+                      </li>
+                    </ul>
+
+                    <div class="tab-content">
+                      <div class="tab-pane fade show active" id="tabDevedor{{ loop.index }}" role="tabpanel">
+                        <div class="d-flex overflow-auto pb-2 gap-2">
+                          {% for mes_ano in dados.meses_anos %}{%
+                            set val =
+                            dados.dados_saldo_devedor.get(compra.chave, {}).get(mes_ano,
+                            0)
+                          %}
+                          {% if val != 0 %}
+                            <div
+                              class="card border-danger shadow-sm flex-shrink-0 text-center p-2"
+                              style="min-width: 80px; background-color: #fff5f5"
+                            >
+                              <span class="d-block extra-small text-muted">
+                                {{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}
+                              </span>
+                              <span class="d-block fw-bold text-danger small">
+                                {{ "{:,.0f}".format(val).replace(',', '.') }}
+                              </span>
+                            </div>
+                          {% endif %}{% endfor %}
+                        </div>
+                      </div>
+
+                      <div class="tab-pane fade" id="tabTotal{{ loop.index }}" role="tabpanel">
+                        <div class="d-flex overflow-auto pb-2 gap-2">
+                          {% for mes_ano in dados.meses_anos %}
+                            {%
+                              set val =
+                              dados.dados_total.get(compra.chave, {}).get(mes_ano, 0)
+                            %}
+                            {% if val != 0 %}
+                              <div
+                                class="card border-primary shadow-sm flex-shrink-0 text-center p-2"
+                                style="min-width: 80px; background-color: #f0f8ff"
+                              >
+                                <span class="d-block extra-small text-muted">
+                                  {{ mes_ano.split('-')[1] }}/{{ mes_ano.split('-')[0][-2:] }}
+                                </span>
+                                <span class="d-block fw-bold text-primary small">
+                                  {{ "{:,.0f}".format(val).replace(',', '.') }}
+                                </span>
+                              </div>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="p-3">
+          <p class="text-center alert alert-warning mb-0">
+            Nenhuma compra encontrada para o grupo "{{ dados.grupo_nome }}" no ano de {{ dados.ano }}.
+          </p>
+        </div>
+      {% endif %}
     </div>
-    {% endif %}
   </div>
-</div>
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/extratos.js') }}"></script>
 {% endblock %}

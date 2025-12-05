@@ -1,212 +1,176 @@
 <!--- app\templates\salario_item\list.html -->
 
-{% extends "base.html" %} {% from "includes/_macros.html" import
-render_confirm_modal %} {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div
-      class="caixa-sombreada-cinza p-2 d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2"
-    >
-      <h4
-        class="mb-0 me-2 d-flex align-items-center"
-        style="color: var(--wf-azul-destaque)"
+{% extends "base.html" %}
+{%
+  from "includes/_macros.html" import
+  render_confirm_modal
+%}
+{% block content %}
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="caixa-sombreada-cinza p-2 d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2"
       >
-        <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
-        Cadastro de Verbas de Salário
-      </h4>
-      <div class="d-flex w-md-auto justify-content-end">
-        <a
-          href="{{ url_for('salario.adicionar_item') }}"
-          class="btn btn-azul btn-sm flex-grow-1 flex-md-grow-0"
-        >
-          <i class="fas fa-plus text-warning me-2"></i> Verba
-        </a>
-      </div>
-    </div>
-
-    <div>
-      <div>
-        {% if itens %}
-
-        <div class="table-responsive p-0 d-none d-lg-block">
-          <div class="card">
-            <div class="card-body">
-              <table class="table table-striped table-hover sortable-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Ativo</th>
-                    <th>Descrição</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for item in itens %}
-                  <tr>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.nome }}</td>
-                    <td>
-                      {% if item.tipo == 'Provento' %}
-                      <span
-                        class="badge bg-success-subtle text-success-emphasis"
-                        >{{ item.tipo }}</span
-                      >
-                      {% elif item.tipo == 'Benefício' %}
-                      <span class="badge bg-info-subtle text-info-emphasis"
-                        >{{ item.tipo }}</span
-                      >
-                      {% elif item.tipo == 'Desconto' %}
-                      <span
-                        class="badge bg-warning-subtle text-warning-emphasis"
-                        >{{ item.tipo }}</span
-                      >
-                      {% elif item.tipo == 'Imposto' %}
-                      <span class="badge bg-danger-subtle text-danger-emphasis"
-                        >{{ item.tipo }}</span
-                      >
-                      {% else %}
-                      <span
-                        class="badge bg-secondary-subtle text-secondary-emphasis"
-                        >{{ item.tipo }}</span
-                      >
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if item.ativo %}
-                      <span
-                        class="badge bg-success-subtle text-success-emphasis"
-                        >Sim</span
-                      >
-                      {% else %}
-                      <span class="badge bg-danger-subtle text-danger-emphasis"
-                        >Não</span
-                      >
-                      {% endif %}
-                    </td>
-                    <td>{{ item.descricao if item.descricao else '-' }}</td>
-                    <td class="table-actions">
-                      <a
-                        href="{{ url_for('salario.editar_item', id=item.id) }}"
-                        class="btn btn-warning me-2"
-                        title="Editar"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </a>
-                      <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#confirmDeleteModal"
-                        data-form-action="{{ url_for('salario.excluir_item', id=item.id) }}"
-                        title="Excluir"
-                      >
-                        <i class="fas fa-trash-alt"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <h4 class="mb-0 me-2 d-flex align-items-center" style="color: var(--wf-azul-destaque)">
+          <i class="fab px-2 fa-innosoft fa-lg text-warning"></i>
+          Cadastro de Verbas de Salário
+        </h4>
+        <div class="d-flex w-md-auto justify-content-end">
+          <a href="{{ url_for('salario.adicionar_item') }}" class="btn btn-azul btn-sm flex-grow-1 flex-md-grow-0">
+            <i class="fas fa-plus text-warning me-2"></i>
+            Verba
+          </a>
         </div>
+      </div>
 
-        <div class="d-lg-none">
-          <div class="list-group border-0">
-            {% for item in itens %}
-            <div
-              class="list-group-item p-1 border-start mb-1 border-1 rounded {% if item.tipo == 'Provento' %}border-grey{% elif item.tipo == 'Benefício' %}border-grey {% elif item.tipo == 'Desconto' %}border-grey{% elif item.tipo == 'Imposto' %}border-grey{% else %}border-grey{% endif %}"
-            >
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="overflow-hidden me-2">
-                  <div class="d-flex align-items-center gap-2">
-                    <h6
-                      class="mb-0 fw-medium text-truncate text-dark"
-                      style="font-size: 0.95rem"
-                    >
-                      {{ item.nome }}
-                    </h6>
-                    {% if not item.ativo %}
-                    <span
-                      class="badge bg-danger-subtle text-danger-emphasis extra-small"
-                      >Inativo</span
-                    >
-                    {% endif %}
-                  </div>
-
-                  <div class="mt-1">
-                    {% if item.tipo == 'Provento' %}
-                    <span
-                      class="badge bg-success-subtle text-success-emphasis extra-small"
-                      >Provento</span
-                    >
-                    {% elif item.tipo == 'Benefício' %}
-                    <span
-                      class="badge bg-info-subtle text-info-emphasis extra-small"
-                      >Benefício</span
-                    >
-                    {% elif item.tipo == 'Desconto' %}
-                    <span
-                      class="badge bg-warning-subtle text-warning-emphasis extra-small"
-                      >Desconto</span
-                    >
-                    {% elif item.tipo == 'Imposto' %}
-                    <span
-                      class="badge bg-danger-subtle text-danger-emphasis extra-small"
-                      >Imposto</span
-                    >
-                    {% else %}
-                    <span
-                      class="badge bg-secondary-subtle text-secondary-emphasis extra-small"
-                      >{{ item.tipo }}</span
-                    >
-                    {% endif %} {% if item.descricao %}
-                    <small class="text-muted ms-1" style="font-size: 0.75rem">
-                      {{ item.descricao | truncate(20) }}
-                    </small>
-                    {% endif %}
-                  </div>
-                </div>
-
-                <div class="d-flex gap-1">
-                  <a
-                    href="{{ url_for('salario.editar_item', id=item.id) }}"
-                    class="btn btn-outline-warning btn-sm py-1 px-2"
-                    title="Editar"
-                  >
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger btn-sm py-1 px-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#confirmDeleteModal"
-                    data-form-action="{{ url_for('salario.excluir_item', id=item.id) }}"
-                    title="Excluir"
-                  >
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
+      <div>
+        <div>
+          {% if itens %}
+            <div class="table-responsive p-0 d-none d-lg-block">
+              <div class="card">
+                <div class="card-body">
+                  <table class="table table-striped table-hover sortable-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Ativo</th>
+                        <th>Descrição</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in itens %}
+                        <tr>
+                          <td>{{ item.id }}</td>
+                          <td>{{ item.nome }}</td>
+                          <td>
+                            {% if item.tipo == 'Provento' %}
+                              <span class="badge bg-success-subtle text-success-emphasis">{{ item.tipo }}</span>
+                            {% elif item.tipo == 'Benefício' %}
+                              <span class="badge bg-info-subtle text-info-emphasis">{{ item.tipo }}</span>
+                            {% elif item.tipo == 'Desconto' %}
+                              <span class="badge bg-warning-subtle text-warning-emphasis">{{ item.tipo }}</span>
+                            {% elif item.tipo == 'Imposto' %}
+                              <span class="badge bg-danger-subtle text-danger-emphasis">{{ item.tipo }}</span>
+                            {% else %}
+                              <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ item.tipo }}</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if item.ativo %}
+                              <span class="badge bg-success-subtle text-success-emphasis">Sim</span>
+                            {% else %}
+                              <span class="badge bg-danger-subtle text-danger-emphasis">Não</span>
+                            {% endif %}
+                          </td>
+                          <td>{{ item.descricao if item.descricao else '-' }}</td>
+                          <td class="table-actions">
+                            <a
+                              href="{{ url_for('salario.editar_item', id=item.id) }}"
+                              class="btn btn-warning me-2"
+                              title="Editar"
+                            >
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <button
+                              type="button"
+                              class="btn btn-danger"
+                              data-bs-toggle="modal"
+                              data-bs-target="#confirmDeleteModal"
+                              data-form-action="{{ url_for('salario.excluir_item', id=item.id) }}"
+                              title="Excluir"
+                            >
+                              <i class="fas fa-trash-alt"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-            {% endfor %}
-          </div>
-        </div>
 
-        {% else %}
-        <div class="card shadow-sm border-1">
-          <div class="card-body text-center py-4">
-            <p class="text-muted mb-0">Nenhuma verba cadastrada ainda.</p>
-          </div>
+            <div class="d-lg-none">
+              <div class="list-group border-0">
+                {% for item in itens %}
+                  <div
+                    class="list-group-item p-1 border-start mb-1 border-1 rounded {% if item.tipo == 'Provento' %}border-grey{% elif item.tipo == 'Benefício' %}border-grey{% elif item.tipo == 'Desconto' %}border-grey{% elif item.tipo == 'Imposto' %}border-grey{% else %}border-grey{% endif %}"
+                  >
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="overflow-hidden me-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <h6 class="mb-0 fw-medium text-truncate text-dark" style="font-size: 0.95rem">
+                            {{ item.nome }}
+                          </h6>
+                          {% if not item.ativo %}
+                            <span class="badge bg-danger-subtle text-danger-emphasis extra-small">Inativo</span>
+                          {% endif %}
+                        </div>
+
+                        <div class="mt-1">
+                          {% if item.tipo == 'Provento' %}
+                            <span class="badge bg-success-subtle text-success-emphasis extra-small">Provento</span>
+                          {% elif item.tipo == 'Benefício' %}
+                            <span class="badge bg-info-subtle text-info-emphasis extra-small">Benefício</span>
+                          {% elif item.tipo == 'Desconto' %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis extra-small">Desconto</span>
+                          {% elif item.tipo == 'Imposto' %}
+                            <span class="badge bg-danger-subtle text-danger-emphasis extra-small">Imposto</span>
+                          {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis extra-small">
+                              {{ item.tipo }}
+                            </span>
+                          {% endif %}
+                          {% if item.descricao %}
+                            <small class="text-muted ms-1" style="font-size: 0.75rem">
+                              {{ item.descricao | truncate(20) }}
+                            </small>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <div class="d-flex gap-1">
+                        <a
+                          href="{{ url_for('salario.editar_item', id=item.id) }}"
+                          class="btn btn-outline-warning btn-sm py-1 px-2"
+                          title="Editar"
+                        >
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm py-1 px-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#confirmDeleteModal"
+                          data-form-action="{{ url_for('salario.excluir_item', id=item.id) }}"
+                          title="Excluir"
+                        >
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <div class="card shadow-sm border-1">
+              <div class="card-body text-center py-4">
+                <p class="text-muted mb-0">Nenhuma verba cadastrada ainda.</p>
+              </div>
+            </div>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
     </div>
   </div>
-</div>
 
-{{ render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
-Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
-não pode ser desfeita.', confirm_button_text='Sim, Excluir' ) }} {% endblock %}
+  {{
+    render_confirm_modal( modal_id='confirmDeleteModal', title='Confirmar
+    Exclusão', body_text='Tem certeza que deseja excluir este registro? Esta ação
+    não pode ser desfeita.', confirm_button_text='Sim, Excluir' )
+  }}
+{% endblock %}

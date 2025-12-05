@@ -1,155 +1,100 @@
 <!-- app/templates/includes/_macros.html -->
 
-<{% macro render_field(field, label=None, attrs={}) %} {% if label %}
-<label for="{{ field.id }}" class="form-label mb-1 small">{{ label }}</label>
-{% else %} {{ field.label(class="form-label mb-1 small") }} {% endif %} {% set
-default_class = 'form-select form-select-sm text-start' if field.type ==
-'SelectField' else 'form-control form-control-sm text-start' %} {{
-field(class=default_class, **attrs) }} {% if field.errors %}
-<div class="form-text text-danger mt-1">
-  {% for error in field.errors %} {{ error }}<br />
-  {% endfor %}
-</div>
-{% endif %} {% endmacro %} {% macro render_checkbox(field, attrs={}) %}
-<div class="form-check">
-  {{ field(class="form-check-input", **attrs) }} {{
-  field.label(class="form-check-label") }}
-</div>
-
+<{% macro render_field(field, label=None, attrs={}) %}{% if label %}
+  <label for="{{ field.id }}" class="form-label mb-1 small">{{ label }}</label>
+{% else %}
+  {{ field.label(class="form-label mb-1 small") }}
+{% endif %}
+{%
+  set
+  default_class = 'form-select form-select-sm text-start' if field.type ==
+  'SelectField' else 'form-control form-control-sm text-start'
+%}
+{{ field(class=default_class, **attrs) }}
 {% if field.errors %}
-<div class="form-text text-danger mt-1">
-  {% for error in field.errors %} {{ error }}<br />
-  {% endfor %}
-</div>
-{% endif %} {% endmacro %} {% macro render_confirm_modal(modal_id, title,
-body_text, confirm_button_text='Confirmar') %}
-<div
-  class="modal fade"
-  id="{{ modal_id }}"
-  tabindex="-1"
-  aria-labelledby="{{ modal_id }}Label"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white py-2">
-        <div class="position-relative w-100">
-          <i
-            class="fas fa-2x fa-exclamation-triangle text-white position-absolute start-0 top-50 translate-middle-y ms-2"
-          ></i>
+  <div class="form-text text-danger mt-1">
+    {% for error in field.errors %}
+      {{ error }}
+      <br />
+    {% endfor %}
+  </div>
+{% endif %}{% endmacro %}
+{% macro render_checkbox(field, attrs={}) %}
+  <div class="form-check">
+    {{ field(class="form-check-input", **attrs) }} {{ field.label(class="form-check-label") }}
+  </div>
 
-          <h4 class="modal-title text-center m-0" id="{{ modal_id }}Label">
-            {{ title }}
-          </h4>
+  {% if field.errors %}
+    <div class="form-text text-danger mt-1">
+      {% for error in field.errors %}
+        {{ error }}
+        <br />
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+{%
+  macro render_confirm_modal(modal_id, title,
+  body_text, confirm_button_text='Confirmar')
+%}
+  <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white py-2">
+          <div class="position-relative w-100">
+            <i
+              class="fas fa-2x fa-exclamation-triangle text-white position-absolute start-0 top-50 translate-middle-y ms-2"
+            ></i>
+
+            <h4 class="modal-title text-center m-0" id="{{ modal_id }}Label">{{ title }}</h4>
+          </div>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body py-2 small">{{ body_text }}</div>
-      <div class="modal-footer py-2">
-        <button
-          type="button"
-          class="btn btn-cinza btn-sm"
-          data-bs-dismiss="modal"
-        >
-          Cancelar
-        </button>
-        <form
-          id="form-{{ modal_id }}"
-          method="POST"
-          action="{{ form_action }}"
-          style="display: inline"
-        >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <button type="submit" class="btn btn-danger btn-sm">
-            {{ confirm_button_text }}
-          </button>
-        </form>
+        <div class="modal-body py-2 small">{{ body_text }}</div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-cinza btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <form id="form-{{ modal_id }}" method="POST" action="{{ form_action }}" style="display: inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn-danger btn-sm">{{ confirm_button_text }}</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endmacro %} {% macro render_estornar_modal(modal_id, form_action, title,
-body_text, confirm_button_text) -%}
-<div
-  class="modal fade"
-  id="{{ modal_id }}"
-  tabindex="-1"
-  aria-labelledby="{{ modal_id }}Label"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div
-        class="modal-header text-white py-2"
-        style="background-color: var(--wf-azul-destaque)"
-      >
-        <div class="position-relative w-100">
-          <i
-            class="fas fa-2x fa-exclamation-triangle text-white position-absolute start-0 top-50 translate-middle-y ms-2"
-          ></i>
+{% endmacro %}
+{%
+  macro render_estornar_modal(modal_id, form_action, title,
+  body_text, confirm_button_text)
+-%}
+  <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header text-white py-2" style="background-color: var(--wf-azul-destaque)">
+          <div class="position-relative w-100">
+            <i
+              class="fas fa-2x fa-exclamation-triangle text-white position-absolute start-0 top-50 translate-middle-y ms-2"
+            ></i>
 
-          <h4 class="modal-title text-center m-0" id="{{ modal_id }}Label">
-            {{ title }}
-          </h4>
+            <h4 class="modal-title text-center m-0" id="{{ modal_id }}Label">{{ title }}</h4>
+          </div>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body py-2 small">{{ body_text }}</div>
-      <div class="modal-footer py-2">
-        <button
-          type="button"
-          class="btn btn-cinza btn-sm"
-          data-bs-dismiss="modal"
-        >
-          Cancelar
-        </button>
-        <form
-          id="form-{{ modal_id }}"
-          method="POST"
-          action="{{ form_action }}"
-          style="display: inline"
-        >
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <input
-            type="hidden"
-            id="{{ modal_id }}-item-id"
-            name="item_id"
-            value=""
-          />
-          <input
-            type="hidden"
-            id="{{ modal_id }}-item-tipo"
-            name="item_tipo"
-            value=""
-          />
-          <input
-            type="hidden"
-            id="{{ modal_id }}-mes-ano"
-            name="mes_ano"
-            value=""
-          />
-          <button
-            type="submit"
-            class="btn text-white btn-sm"
-            style="background-color: var(--wf-azul-destaque)"
-          >
-            {{ confirm_button_text }}
-          </button>
-        </form>
+        <div class="modal-body py-2 small">{{ body_text }}</div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-cinza btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <form id="form-{{ modal_id }}" method="POST" action="{{ form_action }}" style="display: inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" id="{{ modal_id }}-item-id" name="item_id" value="" />
+            <input type="hidden" id="{{ modal_id }}-item-tipo" name="item_tipo" value="" />
+            <input type="hidden" id="{{ modal_id }}-mes-ano" name="mes_ano" value="" />
+            <button type="submit" class="btn text-white btn-sm" style="background-color: var(--wf-azul-destaque)">
+              {{ confirm_button_text }}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endmacro %}
