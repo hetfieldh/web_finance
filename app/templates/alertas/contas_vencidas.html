@@ -193,10 +193,6 @@
 'includes/_modal_recebimento.html' %} {% endblock %} {% block scripts %} {{
 super() }}
 
-<script type="application/json" id="json-data-pagamentos">
-  {{ contas_json | tojson }}
-</script>
-New
 <script type="application/json" id="contas-data">
   {{ contas_json | tojson }}
 </script>

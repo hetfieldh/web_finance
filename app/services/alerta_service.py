@@ -111,7 +111,7 @@ def _formatar_item_salario(item):
         "valor": item.salario_liquido,
         "natureza": NATUREZA_RECEITA,
         "id_original": item.id,
-        "tipo_item": "Salário Líquido",
+        "tipo_item": item.tipo,
         "valor_para_modal": item.salario_liquido,
         "conta_sugerida_id": None,
         "folha_tem_fgts": folha_tem_fgts,

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const pagamentoModal = document.getElementById("pagamentoModal");
-  const jsonDataElement = document.getElementById("json-data-pagamentos");
+  const jsonDataElement = document.getElementById("contas-data");
 
   const todasAsContas = jsonDataElement
     ? JSON.parse(jsonDataElement.textContent)

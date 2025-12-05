@@ -93,8 +93,6 @@ document.addEventListener("DOMContentLoaded", function () {
     Férias: contasPadrao,
     PLR: contasPadrao,
     Rescisão: contasPadrao,
-    "Salário Líquido": contasPadrao,
-
     Receita: contasPadrao,
     Benefício: ["Benefício"],
     FGTS: ["FGTS"],
