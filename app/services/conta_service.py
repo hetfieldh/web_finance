@@ -66,6 +66,7 @@ def criar_conta(form):
             saldo_atual=form.saldo_inicial.data,
             limite=form.limite.data,
             ativa=form.ativa.data,
+            saldo_operacional=form.saldo_operacional.data,
         )
         db.session.add(nova_conta)
         db.session.commit()
@@ -100,6 +101,8 @@ def atualizar_conta(conta, form):
 
         conta.limite = novo_limite
         conta.ativa = form.ativa.data
+        conta.saldo_operacional = form.saldo_operacional.data
+
         db.session.commit()
 
         current_app.logger.info(
@@ -169,17 +172,18 @@ def get_active_accounts_for_user_choices_simple():
 
 
 def get_account_balance_kpis(user_id):
-    saldos = (
+    saldos_operacionais_query = (
+        db.session.query(func.sum(Conta.saldo_atual))
+        .filter(
+            Conta.usuario_id == user_id,
+            Conta.ativa.is_(True),
+            Conta.saldo_operacional.is_(True),
+        )
+        .scalar()
+    )
+
+    saldos_diversos = (
         db.session.query(
-            func.sum(
-                case(
-                    (
-                        Conta.tipo.in_(["Corrente", "Digital", "Dinheiro"]),
-                        Conta.saldo_atual,
-                    ),
-                    else_=0,
-                )
-            ).label("operacional"),
             func.sum(
                 case(
                     (
@@ -201,10 +205,10 @@ def get_account_balance_kpis(user_id):
     )
 
     return {
-        "saldo_operacional": saldos.operacional or Decimal("0.00"),
-        "saldo_investimentos": saldos.investimentos or Decimal("0.00"),
-        "saldo_beneficios": saldos.beneficios or Decimal("0.00"),
-        "saldo_fgts": saldos.fgts or Decimal("0.00"),
+        "saldo_operacional": saldos_operacionais_query or Decimal("0.00"),
+        "saldo_investimentos": saldos_diversos.investimentos or Decimal("0.00"),
+        "saldo_beneficios": saldos_diversos.beneficios or Decimal("0.00"),
+        "saldo_fgts": saldos_diversos.fgts or Decimal("0.00"),
     }
 
 

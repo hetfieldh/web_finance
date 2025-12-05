@@ -86,6 +86,7 @@ render_confirm_modal %} {% block content %}
                     <th>Salário Líquido</th>
                     <th>Benefícios</th>
                     <th>FGTS</th>
+                    <th class="text-center">Status</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
@@ -114,7 +115,23 @@ render_confirm_modal %} {% block content %}
                     </td>
                     <td>{{ movimento.salario_liquido | format_number }}</td>
                     <td>{{ movimento.total_beneficios | format_number }}</td>
-                    <td>{{ movimento.total_fgts }}</td>
+                    <td>{{ movimento.total_fgts | format_number }}</td>
+                    <td class="text-center">
+                      {% if movimento.status == 'Recebido' %}
+                      <span
+                        class="badge bg-success-subtle text-success-emphasis"
+                        >Recebido</span
+                      >
+                      {% elif movimento.status == 'Parcialmente Recebido' %}
+                      <span class="badge bg-info-subtle text-info-emphasis"
+                        >Parcial</span
+                      >
+                      {% else %}
+                      <span class="badge bg-danger-subtle text-danger-emphasis"
+                        >Pendente</span
+                      >
+                      {% endif %}
+                    </td>
                     <td class="table-actions">
                       <a
                         href="{{ url_for('salario.gerenciar_itens_folha', id=movimento.id) }}"

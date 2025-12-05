@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from sqlalchemy import Enum, Numeric, UniqueConstraint
+from sqlalchemy import Boolean, Enum, Numeric, UniqueConstraint
 
 from app import db
 from app.utils import FormChoices
@@ -28,6 +28,7 @@ class Conta(db.Model):
     saldo_atual = db.Column(Numeric(12, 2), nullable=False)
     limite = db.Column(Numeric(12, 2), nullable=True)
     ativa = db.Column(db.Boolean, nullable=False, default=True)
+    saldo_operacional = db.Column(db.Boolean, nullable=False, default=True)
     data_criacao = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
@@ -36,7 +37,11 @@ class Conta(db.Model):
 
     __table_args__ = (
         UniqueConstraint(
-            "usuario_id", "nome_banco", "agencia", "conta", "tipo",
+            "usuario_id",
+            "nome_banco",
+            "agencia",
+            "conta",
+            "tipo",
             name="_usuario_conta_uc",
         ),
     )

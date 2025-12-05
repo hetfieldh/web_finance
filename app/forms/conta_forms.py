@@ -82,6 +82,7 @@ class CadastroContaForm(FlaskForm):
         default=0.00,
     )
     ativa = BooleanField("Conta Ativa", default=True)
+    saldo_operacional = BooleanField("Saldo Operacional", default=True)
     submit = SubmitField("Adicionar")
 
     def validate_limite(self, field):
@@ -136,6 +137,9 @@ class EditarContaForm(FlaskForm):
         places=2,
     )
     ativa = BooleanField("Conta Ativa")
+
+    saldo_operacional = BooleanField("Saldo Operacional")
+
     submit = SubmitField("Atualizar")
 
     def __init__(

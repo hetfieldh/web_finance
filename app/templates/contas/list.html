@@ -49,6 +49,7 @@ render_confirm_modal %} {% block content %}
                     <th>Saldo Atual</th>
                     <th>Limite</th>
                     <th>Ativa</th>
+                    <th>Op?</th>
                     <th>Registro</th>
                     <th>Ações</th>
                   </tr>
@@ -81,6 +82,13 @@ render_confirm_modal %} {% block content %}
                       <span class="badge bg-danger-subtle text-danger-emphasis"
                         >Não</span
                       >
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if conta.saldo_operacional %}
+                        <span class="badge bg-primary-subtle text-primary-emphasis">Sim</span>
+                      {% else %}
+                        <span>Não</span>
                       {% endif %}
                     </td>
                     <td>
@@ -150,6 +158,16 @@ render_confirm_modal %} {% block content %}
                 <div class="col-6">
                   <i class="fas fa-hashtag me-1"></i> CC:
                   <strong>{{ conta.conta }}</strong>
+                </div>
+                <div class="col-6">
+                  <i class="fas fa-money-bill-wave me-1"></i> Op: {% if
+                  conta.saldo_operacional == True %}
+                  <span class="badge bg-success-subtle text-success-emphasis"
+                    >Sim</span
+                  >
+                  {% else %}
+                  <strong class="text-dark">Não</strong>
+                  {% endif %}
                 </div>
               </div>
 

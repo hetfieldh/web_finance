@@ -206,7 +206,7 @@ def listar_movimentos():
         return redirect(url_for("salario.listar_movimentos"))
 
     movimentos = query.order_by(
-        SalarioMovimento.data_recebimento.asc(), SalarioMovimento.id.desc()
+        SalarioMovimento.data_recebimento.desc(),
     ).all()
 
     return render_template(

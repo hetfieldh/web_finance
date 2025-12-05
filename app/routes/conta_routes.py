@@ -59,6 +59,7 @@ def adicionar_conta():
 @login_required
 def editar_conta(id):
     conta = Conta.query.filter_by(id=id, usuario_id=current_user.id).first_or_404()
+
     form = EditarContaForm(
         obj=conta,
         original_nome_banco=conta.nome_banco,
