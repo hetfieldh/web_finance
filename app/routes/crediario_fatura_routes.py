@@ -186,18 +186,15 @@ def automatizar_faturas():
     return redirect(url_for("crediario_fatura.listar_faturas"))
 
 
-# --- ADICIONE ESTA NOVA ROTA NO FINAL DO ARQUIVO ---
 @crediario_fatura_bp.route("/excluir_em_massa", methods=["POST"])
 @login_required
 def excluir_em_massa():
-    # Pega os IDs enviados pelos checkboxes (name="item_ids")
     ids = request.form.getlist("item_ids")
 
     if not ids:
         flash("Nenhuma fatura selecionada.", "warning")
         return redirect(url_for("crediario_fatura.listar_faturas"))
 
-    # Busca as faturas no banco (garantindo que pertencem ao usuário logado)
     faturas = CrediarioFatura.query.filter(
         CrediarioFatura.id.in_(ids), CrediarioFatura.usuario_id == current_user.id
     ).all()
@@ -206,7 +203,6 @@ def excluir_em_massa():
     ignoradas = 0
 
     for fatura in faturas:
-        # Proteção: Não excluir faturas pagas ou parciais
         if fatura.status in [STATUS_PAGO, STATUS_PARCIAL_PAGO]:
             ignoradas += 1
         else:

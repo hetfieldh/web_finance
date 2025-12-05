@@ -156,7 +156,11 @@ def editar_movimento_crediario(id):
         success, message = editar_movimento_service(movimento, form)
         if success:
             flash(message, "success")
-            return redirect(url_for("crediario_movimento.listar_movimentos_crediario"))
+            return redirect(
+                url_for(
+                    "crediario_movimento.listar_movimentos_crediario", trigger_sync=1
+                )
+            )
         else:
             flash(message, "danger")
             return render_template(

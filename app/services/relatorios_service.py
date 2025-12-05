@@ -44,6 +44,18 @@ from app.utils import (
     TIPO_SAIDA,
 )
 
+STATUS_ABERTO_PAGAR = [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]
+STATUS_ABERTO_RECEBER = [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_RECEBIDO]
+SSTATUS_TUDO = [
+    STATUS_PENDENTE,
+    STATUS_ATRASADO,
+    STATUS_PARCIAL_PAGO,
+    STATUS_PAGO,
+    STATUS_RECEBIDO,
+    STATUS_PARCIAL_RECEBIDO,
+    STATUS_AMORTIZADO,
+]
+
 
 def get_resumo_salario_anual(user_id, ano):
     from app.models.salario_item_model import SalarioItem
@@ -174,9 +186,12 @@ def get_resumo_mensal(user_id, ano, mes):
         Conta.ativa.is_(True),
     ).scalar() or Decimal("0.00")
 
-    movimentacoes = []
-    total_receitas = Decimal("0.00")
-    total_despesas = Decimal("0.00")
+    movimentacoes_completas = []
+    total_receitas_em_aberto = Decimal("0.00")
+    total_despesas_em_aberto = Decimal("0.00")
+
+    STATUS_ABERTO_PAGAR = [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_PAGO]
+    STATUS_ABERTO_RECEBER = [STATUS_PENDENTE, STATUS_ATRASADO, STATUS_PARCIAL_RECEBIDO]
 
     desp_rec_mes = (
         DespRecMovimento.query.join(DespRec)
@@ -189,30 +204,31 @@ def get_resumo_mensal(user_id, ano, mes):
     )
 
     for item in desp_rec_mes:
-        valor = (
-            item.valor_realizado
-            if item.status
-            in [
-                STATUS_PAGO,
-                STATUS_RECEBIDO,
-                STATUS_PARCIAL_PAGO,
-                STATUS_PARCIAL_RECEBIDO,
-            ]
-            else item.valor_previsto
-        )
-        movimentacoes.append(
+        is_realizado = item.status in [
+            STATUS_PAGO,
+            STATUS_RECEBIDO,
+            STATUS_PARCIAL_PAGO,
+            STATUS_PARCIAL_RECEBIDO,
+        ]
+        valor_para_lista = item.valor_realizado if is_realizado else item.valor_previsto
+
+        movimentacoes_completas.append(
             {
                 "data": item.data_vencimento,
                 "descricao": item.despesa_receita.nome,
-                "valor": valor,
+                "valor": valor_para_lista,
                 "tipo": item.despesa_receita.natureza,
                 "status": item.status,
             }
         )
-        if item.despesa_receita.natureza == NATUREZA_RECEITA:
-            total_receitas += valor
-        else:
-            total_despesas += valor
+
+        if item.status in (STATUS_ABERTO_PAGAR + STATUS_ABERTO_RECEBER):
+            valor_pendente = item.valor_previsto - (item.valor_realizado or Decimal(0))
+
+            if item.despesa_receita.natureza == NATUREZA_RECEITA:
+                total_receitas_em_aberto += valor_pendente
+            else:
+                total_despesas_em_aberto += valor_pendente
 
     from app.models.crediario_model import Crediario
 
@@ -229,26 +245,22 @@ def get_resumo_mensal(user_id, ano, mes):
     )
 
     for fatura in faturas_mes:
-        valor = (
-            fatura.valor_pago_fatura
-            if fatura.status in [STATUS_PAGO, STATUS_PARCIAL_PAGO]
-            else fatura.valor_total_fatura
+        valor_a_pagar = fatura.valor_total_fatura - (
+            fatura.valor_pago_fatura or Decimal(0)
         )
-        valor_calculo = (
-            fatura.valor_total_fatura - fatura.valor_pago_fatura
-            if fatura.status == STATUS_PARCIAL_PAGO
-            else valor
-        )
-        movimentacoes.append(
+
+        movimentacoes_completas.append(
             {
                 "data": fatura.data_vencimento_fatura,
                 "descricao": f"Fatura {fatura.crediario.nome_crediario}",
-                "valor": valor_calculo,
+                "valor": fatura.valor_total_fatura,
                 "tipo": NATUREZA_DESPESA,
                 "status": fatura.status,
             }
         )
-        total_despesas += valor_calculo
+
+        if fatura.status in STATUS_ABERTO_PAGAR:
+            total_despesas_em_aberto += valor_a_pagar
 
     from app.models.financiamento_model import Financiamento
 
@@ -263,21 +275,20 @@ def get_resumo_mensal(user_id, ano, mes):
     )
 
     for parcela in parcelas_mes:
-        valor = (
-            parcela.valor_pago
-            if parcela.status in [STATUS_PAGO, STATUS_AMORTIZADO]
-            else parcela.valor_total_previsto
-        )
-        movimentacoes.append(
+        valor_para_lista = parcela.valor_total_previsto
+
+        movimentacoes_completas.append(
             {
                 "data": parcela.data_vencimento,
                 "descricao": f"{parcela.financiamento.nome_financiamento} ({parcela.numero_parcela}/{parcela.financiamento.prazo_meses})",
-                "valor": valor,
+                "valor": valor_para_lista,
                 "tipo": NATUREZA_DESPESA,
                 "status": parcela.status,
             }
         )
-        total_despesas += valor
+
+        if parcela.status in STATUS_ABERTO_PAGAR:
+            total_despesas_em_aberto += valor_para_lista
 
     salarios_mes = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
@@ -285,47 +296,73 @@ def get_resumo_mensal(user_id, ano, mes):
     ).all()
 
     for salario in salarios_mes:
-        if salario.salario_liquido > 0 and salario.status in [
-            STATUS_PENDENTE,
-            STATUS_RECEBIDO,
-            STATUS_PARCIAL_RECEBIDO,
-        ]:
-            movimentacoes.append(
+        if salario.salario_liquido > 0:
+            is_salario_pago = salario.movimento_bancario_salario_id is not None
+            valor_para_lista = salario.salario_liquido
+
+            movimentacoes_completas.append(
                 {
                     "data": salario.data_recebimento,
                     "descricao": f"Salário Líquido (Ref: {salario.mes_referencia})",
-                    "valor": salario.salario_liquido,
+                    "valor": valor_para_lista,
                     "tipo": NATUREZA_RECEITA,
                     "status": salario.status,
                 }
             )
-            total_receitas += salario.salario_liquido
 
-        if salario.total_beneficios > 0 and salario.status in [
+            if not is_salario_pago and salario.status in STATUS_ABERTO_RECEBER:
+                total_receitas_em_aberto += valor_para_lista
+
+        total_beneficios_pendentes = Decimal(0)
+        for item_beneficio in salario.itens:
+            if item_beneficio.salario_item.tipo == "Benefício":
+
+                movimentacoes_completas.append(
+                    {
+                        "data": salario.data_recebimento,
+                        "descricao": f"Benefício: {item_beneficio.salario_item.nome} (Ref: {salario.mes_referencia})",
+                        "valor": item_beneficio.valor,
+                        "tipo": NATUREZA_RECEITA,
+                        "status": salario.status,
+                    }
+                )
+
+                if (
+                    item_beneficio.movimento_bancario_id is None
+                    and salario.status in STATUS_ABERTO_RECEBER
+                ):
+                    total_beneficios_pendentes += item_beneficio.valor
+
+        total_receitas_em_aberto += total_beneficios_pendentes
+
+    movimentacoes_completas.sort(key=lambda x: x["data"])
+
+    movimentacoes_em_aberto = []
+    movimentacoes_realizadas = []
+
+    for mov in movimentacoes_completas:
+        if mov["status"] in [STATUS_PAGO, STATUS_RECEBIDO, STATUS_AMORTIZADO]:
+            movimentacoes_realizadas.append(mov)
+
+        elif mov["status"] in [
             STATUS_PENDENTE,
-            STATUS_RECEBIDO,
+            STATUS_ATRASADO,
+            STATUS_PARCIAL_PAGO,
             STATUS_PARCIAL_RECEBIDO,
         ]:
-            movimentacoes.append(
-                {
-                    "data": salario.data_recebimento,
-                    "descricao": f"Benefícios (Ref: {salario.mes_referencia})",
-                    "valor": salario.total_beneficios,
-                    "tipo": NATUREZA_RECEITA,
-                    "status": salario.status,
-                }
-            )
+            movimentacoes_em_aberto.append(mov)
 
-    movimentacoes.sort(key=lambda x: x["data"])
-
-    saldo_final_previsto = (saldo_operacional_atual + total_receitas) - total_despesas
+    saldo_final_previsto = (
+        saldo_operacional_atual + total_receitas_em_aberto
+    ) - total_despesas_em_aberto
 
     return {
         "saldo_inicial": saldo_operacional_atual,
-        "total_receitas": total_receitas,
-        "total_despesas": total_despesas,
+        "total_receitas": total_receitas_em_aberto,
+        "total_despesas": total_despesas_em_aberto,
         "saldo_final_previsto": saldo_final_previsto,
-        "movimentacoes": movimentacoes,
+        "movimentacoes_em_aberto": movimentacoes_em_aberto,
+        "movimentacoes_realizadas": movimentacoes_realizadas,
     }
 
 
@@ -333,7 +370,6 @@ def get_contas_a_vencer(user_id):
     hoje = date.today()
     data_limite = hoje + timedelta(days=7)
     movimentos = []
-
     desp_rec_a_vencer = (
         DespRecMovimento.query.join(DespRec)
         .filter(

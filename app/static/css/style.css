@@ -147,7 +147,7 @@ h6,
 }
 
 /* Navbar fixa no topo do conteúdo */
-#page-content-wrapper > .navbar {
+#page-content-wrapper>.navbar {
   position: sticky;
   top: 0;
   z-index: 1020;
@@ -416,15 +416,15 @@ h6,
   color: var(--wf-white);
 }
 
-.navbar-nav .nav-item a > i {
+.navbar-nav .nav-item a>i {
   transition:
     transform 0.2s,
     color 0.2s;
 }
 
 /* Aumenta ícones ao passar o mouse */
-.navbar-nav .nav-item .btn.text-warning:hover > i,
-.navbar-nav .nav-item .nav-link:hover > .fa-home {
+.navbar-nav .nav-item .btn.text-warning:hover>i,
+.navbar-nav .nav-item .nav-link:hover>.fa-home {
   color: var(--wf-texto-botao-hover) !important;
   transform: scale(1.3);
 }
@@ -686,6 +686,7 @@ body.login-body {
 /* Reduz o tamanho dos títulos em telas menores que 768px para
    melhorar a leitura em dispositivos móveis. */
 @media (max-width: 767.98px) {
+
   h1,
   .h1 {
     font-size: 1.8rem;
@@ -716,6 +717,7 @@ body.login-body {
 .table-scroll {
   display: block;
   width: 100%;
+
   overflow-x: auto;
   /* Habilita scroll horizontal */
   -webkit-overflow-scrolling: touch;
@@ -837,6 +839,7 @@ body.login-body {
 
 /* --- 11.6 AJUSTES DE TABELA PARA MOBILE --- */
 @media (max-width: 768px) {
+
   .table-padrao th,
   .table-padrao td {
     font-size: 0.7rem;

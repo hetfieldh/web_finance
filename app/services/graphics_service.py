@@ -198,7 +198,7 @@ def get_monthly_graphics_data(user_id, year, month):
     # SALÁRIOS e BENEFÍCIOS
     salarios_recebidos = SalarioMovimento.query.filter(
         SalarioMovimento.usuario_id == user_id,
-        SalarioMovimento.data_criacao.between(data_inicio_mes, data_fim_mes),
+        SalarioMovimento.data_recebimento.between(data_inicio_mes, data_fim_mes),
     ).all()
     for salario in salarios_recebidos:
         if salario.status in [STATUS_RECEBIDO, STATUS_PARCIAL_RECEBIDO]:
