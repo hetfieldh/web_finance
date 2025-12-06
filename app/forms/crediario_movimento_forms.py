@@ -83,7 +83,6 @@ class CadastroCrediarioMovimentoForm(FlaskForm):
         "Valor Total da Compra",
         validators=[
             InputRequired("O valor total da compra é obrigatório."),
-            NumberRange(min=Decimal("0.01"), message="O valor deve ser maior que zero."),
         ],
         places=2,
     )
@@ -194,7 +193,6 @@ class EditarCrediarioMovimentoForm(FlaskForm):
         "Valor Total da Compra",
         validators=[
             InputRequired("O valor total da compra é obrigatório."),
-            NumberRange(min=Decimal("0.01"), message="O valor deve ser maior que zero."),
         ],
         places=2,
     )

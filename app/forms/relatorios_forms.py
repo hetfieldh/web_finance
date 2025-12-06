@@ -9,9 +9,9 @@ class ResumoAnualForm(FlaskForm):
     submit = SubmitField("Buscar")
 
 class GastosCrediarioForm(FlaskForm):
-    ano = SelectField("Ano", coerce=int)
+    ano = SelectField("", coerce=int)
     visualizacao = SelectField(
-        "Visualizar Gastos por",
+        "",
         choices=[
             ("grupo", "Grupo"),
             ("subgrupo", "Subgrupo"),

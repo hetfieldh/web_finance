@@ -13,7 +13,7 @@ from app.models.crediario_grupo_model import CrediarioGrupo
 from app.models.crediario_movimento_model import CrediarioMovimento
 from app.models.crediario_parcela_model import CrediarioParcela
 from app.models.crediario_subgrupo_model import CrediarioSubgrupo
-from app.utils import STATUS_PAGO, STATUS_PARCIAL_PAGO
+from app.utils import STATUS_PAGO, STATUS_PARCIAL_PAGO, FormChoices
 
 
 def adicionar_movimento(form):
@@ -35,10 +35,25 @@ def adicionar_movimento(form):
             return False, msg
 
         valor_total_compra = form.valor_total_compra.data
+
+        grupo = None
         if form.crediario_grupo_id.data:
             grupo = db.session.get(CrediarioGrupo, form.crediario_grupo_id.data)
-            if grupo and grupo.tipo_grupo_crediario == "Estorno":
-                valor_total_compra = -valor_total_compra
+
+        TIPO_AJUSTE_VAL = str(FormChoices.TiposCrediarioGrupo.AJUSTE.value)
+        TIPO_ESTORNO_VAL = str(FormChoices.TiposCrediarioGrupo.ESTORNO.value)
+
+        tipo_grupo_atual = str(grupo.tipo_grupo_crediario) if grupo else ""
+
+        if valor_total_compra < 0:
+            if tipo_grupo_atual != TIPO_AJUSTE_VAL:
+                return (
+                    False,
+                    f"Valores negativos são permitidos apenas para grupos do tipo '{TIPO_AJUSTE_VAL}'.",
+                )
+
+        if tipo_grupo_atual == TIPO_ESTORNO_VAL:
+            valor_total_compra = -abs(valor_total_compra)
 
         numero_parcelas = form.numero_parcelas.data
         if numero_parcelas <= 0:
@@ -124,10 +139,28 @@ def editar_movimento(movimento, form):
             )
 
         valor_total_compra = form.valor_total_compra.data
-        if (
-            movimento.crediario_grupo
-            and movimento.crediario_grupo.tipo_grupo_crediario == "Estorno"
-        ):
+
+        grupo_selecionado = None
+        if form.crediario_grupo_id.data:
+            grupo_selecionado = db.session.get(
+                CrediarioGrupo, form.crediario_grupo_id.data
+            )
+
+        TIPO_AJUSTE_VAL = str(FormChoices.TiposCrediarioGrupo.AJUSTE.value)
+        TIPO_ESTORNO_VAL = str(FormChoices.TiposCrediarioGrupo.ESTORNO.value)
+
+        tipo_grupo_atual = (
+            str(grupo_selecionado.tipo_grupo_crediario) if grupo_selecionado else ""
+        )
+
+        if valor_total_compra < 0:
+            if tipo_grupo_atual != TIPO_AJUSTE_VAL:
+                return (
+                    False,
+                    f"Valores negativos são permitidos apenas para grupos do tipo '{TIPO_AJUSTE_VAL}'.",
+                )
+
+        if tipo_grupo_atual == TIPO_ESTORNO_VAL:
             valor_total_compra = -abs(valor_total_compra)
 
         movimento.crediario_id = form.crediario_id.data

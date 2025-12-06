@@ -7,7 +7,6 @@
   >
     <div>
       <span class="text-dark fw-bold">
-        <i class="fas fa-list-ol me-2"></i>
         Crediário Detalhado:
       </span>
       <span class="text-secondary small d-block d-md-inline">Abertura por Grupo > Subgrupo > Loja.</span>
@@ -18,29 +17,29 @@
     <div class="card shadow d-none d-lg-block">
       <div class="card-header menu-primario py-2">
         <h6 class="mb-0 text-white">
-          <i class="fas fa-table me-2"></i>
+          <i class="fas fa-table text-warning me-2"></i>
           Visão Hierárquica
         </h6>
       </div>
-      <div class="card-body p-0">
+      <div class="card-body p-2">
         <div class="table-scroll" style="max-height: 75vh">
           <table class="table table-sm table-hover table-bordered mb-0" id="tabelaCrediario">
             <thead class="table-light sticky-top" style="z-index: 5">
               <tr>
                 <th style="min-width: 250px" class="ps-3">Estrutura</th>
                 {% for mes in meses %}
-                  <th class="text-center bg-light" style="min-width: 100px">{{ mes.label }}</th>
+                  <th class="text-center bg-light" style="min-width: 60px">{{ mes.label }}</th>
                 {% endfor %}
               </tr>
             </thead>
             <tbody>
               {% for grupo_nome, info_grupo in dados.items() %}
                 <tr
-                  class="table-secondary toggle-row"
+                  class="table-white toggle-row"
                   data-target=".grupo-child-{{ info_grupo.id }}"
                   style="cursor: pointer; font-weight: bold"
                 >
-                  <td class="ps-3">
+                  <td class="ps-1">
                     <i class="fas fa-plus-square me-2 text-dark toggle-icon"></i>
                     {{ grupo_nome }}
                   </td>
@@ -59,12 +58,12 @@
                   {% set unique_sub_id = "{}-{}".format(info_grupo.id, info_sub.id) %}
 
                   <tr
-                    class="grupo-child-{{ info_grupo.id }} table-light toggle-row"
+                    class="grupo-child-{{ info_grupo.id }} table-white toggle-row"
                     data-target=".sub-child-{{ unique_sub_id }}"
                     style="display: none; cursor: pointer; font-weight: 600"
                   >
-                    <td class="ps-5" style="border-left: 4px solid var(--wf-azul-destaque)">
-                      <i class="fas fa-caret-right me-2 text-secondary toggle-icon"></i>
+                    <td class="ps-3" style="border-left: 2px solid var(--wf-amarelo-destaque-hover)">
+                      <i class="fas fa-plus-square me-2 text-danger toggle-icon"></i>
                       {{ sub_nome }}
                     </td>
                     {% for mes in meses %}
@@ -80,8 +79,8 @@
 
                   {% for forn_nome, valores_forn in info_sub['fornecedores'].items() %}
                     <tr class="sub-child-{{ unique_sub_id }} bg-white" style="display: none">
-                      <td class="ps-5 text-muted fst-italic small" style="padding-left: 3.5rem !important">
-                        <i class="fas fa-store me-1 text-muted opacity-50"></i>
+                      <td class="ps-1 text-secondaary fst-italic small" style="padding-left: 3.5rem !important">
+                        <i class="fas fa-store me-1 text-danger opacity-50"></i>
                         {{ forn_nome }}
                       </td>
                       {% for mes in meses %}
