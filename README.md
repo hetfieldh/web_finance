@@ -23,7 +23,6 @@ O sistema foi construído de forma modular, com uma gama completa de funcionalid
 - **📈 Consultas e Relatórios:**
   - **Extrato Bancário:** Consulta detalhada de movimentações por conta e período.
   - **Fluxo de Caixa:** Projeção de saldos futuros com base em lançamentos previstos e realizados.
-  - **Fluxo Detalhado:** Visão consolidada de todas as entradas e saídas (salários, receitas, despesas, faturas, financiamentos) em um determinado mês.
   - **Resumo Mensal:** Balanço simplificado de receitas, despesas e saldo do mês.
   - **Resumo Anual da Folha:** Tabela detalhada com todos os itens do holerite (Proventos, Descontos, etc.) totalizados por mês e no ano.
   - **Gastos Anuais por Grupo de Crediário:** Relatório anual que totaliza os gastos (líquido de estornos) por Grupo de Crediário, ordenado do maior para o menor, com resumo por Destino (Próprio, Outros, Coletivo).

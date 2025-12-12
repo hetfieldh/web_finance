@@ -246,7 +246,6 @@ PAGE_CONFIG = {
     "salario.gerenciar_itens_folha": {"title": "TR Salários"},
     # Relatórios
     "extrato.extrato_bancario": {"title": "Extrato Bancário"},
-    "extrato_consolidado.fluxo_caixa_detalhado": {"title": "Fluxo de Caixa Detalhado"},
     "fluxo_caixa.fluxo_caixa": {"title": "Fluxo de Caixa"},
     "relatorios.crediario_detalhado": {"title": "Crediário Detalhado"},
     "relatorios.gastos_por_grupo": {"title": "Crediário Resumo"},
