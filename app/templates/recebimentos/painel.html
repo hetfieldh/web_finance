@@ -85,9 +85,8 @@ render_estornar_modal %} {% block content %}
               </tr>
             </thead>
             <tbody>
-              {% for conta in contas %} {% set attrs = {} %} {% if
-              conta.categoria == 'Salário' %} {% set _ =
-              attrs.update({'data-folha-tem-fgts': 'true' if
+              {% for conta in contas %} {% set attrs = {} %} {% if conta.categoria ==
+              'Salário' %} {% set _ = attrs.update({'data-folha-tem-fgts': 'true' if
               conta.folha_tem_fgts else 'false'}) %} {% endif %}
 
               <tr
@@ -118,11 +117,10 @@ render_estornar_modal %} {% block content %}
                 <td class="text-center">
                   <span style="display: none">
                     {% if conta.data_pagamento %} {{
-                    conta.data_pagamento.strftime('%Y%m%d') }} {% else %} '-' {%
-                    endif %}
+                    conta.data_pagamento.strftime('%Y%m%d') }} {% else %} '-' {% endif %}
                   </span>
-                  {{ conta.data_pagamento.strftime('%d/%m/%Y') if
-                  conta.data_pagamento else '-' }}
+                  {{ conta.data_pagamento.strftime('%d/%m/%Y') if conta.data_pagamento
+                  else '-' }}
                 </td>
                 <td class="text-start">{{ conta.recebido_em or '-' }}</td>
                 <td class="text-center">
@@ -131,9 +129,7 @@ render_estornar_modal %} {% block content %}
                     >Recebido</span
                   >
                   {% elif conta.status == 'Parcialmente Recebido' %}
-                  <span class="badge bg-info-subtle text-info-emphasis"
-                    >Parcial</span
-                  >
+                  <span class="badge bg-info-subtle text-info-emphasis">Parcial</span>
                   {% else %}
                   <span class="badge bg-danger-subtle text-danger-emphasis"
                     >Pendente</span

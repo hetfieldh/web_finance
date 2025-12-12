@@ -18,11 +18,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const pagamentoModal = document.getElementById("pagamentoModal");
-  const jsonDataElement = document.getElementById("contas-data");
+
+  const jsonDataElement = document.getElementById("json-data-pagamentos") || document.getElementById("contas-data");
 
   const todasAsContas = jsonDataElement ? JSON.parse(jsonDataElement.textContent) : [];
 
-  if (pagamentoModal && jsonDataElement) {
+  if (pagamentoModal) {
     const tiposDeContaPermitidosParaPagamento = [
       "Corrente",
       "Poupança",
@@ -34,10 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function formatCurrency(value) {
       const number = parseFloat(value);
-      if (isNaN(number)) {
-        return " 0,00";
-      }
-      return new Intl.NumberFormat("pt-BR").format(number);
+      if (isNaN(number)) return "0,00";
+      return new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2 }).format(number);
     }
 
     pagamentoModal.addEventListener("show.bs.modal", function (event) {
@@ -45,19 +44,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const modalForm = pagamentoModal.querySelector("form");
       const contaSelectInput = modalForm.querySelector('select[name="conta_id"]');
 
-      if (contaSelectInput) {
+      if (contaSelectInput && todasAsContas.length > 0) {
         contaSelectInput.innerHTML = '<option value="">Selecione...</option>';
-
         const contasFiltradas = todasAsContas.filter((conta) =>
           tiposDeContaPermitidosParaPagamento.includes(conta.tipo)
         );
 
         contasFiltradas.forEach((conta) => {
-          const saldoDisponivel = conta.saldo_atual;
-          const saldoLimite = conta.limite;
-          const optionText = `${conta.nome} (${
-            conta.tipo
-          }) - Saldo: ${formatCurrency(saldoDisponivel)} | Limite: ${formatCurrency(saldoLimite)} `;
+          const saldoDisponivel = conta.saldo_atual || 0;
+          const saldoLimite = conta.limite || 0;
+          const optionText = `${conta.nome} (${conta.tipo}) - Saldo: ${formatCurrency(saldoDisponivel)}`;
           const option = new Option(optionText, conta.id);
           contaSelectInput.add(option);
         });
@@ -67,17 +63,20 @@ document.addEventListener("DOMContentLoaded", function () {
       const itemTipo = button.getAttribute("data-item-tipo");
       const itemValor = button.getAttribute("data-item-valor");
       const itemDescricao = button.getAttribute("data-item-descricao");
+      const itemData = button.getAttribute("data-item-data");
 
       modalForm.querySelector('input[name="item_id"]').value = itemId;
       modalForm.querySelector('input[name="item_tipo"]').value = itemTipo;
       modalForm.querySelector('input[name="item_descricao"]').value = itemDescricao;
-      const valorPagoInput = modalForm.querySelector('input[name="valor_pago"]');
-      const valorPagoHelp = document.getElementById("valor-pago-help");
 
+      const valorPagoInput = modalForm.querySelector('input[name="valor_pago"]');
       valorPagoInput.value = itemValor;
 
       const dataInput = this.querySelector("#data_pagamento");
-      if (!dataInput.value) {
+
+      if (itemData) {
+        dataInput.value = itemData;
+      } else if (!dataInput.value) {
         const hoje = new Date();
         const ano = hoje.getFullYear();
         const mes = String(hoje.getMonth() + 1).padStart(2, "0");
@@ -85,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         dataInput.value = `${ano}-${mes}-${dia}`;
       }
 
+      const valorPagoHelp = document.getElementById("valor-pago-help");
       if (itemTipo === "Financiamento" || itemTipo === "Crediário") {
         valorPagoInput.readOnly = false;
         valorPagoInput.style.backgroundColor = "";

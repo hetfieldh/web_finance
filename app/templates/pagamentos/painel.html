@@ -141,35 +141,31 @@ render_estornar_modal %} {% block content %}
                   {{ conta.valor_display | format_number }}
                 </td>
                 <td class="text-end fw-bold text-success">
-                  {% if conta.valor_pago > 0 %} {{ conta.valor_pago |
-                  format_number }} {% else %} - {% endif %}
+                  {% if conta.valor_pago > 0 %} {{ conta.valor_pago | format_number }} {%
+                  else %} - {% endif %}
                 </td>
                 <td class="text-center">
                   <span style="display: none">
                     {% if conta.data_pagamento %} {{
-                    conta.data_pagamento.strftime('%Y%m%d') }} {% else %} '-' {%
-                    endif %}
+                    conta.data_pagamento.strftime('%Y%m%d') }} {% else %} '-' {% endif %}
                   </span>
-                  {{ conta.data_pagamento.strftime('%d/%m/%Y') if
-                  conta.data_pagamento else '-' }}
+                  {{ conta.data_pagamento.strftime('%d/%m/%Y') if conta.data_pagamento
+                  else '-' }}
                 </td>
                 <td class="text-start">{{ conta.pago_com or '-' }}</td>
                 <td class="text-center">
                   {% set status_text = conta.status %} {% set status_class =
-                  'bg-danger-subtle text-danger' %} {% if conta.status in
-                  ['Pago'] %} {% set status_text = 'Pago' %} {% set status_class
-                  = 'bg-success-subtle text-success' %} {% elif conta.status ==
-                  'Atrasado' %} {% set status_class = 'bg-danger-subtle
-                  text-danger' %} {% elif conta.status == 'Parcialmente Paga' %}
-                  {% set status_text = 'Parcial' %} {% set status_class =
-                  'bg-info-subtle text-info' %} {% endif %}
-                  <span class="badge {{ status_class }}"
-                    >{{ status_text }}</span
-                  >
+                  'bg-danger-subtle text-danger' %} {% if conta.status in ['Pago'] %} {%
+                  set status_text = 'Pago' %} {% set status_class = 'bg-success-subtle
+                  text-success' %} {% elif conta.status == 'Atrasado' %} {% set
+                  status_class = 'bg-danger-subtle text-danger' %} {% elif conta.status ==
+                  'Parcialmente Paga' %} {% set status_text = 'Parcial' %} {% set
+                  status_class = 'bg-info-subtle text-info' %} {% endif %}
+                  <span class="badge {{ status_class }}">{{ status_text }}</span>
                 </td>
                 <td class="text-center">
-                  {% if conta.status != 'Pago' %} {% if conta.tipo ==
-                  'Crediário' and conta.desatualizada %}
+                  {% if conta.status != 'Pago' %} {% if conta.tipo == 'Crediário' and
+                  conta.desatualizada %}
                   <div class="d-flex justify-content-center align-items-center">
                     <i
                       class="fas fa-sync-alt fa-lg text-primary"

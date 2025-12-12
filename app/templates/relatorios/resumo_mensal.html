@@ -93,7 +93,9 @@
 
             <div class="card-body p-0 p-md-1">
               <div class="table-responsive d-none d-md-block p-0">
-                <table class="table table-striped table-hover sortable-table mb-0">
+                <table
+                  class="table table-striped table-hover {% if dados.movimentacoes_em_aberto %}sortable-table{% endif %} mb-0"
+                >
                   <thead>
                     <tr>
                       <th>Vencimento</th>
@@ -112,8 +114,7 @@
                         <td>{{ item.descricao }}</td>
                         <td class="text-center">
                           <span
-                            class="badge
-                            {% if item.tipo == 'Receita' %}
+                            class="badge {% if item.tipo == 'Receita' %}
                               bg-success-subtle text-success-emphasis
                             {% else %}
                               bg-danger-subtle text-danger-emphasis
@@ -123,8 +124,7 @@
                           </span>
                         </td>
                         <td
-                          class="text-end fw-semibold
-                          {% if item.tipo == 'Receita' %}text-success{% else %}text-danger{% endif %}"
+                          class="text-end fw-semibold {% if item.tipo == 'Receita' %}text-success{% else %}text-danger{% endif %}"
                         >
                           {{ item.valor | format_number }}
                         </td>
@@ -195,7 +195,9 @@
 
             <div class="card-body p-0 p-md-1">
               <div class="table-responsive d-none d-md-block p-0">
-                <table class="table table-striped table-hover sortable-table mb-0">
+                <table
+                  class="table table-striped table-hover {% if dados.movimentacoes_realizadas %}sortable-table{% endif %} mb-0"
+                >
                   <thead>
                     <tr>
                       <th>Data Pagamento/Recebimento</th>
@@ -214,19 +216,14 @@
                         <td>{{ item.descricao }}</td>
                         <td class="text-center">
                           <span
-                            class="badge
-                                            {% if item.tipo == 'Receita' %}
-                              bg-success-subtle text-success-emphasis
-                            {% else %}
-                              bg-danger-subtle text-danger-emphasis
-                            {% endif %}"
+                            class="badge {% if item.tipo == 'Receita' %}bg-success-subtle text-success-emphasis{% else %}bg-danger-subtle
+                            text-danger-emphasis{% endif %}"
                           >
                             {{ item.tipo }}
                           </span>
                         </td>
                         <td
-                          class="text-end fw-semibold
-                                        {% if item.tipo == 'Receita' %}text-success{% else %}text-danger{% endif %}"
+                          class="text-end fw-semibold {% if item.tipo == 'Receita' %}text-success{% else %}text-danger{% endif %}"
                         >
                           {{ item.valor | format_number }}
                         </td>

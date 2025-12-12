@@ -159,7 +159,7 @@ class EditarMovimentoForm(FlaskForm):
         "Data de Vencimento",
         format="%Y-%m-%d",
         validators=[DataRequired("A data de vencimento é obrigatória.")],
-        render_kw={"readonly": True},
+        render_kw={"readonly": False},
     )
     valor_previsto = DecimalField(
         "Valor Previsto",

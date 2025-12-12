@@ -2,7 +2,7 @@
 
 ![Badge de Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 ![Badge de Linguagem](https://img.shields.io/badge/python-3.9%2B-blue)
-![Badge de Framework](https://img.shields.io/badge/flask-2.x-orange)
+![Badge de Framework](https://img.shields.io/badge/flask-3.x-orange)
 ![Badge de Banco de Dados](https://img.shields.io/badge/database-PostgreSQL%20%7C%20MySQL-purple)
 
 Web Finance é um sistema web completo para gestão e análise de finanças pessoais, desenvolvido para centralizar todas as informações financeiras de um usuário em um único lugar, oferecendo clareza, controle e previsibilidade.
@@ -30,7 +30,7 @@ O sistema foi construído de forma modular, com uma gama completa de funcionalid
 - **⚙️ Painéis de Ação:**
   - **Painel de Pagamentos:** Centraliza todas as contas a pagar (Despesas, Faturas, Parcelas de Financiamento) de um mês específico, permitindo registrar pagamentos.
   - **Painel de Recebimentos:** Centraliza todas as contas a receber (Receitas, Salário, Benefícios) de um mês específico, permitindo registrar recebimentos.
-- **🎨 Gráficos:** Visualização de dados financeiros através de gráficos (requer configuração/implementação adicional).
+- **🎨 Gráficos:** Visualização de dados financeiros através de gráficos (Chart.js integrado).
 
 ---
 
@@ -40,7 +40,7 @@ Este projeto foi construído utilizando as seguintes tecnologias e padrões:
 
 - **Backend:**
   - **Linguagem:** Python 3
-  - **Framework:** Flask
+  - **Framework:** Flask 3.x
   - **ORM:** SQLAlchemy com Flask-SQLAlchemy
   - **Migrations:** Flask-Migrate (Alembic)
   - **Autenticação:** Flask-Login
@@ -54,8 +54,8 @@ Este projeto foi construído utilizando as seguintes tecnologias e padrões:
   - **Gráficos:** Chart.js (via CDN no `base.html`)
   - **Seletores de Data:** Flatpickr (via CDN no `base.html`)
 - **Banco de Dados:**
-  - PostgreSQL (configuração padrão)
-  - MySQL (suportado via SQLAlchemy, requer ajuste na `DATABASE_URL`)
+  - PostgreSQL (configuração padrão recomendada)
+  - MySQL (suportado via SQLAlchemy e `mysql-connector-python`)
 - **Arquitetura:**
   - Padrão próximo ao MVC (Model-View-Controller adaptado ao Flask com Blueprints)
   - Estrutura em Camadas (Rotas/Views, Serviços, Modelos/Dados)
@@ -110,13 +110,13 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente de de
       SECRET_KEY='sua_chave_secreta_aqui_bem_longa_e_segura'
 
       # Exemplo para PostgreSQL (recomendado):
-      DATABASE_URL='postgresql://SEU_USUARIO:SUA_SENHA@localhost:5432/web_finance_db'
+      # DATABASE_URL='postgresql://SEU_USUARIO:SUA_SENHA@localhost:5432/web_finance_db'
 
       # Exemplo para MySQL (alternativa):
-      # DATABASE_URL='mysql+mysqlconnector://SEU_USUARIO:SUA_SENHA@localhost:3306/web_finance_db'
+      DATABASE_URL='mysql+mysqlconnector://SEU_USUARIO:SUA_SENHA@localhost:3306/web_finance_db'
       ```
 
-    - **Importante:** Garanta que o driver apropriado (`psycopg2-binary` para PostgreSQL ou `mysql-connector-python` para MySQL) esteja listado no `requirements.txt` e instalado.
+    - **Importante:** O arquivo `requirements.txt` atual inclui o driver `mysql-connector-python`. Se for utilizar PostgreSQL, instale o driver correspondente: `pip install psycopg2-binary`.
 
 5.  **Aplique as migrações do banco de dados:**
 
